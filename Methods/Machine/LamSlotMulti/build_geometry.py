@@ -32,11 +32,9 @@ def build_geometry(self, sym=1, alpha=0, delta=0):
 
     """
 
-    # getting Number of Slot
-    Zs = self.get_Zs()
-
     # Check for symmetry
-    assert (Zs % sym) == 0
+    for Zs in self.get_Zs_slot_list():
+        assert (Zs % sym) == 0
 
     if self.is_stator:
         ll = "Stator"  # Label lamination

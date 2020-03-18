@@ -8,8 +8,8 @@ from pyleecan.Classes.Arc1 import Arc1
 from pyleecan.Classes.Segment import Segment
 
 
-def get_Zs(self):
-    """Return the number of Slot of the Lamination
+def get_Zs_slot_list(self):
+    """Return the number of slots of the individual slot in the list
 
     Parameters
     ----------
@@ -18,9 +18,13 @@ def get_Zs(self):
 
     Returns
     -------
-    Zs : float
+    Zs_list : list
         Number of Slot
 
     """
 
-    return sum(self.get_Zs_slot_list())
+    Zs_list = list()
+    for slot in self.slot_list:
+        Zs_list.append(slot.Zs)
+
+    return Zs_list

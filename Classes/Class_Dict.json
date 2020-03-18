@@ -2296,6 +2296,7 @@
             "plot",
             "comp_height_yoke",
             "get_Zs",
+            "get_Zs_slot_list",
             "get_bore_desc"
         ],
         "mother": "Lamination",
