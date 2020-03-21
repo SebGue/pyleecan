@@ -102,6 +102,11 @@ try:
 except ImportError as error:
     get_notch_list = error
 
+try:
+    from pyleecan.Methods.Machine.Lamination.get_bore_desc import get_bore_desc
+except ImportError as error:
+    get_bore_desc = error
+
 
 from pyleecan.Classes._check import InitUnKnowClassError
 from pyleecan.Classes.Material import Material
@@ -309,6 +314,17 @@ class Lamination(FrozenClass):
         )
     else:
         get_notch_list = get_notch_list
+    # cf Methods.Machine.Lamination.get_bore_desc
+    if isinstance(get_bore_desc, ImportError):
+        get_bore_desc = property(
+            fget=lambda x: raise_(
+                ImportError(
+                    "Can't use Lamination method get_bore_desc: " + str(get_bore_desc)
+                )
+            )
+        )
+    else:
+        get_bore_desc = get_bore_desc
     # save method is available in all object
     save = save
 

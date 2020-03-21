@@ -67,8 +67,17 @@ def build_geometry(self, sym=1, alpha=0, delta=0):
         for line in Slot_lines:
             line.rotate(slot_pitch / 2)
         # Generate all the Slot and Bore lines
-        a0 = slot_pitch - t_angle / 2
-        a1 = slot_pitch + t_angle / 2
+        _line_list = self.get_bore_line(sym=sym)
+        line_list = list()
+        # Duplicate and rotate the slot + bore for each slot
+        for line in _line_list:
+            new_line = type(line)(init_dict=line.as_dict())
+            #new_line.rotate(-1 * slot_pitch / 2)
+            line_list.append(new_line)
+
+        """
+        # a0 = slot_pitch - t_angle / 2
+        # a1 = slot_pitch + t_angle / 2
         line_list = list()
         for ii in range(Zs // sym):
             # Duplicate and rotate the slot + bore for each slot
@@ -78,6 +87,7 @@ def build_geometry(self, sym=1, alpha=0, delta=0):
                 line_list.append(new_line)
             bore_lines = self.get_bore_line(a0 + ii * slot_pitch, a1 + ii * slot_pitch)
             line_list.extend(bore_lines)
+        """
     else:  # No slot
         return build_geo(self, sym=sym, alpha=alpha, delta=delta)
 
@@ -111,17 +121,18 @@ def build_geometry(self, sym=1, alpha=0, delta=0):
             surf_list.append(surf_slot)
     else:  # Only one surface
         # Modify the bore radius
-        if len(bore_lines) > 0:
-            line_list.pop(-1)
-            start_angle = angle(line_list[-1].get_end())
-            line_list.extend(
-                self.get_bore_line(
-                    start_angle, start_angle + t_angle / 2, label="Bore_Line"
-                )
+        """
+        line_list.pop(-1)
+        start_angle = angle(line_list[-1].get_end())
+        line_list.extend(
+            self.get_bore_line(
+                start_angle, start_angle + t_angle / 2, label="Bore_Line"
             )
-            line_list.insert(
-                0, self.get_bore_line(0, t_angle / 2, label="Bore_Line")[0]
-            )
+        )
+        line_list.insert(
+            0, self.get_bore_line(0, t_angle / 2, label="Bore_Line")[0]
+        )
+        """
         # Add the Yoke part
         Zy1 = Ryoke
         Zy2 = Ryoke * exp(1j * 2 * pi / sym)

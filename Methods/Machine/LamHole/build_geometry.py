@@ -63,7 +63,7 @@ def build_geometry(self, sym=1, alpha=0, delta=0, is_simplified=False):
         if self.bore is None:
             surf_list.append(
                 SurfLine(
-                    line_list=self.get_bore_line(0, 2 * pi, label=label_bore),
+                    line_list=self.get_bore_line(sym=sym, label=label_bore),
                     label="Lamination_" + label + "_Bore_" + label1,
                     point_ref=ref_point,
                 )
@@ -94,7 +94,7 @@ def build_geometry(self, sym=1, alpha=0, delta=0, is_simplified=False):
         Z_begin = Ryoke * exp(1j * alpha_begin)
         Z_end = Ryoke * exp(1j * alpha_end)
         line_list = [Segment(Z_begin, begin, label=label + "_Yoke_Side")]
-        bore_line = self.get_bore_line(alpha_begin, alpha_end, label=label_bore)
+        bore_line = self.get_bore_line(sym=sym, label=label_bore)
         for line in bore_line:
             line_list.append(line)
         line_list.append(Segment(end, Z_end, label=label + "_Yoke_Side"))

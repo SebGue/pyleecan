@@ -28,7 +28,7 @@ def _get_bore_desc(lam, sym=1):
         alphas = lam.alpha
     elif hasattr(lam, "slot"):
         slots = [lam.slot]
-        alphas = [0]
+        alphas = [pi / lam.slot.Zs]
     else:
         slots = []
         alphas = []
@@ -53,12 +53,44 @@ def _get_bore_desc(lam, sym=1):
 
     # Add all the bore lines
     bore_desc = list()
-    for ii, desc in enumerate(merged_list):
-        bore_desc.append(desc)
-        if ii != len(merged_list) - 1:
+    # if lamination has slots and/or notches
+    if merged_list:
+        for ii, desc in enumerate(merged_list):
+            bore_desc.append(desc)
+            if ii != len(merged_list) - 1:
+                bore_dict = dict()
+                bore_dict["begin_angle"] = merged_list[ii]["end_angle"]
+                bore_dict["end_angle"] = merged_list[ii + 1]["begin_angle"]
+                bore_dict["obj"] = Arc1(
+                    begin=Rbo * exp(1j * bore_dict["begin_angle"]),
+                    end=Rbo * exp(1j * bore_dict["end_angle"]),
+                    radius=Rbo,
+                    is_trigo_direction=True,
+                )
+                bore_desc.append(bore_dict)
+    
+        # Add last bore line
+        if sym == 1:
             bore_dict = dict()
-            bore_dict["begin_angle"] = merged_list[ii]["end_angle"]
-            bore_dict["end_angle"] = merged_list[ii + 1]["begin_angle"]
+            bore_dict["begin_angle"] = merged_list[-1]["end_angle"]
+            bore_dict["end_angle"] = merged_list[0]["begin_angle"]
+            bore_dict["obj"] = Arc1(
+                begin=Rbo * exp(1j * bore_dict["begin_angle"]),
+                end=Rbo * exp(1j * bore_dict["end_angle"]),
+                radius=Rbo,
+                is_trigo_direction=True,
+            )
+            if merged_list[0]["begin_angle"] < 0:
+                # First element is an slot or notch
+                bore_desc.append(bore_dict)
+            else:
+                # First element is a bore line
+                bore_desc.insert(0, bore_dict)
+        else:  # With symmetry
+            # Add last bore line
+            bore_dict = dict()
+            bore_dict["begin_angle"] = merged_list[-1]["end_angle"]
+            bore_dict["end_angle"] = 2 * pi / sym
             bore_dict["obj"] = Arc1(
                 begin=Rbo * exp(1j * bore_dict["begin_angle"]),
                 end=Rbo * exp(1j * bore_dict["end_angle"]),
@@ -67,45 +99,54 @@ def _get_bore_desc(lam, sym=1):
             )
             bore_desc.append(bore_dict)
 
-    # Add last bore line
-    if sym == 1:
-        bore_dict = dict()
-        bore_dict["begin_angle"] = merged_list[-1]["end_angle"]
-        bore_dict["end_angle"] = merged_list[0]["begin_angle"]
-        bore_dict["obj"] = Arc1(
-            begin=Rbo * exp(1j * bore_dict["begin_angle"]),
-            end=Rbo * exp(1j * bore_dict["end_angle"]),
-            radius=Rbo,
-            is_trigo_direction=True,
-        )
-        if merged_list[0]["begin_angle"] < 0:
-            # First element is an slot or notch
+            # Add first bore line
+            bore_dict = dict()
+            bore_dict["begin_angle"] = 0
+            bore_dict["end_angle"] = merged_list[0]["begin_angle"]
+            bore_dict["obj"] = Arc1(
+                begin=Rbo * exp(1j * bore_dict["begin_angle"]),
+                end=Rbo * exp(1j * bore_dict["end_angle"]),
+                radius=Rbo,
+                is_trigo_direction=True,
+            )
+            bore_desc.insert(0, bore_dict)
+    
+    # if lamination has no notches or slots
+    else:
+        if sym == 1:
+            # first half circle
+            bore_dict = dict()
+            bore_dict["begin_angle"] = 0
+            bore_dict["end_angle"] = pi
+            bore_dict["obj"] = Arc1(
+                    begin=Rbo * exp(1j * bore_dict["begin_angle"]),
+                    end=Rbo * exp(1j * bore_dict["end_angle"]),
+                    radius=Rbo,
+                    is_trigo_direction=True,
+                )
+            bore_desc.append(bore_dict)
+            # second half circle
+            bore_dict = dict()
+            bore_dict["begin_angle"] = pi
+            bore_dict["end_angle"] = 2 * pi
+            bore_dict["obj"] = Arc1(
+                    begin=Rbo * exp(1j * bore_dict["begin_angle"]),
+                    end=Rbo * exp(1j * bore_dict["end_angle"]),
+                    radius=Rbo,
+                    is_trigo_direction=True,
+                )
             bore_desc.append(bore_dict)
         else:
-            # First element is a bore line
-            bore_desc.insert(0, bore_dict)
-    else:  # With symmetry
-        # Add last bore line
-        bore_dict = dict()
-        bore_dict["begin_angle"] = merged_list[-1]["end_angle"]
-        bore_dict["end_angle"] = 2 * pi / sym
-        bore_dict["obj"] = Arc1(
-            begin=Rbo * exp(1j * bore_dict["begin_angle"]),
-            end=Rbo * exp(1j * bore_dict["end_angle"]),
-            radius=Rbo,
-            is_trigo_direction=True,
-        )
-        bore_desc.append(bore_dict)
+            bore_dict = dict()
+            bore_dict["begin_angle"] = 0
+            bore_dict["end_angle"] = 2 * pi / sym
+            bore_dict["obj"] = Arc1(
+                    begin=Rbo * exp(1j * bore_dict["begin_angle"]),
+                    end=Rbo * exp(1j * bore_dict["end_angle"]),
+                    radius=Rbo,
+                    is_trigo_direction=True,
+                )
+            bore_desc.append(bore_dict)
+            
 
-        # Add first bore line
-        bore_dict = dict()
-        bore_dict["begin_angle"] = 0
-        bore_dict["end_angle"] = merged_list[0]["begin_angle"]
-        bore_dict["obj"] = Arc1(
-            begin=Rbo * exp(1j * bore_dict["begin_angle"]),
-            end=Rbo * exp(1j * bore_dict["end_angle"]),
-            radius=Rbo,
-            is_trigo_direction=True,
-        )
-        bore_desc.insert(0, bore_dict)
     return bore_desc

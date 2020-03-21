@@ -10,7 +10,7 @@ from pyleecan.Classes.Arc3 import Arc3
 from pyleecan.Methods import NotImplementedYetError
 
 
-def get_bore_line(self, alpha1, alpha2, label="", ignore_notches=False):
+def get_bore_line(self, sym=1, label=""):
     """
 
     Parameters
@@ -30,39 +30,16 @@ def get_bore_line(self, alpha1, alpha2, label="", ignore_notches=False):
         list of bore line
 
     """
-    delta = alpha2 - alpha1
-
-    if delta == 0:
-        return []
-
-    elif delta > 2 * pi:
-        raise NotImplementedYetError(
-            "Only angle smaller/equal to 2*pi are implemented."
-        )
-    else:
-        # ignore_notches = 1
-        if not self.notch or ignore_notches:
-            Rbo = self.get_Rbo()
-            Z1 = Rbo * exp(1j * alpha1)
-            if delta == 2 * pi:
-                Z2 = Rbo * exp(1j * (alpha1 + delta / 2))
-                line1 = Arc3(begin=Z1, end=Z2, is_trigo_direction=True, label=label)
-                line2 = Arc3(begin=Z2, end=Z1, is_trigo_direction=True, label=label)
-                return [line1, line2]
-            else:
-                Z2 = Rbo * exp(1j * alpha2)
-                return [Arc1(begin=Z1, end=Z2, radius=Rbo, label=label)]
+    # adapted from LamSlotMulti.build_geometry
+    bore_desc = self.get_bore_desc(sym=sym)
+    bore_list = list()
+    for bore in bore_desc:
+        if type(bore["obj"]) is Arc1:
+            bore_list.append(bore["obj"])
         else:
-            # === intermediate solution ========================================
-            # no check for intersection of different notches
-            line_list = self.notch[0].build_geometry(alpha1, alpha2, label=label)
-            # === later =======================================================
-            """
-            bore_line = self.get_bore_line(alpha1, alpha2, ignore_notches=True)
-            for notch in notch_shape:
-                notch_line = notch.build_geometry()
-                bore_line = build_intersect_geometry(bore_line, notch_line,
-                                            inwards=True)
-            """
+            lines = bore["obj"].build_geometry()
+            for line in lines:
+                line.rotate((bore["begin_angle"] + bore["end_angle"]) / 2)
+            bore_list.extend(lines)
 
-            return line_list
+    return bore_list
