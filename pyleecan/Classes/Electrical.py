@@ -79,7 +79,7 @@ class Electrical(FrozenClass):
     # get_logger method is available in all object
     get_logger = get_logger
 
-    def __init__(self, eec=None, init_dict=None, init_str=None):
+    def __init__(self, eec=None, is_comp_torque=False, init_dict=None, init_str=None):
         """Constructor of the class. Can be use in three ways :
         - __init__ (arg1 = 1, arg3 = 5) every parameters have name and default values
             for pyleecan type, -1 will call the default constructor
@@ -97,9 +97,12 @@ class Electrical(FrozenClass):
             # Overwrite default value with init_dict content
             if "eec" in list(init_dict.keys()):
                 eec = init_dict["eec"]
+            if "is_comp_torque" in list(init_dict.keys()):
+                is_comp_torque = init_dict["is_comp_torque"]
         # Set the properties (value check and convertion are done in setter)
         self.parent = None
         self.eec = eec
+        self.is_comp_torque = is_comp_torque
 
         # The class is frozen, for now it's impossible to add new properties
         self._freeze()
@@ -117,6 +120,7 @@ class Electrical(FrozenClass):
             Electrical_str += "eec = " + tmp
         else:
             Electrical_str += "eec = None" + linesep + linesep
+        Electrical_str += "is_comp_torque = " + str(self.is_comp_torque) + linesep
         return Electrical_str
 
     def __eq__(self, other):
@@ -125,6 +129,8 @@ class Electrical(FrozenClass):
         if type(other) != type(self):
             return False
         if other.eec != self.eec:
+            return False
+        if other.is_comp_torque != self.is_comp_torque:
             return False
         return True
 
@@ -136,6 +142,7 @@ class Electrical(FrozenClass):
             Electrical_dict["eec"] = None
         else:
             Electrical_dict["eec"] = self.eec.as_dict()
+        Electrical_dict["is_comp_torque"] = self.is_comp_torque
         # The class name is added to the dict fordeserialisation purpose
         Electrical_dict["__class__"] = "Electrical"
         return Electrical_dict
@@ -145,6 +152,7 @@ class Electrical(FrozenClass):
 
         if self.eec is not None:
             self.eec._set_None()
+        self.is_comp_torque = None
 
     def _get_eec(self):
         """getter of eec"""
@@ -171,5 +179,23 @@ class Electrical(FrozenClass):
         doc=u"""Electrical Equivalent Circuit
 
         :Type: EEC
+        """,
+    )
+
+    def _get_is_comp_torque(self):
+        """getter of is_comp_torque"""
+        return self._is_comp_torque
+
+    def _set_is_comp_torque(self, value):
+        """setter of is_comp_torque"""
+        check_var("is_comp_torque", value, "bool")
+        self._is_comp_torque = value
+
+    is_comp_torque = property(
+        fget=_get_is_comp_torque,
+        fset=_set_is_comp_torque,
+        doc=u"""Iteratively compute currents and voltages coressponding to reference torque
+
+        :Type: bool
         """,
     )

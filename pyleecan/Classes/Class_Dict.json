@@ -1001,6 +1001,15 @@
                 "type": "EEC",
                 "unit": "-",
                 "value": null
+            },
+            {
+                "desc": "Iteratively compute currents and voltages coressponding to reference torque",
+                "max": "",
+                "min": "",
+                "name": "is_comp_torque",
+                "type": "bool",
+                "unit": "",
+                "value": false
             }
         ]
     },
