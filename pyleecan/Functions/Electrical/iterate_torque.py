@@ -6,8 +6,9 @@ from pprint import pprint
 
 # TODO some variable to be moved to Electrical class
 is_update_parameters = False  # update parameters to estimated OP
-max_current = 1000  # [A] max. current magnitude
-max_voltage = 1000  # [V] max. voltage magnitude
+max_current = 5000  # [A] max. current magnitude
+max_voltage = 563.38  # [V] max. voltage magnitude
+TOL = 1e-3  # [] aceptable tolerance of current difference
 
 
 def _comp_voltage(I, elec, output):
@@ -23,15 +24,9 @@ def _comp_voltage(I, elec, output):
     # set currents
     param["Id"] = I[0]
     param["Iq"] = I[1]
+    output.elec.Is = None
     output.elec.Id_ref = I[0]
     output.elec.Iq_ref = I[1]
-
-    # adapt flux
-    if "Ld" in param and param["Ld"]:
-        param["Phid"] = param["phi"] + I[0] * param["Ld"]
-
-    if "Lq" in param and param["Lq"]:
-        param["Phiq"] = I[1] * param["Lq"]
 
     # Solve the electrical equivalent circuit
     elec.eec.solve_EEC(output)
@@ -71,8 +66,8 @@ def iterate_torque(elec, output):
     # Compute first set of parameters of the electrical equivalent circuit
     elec.eec.comp_parameters(output)
 
-    pprint(elec.eec.parameters)
-    print(output.elec.Id_ref, output.elec.Iq_ref)
+    # pprint(elec.eec.parameters)
+    # print(output.elec.Id_ref, output.elec.Iq_ref)
 
     # Solve the electrical equivalent circuit
     # elec.eec.solve_EEC(output)
@@ -97,8 +92,8 @@ def iterate_torque(elec, output):
     )
 
     cons = (
-        # {"type": "ineq", "fun": max_current_constrain},
-        # {"type": "ineq", "fun": max_voltage_constrain},
+        {"type": "ineq", "fun": max_current_constrain},
+        {"type": "ineq", "fun": max_voltage_constrain},
         {"type": "ineq", "fun": torque_constrain},
     )
 
@@ -106,6 +101,65 @@ def iterate_torque(elec, output):
 
     # res = minimize(objectiv, x_start, method='trust-constr', constraints = cons, bounds = bnds) #slower than  SLSQP
     res = minimize(objectiv, x_start, method="SLSQP", constraints=cons, bounds=bnds)
+
+    if res.success == True:
+        # final solve needed ???
+        # _comp_voltage(res.x, elec, output)
+        if is_update_parameters:
+            pass
+            """ Does not work ATM
+            # store actual I_ref values
+            Id_ref = output.elec.Id_ref
+            Iq_ref = output.elec.Iq_ref
+            I = abs(Id_ref + 1j * Iq_ref)
+
+            DO_ITER = True
+            i = 0
+            while DO_ITER:  # TODO test parameter diff. instead ??? maybe not good
+                i += 1
+                print("Parameter Iteration " + str(i))
+                # recompute parameters
+                # TODO improve by comp. diff. ind. around OP -> iterate over diff ind first -> have Ld/Lq adaption function
+                elec.eec.parameters["Id"] = None  # to force recomp.
+                elec.eec.parameters["Iq"] = None
+                # print(output.elec.Id_ref, output.elec.Iq_ref)
+                elec.eec.comp_parameters(output)
+                pprint(elec.eec.parameters)
+                print(output.elec.Id_ref, output.elec.Iq_ref)
+
+                # recompute electrical quantities
+                x_start = res.x
+                res = minimize(
+                    objectiv, x_start, method="SLSQP", constraints=cons, bounds=bnds
+                )
+
+                print(output.elec.Id_ref, output.elec.Iq_ref)
+
+                # print(res.x)
+                if res.success == False:
+                    DO_ITER = False
+                else:
+                    Id_ref_ = output.elec.Id_ref
+                    Iq_ref_ = output.elec.Iq_ref
+                    cond_1 = abs(Id_ref - Id_ref_) <= (TOL * abs(Id_ref) + TOL * I)
+                    cond_2 = abs(Iq_ref - Iq_ref_) <= (TOL * abs(Iq_ref) + TOL * I)
+                    # print(cond_1, cond_2)
+                    # print(Id_ref, Id_ref_, Iq_ref, Iq_ref_)
+                    if cond_1 and cond_2:
+                        DO_ITER = False
+                    else:
+                        # adapt for (more) stable iteration
+                        k = 0.1
+                        output.elec.Id_ref = k * Id_ref_ + (1 - k) * Id_ref
+                        output.elec.Iq_ref = k * Iq_ref_ + (1 - k) * Iq_ref
+
+                        Id_ref = Id_ref_
+                        Iq_ref = Iq_ref_
+                        I = abs(Id_ref + 1j * Iq_ref)
+            """
+
+        output.elec.Is = None
+        output.elec.Is = output.elec.get_Is()
 
     if res.success == False:
         print("False")
@@ -115,7 +169,3 @@ def iterate_torque(elec, output):
         output.elec.Ud_ref = None
         output.elec.Uq_ref = None
         output.elec.Us = None
-    else:
-        # final solve
-        # _comp_voltage(res.x, elec, output)
-        pass
