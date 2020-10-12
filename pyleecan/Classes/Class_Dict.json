@@ -971,6 +971,15 @@
                 "type": "Drive",
                 "unit": "-",
                 "value": null
+            },
+            {
+                "desc": "Keep model parameters (exept currents and voltages) once they are set, i.e. parameters won't be recomputed by comp_parameter method",
+                "max": "",
+                "min": "",
+                "name": "is_keep_parameter",
+                "type": "bool",
+                "unit": "",
+                "value": false
             }
         ]
     },
@@ -10110,7 +10119,7 @@
                 "value": null
             },
             {
-                "desc": "Select with kind of OP_matrix is used 0: (N0,I0,Phi0,T,P), 1:(N0,Id,Iq,T,P) ",
+                "desc": "Select which kind of OP_matrix is used 0: (N0,I0,Phi0,T,P), 1:(N0,Id,Iq,T,P) ",
                 "max": "1",
                 "min": "0",
                 "name": "type_OP_matrix",
