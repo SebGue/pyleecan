@@ -27,6 +27,8 @@ def run(self):
 
         # Compute the reference simulation
         if self.var_simu.ref_simu_index is None:
+            logger = self.get_logger()
+            logger.info("Computing reference simulation")
             self.run_single()
 
         # Compute the multisimulation
