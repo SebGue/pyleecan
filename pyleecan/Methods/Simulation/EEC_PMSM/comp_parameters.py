@@ -18,37 +18,32 @@ def comp_parameters(self, output):
     # Parameters to compute only once
     if "R20" not in PAR:
         PAR["R20"] = output.simu.machine.stator.comp_resistance_wind()
-    if "phi" not in PAR:
-        PAR["phi"] = self.fluxlink.comp_fluxlinkage(output)
+    if "Phi" not in PAR:
+        PAR["Phi"] = self.fluxlink.comp_fluxlinkage(output)
 
     # Parameters which may vary for each simulation
     is_comp_ind = False
     # check for complete parameter set
     # (there may be some redundancy here but it seems simplier to implement)
-    if not all(k in PAR for k in ("Phid", "Phiq", "Ld", "Lq")):
+    if not all(k in PAR for k in ("Ld", "Lq")):
         is_comp_ind = True
 
-    # check for d- and q-current (change)
+    # check for d- and q-current (change) and set modell currents accordingly
     if "Id" not in PAR or PAR["Id"] != output.elec.Id_ref:
         PAR["Id"] = output.elec.Id_ref
-        is_comp_ind = True
+        if not self.is_keep_parameter:
+            is_comp_ind = True
 
     if "Iq" not in PAR or PAR["Iq"] != output.elec.Iq_ref:
         PAR["Iq"] = output.elec.Iq_ref
-        is_comp_ind = True
+        if not self.is_keep_parameter:
+            is_comp_ind = True
 
     # compute inductance if nessessary
     if is_comp_ind:
         (phid, phiq) = self.indmag.comp_inductance(output)
         if PAR["Id"] != 0:
-            PAR["Ld"] = (phid - PAR["phi"]) / PAR["Id"]
-        else:
-            PAR["Ld"] = None  # to have the parameters complete though
+            PAR["Ld"] = (phid - PAR["Phi"]) / PAR["Id"]
 
         if PAR["Iq"] != 0:
             PAR["Lq"] = phiq / PAR["Iq"]
-        else:
-            PAR["Lq"] = None  # to have the parameters complete though
-
-        PAR["Phid"] = phid
-        PAR["Phiq"] = phiq

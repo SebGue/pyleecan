@@ -103,6 +103,7 @@ class EEC_PMSM(EEC):
         parameters=-1,
         freq0=None,
         drive=None,
+        is_keep_parameter=False,
         init_dict=None,
         init_str=None,
     ):
@@ -131,12 +132,15 @@ class EEC_PMSM(EEC):
                 freq0 = init_dict["freq0"]
             if "drive" in list(init_dict.keys()):
                 drive = init_dict["drive"]
+            if "is_keep_parameter" in list(init_dict.keys()):
+                is_keep_parameter = init_dict["is_keep_parameter"]
         # Set the properties (value check and convertion are done in setter)
         self.indmag = indmag
         self.fluxlink = fluxlink
         self.parameters = parameters
         self.freq0 = freq0
         self.drive = drive
+        self.is_keep_parameter = is_keep_parameter
         # Call EEC init
         super(EEC_PMSM, self).__init__()
         # The class is frozen (in EEC init), for now it's impossible to
@@ -165,6 +169,7 @@ class EEC_PMSM(EEC):
             EEC_PMSM_str += "drive = " + tmp
         else:
             EEC_PMSM_str += "drive = None" + linesep + linesep
+        EEC_PMSM_str += "is_keep_parameter = " + str(self.is_keep_parameter) + linesep
         return EEC_PMSM_str
 
     def __eq__(self, other):
@@ -186,6 +191,8 @@ class EEC_PMSM(EEC):
             return False
         if other.drive != self.drive:
             return False
+        if other.is_keep_parameter != self.is_keep_parameter:
+            return False
         return True
 
     def as_dict(self):
@@ -201,12 +208,15 @@ class EEC_PMSM(EEC):
             EEC_PMSM_dict["fluxlink"] = None
         else:
             EEC_PMSM_dict["fluxlink"] = self.fluxlink.as_dict()
-        EEC_PMSM_dict["parameters"] = self.parameters
+        EEC_PMSM_dict["parameters"] = (
+            self.parameters.copy() if self.parameters is not None else None
+        )
         EEC_PMSM_dict["freq0"] = self.freq0
         if self.drive is None:
             EEC_PMSM_dict["drive"] = None
         else:
             EEC_PMSM_dict["drive"] = self.drive.as_dict()
+        EEC_PMSM_dict["is_keep_parameter"] = self.is_keep_parameter
         # The class name is added to the dict fordeserialisation purpose
         # Overwrite the mother class name
         EEC_PMSM_dict["__class__"] = "EEC_PMSM"
@@ -223,6 +233,7 @@ class EEC_PMSM(EEC):
         self.freq0 = None
         if self.drive is not None:
             self.drive._set_None()
+        self.is_keep_parameter = None
         # Set to None the properties inherited from EEC
         super(EEC_PMSM, self)._set_None()
 
@@ -351,5 +362,23 @@ class EEC_PMSM(EEC):
         doc=u"""Drive
 
         :Type: Drive
+        """,
+    )
+
+    def _get_is_keep_parameter(self):
+        """getter of is_keep_parameter"""
+        return self._is_keep_parameter
+
+    def _set_is_keep_parameter(self, value):
+        """setter of is_keep_parameter"""
+        check_var("is_keep_parameter", value, "bool")
+        self._is_keep_parameter = value
+
+    is_keep_parameter = property(
+        fget=_get_is_keep_parameter,
+        fset=_set_is_keep_parameter,
+        doc=u"""Keep model parameters (exept currents and voltages) once they are set, i.e. parameters won't be recomputed by comp_parameter method
+
+        :Type: bool
         """,
     )

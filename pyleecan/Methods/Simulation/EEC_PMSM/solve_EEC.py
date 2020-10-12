@@ -26,34 +26,38 @@ def solve_EEC(self, output):
     output : Output
         an Output object
     """
-
+    # readability
     felec = output.elec.felec
     ws = 2 * pi * felec
+    R = self.parameters["R20"]
+    Ld = self.parameters["Ld"]
+    Lq = self.parameters["Lq"]
+
+    Phi = self.parameters["Phi"]
 
     # Prepare linear system
 
     # Solve system
     if "Ud" in self.parameters:
+        Ud = self.parameters["Ud"]
+        Uq = self.parameters["Uq"]
+
         XR = array(
             [
-                [self.parameters["R20"], -ws * self.parameters["Lq"]],
-                [ws * self.parameters["Ld"], self.parameters["R20"]],
+                [R, -ws * Lq],
+                [ws * Ld, R],
             ]
         )
-        XE = array([0, ws * self.parameters["phi"]])
-        XU = array([self.parameters["Ud"], self.parameters["Uq"]])
+        XE = array([0, ws * Phi])
+        XU = array([Ud, Uq])
         XI = solve(XR, XU - XE)
         output.elec.Id_ref = XI[0]
         output.elec.Iq_ref = XI[1]
     else:
-        output.elec.Ud_ref = (
-            self.parameters["R20"] * self.parameters["Id"]
-            - ws * self.parameters["Phiq"]
-        )
-        output.elec.Uq_ref = (
-            self.parameters["R20"] * self.parameters["Iq"]
-            + ws * self.parameters["Phid"]
-        )
+        Id = self.parameters["Id"]
+        Iq = self.parameters["Iq"]
+        output.elec.Ud_ref = R * Id - ws * Lq * Iq
+        output.elec.Uq_ref = R * Iq + ws * Ld * Id + ws * Phi
 
     # Compute currents
     output.elec.Is = None
