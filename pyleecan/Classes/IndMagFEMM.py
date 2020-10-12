@@ -171,7 +171,9 @@ class IndMagFEMM(IndMag):
 
         # Get the properties inherited from IndMag
         IndMagFEMM_dict = super(IndMagFEMM, self).as_dict()
-        IndMagFEMM_dict["FEMM_dict"] = self.FEMM_dict
+        IndMagFEMM_dict["FEMM_dict"] = (
+            self.FEMM_dict.copy() if self.FEMM_dict is not None else None
+        )
         IndMagFEMM_dict["type_calc_leakage"] = self.type_calc_leakage
         IndMagFEMM_dict["is_sliding_band"] = self.is_sliding_band
         IndMagFEMM_dict["is_symmetry_a"] = self.is_symmetry_a
@@ -179,7 +181,7 @@ class IndMagFEMM(IndMag):
         IndMagFEMM_dict["is_antiper_a"] = self.is_antiper_a
         IndMagFEMM_dict["Nt_tot"] = self.Nt_tot
         IndMagFEMM_dict["Kgeo_fineness"] = self.Kgeo_fineness
-        # The class name is added to the dict fordeserialisation purpose
+        # The class name is added to the dict for deserialisation purpose
         # Overwrite the mother class name
         IndMagFEMM_dict["__class__"] = "IndMagFEMM"
         return IndMagFEMM_dict

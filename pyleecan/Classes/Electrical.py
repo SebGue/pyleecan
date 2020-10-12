@@ -143,7 +143,7 @@ class Electrical(FrozenClass):
         else:
             Electrical_dict["eec"] = self.eec.as_dict()
         Electrical_dict["is_comp_torque"] = self.is_comp_torque
-        # The class name is added to the dict fordeserialisation purpose
+        # The class name is added to the dict for deserialisation purpose
         Electrical_dict["__class__"] = "Electrical"
         return Electrical_dict
 

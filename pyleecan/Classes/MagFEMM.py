@@ -351,7 +351,9 @@ class MagFEMM(Magnetics):
         MagFEMM_dict["Kgeo_fineness"] = self.Kgeo_fineness
         MagFEMM_dict["type_calc_leakage"] = self.type_calc_leakage
         MagFEMM_dict["file_name"] = self.file_name
-        MagFEMM_dict["FEMM_dict"] = self.FEMM_dict
+        MagFEMM_dict["FEMM_dict"] = (
+            self.FEMM_dict.copy() if self.FEMM_dict is not None else None
+        )
         MagFEMM_dict["angle_stator"] = self.angle_stator
         MagFEMM_dict["is_get_mesh"] = self.is_get_mesh
         MagFEMM_dict["is_save_FEA"] = self.is_save_FEA
@@ -367,7 +369,7 @@ class MagFEMM(Magnetics):
             MagFEMM_dict["stator_dxf"] = self.stator_dxf.as_dict()
         MagFEMM_dict["import_file"] = self.import_file
         MagFEMM_dict["is_close_femm"] = self.is_close_femm
-        # The class name is added to the dict fordeserialisation purpose
+        # The class name is added to the dict for deserialisation purpose
         # Overwrite the mother class name
         MagFEMM_dict["__class__"] = "MagFEMM"
         return MagFEMM_dict

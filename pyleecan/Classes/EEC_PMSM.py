@@ -217,7 +217,7 @@ class EEC_PMSM(EEC):
         else:
             EEC_PMSM_dict["drive"] = self.drive.as_dict()
         EEC_PMSM_dict["is_keep_parameter"] = self.is_keep_parameter
-        # The class name is added to the dict fordeserialisation purpose
+        # The class name is added to the dict for deserialisation purpose
         # Overwrite the mother class name
         EEC_PMSM_dict["__class__"] = "EEC_PMSM"
         return EEC_PMSM_dict

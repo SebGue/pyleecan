@@ -185,13 +185,15 @@ class EEC_SCIM(EEC):
             EEC_SCIM_dict["indmag"] = None
         else:
             EEC_SCIM_dict["indmag"] = self.indmag.as_dict()
-        EEC_SCIM_dict["parameters"] = self.parameters
+        EEC_SCIM_dict["parameters"] = (
+            self.parameters.copy() if self.parameters is not None else None
+        )
         EEC_SCIM_dict["freq0"] = self.freq0
         if self.drive is None:
             EEC_SCIM_dict["drive"] = None
         else:
             EEC_SCIM_dict["drive"] = self.drive.as_dict()
-        # The class name is added to the dict fordeserialisation purpose
+        # The class name is added to the dict for deserialisation purpose
         # Overwrite the mother class name
         EEC_SCIM_dict["__class__"] = "EEC_SCIM"
         return EEC_SCIM_dict

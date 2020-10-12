@@ -173,7 +173,9 @@ class FluxLinkFEMM(FluxLink):
 
         # Get the properties inherited from FluxLink
         FluxLinkFEMM_dict = super(FluxLinkFEMM, self).as_dict()
-        FluxLinkFEMM_dict["FEMM_dict"] = self.FEMM_dict
+        FluxLinkFEMM_dict["FEMM_dict"] = (
+            self.FEMM_dict.copy() if self.FEMM_dict is not None else None
+        )
         FluxLinkFEMM_dict["type_calc_leakage"] = self.type_calc_leakage
         FluxLinkFEMM_dict["is_sliding_band"] = self.is_sliding_band
         FluxLinkFEMM_dict["is_symmetry_a"] = self.is_symmetry_a
@@ -181,7 +183,7 @@ class FluxLinkFEMM(FluxLink):
         FluxLinkFEMM_dict["is_antiper_a"] = self.is_antiper_a
         FluxLinkFEMM_dict["Nt_tot"] = self.Nt_tot
         FluxLinkFEMM_dict["Kgeo_fineness"] = self.Kgeo_fineness
-        # The class name is added to the dict fordeserialisation purpose
+        # The class name is added to the dict for deserialisation purpose
         # Overwrite the mother class name
         FluxLinkFEMM_dict["__class__"] = "FluxLinkFEMM"
         return FluxLinkFEMM_dict
