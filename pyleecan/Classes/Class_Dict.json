@@ -1079,6 +1079,24 @@
                 "type": "bool",
                 "unit": "",
                 "value": false
+            },
+            {
+                "desc": "Maximum phase peak current",
+                "max": "",
+                "min": "0",
+                "name": "Imax",
+                "type": "float",
+                "unit": "A",
+                "value": null
+            },
+            {
+                "desc": "Maximum phase peak voltage",
+                "max": "",
+                "min": "0",
+                "name": "Umax",
+                "type": "float",
+                "unit": "V",
+                "value": null
             }
         ]
     },

@@ -79,7 +79,15 @@ class Electrical(FrozenClass):
     # get_logger method is available in all object
     get_logger = get_logger
 
-    def __init__(self, eec=None, is_comp_torque=False, init_dict=None, init_str=None):
+    def __init__(
+        self,
+        eec=None,
+        is_comp_torque=False,
+        Imax=None,
+        Umax=None,
+        init_dict=None,
+        init_str=None,
+    ):
         """Constructor of the class. Can be use in three ways :
         - __init__ (arg1 = 1, arg3 = 5) every parameters have name and default values
             for pyleecan type, -1 will call the default constructor
@@ -99,10 +107,16 @@ class Electrical(FrozenClass):
                 eec = init_dict["eec"]
             if "is_comp_torque" in list(init_dict.keys()):
                 is_comp_torque = init_dict["is_comp_torque"]
+            if "Imax" in list(init_dict.keys()):
+                Imax = init_dict["Imax"]
+            if "Umax" in list(init_dict.keys()):
+                Umax = init_dict["Umax"]
         # Set the properties (value check and convertion are done in setter)
         self.parent = None
         self.eec = eec
         self.is_comp_torque = is_comp_torque
+        self.Imax = Imax
+        self.Umax = Umax
 
         # The class is frozen, for now it's impossible to add new properties
         self._freeze()
@@ -121,6 +135,8 @@ class Electrical(FrozenClass):
         else:
             Electrical_str += "eec = None" + linesep + linesep
         Electrical_str += "is_comp_torque = " + str(self.is_comp_torque) + linesep
+        Electrical_str += "Imax = " + str(self.Imax) + linesep
+        Electrical_str += "Umax = " + str(self.Umax) + linesep
         return Electrical_str
 
     def __eq__(self, other):
@@ -131,6 +147,10 @@ class Electrical(FrozenClass):
         if other.eec != self.eec:
             return False
         if other.is_comp_torque != self.is_comp_torque:
+            return False
+        if other.Imax != self.Imax:
+            return False
+        if other.Umax != self.Umax:
             return False
         return True
 
@@ -143,6 +163,8 @@ class Electrical(FrozenClass):
         else:
             Electrical_dict["eec"] = self.eec.as_dict()
         Electrical_dict["is_comp_torque"] = self.is_comp_torque
+        Electrical_dict["Imax"] = self.Imax
+        Electrical_dict["Umax"] = self.Umax
         # The class name is added to the dict for deserialisation purpose
         Electrical_dict["__class__"] = "Electrical"
         return Electrical_dict
@@ -153,6 +175,8 @@ class Electrical(FrozenClass):
         if self.eec is not None:
             self.eec._set_None()
         self.is_comp_torque = None
+        self.Imax = None
+        self.Umax = None
 
     def _get_eec(self):
         """getter of eec"""
@@ -197,5 +221,43 @@ class Electrical(FrozenClass):
         doc=u"""Iteratively compute currents and voltages coressponding to reference torque
 
         :Type: bool
+        """,
+    )
+
+    def _get_Imax(self):
+        """getter of Imax"""
+        return self._Imax
+
+    def _set_Imax(self, value):
+        """setter of Imax"""
+        check_var("Imax", value, "float", Vmin=0)
+        self._Imax = value
+
+    Imax = property(
+        fget=_get_Imax,
+        fset=_set_Imax,
+        doc=u"""Maximum phase peak current
+
+        :Type: float
+        :min: 0
+        """,
+    )
+
+    def _get_Umax(self):
+        """getter of Umax"""
+        return self._Umax
+
+    def _set_Umax(self, value):
+        """setter of Umax"""
+        check_var("Umax", value, "float", Vmin=0)
+        self._Umax = value
+
+    Umax = property(
+        fget=_get_Umax,
+        fset=_set_Umax,
+        doc=u"""Maximum phase peak voltage
+
+        :Type: float
+        :min: 0
         """,
     )
