@@ -85,17 +85,24 @@ def iterate_torque(elec, output):
     bnds = None  # ((-max_current, max_current), (-max_current, max_current))
 
     # constraints
-    max_current_constrain = lambda x: -sqrt(x[0] ** 2 + x[1] ** 2) + max_current
-    max_voltage_constrain = lambda x: -_comp_voltage(x, elec, output) + max_voltage
+    max_current_constrain = lambda x: -sqrt(x[0] ** 2 + x[1] ** 2) + elec.Imax
+    max_voltage_constrain = lambda x: -_comp_voltage(x, elec, output) + elec.Umax
     torque_constrain = (
         lambda x: -((_comp_torque(x, elec, output) - torque_ref) ** 2) + torque_err ** 2
     )
 
-    cons = (
+    cons = [
+        {"type": "ineq", "fun": torque_constrain},
         {"type": "ineq", "fun": max_current_constrain},
         {"type": "ineq", "fun": max_voltage_constrain},
-        {"type": "ineq", "fun": torque_constrain},
-    )
+    ]
+
+    if elec.Imax is None:
+        cons.pop(1)
+    if elec.Umax is None:
+        cons.pop(-1)
+
+    cons = tuple(cons)
 
     x_start = [10, 10]
 
@@ -169,3 +176,4 @@ def iterate_torque(elec, output):
         output.elec.Ud_ref = None
         output.elec.Uq_ref = None
         output.elec.Us = None
+
