@@ -18,6 +18,9 @@ def comp_power(self, output):
     Ud = output.elec.Ud_ref
     Uq = output.elec.Uq_ref
 
-    Pem_av_ref = qs * (Ud * Id + Uq * Iq) / 2
+    if Ud is None or Uq is None or Id is None or Iq is None:
+        Pem_av_ref = None
+    else:
+        Pem_av_ref = qs * (Ud * Id + Uq * Iq) / 2
 
     output.elec.Pem_av_ref = Pem_av_ref

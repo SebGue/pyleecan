@@ -17,6 +17,9 @@ def comp_joule_losses(self, output):
     Iq = output.elec.Iq_ref
     R = self.parameters["R20"]
 
-    Pj_losses = qs * R * (Id ** 2 + Iq ** 2) / 2
+    if Id is not None and Iq is not None:
+        Pj_losses = qs * R * (Id ** 2 + Iq ** 2) / 2
+    else:
+        Pj_losses = None
 
     output.elec.Pj_losses = Pj_losses
