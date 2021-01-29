@@ -1731,7 +1731,8 @@
             "has_magnet",
             "remove_magnet",
             "comp_surface_magnet_id",
-            "plot_schematics"
+            "plot_schematics",
+            "get_height_magnet_id"
         ],
         "mother": "HoleMag",
         "name": "HoleM50",
@@ -1872,7 +1873,8 @@
             "comp_width",
             "has_magnet",
             "plot_schematics",
-            "remove_magnet"
+            "remove_magnet",
+            "get_height_magnet_id"
         ],
         "mother": "HoleMag",
         "name": "HoleM51",
@@ -2032,7 +2034,8 @@
             "comp_W1",
             "has_magnet",
             "plot_schematics",
-            "remove_magnet"
+            "remove_magnet",
+            "get_height_magnet_id"
         ],
         "mother": "HoleMag",
         "name": "HoleM52",
@@ -2119,7 +2122,8 @@
             "comp_W5",
             "has_magnet",
             "plot_schematics",
-            "remove_magnet"
+            "remove_magnet",
+            "get_height_magnet_id"
         ],
         "mother": "HoleMag",
         "name": "HoleM53",
@@ -2305,7 +2309,8 @@
             "comp_surface_magnet_id",
             "has_magnet",
             "plot_schematics",
-            "remove_magnet"
+            "remove_magnet",
+            "get_height_magnet_id"
         ],
         "mother": "HoleMag",
         "name": "HoleM57",
@@ -2417,7 +2422,8 @@
             "comp_surface_magnet_id",
             "has_magnet",
             "plot_schematics",
-            "remove_magnet"
+            "remove_magnet",
+            "get_height_magnet_id"
         ],
         "mother": "HoleMag",
         "name": "HoleM58",

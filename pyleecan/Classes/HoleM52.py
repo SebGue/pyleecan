@@ -72,6 +72,11 @@ try:
 except ImportError as error:
     remove_magnet = error
 
+try:
+    from ..Methods.Slot.HoleM52.get_height_magnet_id import get_height_magnet_id
+except ImportError as error:
+    get_height_magnet_id = error
+
 
 from ._check import InitUnKnowClassError
 from .Magnet import Magnet
@@ -198,6 +203,18 @@ class HoleM52(HoleMag):
         )
     else:
         remove_magnet = remove_magnet
+    # cf Methods.Slot.HoleM52.get_height_magnet_id
+    if isinstance(get_height_magnet_id, ImportError):
+        get_height_magnet_id = property(
+            fget=lambda x: raise_(
+                ImportError(
+                    "Can't use HoleM52 method get_height_magnet_id: "
+                    + str(get_height_magnet_id)
+                )
+            )
+        )
+    else:
+        get_height_magnet_id = get_height_magnet_id
     # save and copy methods are available in all object
     save = save
     copy = copy

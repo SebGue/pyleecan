@@ -7,4 +7,4 @@ W2,m,Distance Magnet to top of the V,0,float,"1,00E-02",0,,,,,comp_surface_magne
 W3,m,Tooth width (at V top),0,float,"1,00E-02",0,,,,,has_magnet,,,
 W4,m,Magnet Width,0,float,"1,00E-02",0,,,,,plot_schematics,,,
 magnet_0,-,First Magnet,0,Magnet,,,,,,,remove_magnet,,,
-magnet_1,-,Second Magnet,0,Magnet,,,,,,,,,,
+magnet_1,-,Second Magnet,0,Magnet,,,,,,,get_height_magnet_id,,,
