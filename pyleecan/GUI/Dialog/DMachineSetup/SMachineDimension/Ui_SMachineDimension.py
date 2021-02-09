@@ -26,7 +26,7 @@ class Ui_SMachineDimension(object):
         self.img_machine = QLabel(SMachineDimension)
         self.img_machine.setObjectName(u"img_machine")
         self.img_machine.setMinimumSize(QSize(0, 0))
-        self.img_machine.setMaximumSize(QSize(16777215, 16777215))
+        self.img_machine.setMaximumSize(QSize(645, 532))
         self.img_machine.setPixmap(
             QPixmap(
                 u":/images/images/MachineSetup/MachineDimension/Dimension_Shaft_Rotor_Stator.png"

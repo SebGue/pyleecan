@@ -26,7 +26,7 @@ class Ui_DMachineSetup(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.nav_step.sizePolicy().hasHeightForWidth())
         self.nav_step.setSizePolicy(sizePolicy)
-        self.nav_step.setMaximumSize(QSize(190, 16777215))
+        self.nav_step.setMaximumSize(QSize(220, 16777215))
 
         self.horizontalLayout_2.addWidget(self.nav_step)
 
