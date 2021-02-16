@@ -3987,7 +3987,8 @@
             "comp_height_yoke",
             "get_notch_list",
             "comp_angle_q_axis",
-            "comp_radius_mid_yoke"
+            "comp_radius_mid_yoke",
+            "get_magnet_list"
         ],
         "mother": "",
         "name": "Lamination",

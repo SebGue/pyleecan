@@ -119,6 +119,11 @@ try:
 except ImportError as error:
     comp_radius_mid_yoke = error
 
+try:
+    from ..Methods.Machine.Lamination.get_magnet_list import get_magnet_list
+except ImportError as error:
+    get_magnet_list = error
+
 
 from ._check import InitUnKnowClassError
 from .Material import Material
@@ -350,6 +355,18 @@ class Lamination(FrozenClass):
         )
     else:
         comp_radius_mid_yoke = comp_radius_mid_yoke
+    # cf Methods.Machine.Lamination.get_magnet_list
+    if isinstance(get_magnet_list, ImportError):
+        get_magnet_list = property(
+            fget=lambda x: raise_(
+                ImportError(
+                    "Can't use Lamination method get_magnet_list: "
+                    + str(get_magnet_list)
+                )
+            )
+        )
+    else:
+        get_magnet_list = get_magnet_list
     # save and copy methods are available in all object
     save = save
     copy = copy
