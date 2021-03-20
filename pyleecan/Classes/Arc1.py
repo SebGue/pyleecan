@@ -73,6 +73,11 @@ except ImportError as error:
     rotate = error
 
 try:
+    from ..Methods.Geometry.Arc1.scale import scale
+except ImportError as error:
+    scale = error
+
+try:
     from ..Methods.Geometry.Arc1.split_half import split_half
 except ImportError as error:
     split_half = error
@@ -191,6 +196,15 @@ class Arc1(Arc):
         )
     else:
         rotate = rotate
+    # cf Methods.Geometry.Arc1.scale
+    if isinstance(scale, ImportError):
+        scale = property(
+            fget=lambda x: raise_(
+                ImportError("Can't use Arc1 method scale: " + str(scale))
+            )
+        )
+    else:
+        scale = scale
     # cf Methods.Geometry.Arc1.split_half
     if isinstance(split_half, ImportError):
         split_half = property(
@@ -291,6 +305,25 @@ class Arc1(Arc):
             return False
         return True
 
+    def compare(self, other, name="self"):
+        """Compare two objects and return list of differences"""
+
+        if type(other) != type(self):
+            return ["type(" + name + ")"]
+        diff_list = list()
+
+        # Check the properties inherited from Arc
+        diff_list.extend(super(Arc1, self).compare(other, name=name))
+        if other._begin != self._begin:
+            diff_list.append(name + ".begin")
+        if other._end != self._end:
+            diff_list.append(name + ".end")
+        if other._radius != self._radius:
+            diff_list.append(name + ".radius")
+        if other._is_trigo_direction != self._is_trigo_direction:
+            diff_list.append(name + ".is_trigo_direction")
+        return diff_list
+
     def __sizeof__(self):
         """Return the size in memory of the object (including all subobject)"""
 
@@ -304,11 +337,15 @@ class Arc1(Arc):
         S += getsizeof(self.is_trigo_direction)
         return S
 
-    def as_dict(self):
-        """Convert this object in a json seriable dict (can be use in __init__)"""
+    def as_dict(self, **kwargs):
+        """
+        Convert this object in a json serializable dict (can be use in __init__).
+        Optional keyword input parameter is for internal use only
+        and may prevent json serializability.
+        """
 
         # Get the properties inherited from Arc
-        Arc1_dict = super(Arc1, self).as_dict()
+        Arc1_dict = super(Arc1, self).as_dict(**kwargs)
         if self.begin is None:
             Arc1_dict["begin"] = None
         elif isinstance(self.begin, float):

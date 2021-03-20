@@ -49,6 +49,7 @@
             "get_middle",
             "reverse",
             "rotate",
+            "scale",
             "split_half",
             "translate"
         ],
@@ -117,6 +118,7 @@
             "get_middle",
             "reverse",
             "rotate",
+            "scale",
             "split_half",
             "translate"
         ],
@@ -145,8 +147,8 @@
             },
             {
                 "desc": "opening angle of the arc",
-                "max": "6.2831853071796",
-                "min": "-6.2831853071796",
+                "max": "6.283185308",
+                "min": "-6.283185308",
                 "name": "angle",
                 "type": "float",
                 "unit": "rad",
@@ -176,6 +178,7 @@
             "get_middle",
             "reverse",
             "rotate",
+            "scale",
             "split_half",
             "translate"
         ],
@@ -322,7 +325,7 @@
         "methods": [
             "add_cell",
             "get_connectivity",
-            "get_point2cell",
+            "get_node2cell",
             "is_exist"
         ],
         "mother": "",
@@ -349,10 +352,10 @@
                 "value": 0
             },
             {
-                "desc": "Define the number of node per element",
+                "desc": "Define the number of node per cell",
                 "max": "",
                 "min": "",
-                "name": "nb_pt_per_cell",
+                "name": "nb_node_per_cell",
                 "type": "int",
                 "unit": "",
                 "value": 0
@@ -783,7 +786,9 @@
         ],
         "desc": "Class for defining data to keep on a multi-simulation",
         "is_internal": false,
-        "methods": [],
+        "methods": [
+            "as_dict"
+        ],
         "mother": "",
         "name": "DataKeeper",
         "package": "Simulation",
@@ -842,6 +847,15 @@
                 "type": "list",
                 "unit": "-",
                 "value": []
+            },
+            {
+                "desc": "Result for the reference simulation",
+                "max": "",
+                "min": "",
+                "name": "result_ref",
+                "type": "",
+                "unit": "-",
+                "value": null
             }
         ]
     },
@@ -1450,7 +1464,8 @@
             }
         ],
         "daughters": [
-            "ForceMT"
+            "ForceMT",
+            "ForceTensor"
         ],
         "desc": "Forces module abstract object",
         "is_internal": false,
@@ -1539,6 +1554,38 @@
         "package": "Simulation",
         "path": "pyleecan/Generator/ClassesRef/Simulation/ForceMT.csv",
         "properties": []
+    },
+    "ForceTensor": {
+        "constants": [
+            {
+                "name": "VERSION",
+                "value": "1"
+            }
+        ],
+        "daughters": [],
+        "desc": "Force various tensors (Maxwell, magnetostrictive) model for radial flux machines",
+        "is_internal": false,
+        "methods": [
+            "comp_force",
+            "comp_force_nodal",
+            "comp_magnetrosctrictive_tensor",
+            "element_loop"
+        ],
+        "mother": "Force",
+        "name": "ForceTensor",
+        "package": "Simulation",
+        "path": "pyleecan/Generator/ClassesRef/Simulation/ForceTensor.csv",
+        "properties": [
+            {
+                "desc": "Name of the group selected for magnetic force computation. If None, all the domain is selected.",
+                "max": "",
+                "min": "",
+                "name": "group",
+                "type": "str",
+                "unit": "-",
+                "value": "stator core"
+            }
+        ]
     },
     "Frame": {
         "constants": [
@@ -1673,18 +1720,19 @@
         "desc": "Holes for lamination (abstract)",
         "is_internal": false,
         "methods": [
+            "comp_height",
+            "comp_magnetization_dict",
             "comp_radius",
             "comp_surface",
+            "convert_to_UD",
             "get_is_stator",
+            "get_magnet_by_id",
+            "get_magnet_dict",
             "get_Rbo",
             "get_Rext",
             "has_magnet",
             "plot",
-            "comp_height",
-            "get_magnet_by_id",
-            "set_magnet_by_id",
-            "get_magnet_dict",
-            "convert_to_UD"
+            "set_magnet_by_id"
         ],
         "mother": "",
         "name": "Hole",
@@ -1708,6 +1756,15 @@
                 "type": "Material",
                 "unit": "-",
                 "value": ""
+            },
+            {
+                "desc": "Dictionary add an offset to the magnetization direction of the magnets (key=magnet_X, value=angle[rad])",
+                "max": "",
+                "min": "",
+                "name": "magnetization_dict_offset",
+                "type": "dict",
+                "unit": "-",
+                "value": null
             }
         ]
     },
@@ -1730,12 +1787,13 @@
             "build_geometry",
             "check",
             "comp_alpha",
+            "comp_magnetization_dict",
             "comp_radius",
+            "comp_surface_magnet_id",
             "comp_W5",
             "has_magnet",
-            "remove_magnet",
-            "comp_surface_magnet_id",
-            "plot_schematics"
+            "plot_schematics",
+            "remove_magnet"
         ],
         "mother": "HoleMag",
         "name": "HoleM50",
@@ -1871,6 +1929,7 @@
             "build_geometry",
             "check",
             "comp_alpha",
+            "comp_magnetization_dict",
             "comp_radius",
             "comp_surface_magnet_id",
             "comp_width",
@@ -2030,6 +2089,7 @@
             "build_geometry",
             "check",
             "comp_alpha",
+            "comp_magnetization_dict",
             "comp_radius",
             "comp_surface",
             "comp_surface_magnet_id",
@@ -2118,6 +2178,7 @@
             "build_geometry",
             "check",
             "comp_alpha",
+            "comp_magnetization_dict",
             "comp_radius",
             "comp_surface_magnet_id",
             "comp_W5",
@@ -2240,6 +2301,7 @@
             "_comp_point_coordinate",
             "build_geometry",
             "check",
+            "comp_magnetization_dict",
             "comp_radius",
             "comp_surface",
             "plot_schematics"
@@ -2305,6 +2367,7 @@
             "_comp_point_coordinate",
             "build_geometry",
             "check",
+            "comp_magnetization_dict",
             "comp_radius",
             "comp_surface_magnet_id",
             "has_magnet",
@@ -2417,6 +2480,7 @@
             "_comp_point_coordinate",
             "build_geometry",
             "check",
+            "comp_magnetization_dict",
             "comp_radius",
             "comp_surface_magnet_id",
             "has_magnet",
@@ -2559,10 +2623,10 @@
         "is_internal": false,
         "methods": [
             "build_geometry",
+            "check",
             "comp_surface_magnet_id",
             "has_magnet",
-            "remove_magnet",
-            "check"
+            "remove_magnet"
         ],
         "mother": "HoleMag",
         "name": "HoleUD",
@@ -3337,7 +3401,8 @@
         "is_internal": false,
         "methods": [
             "gen_input",
-            "set_Id_Iq"
+            "set_Id_Iq",
+            "set_OP_from_array"
         ],
         "mother": "Input",
         "name": "InputCurrent",
@@ -4111,7 +4176,9 @@
         ],
         "desc": "Abstract geometry class (A line between two points)",
         "is_internal": false,
-        "methods": [],
+        "methods": [
+            "comp_normal"
+        ],
         "mother": "",
         "name": "Line",
         "package": "Geometry",
@@ -4935,7 +5002,6 @@
             "solve_FEMM",
             "get_meshsolution",
             "get_path_save_fem",
-            "build_meshsolution",
             "solve_FEMM_parallel"
         ],
         "mother": "Magnetics",
@@ -4989,19 +5055,19 @@
                 "value": ""
             },
             {
-                "desc": "To save FEA mesh for latter post-procesing ",
+                "desc": "To save FEA and mesh for latter post-procesing ",
                 "max": "",
                 "min": "",
-                "name": "is_get_mesh",
+                "name": "is_get_meshsolution",
                 "type": "bool",
                 "unit": "",
                 "value": 0
             },
             {
-                "desc": "To save FEA mesh and solution in .dat file",
+                "desc": "To save FEA and mesh as h5 files to save memory",
                 "max": "",
                 "min": "",
-                "name": "is_save_FEA",
+                "name": "is_save_meshsolution_as_file",
                 "type": "bool",
                 "unit": "",
                 "value": 0
@@ -5742,16 +5808,19 @@
         "desc": "Gather the mesh storage format",
         "is_internal": false,
         "methods": [
-            "get_point",
+            "get_node",
+            "get_node_indice",
             "get_cell",
             "get_mesh_pv",
             "get_cell_area",
-            "add_cell",
             "get_vertice",
-            "get_point2cell",
+            "get_node2cell",
+            "add_cell",
             "renum",
             "find_cell",
-            "interface"
+            "interface",
+            "clear_node",
+            "clear_cell"
         ],
         "mother": "Mesh",
         "name": "MeshMat",
@@ -5771,10 +5840,19 @@
                 "desc": "Storing nodes",
                 "max": "",
                 "min": "",
-                "name": "point",
-                "type": "PointMat",
+                "name": "node",
+                "type": "NodeMat",
                 "unit": "",
                 "value": ""
+            },
+            {
+                "desc": "True if renumering the nodes and cells is useful when renum method is called (saving calculation time)",
+                "max": "",
+                "min": "",
+                "name": "_is_renum",
+                "type": "bool",
+                "unit": "",
+                "value": 0
             }
         ]
     },
@@ -5811,7 +5889,7 @@
                 "name": "label",
                 "type": "str",
                 "unit": "",
-                "value": "None"
+                "value": ""
             },
             {
                 "desc": "A list of Mesh objects. ",
@@ -5857,6 +5935,15 @@
                 "type": "int",
                 "unit": "",
                 "value": 2
+            },
+            {
+                "desc": "Path where the MeshSolution is stored as a file",
+                "max": "",
+                "min": "",
+                "name": "path",
+                "type": "str",
+                "unit": "",
+                "value": "None"
             }
         ]
     },
@@ -5872,7 +5959,7 @@
         "is_internal": false,
         "methods": [
             "get_mesh_pv",
-            "get_point",
+            "get_node",
             "get_cell",
             "get_normals",
             "get_surf",
@@ -5890,7 +5977,7 @@
                 "max": "",
                 "min": "",
                 "name": "mesh",
-                "type": "pyvista.core.pointset.PointGrid",
+                "type": "vtk.vtkPointSet",
                 "unit": "",
                 "value": "None"
             },
@@ -6015,6 +6102,65 @@
                 "type": "int",
                 "unit": "-",
                 "value": null
+            }
+        ]
+    },
+    "NodeMat": {
+        "constants": [
+            {
+                "name": "VERSION",
+                "value": "1"
+            }
+        ],
+        "daughters": [],
+        "desc": "Class to define nodes coordinates and getter.",
+        "is_internal": false,
+        "methods": [
+            "add_node",
+            "get_coord",
+            "is_exist",
+            "get_indice"
+        ],
+        "mother": "",
+        "name": "NodeMat",
+        "package": "Mesh",
+        "path": "pyleecan/Generator/ClassesRef/Mesh/NodeMat.csv",
+        "properties": [
+            {
+                "desc": "Nodes coordinates",
+                "max": "",
+                "min": "",
+                "name": "coordinate",
+                "type": "ndarray",
+                "unit": "",
+                "value": []
+            },
+            {
+                "desc": "Total number of nodes",
+                "max": "",
+                "min": "",
+                "name": "nb_node",
+                "type": "int",
+                "unit": "",
+                "value": 0
+            },
+            {
+                "desc": "Sensibility for node searching",
+                "max": "",
+                "min": "",
+                "name": "delta",
+                "type": "float",
+                "unit": "",
+                "value": 1e-10
+            },
+            {
+                "desc": "Nodes unique indices",
+                "max": "",
+                "min": "",
+                "name": "indice",
+                "type": "ndarray",
+                "unit": "",
+                "value": ""
             }
         ]
     },
@@ -6697,6 +6843,15 @@
                 "min": "",
                 "name": "Rag",
                 "type": "float",
+                "unit": "-",
+                "value": null
+            },
+            {
+                "desc": "Force computed on a mesh",
+                "max": "",
+                "min": "",
+                "name": "meshsolution",
+                "type": "MeshSolution",
                 "unit": "-",
                 "value": null
             }
@@ -7596,65 +7751,6 @@
             }
         ]
     },
-    "PointMat": {
-        "constants": [
-            {
-                "name": "VERSION",
-                "value": "1"
-            }
-        ],
-        "daughters": [],
-        "desc": "Class to define nodes coordinates and getter.",
-        "is_internal": false,
-        "methods": [
-            "add_point",
-            "get_coord",
-            "get_group",
-            "is_exist"
-        ],
-        "mother": "",
-        "name": "PointMat",
-        "package": "Mesh",
-        "path": "pyleecan/Generator/ClassesRef/Mesh/PointMat.csv",
-        "properties": [
-            {
-                "desc": "Nodes coordinates",
-                "max": "",
-                "min": "",
-                "name": "coordinate",
-                "type": "ndarray",
-                "unit": "",
-                "value": []
-            },
-            {
-                "desc": "Total number of nodes",
-                "max": "",
-                "min": "",
-                "name": "nb_pt",
-                "type": "int",
-                "unit": "",
-                "value": 0
-            },
-            {
-                "desc": "Sensibility for node searching",
-                "max": "",
-                "min": "",
-                "name": "delta",
-                "type": "float",
-                "unit": "",
-                "value": 1e-10
-            },
-            {
-                "desc": "Point indices",
-                "max": "",
-                "min": "",
-                "name": "indice",
-                "type": "ndarray",
-                "unit": "",
-                "value": ""
-            }
-        ]
-    },
     "PolarArc": {
         "constants": [
             {
@@ -8142,6 +8238,7 @@
         "is_internal": false,
         "methods": [
             "check",
+            "comp_distance",
             "comp_length",
             "discretize",
             "draw_FEMM",
@@ -8149,14 +8246,14 @@
             "get_end",
             "get_middle",
             "intersect_line",
+            "is_on_line",
+            "plot",
             "reverse",
             "rotate",
+            "scale",
             "split_half",
             "split_line",
-            "translate",
-            "is_on_line",
-            "comp_distance",
-            "plot"
+            "translate"
         ],
         "mother": "Line",
         "name": "Segment",
@@ -8398,6 +8495,24 @@
                 "type": "str",
                 "unit": "-",
                 "value": "None"
+            },
+            {
+                "desc": "Layer of the simulation in a multi-simulation (0 is top simulation)",
+                "max": "",
+                "min": "0",
+                "name": "layer",
+                "type": "int",
+                "unit": "-",
+                "value": null
+            },
+            {
+                "desc": "Enable to set the log console_handler to warning starting from a particular layer. layer_log_warn=2 => layer 0 and 1 info, layer 2 warning",
+                "max": "",
+                "min": "0",
+                "name": "layer_log_warn",
+                "type": "int",
+                "unit": "-",
+                "value": null
             }
         ]
     },
@@ -8419,6 +8534,7 @@
             "SlotM14",
             "SlotM15",
             "SlotM16",
+            "SlotM17",
             "SlotUD",
             "SlotUD2",
             "SlotW10",
@@ -8450,6 +8566,7 @@
             "comp_angle_opening",
             "comp_height",
             "comp_height_active",
+            "comp_height_opening",
             "comp_radius",
             "comp_radius_mid_active",
             "comp_surface",
@@ -9208,6 +9325,37 @@
                 "value": 0.001
             }
         ]
+    },
+    "SlotM17": {
+        "constants": [
+            {
+                "name": "VERSION",
+                "value": "1"
+            },
+            {
+                "name": "IS_SYMMETRICAL",
+                "value": "1"
+            }
+        ],
+        "daughters": [],
+        "desc": "Full rotor magnet",
+        "is_internal": false,
+        "methods": [
+            "build_geometry",
+            "check",
+            "comp_angle_opening",
+            "comp_height",
+            "comp_height_active",
+            "comp_surface",
+            "comp_surface_active",
+            "get_surface_active",
+            "plot_schematics"
+        ],
+        "mother": "Slot",
+        "name": "SlotM17",
+        "package": "Slot",
+        "path": "pyleecan/Generator/ClassesRef/Slot/SlotM17.csv",
+        "properties": []
     },
     "SlotUD": {
         "constants": [
@@ -11244,16 +11392,17 @@
         "desc": "SurfLine defined by list of lines that delimit it, label and point reference.",
         "is_internal": false,
         "methods": [
-            "get_lines",
-            "rotate",
-            "translate",
             "check",
             "comp_length",
-            "get_patches",
-            "discretize",
+            "comp_point_ref",
             "comp_surface",
+            "discretize",
+            "get_lines",
+            "get_patches",
             "plot_lines",
-            "comp_point_ref"
+            "rotate",
+            "scale",
+            "translate"
         ],
         "mother": "Surface",
         "name": "SurfLine",
@@ -11477,6 +11626,10 @@
             {
                 "name": "VERSION",
                 "value": "1"
+            },
+            {
+                "name": "NAME",
+                "value": "\"Variable Load\""
             }
         ],
         "daughters": [
@@ -11507,7 +11660,7 @@
         "is_internal": false,
         "methods": [
             "get_input_list",
-            "get_simulations",
+            "generate_simulation_list",
             "gen_datakeeper_list",
             "check_param",
             "get_elec_datakeeper"
@@ -11527,7 +11680,7 @@
                 "value": null
             },
             {
-                "desc": "Select with kind of OP_matrix is used 0: (N0,I0,Phi0,T,P), 1:(N0,Id,Iq,T,P) ",
+                "desc": "Select which kind of OP_matrix is used 0: (N0,I0,Phi0,T,P), 1:(N0,Id,Iq,T,P) ",
                 "max": "1",
                 "min": "0",
                 "name": "type_OP_matrix",
@@ -11560,6 +11713,10 @@
             {
                 "name": "VERSION",
                 "value": "1"
+            },
+            {
+                "name": "NAME",
+                "value": "\"Parameter Sweep\""
             }
         ],
         "daughters": [],
@@ -11567,7 +11724,7 @@
         "is_internal": false,
         "methods": [
             "check_param",
-            "get_simulations",
+            "generate_simulation_list",
             "get_simu_number"
         ],
         "mother": "VarSimu",
@@ -11604,7 +11761,7 @@
             "run",
             "set_reused_data",
             "check_param",
-            "get_simulations"
+            "generate_simulation_list"
         ],
         "mother": "",
         "name": "VarSimu",
@@ -11657,11 +11814,11 @@
                 "value": false
             },
             {
-                "desc": "Index of the reference simulation, if None the reference simulation is not in the multi-simulation",
+                "desc": "Multi-simulation of a Multi-simulation definition",
                 "max": "",
-                "min": "0",
-                "name": "ref_simu_index",
-                "type": "int",
+                "min": "",
+                "name": "var_simu",
+                "type": "VarSimu",
                 "unit": "-",
                 "value": null
             },
@@ -12231,7 +12388,8 @@
             "plot_pareto",
             "plot_generation",
             "get_pareto_index",
-            "print_memory"
+            "print_memory",
+            "get_xoutput_ref"
         ],
         "mother": "Output",
         "name": "XOutput",
@@ -12248,7 +12406,7 @@
                 "value": ""
             },
             {
-                "desc": "List containing Output for each simulation",
+                "desc": "List containing Output (or Xoutput) for each simulation",
                 "max": "",
                 "min": "",
                 "name": "output_list",
@@ -12257,7 +12415,7 @@
                 "value": ""
             },
             {
-                "desc": "Dictionnary containing VarParam DataKeeper results in ndarray",
+                "desc": "Dictionnary containing DataKeeper",
                 "max": "",
                 "min": "",
                 "name": "xoutput_dict",
@@ -12273,6 +12431,24 @@
                 "type": "int",
                 "unit": "-",
                 "value": 0
+            },
+            {
+                "desc": "Xoutput (or Output) of the reference simulation (only if is_keep_all_output is True and not included in output_list)",
+                "max": "",
+                "min": "",
+                "name": "xoutput_ref",
+                "type": "Output",
+                "unit": "-",
+                "value": null
+            },
+            {
+                "desc": "Index of the Xoutput (or Output) of the reference simulation in the output_list (only if is_keep_all_output is True)",
+                "max": "",
+                "min": "",
+                "name": "xoutput_ref_index",
+                "type": "int",
+                "unit": "-",
+                "value": null
             }
         ]
     }

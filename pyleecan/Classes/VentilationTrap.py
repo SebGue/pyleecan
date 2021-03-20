@@ -123,6 +123,7 @@ class VentilationTrap(Hole):
         W2=1,
         Zh=36,
         mat_void=-1,
+        magnetization_dict_offset=None,
         init_dict=None,
         init_str=None,
     ):
@@ -155,6 +156,8 @@ class VentilationTrap(Hole):
                 Zh = init_dict["Zh"]
             if "mat_void" in list(init_dict.keys()):
                 mat_void = init_dict["mat_void"]
+            if "magnetization_dict_offset" in list(init_dict.keys()):
+                magnetization_dict_offset = init_dict["magnetization_dict_offset"]
         # Set the properties (value check and convertion are done in setter)
         self.Alpha0 = Alpha0
         self.D0 = D0
@@ -162,7 +165,11 @@ class VentilationTrap(Hole):
         self.W1 = W1
         self.W2 = W2
         # Call Hole init
-        super(VentilationTrap, self).__init__(Zh=Zh, mat_void=mat_void)
+        super(VentilationTrap, self).__init__(
+            Zh=Zh,
+            mat_void=mat_void,
+            magnetization_dict_offset=magnetization_dict_offset,
+        )
         # The class is frozen (in Hole init), for now it's impossible to
         # add new properties
 
@@ -200,6 +207,27 @@ class VentilationTrap(Hole):
             return False
         return True
 
+    def compare(self, other, name="self"):
+        """Compare two objects and return list of differences"""
+
+        if type(other) != type(self):
+            return ["type(" + name + ")"]
+        diff_list = list()
+
+        # Check the properties inherited from Hole
+        diff_list.extend(super(VentilationTrap, self).compare(other, name=name))
+        if other._Alpha0 != self._Alpha0:
+            diff_list.append(name + ".Alpha0")
+        if other._D0 != self._D0:
+            diff_list.append(name + ".D0")
+        if other._H0 != self._H0:
+            diff_list.append(name + ".H0")
+        if other._W1 != self._W1:
+            diff_list.append(name + ".W1")
+        if other._W2 != self._W2:
+            diff_list.append(name + ".W2")
+        return diff_list
+
     def __sizeof__(self):
         """Return the size in memory of the object (including all subobject)"""
 
@@ -214,11 +242,15 @@ class VentilationTrap(Hole):
         S += getsizeof(self.W2)
         return S
 
-    def as_dict(self):
-        """Convert this object in a json seriable dict (can be use in __init__)"""
+    def as_dict(self, **kwargs):
+        """
+        Convert this object in a json serializable dict (can be use in __init__).
+        Optional keyword input parameter is for internal use only
+        and may prevent json serializability.
+        """
 
         # Get the properties inherited from Hole
-        VentilationTrap_dict = super(VentilationTrap, self).as_dict()
+        VentilationTrap_dict = super(VentilationTrap, self).as_dict(**kwargs)
         VentilationTrap_dict["Alpha0"] = self.Alpha0
         VentilationTrap_dict["D0"] = self.D0
         VentilationTrap_dict["H0"] = self.H0

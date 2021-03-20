@@ -23,6 +23,11 @@ except ImportError as error:
     build_geometry = error
 
 try:
+    from ..Methods.Slot.HoleUD.check import check
+except ImportError as error:
+    check = error
+
+try:
     from ..Methods.Slot.HoleUD.comp_surface_magnet_id import comp_surface_magnet_id
 except ImportError as error:
     comp_surface_magnet_id = error
@@ -36,11 +41,6 @@ try:
     from ..Methods.Slot.HoleUD.remove_magnet import remove_magnet
 except ImportError as error:
     remove_magnet = error
-
-try:
-    from ..Methods.Slot.HoleUD.check import check
-except ImportError as error:
-    check = error
 
 
 from ._check import InitUnKnowClassError
@@ -67,6 +67,15 @@ class HoleUD(HoleMag):
         )
     else:
         build_geometry = build_geometry
+    # cf Methods.Slot.HoleUD.check
+    if isinstance(check, ImportError):
+        check = property(
+            fget=lambda x: raise_(
+                ImportError("Can't use HoleUD method check: " + str(check))
+            )
+        )
+    else:
+        check = check
     # cf Methods.Slot.HoleUD.comp_surface_magnet_id
     if isinstance(comp_surface_magnet_id, ImportError):
         comp_surface_magnet_id = property(
@@ -99,15 +108,6 @@ class HoleUD(HoleMag):
         )
     else:
         remove_magnet = remove_magnet
-    # cf Methods.Slot.HoleUD.check
-    if isinstance(check, ImportError):
-        check = property(
-            fget=lambda x: raise_(
-                ImportError("Can't use HoleUD method check: " + str(check))
-            )
-        )
-    else:
-        check = check
     # save and copy methods are available in all object
     save = save
     copy = copy
@@ -120,6 +120,7 @@ class HoleUD(HoleMag):
         magnet_dict=-1,
         Zh=36,
         mat_void=-1,
+        magnetization_dict_offset=None,
         init_dict=None,
         init_str=None,
     ):
@@ -146,11 +147,17 @@ class HoleUD(HoleMag):
                 Zh = init_dict["Zh"]
             if "mat_void" in list(init_dict.keys()):
                 mat_void = init_dict["mat_void"]
+            if "magnetization_dict_offset" in list(init_dict.keys()):
+                magnetization_dict_offset = init_dict["magnetization_dict_offset"]
         # Set the properties (value check and convertion are done in setter)
         self.surf_list = surf_list
         self.magnet_dict = magnet_dict
         # Call HoleMag init
-        super(HoleUD, self).__init__(Zh=Zh, mat_void=mat_void)
+        super(HoleUD, self).__init__(
+            Zh=Zh,
+            mat_void=mat_void,
+            magnetization_dict_offset=magnetization_dict_offset,
+        )
         # The class is frozen (in HoleMag init), for now it's impossible to
         # add new properties
 
@@ -192,6 +199,47 @@ class HoleUD(HoleMag):
             return False
         return True
 
+    def compare(self, other, name="self"):
+        """Compare two objects and return list of differences"""
+
+        if type(other) != type(self):
+            return ["type(" + name + ")"]
+        diff_list = list()
+
+        # Check the properties inherited from HoleMag
+        diff_list.extend(super(HoleUD, self).compare(other, name=name))
+        if (other.surf_list is None and self.surf_list is not None) or (
+            other.surf_list is not None and self.surf_list is None
+        ):
+            diff_list.append(name + ".surf_list None mismatch")
+        elif self.surf_list is None:
+            pass
+        elif len(other.surf_list) != len(self.surf_list):
+            diff_list.append("len(" + name + ".surf_list)")
+        else:
+            for ii in range(len(other.surf_list)):
+                diff_list.extend(
+                    self.surf_list[ii].compare(
+                        other.surf_list[ii], name=name + ".surf_list[" + str(ii) + "]"
+                    )
+                )
+        if (other.magnet_dict is None and self.magnet_dict is not None) or (
+            other.magnet_dict is not None and self.magnet_dict is None
+        ):
+            diff_list.append(name + ".magnet_dict None mismatch")
+        elif self.magnet_dict is None:
+            pass
+        elif len(other.magnet_dict) != len(self.magnet_dict):
+            diff_list.append("len(" + name + "magnet_dict)")
+        else:
+            for key in self.magnet_dict:
+                diff_list.extend(
+                    self.magnet_dict[key].compare(
+                        other.magnet_dict[key], name=name + ".magnet_dict"
+                    )
+                )
+        return diff_list
+
     def __sizeof__(self):
         """Return the size in memory of the object (including all subobject)"""
 
@@ -207,18 +255,22 @@ class HoleUD(HoleMag):
                 S += getsizeof(value) + getsizeof(key)
         return S
 
-    def as_dict(self):
-        """Convert this object in a json seriable dict (can be use in __init__)"""
+    def as_dict(self, **kwargs):
+        """
+        Convert this object in a json serializable dict (can be use in __init__).
+        Optional keyword input parameter is for internal use only
+        and may prevent json serializability.
+        """
 
         # Get the properties inherited from HoleMag
-        HoleUD_dict = super(HoleUD, self).as_dict()
+        HoleUD_dict = super(HoleUD, self).as_dict(**kwargs)
         if self.surf_list is None:
             HoleUD_dict["surf_list"] = None
         else:
             HoleUD_dict["surf_list"] = list()
             for obj in self.surf_list:
                 if obj is not None:
-                    HoleUD_dict["surf_list"].append(obj.as_dict())
+                    HoleUD_dict["surf_list"].append(obj.as_dict(**kwargs))
                 else:
                     HoleUD_dict["surf_list"].append(None)
         if self.magnet_dict is None:
@@ -227,7 +279,7 @@ class HoleUD(HoleMag):
             HoleUD_dict["magnet_dict"] = dict()
             for key, obj in self.magnet_dict.items():
                 if obj is not None:
-                    HoleUD_dict["magnet_dict"][key] = obj.as_dict()
+                    HoleUD_dict["magnet_dict"][key] = obj.as_dict(**kwargs)
                 else:
                     HoleUD_dict["magnet_dict"][key] = None
         # The class name is added to the dict for deserialisation purpose

@@ -73,6 +73,11 @@ except ImportError as error:
     rotate = error
 
 try:
+    from ..Methods.Geometry.Arc2.scale import scale
+except ImportError as error:
+    scale = error
+
+try:
     from ..Methods.Geometry.Arc2.split_half import split_half
 except ImportError as error:
     split_half = error
@@ -191,6 +196,15 @@ class Arc2(Arc):
         )
     else:
         rotate = rotate
+    # cf Methods.Geometry.Arc2.scale
+    if isinstance(scale, ImportError):
+        scale = property(
+            fget=lambda x: raise_(
+                ImportError("Can't use Arc2 method scale: " + str(scale))
+            )
+        )
+    else:
+        scale = scale
     # cf Methods.Geometry.Arc2.split_half
     if isinstance(split_half, ImportError):
         split_half = property(
@@ -284,6 +298,23 @@ class Arc2(Arc):
             return False
         return True
 
+    def compare(self, other, name="self"):
+        """Compare two objects and return list of differences"""
+
+        if type(other) != type(self):
+            return ["type(" + name + ")"]
+        diff_list = list()
+
+        # Check the properties inherited from Arc
+        diff_list.extend(super(Arc2, self).compare(other, name=name))
+        if other._begin != self._begin:
+            diff_list.append(name + ".begin")
+        if other._center != self._center:
+            diff_list.append(name + ".center")
+        if other._angle != self._angle:
+            diff_list.append(name + ".angle")
+        return diff_list
+
     def __sizeof__(self):
         """Return the size in memory of the object (including all subobject)"""
 
@@ -296,11 +327,15 @@ class Arc2(Arc):
         S += getsizeof(self.angle)
         return S
 
-    def as_dict(self):
-        """Convert this object in a json seriable dict (can be use in __init__)"""
+    def as_dict(self, **kwargs):
+        """
+        Convert this object in a json serializable dict (can be use in __init__).
+        Optional keyword input parameter is for internal use only
+        and may prevent json serializability.
+        """
 
         # Get the properties inherited from Arc
-        Arc2_dict = super(Arc2, self).as_dict()
+        Arc2_dict = super(Arc2, self).as_dict(**kwargs)
         if self.begin is None:
             Arc2_dict["begin"] = None
         elif isinstance(self.begin, float):
@@ -374,7 +409,7 @@ class Arc2(Arc):
 
     def _set_angle(self, value):
         """setter of angle"""
-        check_var("angle", value, "float", Vmin=-6.2831853071796, Vmax=6.2831853071796)
+        check_var("angle", value, "float", Vmin=-6.283185308, Vmax=6.283185308)
         self._angle = value
 
     angle = property(
@@ -383,7 +418,7 @@ class Arc2(Arc):
         doc=u"""opening angle of the arc
 
         :Type: float
-        :min: -6.2831853071796
-        :max: 6.2831853071796
+        :min: -6.283185308
+        :max: 6.283185308
         """,
     )
