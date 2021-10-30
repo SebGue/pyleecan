@@ -6,6 +6,7 @@ from Tests import save_validation_path as save_path
 
 from numpy import exp, sqrt, pi, max as np_max
 from numpy.testing import assert_array_almost_equal
+from pyleecan.Classes.OPdq import OPdq
 
 from pyleecan.Classes.Simu1 import Simu1
 import matplotlib.pyplot as plt
@@ -37,7 +38,11 @@ def test_FEMM_periodicity_time_no_periodicity_a():
 
     SPMSM_015 = load(join(DATA_DIR, "Machine", "SPMSM_015.json"))
 
-    simu = Simu1(name="test_FEMM_periodicity_time_no_periodicity_a", machine=SPMSM_015)
+    assert SPMSM_015.comp_periodicity_spatial() == (9, False)
+
+    name = "test_FEMM_periodicity_time_no_periodicity_a"
+
+    simu = Simu1(name=name + "_1", machine=SPMSM_015)
 
     # Definition of the enforced output of the electrical module
     I0_rms = 250 / sqrt(2)
@@ -47,11 +52,9 @@ def test_FEMM_periodicity_time_no_periodicity_a():
     Iq_ref = (I0_rms * exp(1j * Phi0)).imag
 
     simu.input = InputCurrent(
-        Id_ref=Id_ref,
-        Iq_ref=Iq_ref,
+        OP=OPdq(N0=1000, Id_ref=Id_ref, Iq_ref=Iq_ref),
         Na_tot=252 * 9,
         Nt_tot=4 * 9,
-        N0=1000,
     )
 
     # Definition of the magnetic simulation: with periodicity
@@ -67,6 +70,7 @@ def test_FEMM_periodicity_time_no_periodicity_a():
 
     # Definition of the magnetic simulation: no periodicity
     simu2 = simu.copy()
+    simu2.name = name + "_2"
     simu2.mag.is_periodicity_t = False
 
     # Run simulations
@@ -128,7 +132,7 @@ def test_FEMM_periodicity_time_no_periodicity_a():
 
     out.mag.Phi_wind_stator.plot_2D_Data(
         "time",
-        "phase",
+        "phase[]",
         data_list=[out2.mag.Phi_wind_stator],
         legend_list=["Periodic", "Full"],
         save_path=join(save_path, simu.name + "_Phi_wind_stator_time.png"),
@@ -182,7 +186,11 @@ def test_FEMM_periodicity_time():
 
     SPMSM_015 = load(join(DATA_DIR, "Machine", "SPMSM_015.json"))
 
-    simu = Simu1(name="test_FEMM_periodicity_time", machine=SPMSM_015)
+    assert SPMSM_015.comp_periodicity_spatial() == (9, False)
+
+    name = "test_FEMM_periodicity_time"
+
+    simu = Simu1(name=name + "_1", machine=SPMSM_015)
 
     # Definition of the enforced output of the electrical module
     I0_rms = 250 / sqrt(2)
@@ -192,11 +200,9 @@ def test_FEMM_periodicity_time():
     Iq_ref = (I0_rms * exp(1j * Phi0)).imag
 
     simu.input = InputCurrent(
-        Id_ref=Id_ref,
-        Iq_ref=Iq_ref,
+        OP=OPdq(N0=1000, Id_ref=Id_ref, Iq_ref=Iq_ref),
         Na_tot=252 * 9,
         Nt_tot=4 * 9,
-        N0=1000,
     )
 
     # Definition of the magnetic simulation: with periodicity
@@ -212,6 +218,7 @@ def test_FEMM_periodicity_time():
 
     # Definition of the magnetic simulation: no periodicity
     simu2 = simu.copy()
+    simu2.name = name + "_2"
     simu2.mag.is_periodicity_t = False
 
     # Run simulations
@@ -257,7 +264,27 @@ def test_FEMM_periodicity_time():
         "angle[0]",
         data_list=[out2.force.AGSF],
         legend_list=["Periodic", "Full"],
-        save_path=join(save_path, simu.name + "_P_fft2.png"),
+        save_path=join(save_path, simu.name + "_P_freqs.png"),
+        is_show_fig=False,
+        **dict_2D
+    )
+
+    out.force.AGSF.plot_2D_Data(
+        "time",
+        "angle[0]",
+        data_list=[out2.force.AGSF],
+        legend_list=["Periodic", "Full"],
+        save_path=join(save_path, simu.name + "_P_time.png"),
+        is_show_fig=False,
+        **dict_2D
+    )
+
+    out.force.AGSF.plot_2D_Data(
+        "angle",
+        "time[0]",
+        data_list=[out2.force.AGSF],
+        legend_list=["Periodic", "Full"],
+        save_path=join(save_path, simu.name + "_P_angle.png"),
         is_show_fig=False,
         **dict_2D
     )
@@ -273,7 +300,7 @@ def test_FEMM_periodicity_time():
 
     out.mag.Phi_wind_stator.plot_2D_Data(
         "time",
-        "phase",
+        "phase[]",
         data_list=[out2.mag.Phi_wind_stator],
         legend_list=["Periodic", "Full"],
         save_path=join(save_path, simu.name + "_Phi_wind_stator_time.png"),
@@ -310,7 +337,7 @@ def test_FEMM_periodicity_time():
     Prad2 = result_AGSF2["radial"]
     time = result_AGSF2["time"]
 
-    assert_array_almost_equal(Prad / 1000, Prad2 / 1000, decimal=0)
+    assert_array_almost_equal(Prad / 100000, Prad2 / 100000, decimal=2)
 
     return out, out2
 
@@ -373,6 +400,8 @@ def test_FEMM_periodicity_angle():
     # SPMSM_015.plot(sym=3)
     # plt.show()
 
+    assert SPMSM_015.comp_periodicity_spatial() == (9, False)
+
     simu = Simu1(name="test_FEMM_periodicity_angle", machine=SPMSM_015)
 
     # Definition of the enforced output of the electrical module
@@ -383,11 +412,9 @@ def test_FEMM_periodicity_angle():
     Iq_ref = (I0_rms * exp(1j * Phi0)).imag
 
     simu.input = InputCurrent(
-        Id_ref=Id_ref,
-        Iq_ref=Iq_ref,
+        OP=OPdq(N0=1000, Id_ref=Id_ref, Iq_ref=Iq_ref),
         Na_tot=252 * 9,
         Nt_tot=4 * 9,
-        N0=1000,
     )
 
     # Definition of the magnetic simulation: with periodicity
@@ -472,7 +499,7 @@ def test_FEMM_periodicity_angle():
 
     out.mag.Phi_wind_stator.plot_2D_Data(
         "time",
-        "phase",
+        "phase[]",
         data_list=[out2.mag.Phi_wind_stator],
         legend_list=["Periodic", "Full"],
         save_path=join(save_path, simu.name + "_Phi_wind_stator_time.png"),
@@ -594,8 +621,8 @@ def test_Ring_Magnet():
 # To run it without pytest
 if __name__ == "__main__":
 
-    test_Ring_Magnet()
     # out, out2 = test_FEMM_periodicity_angle()
     # out3, out4 = test_FEMM_periodicity_time()
     # out5, out6 = test_FEMM_periodicity_time_no_periodicity_a()
+    test_Ring_Magnet()
     print("Done")

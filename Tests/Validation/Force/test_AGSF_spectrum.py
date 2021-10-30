@@ -13,6 +13,7 @@ from numpy import (
 from numpy.testing import assert_array_almost_equal
 
 from pyleecan.Classes.ForceMT import ForceMT
+from pyleecan.Classes.OPdq import OPdq
 from pyleecan.Classes.Simu1 import Simu1
 from pyleecan.Classes.MagFEMM import MagFEMM
 from pyleecan.Classes.InputCurrent import InputCurrent
@@ -30,7 +31,10 @@ Toyota_Prius = load(join(DATA_DIR, "Machine", "Toyota_Prius.json"))
 simu = Simu1(name="test_AGSF_spectrum", machine=Toyota_Prius)
 
 simu.input = InputCurrent(
-    Id_ref=0, Iq_ref=0, Ir=None, Na_tot=2 ** 6, Nt_tot=4 * 2 ** 4, N0=1200
+    OP=OPdq(Id_ref=0, Iq_ref=0, N0=1200),
+    Ir=None,
+    Na_tot=2 ** 6,
+    Nt_tot=4 * 2 ** 4,
 )
 
 simu.elec = None
@@ -181,7 +185,6 @@ def test_IPMSM_AGSF_spectrum_sym():
                 Prad_wr[ifrq, ir] * exp(1j * 2 * pi * frq * Xtime + 1j * r * Xangle)
             )
 
-    # assert_array_almost_equal(XP_rad1, Prad, decimal=3)
     test = abs(XP_rad1 - Prad) / mean(XP_rad1)
     assert_array_almost_equal(test, 0, decimal=1)  # Less than 10% error
 
@@ -191,14 +194,14 @@ def test_IPMSM_AGSF_spectrum_sym():
 if __name__ == "__main__":
 
     out = test_IPMSM_AGSF_spectrum_sym()
-    out2 = test_IPMSM_AGSF_spectrum_no_sym()
+    # out2 = test_IPMSM_AGSF_spectrum_no_sym()
 
-    out.force.AGSF.plot_2D_Data(
-        "wavenumber",
-        "freqs=160",
-        data_list=[out2.force.AGSF],
-        legend_list=["Periodic", "Full"],
-        save_path=join(save_path, simu.name + "_space_fft_freq160.png"),
-        is_show_fig=False,
-        **dict_2D
-    )
+    # out.force.AGSF.plot_2D_Data(
+    #     "wavenumber",
+    #     "freqs=160",
+    #     data_list=[out2.force.AGSF],
+    #     legend_list=["Periodic", "Full"],
+    #     save_path=join(save_path, simu.name + "_space_fft_freq160.png"),
+    #     is_show_fig=False,
+    #     **dict_2D
+    # )
