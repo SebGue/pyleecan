@@ -1,0 +1,3 @@
+Variable name,Unit,Description (EN),Size,Type,Default value,Minimum value,Maximum value,,Package,Inherit,Methods,Constant Name,Constant Value,Class description
+machine,-,machine model for performance evaluation,,Machine,,,,,Simulation,,solve,VERSION,1,Abstract Class of Electrical Equivalent Circuit
+logger_name,-,Name of the logger to use,0,str,Pyleecan.Performance,,,,,,,,,,

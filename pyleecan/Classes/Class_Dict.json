@@ -1296,6 +1296,137 @@
             }
         ]
     },
+    "EECx": {
+        "constants": [
+            {
+                "name": "VERSION",
+                "value": "1"
+            }
+        ],
+        "daughters": [
+            "EECx_PMSM"
+        ],
+        "desc": "Abstract Class of Electrical Equivalent Circuit",
+        "is_internal": false,
+        "methods": [
+            "solve"
+        ],
+        "mother": "",
+        "name": "EECx",
+        "package": "Simulation",
+        "path": "pyleecan/Generator/ClassesRef/Simulation/EECx.csv",
+        "properties": [
+            {
+                "desc": "machine model for performance evaluation",
+                "max": "",
+                "min": "",
+                "name": "machine",
+                "type": "Machine",
+                "unit": "-",
+                "value": ""
+            },
+            {
+                "desc": "Name of the logger to use",
+                "max": "",
+                "min": "",
+                "name": "logger_name",
+                "type": "str",
+                "unit": "-",
+                "value": "Pyleecan.Performance"
+            }
+        ]
+    },
+    "EECx_PMSM": {
+        "constants": [
+            {
+                "name": "VERSION",
+                "value": "1"
+            }
+        ],
+        "daughters": [],
+        "desc": "Class of Electrical Equivalent Circuit for PMSM",
+        "is_internal": false,
+        "methods": [
+            "solve",
+            "comp_pmsm_model",
+            "get_fun_core_loss",
+            "get_fun_mech_loss",
+            "get_torque_fun",
+            "get_torque_fun",
+            "get_fluxlinkage_fun",
+            "comp_parameter",
+            "get_fun_misc_loss"
+        ],
+        "mother": "EECx",
+        "name": "EECx_PMSM",
+        "package": "Simulation",
+        "path": "pyleecan/Generator/ClassesRef/Simulation/EECx_PMSM.csv",
+        "properties": [
+            {
+                "desc": "machine characteristics table",
+                "max": "",
+                "min": "",
+                "name": "table",
+                "type": "MagLUT",
+                "unit": "-",
+                "value": ""
+            },
+            {
+                "desc": "end winding leakage model",
+                "max": "",
+                "min": "",
+                "name": "ew_leakage",
+                "type": "EndWindLeakage",
+                "unit": "",
+                "value": null
+            },
+            {
+                "desc": "model to compute the winding resistance",
+                "max": "",
+                "min": "",
+                "name": "winding",
+                "type": "ACWinding",
+                "unit": "",
+                "value": ""
+            },
+            {
+                "desc": "dict of core loss models (e.g. magnets, frame and iron losses)",
+                "max": "",
+                "min": "",
+                "name": "core_loss",
+                "type": "{LossModel}",
+                "unit": "",
+                "value": null
+            },
+            {
+                "desc": "dict of mechanical loss models (e.g. bearing and windage losses)",
+                "max": "",
+                "min": "",
+                "name": "mech_loss",
+                "type": "{LossModel}",
+                "unit": "",
+                "value": null
+            },
+            {
+                "desc": "dict of miscellaneous loss models",
+                "max": "",
+                "min": "",
+                "name": "misc_loss",
+                "type": "{LossModel}",
+                "unit": "",
+                "value": null
+            },
+            {
+                "desc": "Stator winding temperature",
+                "max": "",
+                "min": "",
+                "name": "tW",
+                "type": "float",
+                "unit": "\u00c2\u00b0C",
+                "value": 20
+            }
+        ]
+    },
     "Electrical": {
         "constants": [
             {
@@ -6166,6 +6297,138 @@
             }
         ]
     },
+    "MagLUT": {
+        "constants": [
+            {
+                "name": "VERSION",
+                "value": "1"
+            }
+        ],
+        "daughters": [],
+        "desc": "Object to store the flux and torque of a (normalized) machine",
+        "is_internal": false,
+        "methods": [
+            "_set_fluxlinkage",
+            "get_interp",
+            "interpolate",
+            "comp_inductance",
+            "comp_grad_flux",
+            "get_fluxlinkage",
+            "get_torque"
+        ],
+        "mother": "XOutput",
+        "name": "MagLUT",
+        "package": "Simulation",
+        "path": "pyleecan/Generator/ClassesRef/Simulation/MagLUT.csv",
+        "properties": []
+    },
+    "MagLUTSimu": {
+        "constants": [
+            {
+                "name": "VERSION",
+                "value": "1"
+            }
+        ],
+        "daughters": [],
+        "desc": "Object to simulate the flux and torque of a (normalized) machine",
+        "is_internal": false,
+        "methods": [
+            "run_simu",
+            "get_norm_machine",
+            "is_norm_machine",
+            "get_torque_norm",
+            "get_flux_norm",
+            "get_current_norm",
+            "get_VarLoadCurrent"
+        ],
+        "mother": "Simu1",
+        "name": "MagLUTSimu",
+        "package": "Simulation",
+        "path": "pyleecan/Generator/ClassesRef/Simulation/MagLUTSimu.csv",
+        "properties": [
+            {
+                "desc": "Reference dq current density matrix",
+                "max": "",
+                "min": "",
+                "name": "S_ref",
+                "type": "ndarray",
+                "unit": "A/m\u00c2\u00b2",
+                "value": ""
+            },
+            {
+                "desc": "Reference winding fill factor",
+                "max": "",
+                "min": "",
+                "name": "fill_factor",
+                "type": "float",
+                "unit": "",
+                "value": 0.4
+            },
+            {
+                "desc": "Maximum rms current density",
+                "max": "",
+                "min": "",
+                "name": "S_max",
+                "type": "float",
+                "unit": "A/m\u00c2\u00b2",
+                "value": null
+            },
+            {
+                "desc": "Maximum d current density",
+                "max": "",
+                "min": "",
+                "name": "S_d_max",
+                "type": "float",
+                "unit": "A/m\u00c2\u00b2",
+                "value": null
+            },
+            {
+                "desc": "Maximum q current density",
+                "max": "",
+                "min": "",
+                "name": "S_q_max",
+                "type": "float",
+                "unit": "A/m\u00c2\u00b2",
+                "value": null
+            },
+            {
+                "desc": "Rotation discretization",
+                "max": "",
+                "min": "1",
+                "name": "Nr",
+                "type": "int",
+                "unit": "-",
+                "value": null
+            },
+            {
+                "desc": "Number of rotor revolution",
+                "max": "",
+                "min": "0",
+                "name": "Nrev",
+                "type": "float",
+                "unit": "-",
+                "value": null
+            },
+            {
+                "desc": "Magnet temperature",
+                "max": "",
+                "min": "",
+                "name": "tM",
+                "type": "float",
+                "unit": "\u00c2\u00b0C",
+                "value": 20
+            },
+            {
+                "desc": "Dict to set user MagFEMM parameter",
+                "max": "",
+                "min": "",
+                "name": "simu_dict",
+                "type": "dict",
+                "unit": "",
+                "value": null
+            }
+        ]
+    },
     "Magnet": {
         "constants": [
             {
@@ -9052,6 +9315,7 @@
             }
         ],
         "daughters": [
+            "MagLUT",
             "XOutput"
         ],
         "desc": "Main Output object: gather all the outputs of all the modules",
@@ -9982,7 +10246,9 @@
                 "value": "1"
             }
         ],
-        "daughters": [],
+        "daughters": [
+            "MagLUTSimu"
+        ],
         "desc": "Five sequential weak coupling multi physics simulation",
         "is_internal": false,
         "methods": [
@@ -10048,6 +10314,7 @@
             }
         ],
         "daughters": [
+            "MagLUTSimu",
             "Simu1"
         ],
         "desc": "Abstract class for the simulation",
@@ -14285,7 +14552,9 @@
                 "value": "1"
             }
         ],
-        "daughters": [],
+        "daughters": [
+            "MagLUT"
+        ],
         "desc": "XOutput object: gather all the outputs of all the modules for multiple simulations",
         "is_internal": false,
         "methods": [

@@ -27,6 +27,7 @@ def run(self):
         if isinstance(machine, MachineSCIM):
             self.eec = EEC_SCIM()
         elif isinstance(machine, (MachineSIPMSM, MachineIPMSM)):
+            # TODO won't work since self.fluxlink is None, see eec.comp_parameters
             self.eec = EEC_PMSM()
     else:
         # Check that EEC is consistent with machine type
@@ -43,6 +44,10 @@ def run(self):
                 "Cannot run Electrical model if machine is PMSM and eec is not EEC_PMSM or EEC_ANL"
             )
 
+    # TODO maybe make this whole code block part of eec.solve_EEC(), so EEC
+    #      take care of correct parameters on its own
+    #      otherwise the abstract EEC class should have all the props and methods
+    #      required here (so the EEC structure is forced)
     if self.ELUT_enforced is not None:
         # enforce parameters of EEC coming from enforced ELUT at right temperatures
         if self.eec.parameters is None:

@@ -1,0 +1,8 @@
+Variable name,Unit,Description (EN),Size,Type,Default value,Minimum value,Maximum value,,Package,Inherit,Methods,Constant Name,Constant Value,Class description
+,,,,,,,,,Simulation,XOutput,_set_fluxlinkage,VERSION,1,Object to store the flux and torque of a (normalized) machine
+,,,,,,,,,,,get_interp,,,
+,,,,,,,,,,,interpolate,,,
+,,,,,,,,,,,comp_inductance,,,
+,,,,,,,,,,,comp_grad_flux,,,
+,,,,,,,,,,,get_fluxlinkage,,,
+,,,,,,,,,,,get_torque,,,

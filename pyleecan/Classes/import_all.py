@@ -28,6 +28,8 @@ from ..Classes.EEC_ANL import EEC_ANL
 from ..Classes.EEC_LSRPM import EEC_LSRPM
 from ..Classes.EEC_PMSM import EEC_PMSM
 from ..Classes.EEC_SCIM import EEC_SCIM
+from ..Classes.EECx import EECx
+from ..Classes.EECx_PMSM import EECx_PMSM
 from ..Classes.Electrical import Electrical
 from ..Classes.Elmer import Elmer
 from ..Classes.ElmerResults import ElmerResults
@@ -109,6 +111,8 @@ from ..Classes.MachineUD import MachineUD
 from ..Classes.MachineWRSM import MachineWRSM
 from ..Classes.MagElmer import MagElmer
 from ..Classes.MagFEMM import MagFEMM
+from ..Classes.MagLUT import MagLUT
+from ..Classes.MagLUTSimu import MagLUTSimu
 from ..Classes.Magnet import Magnet
 from ..Classes.Magnetics import Magnetics
 from ..Classes.MatEconomical import MatEconomical
