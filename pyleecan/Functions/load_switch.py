@@ -114,7 +114,6 @@ load_switch = {
     "MagElmer": MagElmer,
     "MagFEMM": MagFEMM,
     "MagLUT": MagLUT,
-    "MagLUTSimu": MagLUTSimu,
     "Magnet": Magnet,
     "Magnetics": Magnetics,
     "MatEconomical": MatEconomical,
@@ -240,4 +239,7 @@ load_switch = {
     "WindingSC": WindingSC,
     "WindingUD": WindingUD,
     "XOutput": XOutput,
+    "xLUT": xLUT,
+    "xLUTdq": xLUTdq,
+    "xLUTdqSimu": xLUTdqSimu,
 }

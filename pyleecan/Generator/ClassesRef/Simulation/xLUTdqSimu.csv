@@ -1,0 +1,10 @@
+Variable name,Unit,Description (EN),Size,Type,Default value,Minimum value,Maximum value,,Package,Inherit,Methods,Constant Name,Constant Value,Class description
+S_ref,A/m²,Reference dq current density matrix,,ndarray,,,,,Simulation,Simu1,get_norm_machine,VERSION,1,Object to simulate the flux and torque of a (normalized) machine
+fill_factor,,Reference winding fill factor,,float,0.4,,,,,,is_norm_machine,,,
+S_max,A/m²,Maximum rms current density,,float,None,,,,,,get_torque_norm,,,
+S_d_max,A/m²,Maximum d current density,,float,None,,,,,,get_flux_norm,,,
+S_q_max,A/m²,Maximum q current density,,float,None,,,,,,get_current_norm,,,
+Nr,-,Rotation discretization,0,int,None,1,,,,,get_VarLoadCurrent,,,
+Nrev,-,Number of rotor revolution,,float,None,0,,,,,,,,
+tM,°C,Magnet temperature,,float,20,,,,,,,,,
+simu_dict,,Dict to set user MagFEMM parameter,,dict,None,,,,,,,,,

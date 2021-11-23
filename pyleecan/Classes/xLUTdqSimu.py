@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# File generated according to Generator/ClassesRef/Simulation/MagLUTSimu.csv
+# File generated according to Generator/ClassesRef/Simulation/xLUTdqSimu.csv
 # WARNING! All changes made in this file will be lost!
-"""Method code available at https://github.com/Eomys/pyleecan/tree/master/pyleecan/Methods/Simulation/MagLUTSimu
+"""Method code available at https://github.com/Eomys/pyleecan/tree/master/pyleecan/Methods/Simulation/xLUTdqSimu
 """
 
 from os import linesep
@@ -18,37 +18,32 @@ from .Simu1 import Simu1
 # Import all class method
 # Try/catch to remove unnecessary dependencies in unused method
 try:
-    from ..Methods.Simulation.MagLUTSimu.run_simu import run_simu
-except ImportError as error:
-    run_simu = error
-
-try:
-    from ..Methods.Simulation.MagLUTSimu.get_norm_machine import get_norm_machine
+    from ..Methods.Simulation.xLUTdqSimu.get_norm_machine import get_norm_machine
 except ImportError as error:
     get_norm_machine = error
 
 try:
-    from ..Methods.Simulation.MagLUTSimu.is_norm_machine import is_norm_machine
+    from ..Methods.Simulation.xLUTdqSimu.is_norm_machine import is_norm_machine
 except ImportError as error:
     is_norm_machine = error
 
 try:
-    from ..Methods.Simulation.MagLUTSimu.get_torque_norm import get_torque_norm
+    from ..Methods.Simulation.xLUTdqSimu.get_torque_norm import get_torque_norm
 except ImportError as error:
     get_torque_norm = error
 
 try:
-    from ..Methods.Simulation.MagLUTSimu.get_flux_norm import get_flux_norm
+    from ..Methods.Simulation.xLUTdqSimu.get_flux_norm import get_flux_norm
 except ImportError as error:
     get_flux_norm = error
 
 try:
-    from ..Methods.Simulation.MagLUTSimu.get_current_norm import get_current_norm
+    from ..Methods.Simulation.xLUTdqSimu.get_current_norm import get_current_norm
 except ImportError as error:
     get_current_norm = error
 
 try:
-    from ..Methods.Simulation.MagLUTSimu.get_VarLoadCurrent import get_VarLoadCurrent
+    from ..Methods.Simulation.xLUTdqSimu.get_VarLoadCurrent import get_VarLoadCurrent
 except ImportError as error:
     get_VarLoadCurrent = error
 
@@ -66,86 +61,77 @@ from .VarSimu import VarSimu
 from .Post import Post
 
 
-class MagLUTSimu(Simu1):
+class xLUTdqSimu(Simu1):
     """Object to simulate the flux and torque of a (normalized) machine"""
 
     VERSION = 1
 
     # Check ImportError to remove unnecessary dependencies in unused method
-    # cf Methods.Simulation.MagLUTSimu.run_simu
-    if isinstance(run_simu, ImportError):
-        run_simu = property(
-            fget=lambda x: raise_(
-                ImportError("Can't use MagLUTSimu method run_simu: " + str(run_simu))
-            )
-        )
-    else:
-        run_simu = run_simu
-    # cf Methods.Simulation.MagLUTSimu.get_norm_machine
+    # cf Methods.Simulation.xLUTdqSimu.get_norm_machine
     if isinstance(get_norm_machine, ImportError):
         get_norm_machine = property(
             fget=lambda x: raise_(
                 ImportError(
-                    "Can't use MagLUTSimu method get_norm_machine: "
+                    "Can't use xLUTdqSimu method get_norm_machine: "
                     + str(get_norm_machine)
                 )
             )
         )
     else:
         get_norm_machine = get_norm_machine
-    # cf Methods.Simulation.MagLUTSimu.is_norm_machine
+    # cf Methods.Simulation.xLUTdqSimu.is_norm_machine
     if isinstance(is_norm_machine, ImportError):
         is_norm_machine = property(
             fget=lambda x: raise_(
                 ImportError(
-                    "Can't use MagLUTSimu method is_norm_machine: "
+                    "Can't use xLUTdqSimu method is_norm_machine: "
                     + str(is_norm_machine)
                 )
             )
         )
     else:
         is_norm_machine = is_norm_machine
-    # cf Methods.Simulation.MagLUTSimu.get_torque_norm
+    # cf Methods.Simulation.xLUTdqSimu.get_torque_norm
     if isinstance(get_torque_norm, ImportError):
         get_torque_norm = property(
             fget=lambda x: raise_(
                 ImportError(
-                    "Can't use MagLUTSimu method get_torque_norm: "
+                    "Can't use xLUTdqSimu method get_torque_norm: "
                     + str(get_torque_norm)
                 )
             )
         )
     else:
         get_torque_norm = get_torque_norm
-    # cf Methods.Simulation.MagLUTSimu.get_flux_norm
+    # cf Methods.Simulation.xLUTdqSimu.get_flux_norm
     if isinstance(get_flux_norm, ImportError):
         get_flux_norm = property(
             fget=lambda x: raise_(
                 ImportError(
-                    "Can't use MagLUTSimu method get_flux_norm: " + str(get_flux_norm)
+                    "Can't use xLUTdqSimu method get_flux_norm: " + str(get_flux_norm)
                 )
             )
         )
     else:
         get_flux_norm = get_flux_norm
-    # cf Methods.Simulation.MagLUTSimu.get_current_norm
+    # cf Methods.Simulation.xLUTdqSimu.get_current_norm
     if isinstance(get_current_norm, ImportError):
         get_current_norm = property(
             fget=lambda x: raise_(
                 ImportError(
-                    "Can't use MagLUTSimu method get_current_norm: "
+                    "Can't use xLUTdqSimu method get_current_norm: "
                     + str(get_current_norm)
                 )
             )
         )
     else:
         get_current_norm = get_current_norm
-    # cf Methods.Simulation.MagLUTSimu.get_VarLoadCurrent
+    # cf Methods.Simulation.xLUTdqSimu.get_VarLoadCurrent
     if isinstance(get_VarLoadCurrent, ImportError):
         get_VarLoadCurrent = property(
             fget=lambda x: raise_(
                 ImportError(
-                    "Can't use MagLUTSimu method get_VarLoadCurrent: "
+                    "Can't use xLUTdqSimu method get_VarLoadCurrent: "
                     + str(get_VarLoadCurrent)
                 )
             )
@@ -264,7 +250,7 @@ class MagLUTSimu(Simu1):
         self.tM = tM
         self.simu_dict = simu_dict
         # Call Simu1 init
-        super(MagLUTSimu, self).__init__(
+        super(xLUTdqSimu, self).__init__(
             elec=elec,
             mag=mag,
             struct=struct,
@@ -288,25 +274,25 @@ class MagLUTSimu(Simu1):
     def __str__(self):
         """Convert this object in a readeable string (for print)"""
 
-        MagLUTSimu_str = ""
+        xLUTdqSimu_str = ""
         # Get the properties inherited from Simu1
-        MagLUTSimu_str += super(MagLUTSimu, self).__str__()
-        MagLUTSimu_str += (
+        xLUTdqSimu_str += super(xLUTdqSimu, self).__str__()
+        xLUTdqSimu_str += (
             "S_ref = "
             + linesep
             + str(self.S_ref).replace(linesep, linesep + "\t")
             + linesep
             + linesep
         )
-        MagLUTSimu_str += "fill_factor = " + str(self.fill_factor) + linesep
-        MagLUTSimu_str += "S_max = " + str(self.S_max) + linesep
-        MagLUTSimu_str += "S_d_max = " + str(self.S_d_max) + linesep
-        MagLUTSimu_str += "S_q_max = " + str(self.S_q_max) + linesep
-        MagLUTSimu_str += "Nr = " + str(self.Nr) + linesep
-        MagLUTSimu_str += "Nrev = " + str(self.Nrev) + linesep
-        MagLUTSimu_str += "tM = " + str(self.tM) + linesep
-        MagLUTSimu_str += "simu_dict = " + str(self.simu_dict) + linesep
-        return MagLUTSimu_str
+        xLUTdqSimu_str += "fill_factor = " + str(self.fill_factor) + linesep
+        xLUTdqSimu_str += "S_max = " + str(self.S_max) + linesep
+        xLUTdqSimu_str += "S_d_max = " + str(self.S_d_max) + linesep
+        xLUTdqSimu_str += "S_q_max = " + str(self.S_q_max) + linesep
+        xLUTdqSimu_str += "Nr = " + str(self.Nr) + linesep
+        xLUTdqSimu_str += "Nrev = " + str(self.Nrev) + linesep
+        xLUTdqSimu_str += "tM = " + str(self.tM) + linesep
+        xLUTdqSimu_str += "simu_dict = " + str(self.simu_dict) + linesep
+        return xLUTdqSimu_str
 
     def __eq__(self, other):
         """Compare two objects (skip parent)"""
@@ -315,7 +301,7 @@ class MagLUTSimu(Simu1):
             return False
 
         # Check the properties inherited from Simu1
-        if not super(MagLUTSimu, self).__eq__(other):
+        if not super(xLUTdqSimu, self).__eq__(other):
             return False
         if not array_equal(other.S_ref, self.S_ref):
             return False
@@ -347,7 +333,7 @@ class MagLUTSimu(Simu1):
         diff_list = list()
 
         # Check the properties inherited from Simu1
-        diff_list.extend(super(MagLUTSimu, self).compare(other, name=name))
+        diff_list.extend(super(xLUTdqSimu, self).compare(other, name=name))
         if not array_equal(other.S_ref, self.S_ref):
             diff_list.append(name + ".S_ref")
         if other._fill_factor != self._fill_factor:
@@ -376,7 +362,7 @@ class MagLUTSimu(Simu1):
         S = 0  # Full size of the object
 
         # Get size of the properties inherited from Simu1
-        S += super(MagLUTSimu, self).__sizeof__()
+        S += super(xLUTdqSimu, self).__sizeof__()
         S += getsizeof(self.S_ref)
         S += getsizeof(self.fill_factor)
         S += getsizeof(self.S_max)
@@ -402,38 +388,38 @@ class MagLUTSimu(Simu1):
         """
 
         # Get the properties inherited from Simu1
-        MagLUTSimu_dict = super(MagLUTSimu, self).as_dict(
+        xLUTdqSimu_dict = super(xLUTdqSimu, self).as_dict(
             type_handle_ndarray=type_handle_ndarray,
             keep_function=keep_function,
             **kwargs
         )
         if self.S_ref is None:
-            MagLUTSimu_dict["S_ref"] = None
+            xLUTdqSimu_dict["S_ref"] = None
         else:
             if type_handle_ndarray == 0:
-                MagLUTSimu_dict["S_ref"] = self.S_ref.tolist()
+                xLUTdqSimu_dict["S_ref"] = self.S_ref.tolist()
             elif type_handle_ndarray == 1:
-                MagLUTSimu_dict["S_ref"] = self.S_ref.copy()
+                xLUTdqSimu_dict["S_ref"] = self.S_ref.copy()
             elif type_handle_ndarray == 2:
-                MagLUTSimu_dict["S_ref"] = self.S_ref
+                xLUTdqSimu_dict["S_ref"] = self.S_ref
             else:
                 raise Exception(
                     "Unknown type_handle_ndarray: " + str(type_handle_ndarray)
                 )
-        MagLUTSimu_dict["fill_factor"] = self.fill_factor
-        MagLUTSimu_dict["S_max"] = self.S_max
-        MagLUTSimu_dict["S_d_max"] = self.S_d_max
-        MagLUTSimu_dict["S_q_max"] = self.S_q_max
-        MagLUTSimu_dict["Nr"] = self.Nr
-        MagLUTSimu_dict["Nrev"] = self.Nrev
-        MagLUTSimu_dict["tM"] = self.tM
-        MagLUTSimu_dict["simu_dict"] = (
+        xLUTdqSimu_dict["fill_factor"] = self.fill_factor
+        xLUTdqSimu_dict["S_max"] = self.S_max
+        xLUTdqSimu_dict["S_d_max"] = self.S_d_max
+        xLUTdqSimu_dict["S_q_max"] = self.S_q_max
+        xLUTdqSimu_dict["Nr"] = self.Nr
+        xLUTdqSimu_dict["Nrev"] = self.Nrev
+        xLUTdqSimu_dict["tM"] = self.tM
+        xLUTdqSimu_dict["simu_dict"] = (
             self.simu_dict.copy() if self.simu_dict is not None else None
         )
         # The class name is added to the dict for deserialisation purpose
         # Overwrite the mother class name
-        MagLUTSimu_dict["__class__"] = "MagLUTSimu"
-        return MagLUTSimu_dict
+        xLUTdqSimu_dict["__class__"] = "xLUTdqSimu"
+        return xLUTdqSimu_dict
 
     def _set_None(self):
         """Set all the properties to None (except pyleecan object)"""
@@ -448,7 +434,7 @@ class MagLUTSimu(Simu1):
         self.tM = None
         self.simu_dict = None
         # Set to None the properties inherited from Simu1
-        super(MagLUTSimu, self)._set_None()
+        super(xLUTdqSimu, self)._set_None()
 
     def _get_S_ref(self):
         """getter of S_ref"""

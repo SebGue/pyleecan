@@ -112,7 +112,6 @@ from ..Classes.MachineWRSM import MachineWRSM
 from ..Classes.MagElmer import MagElmer
 from ..Classes.MagFEMM import MagFEMM
 from ..Classes.MagLUT import MagLUT
-from ..Classes.MagLUTSimu import MagLUTSimu
 from ..Classes.Magnet import Magnet
 from ..Classes.Magnetics import Magnetics
 from ..Classes.MatEconomical import MatEconomical
@@ -238,3 +237,6 @@ from ..Classes.Winding import Winding
 from ..Classes.WindingSC import WindingSC
 from ..Classes.WindingUD import WindingUD
 from ..Classes.XOutput import XOutput
+from ..Classes.xLUT import xLUT
+from ..Classes.xLUTdq import xLUTdq
+from ..Classes.xLUTdqSimu import xLUTdqSimu

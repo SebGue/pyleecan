@@ -6322,113 +6322,6 @@
         "path": "pyleecan/Generator/ClassesRef/Simulation/MagLUT.csv",
         "properties": []
     },
-    "MagLUTSimu": {
-        "constants": [
-            {
-                "name": "VERSION",
-                "value": "1"
-            }
-        ],
-        "daughters": [],
-        "desc": "Object to simulate the flux and torque of a (normalized) machine",
-        "is_internal": false,
-        "methods": [
-            "run_simu",
-            "get_norm_machine",
-            "is_norm_machine",
-            "get_torque_norm",
-            "get_flux_norm",
-            "get_current_norm",
-            "get_VarLoadCurrent"
-        ],
-        "mother": "Simu1",
-        "name": "MagLUTSimu",
-        "package": "Simulation",
-        "path": "pyleecan/Generator/ClassesRef/Simulation/MagLUTSimu.csv",
-        "properties": [
-            {
-                "desc": "Reference dq current density matrix",
-                "max": "",
-                "min": "",
-                "name": "S_ref",
-                "type": "ndarray",
-                "unit": "A/m\u00c2\u00b2",
-                "value": ""
-            },
-            {
-                "desc": "Reference winding fill factor",
-                "max": "",
-                "min": "",
-                "name": "fill_factor",
-                "type": "float",
-                "unit": "",
-                "value": 0.4
-            },
-            {
-                "desc": "Maximum rms current density",
-                "max": "",
-                "min": "",
-                "name": "S_max",
-                "type": "float",
-                "unit": "A/m\u00c2\u00b2",
-                "value": null
-            },
-            {
-                "desc": "Maximum d current density",
-                "max": "",
-                "min": "",
-                "name": "S_d_max",
-                "type": "float",
-                "unit": "A/m\u00c2\u00b2",
-                "value": null
-            },
-            {
-                "desc": "Maximum q current density",
-                "max": "",
-                "min": "",
-                "name": "S_q_max",
-                "type": "float",
-                "unit": "A/m\u00c2\u00b2",
-                "value": null
-            },
-            {
-                "desc": "Rotation discretization",
-                "max": "",
-                "min": "1",
-                "name": "Nr",
-                "type": "int",
-                "unit": "-",
-                "value": null
-            },
-            {
-                "desc": "Number of rotor revolution",
-                "max": "",
-                "min": "0",
-                "name": "Nrev",
-                "type": "float",
-                "unit": "-",
-                "value": null
-            },
-            {
-                "desc": "Magnet temperature",
-                "max": "",
-                "min": "",
-                "name": "tM",
-                "type": "float",
-                "unit": "\u00c2\u00b0C",
-                "value": 20
-            },
-            {
-                "desc": "Dict to set user MagFEMM parameter",
-                "max": "",
-                "min": "",
-                "name": "simu_dict",
-                "type": "dict",
-                "unit": "",
-                "value": null
-            }
-        ]
-    },
     "Magnet": {
         "constants": [
             {
@@ -9316,7 +9209,9 @@
         ],
         "daughters": [
             "MagLUT",
-            "XOutput"
+            "XOutput",
+            "xLUT",
+            "xLUTdq"
         ],
         "desc": "Main Output object: gather all the outputs of all the modules",
         "is_internal": false,
@@ -10247,7 +10142,7 @@
             }
         ],
         "daughters": [
-            "MagLUTSimu"
+            "xLUTdqSimu"
         ],
         "desc": "Five sequential weak coupling multi physics simulation",
         "is_internal": false,
@@ -10314,8 +10209,8 @@
             }
         ],
         "daughters": [
-            "MagLUTSimu",
-            "Simu1"
+            "Simu1",
+            "xLUTdqSimu"
         ],
         "desc": "Abstract class for the simulation",
         "is_internal": false,
@@ -14553,7 +14448,9 @@
             }
         ],
         "daughters": [
-            "MagLUT"
+            "MagLUT",
+            "xLUT",
+            "xLUTdq"
         ],
         "desc": "XOutput object: gather all the outputs of all the modules for multiple simulations",
         "is_internal": false,
@@ -14641,6 +14538,262 @@
                 "name": "xoutput_ref_index",
                 "type": "int",
                 "unit": "-",
+                "value": null
+            }
+        ]
+    },
+    "xLUT": {
+        "constants": [
+            {
+                "name": "VERSION",
+                "value": "1"
+            }
+        ],
+        "daughters": [
+            "xLUTdq"
+        ],
+        "desc": "Abstract class for Look Up Table (LUT)",
+        "is_internal": false,
+        "methods": [
+            "get_param_dict",
+            "get_phase_dir"
+        ],
+        "mother": "XOutput",
+        "name": "xLUT",
+        "package": "Simulation",
+        "path": "pyleecan/Generator/ClassesRef/Simulation/xLUT.csv",
+        "properties": [
+            {
+                "desc": "DC phase winding resistance at T1_ref per phase ",
+                "max": "",
+                "min": "",
+                "name": "R1",
+                "type": "float",
+                "unit": "Ohm",
+                "value": null
+            },
+            {
+                "desc": "Phase winding leakage inductance ",
+                "max": "",
+                "min": "",
+                "name": "L1",
+                "type": "float",
+                "unit": "H",
+                "value": null
+            },
+            {
+                "desc": "Stator winding average temperature associated to R1, L1 parameters",
+                "max": "",
+                "min": "",
+                "name": "T1_ref",
+                "type": "float",
+                "unit": "degC",
+                "value": 20
+            },
+            {
+                "desc": "Array of operating point values of size (N,5) with N the number of operating points (Speed, Id, Iq, Torque, Power). OP values are set to nan if they are not given.",
+                "max": "",
+                "min": "",
+                "name": "OP_matrix",
+                "type": "ndarray",
+                "unit": "",
+                "value": null
+            },
+            {
+                "desc": "Rotation direction of the stator phases (phase_dir*(n-1)*pi/qs, default value given by PHASE_DIR_REF)",
+                "max": "1",
+                "min": "-1",
+                "name": "phase_dir",
+                "type": "int",
+                "unit": "",
+                "value": null
+            }
+        ]
+    },
+    "xLUTdq": {
+        "constants": [
+            {
+                "name": "VERSION",
+                "value": "1"
+            }
+        ],
+        "daughters": [],
+        "desc": "Look Up Table class for dq OP matrix",
+        "is_internal": false,
+        "methods": [
+            "get_param_dict",
+            "get_bemf",
+            "get_Ldqh",
+            "get_Lmdqh",
+            "import_from_data",
+            "get_Phidqh_mean",
+            "get_Phidqh_mag",
+            "get_Phidqh_mag_mean",
+            "get_Phidqh_mag_harm",
+            "get_orders_dqh",
+            "interp_Phi_dqh",
+            "_store_fluxlinkage",
+            "get_interp",
+            "interpolate",
+            "comp_inductance",
+            "comp_grad_flux",
+            "get_fluxlinkage",
+            "get_torque"
+        ],
+        "mother": "xLUT",
+        "name": "xLUTdq",
+        "package": "Simulation",
+        "path": "pyleecan/Generator/ClassesRef/Simulation/xLUTdq.csv",
+        "properties": [
+            {
+                "desc": "RMS stator winding flux table in dqh frame (including magnets and currents given by I_dqh)",
+                "max": "",
+                "min": "",
+                "name": "Phi_dqh_mean",
+                "type": "ndarray",
+                "unit": "Wbrms",
+                "value": null
+            },
+            {
+                "desc": "Magnet average temperature at which Phi_dqh is given",
+                "max": "",
+                "min": "",
+                "name": "Tmag_ref",
+                "type": "float",
+                "unit": "degC",
+                "value": 20
+            },
+            {
+                "desc": "RMS stator winding flux linkage spectrum in dqh frame including harmonics (only magnets)",
+                "max": "",
+                "min": "",
+                "name": "Phi_dqh_mag",
+                "type": "SciDataTool.Classes.DataND.DataND",
+                "unit": "Wbrms",
+                "value": "None"
+            },
+            {
+                "desc": "Stator winding flux function of time and phases",
+                "max": "",
+                "min": "",
+                "name": "Phi_wind",
+                "type": "[SciDataTool.Classes.DataND.DataND]",
+                "unit": "Wb",
+                "value": "None"
+            },
+            {
+                "desc": "Interpolant function of Phi_dqh",
+                "max": "",
+                "min": "",
+                "name": "Phi_dqh_interp",
+                "type": "scipy.interpolate.interpolate.RegularGridInterpolator",
+                "unit": "",
+                "value": "None"
+            }
+        ]
+    },
+    "xLUTdqSimu": {
+        "constants": [
+            {
+                "name": "VERSION",
+                "value": "1"
+            }
+        ],
+        "daughters": [],
+        "desc": "Object to simulate the flux and torque of a (normalized) machine",
+        "is_internal": false,
+        "methods": [
+            "get_norm_machine",
+            "is_norm_machine",
+            "get_torque_norm",
+            "get_flux_norm",
+            "get_current_norm",
+            "get_VarLoadCurrent"
+        ],
+        "mother": "Simu1",
+        "name": "xLUTdqSimu",
+        "package": "Simulation",
+        "path": "pyleecan/Generator/ClassesRef/Simulation/xLUTdqSimu.csv",
+        "properties": [
+            {
+                "desc": "Reference dq current density matrix",
+                "max": "",
+                "min": "",
+                "name": "S_ref",
+                "type": "ndarray",
+                "unit": "A/m\u00c2\u00b2",
+                "value": ""
+            },
+            {
+                "desc": "Reference winding fill factor",
+                "max": "",
+                "min": "",
+                "name": "fill_factor",
+                "type": "float",
+                "unit": "",
+                "value": 0.4
+            },
+            {
+                "desc": "Maximum rms current density",
+                "max": "",
+                "min": "",
+                "name": "S_max",
+                "type": "float",
+                "unit": "A/m\u00c2\u00b2",
+                "value": null
+            },
+            {
+                "desc": "Maximum d current density",
+                "max": "",
+                "min": "",
+                "name": "S_d_max",
+                "type": "float",
+                "unit": "A/m\u00c2\u00b2",
+                "value": null
+            },
+            {
+                "desc": "Maximum q current density",
+                "max": "",
+                "min": "",
+                "name": "S_q_max",
+                "type": "float",
+                "unit": "A/m\u00c2\u00b2",
+                "value": null
+            },
+            {
+                "desc": "Rotation discretization",
+                "max": "",
+                "min": "1",
+                "name": "Nr",
+                "type": "int",
+                "unit": "-",
+                "value": null
+            },
+            {
+                "desc": "Number of rotor revolution",
+                "max": "",
+                "min": "0",
+                "name": "Nrev",
+                "type": "float",
+                "unit": "-",
+                "value": null
+            },
+            {
+                "desc": "Magnet temperature",
+                "max": "",
+                "min": "",
+                "name": "tM",
+                "type": "float",
+                "unit": "\u00c2\u00b0C",
+                "value": 20
+            },
+            {
+                "desc": "Dict to set user MagFEMM parameter",
+                "max": "",
+                "min": "",
+                "name": "simu_dict",
+                "type": "dict",
+                "unit": "",
                 "value": null
             }
         ]

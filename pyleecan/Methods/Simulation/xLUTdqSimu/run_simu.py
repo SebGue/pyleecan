@@ -23,8 +23,8 @@ default_kwargs = {
 }
 
 # TODO maybe do 'external' ref_simu so there is no need to re/store ref. machine
-def run_simu(self):
-    """Run the CurrentCharacteristic Simulation"""
+def run(self):
+    """Run the LUT Simulation"""
     # store original machine to set it back after simulation
     org_machine = self.machine
 
@@ -129,10 +129,10 @@ def run_simu(self):
     var_simu.datakeeper_list.append(Sq_keeper)
 
     # run the simulation
-    self.run()
+    super(self).run()
 
     # compute dq flux and store as datakeeper
-    output._set_fluxlinkage()
+    output._store_fluxlinkage()
 
     # restore the machine
     self.machine = org_machine
