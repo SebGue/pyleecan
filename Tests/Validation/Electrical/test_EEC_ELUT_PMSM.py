@@ -15,7 +15,9 @@ from pyleecan.Classes.Simu1 import Simu1
 from pyleecan.Classes.InputCurrent import InputCurrent
 from pyleecan.Classes.VarLoadCurrent import VarLoadCurrent
 from pyleecan.Classes.MagFEMM import MagFEMM
-from pyleecan.Classes.PostLUT import PostLUT
+from pyleecan.Classes.xLUTdq import xLUTdq
+
+# from pyleecan.Classes.PostLUTdq import PostLUTdq
 from pyleecan.Classes.Electrical import Electrical
 from pyleecan.Classes.EEC_ANL import EEC_ANL
 from pyleecan.Classes.EEC_PMSM import EEC_PMSM
@@ -93,11 +95,12 @@ def test_EEC_ELUT_PMSM_calc(n_Id=5, n_Iq=5):
     # Define second simu for FEMM comparison
     simu.mag = MagFEMM(is_periodicity_a=True, is_periodicity_t=True, nb_worker=4)
 
-    # Postprocessing
-    simu.var_simu.postproc_list = [PostLUT(is_save_LUT=True)]
+    # Postprocessing, i.e. generate a LUTdq from the simulation results
+    # simu.var_simu.postproc_list = [PostLUTdq(is_save_LUT=True)]
+    out = xLUTdq(simu=simu)
+    simu.run()
 
-    out = simu.run()
-
+    """
     ELUT = out.simu.var_simu.postproc_list[0].LUT
 
     # Check phase_dir calculation
@@ -131,8 +134,8 @@ def test_EEC_ELUT_PMSM_calc(n_Id=5, n_Iq=5):
         is_show_fig=is_show_fig,
         **dict_2D,
     )
-
-    return out, ELUT
+    """
+    return out, None  # ELUT
 
 
 @pytest.mark.long_5s

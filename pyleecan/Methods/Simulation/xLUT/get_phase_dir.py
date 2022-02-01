@@ -15,8 +15,8 @@ def get_phase_dir(self):
         rotating direction of phases +/-1
     """
 
-    if self.phase_dir not in [-1, 1]:
-        # recalculate phase_dir from Phi_wind
-        self.phase_dir = get_phase_dir_DataTime(self.Phi_wind[0])
+    if self.elec.phase_dir not in [-1, 1]:
+        # recalculate phase_dir from Phi_wind TODO: check if this is correct
+        self.elec.phase_dir = get_phase_dir_DataTime(self.Phi_wind[0])
 
-    return self.phase_dir
+    return self.elec.phase_dir
