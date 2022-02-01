@@ -47,6 +47,7 @@ def test_ELUT():
     return ELUT
 
 
+@pytest.mark.dev
 @pytest.mark.long_5s
 @pytest.mark.long_1m
 @pytest.mark.MagFEMM
@@ -94,30 +95,25 @@ def test_EEC_ELUT_PMSM_calc(n_Id=5, n_Iq=5):
 
     # Postprocessing, i.e. generate a LUTdq from the simulation results
     # simu.var_simu.postproc_list = [PostLUTdq(is_save_LUT=True)]
-    out = xLUTdq(simu=simu)
+    lut = xLUTdq(simu=simu)
     simu.run()
 
-    """
-    ELUT = out.simu.var_simu.postproc_list[0].LUT
-
     # Check phase_dir calculation
-    assert ELUT.get_phase_dir() == get_phase_dir_DataTime(ELUT.Phi_wind[0])
+    assert lut.get_phase_dir() == get_phase_dir_DataTime(lut.Phi_wind[0])
 
     # Check flux linkage dqh values
-    Phi_dqh_mean = ELUT.get_Phidqh_mean()
+    Phi_dqh_mean = lut.get_Phidqh_mean()
     OP_list = OP_matrix[:, 1:3].tolist()
     ii = OP_list.index([0, 0])
     Phi_dqh0 = n2dqh_DataTime(
-        ELUT.Phi_wind[ii],
-        is_dqh_rms=True,
-        phase_dir=ELUT.get_phase_dir(),
+        lut.Phi_wind[ii], is_dqh_rms=True, phase_dir=lut.get_phase_dir()
     )
     Phi_dqh0_mean = Phi_dqh0.get_along("time=mean", "phase")[Phi_dqh0.symbol]
     assert_almost_equal(Phi_dqh0_mean, Phi_dqh_mean[ii, :], decimal=20)
     assert_almost_equal(Phi_dqh0_mean[0], 0.141, decimal=3)
 
     # Plot 3-phase current function of time
-    ELUT.Phi_wind[ii].plot_2D_Data(
+    lut.Phi_wind[ii].plot_2D_Data(
         "time",
         "phase[]",
         save_path=join(save_path, name + "_flux_linkage_abc.png"),
@@ -131,8 +127,8 @@ def test_EEC_ELUT_PMSM_calc(n_Id=5, n_Iq=5):
         is_show_fig=is_show_fig,
         **dict_2D,
     )
-    """
-    return out, None  # ELUT
+
+    return lut
 
 
 @pytest.mark.long_5s
