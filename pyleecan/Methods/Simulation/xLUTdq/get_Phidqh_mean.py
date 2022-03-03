@@ -17,15 +17,14 @@ def get_Phidqh_mean(self):
     """
 
     if self.Phi_dqh_mean is None:
-
-        Phi_dqh_mean = zeros((len(self.Phi_wind), 3))
+        stator_label = self.simu.machine.stator.get_label()
+        Phi_wind = [out.mag.Phi_wind[stator_label] for out in self.output_list]
+        Phi_dqh_mean = zeros((len(Phi_wind), 3))
 
         for i, Phi_wind in enumerate(self.Phi_wind):
             # dqh transform
             Phi_dqh = n2dqh_DataTime(
-                Phi_wind,
-                is_dqh_rms=True,
-                phase_dir=self.get_phase_dir(),
+                Phi_wind, is_dqh_rms=True, phase_dir=self.get_phase_dir()
             )
             # mean over time axis
             Phi_dqh_mean[i, :] = Phi_dqh.get_along("time=mean", "phase")[Phi_dqh.symbol]
