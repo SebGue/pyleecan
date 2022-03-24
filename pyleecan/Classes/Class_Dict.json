@@ -607,7 +607,12 @@
             "comp_surface",
             "comp_width",
             "plot",
-            "plot_schematics"
+            "plot_schematics",
+            "comp_width_wire",
+            "comp_height_wire",
+            "comp_nb_circumferential_wire",
+            "comp_nb_radial_wire",
+            "is_round_wire"
         ],
         "mother": "Conductor",
         "name": "CondType12",
@@ -661,6 +666,91 @@
             }
         ]
     },
+    "CondType13": {
+        "constants": [
+            {
+                "name": "VERSION",
+                "value": "1"
+            }
+        ],
+        "daughters": [],
+        "desc": "parallel stranded conductor consisting of at least a single round wire",
+        "is_internal": false,
+        "methods": [
+            "check",
+            "comp_surface_active",
+            "comp_height",
+            "comp_surface",
+            "comp_width",
+            "plot",
+            "plot_schematics",
+            "comp_width_wire",
+            "comp_height_wire",
+            "comp_nb_circumferential_wire",
+            "comp_nb_radial_wire",
+            "is_round_wire"
+        ],
+        "mother": "Conductor",
+        "name": "CondType13",
+        "package": "Machine",
+        "path": "pyleecan/Generator/ClassesRef/Machine/CondType13.csv",
+        "properties": [
+            {
+                "desc": "cf schematics, single wire diameter without insulation [m]",
+                "max": "",
+                "min": "0",
+                "name": "Wwire",
+                "type": "float",
+                "unit": "m",
+                "value": 0.015
+            },
+            {
+                "desc": "(advanced) cf schematics, winding coil insulation diameter [m]",
+                "max": "",
+                "min": "0",
+                "name": "Wins_cond",
+                "type": "float",
+                "unit": "m",
+                "value": 0.015
+            },
+            {
+                "desc": "cf schematics, stator winding number of preformed wires (strands) in parallel per coil along radial (vertical) direction",
+                "max": "",
+                "min": "1",
+                "name": "Nwppc_rad",
+                "type": "int",
+                "unit": "-",
+                "value": 1
+            },
+            {
+                "desc": "cf schematics, stator winding number of preformed wires (strands) in parallel per coil along tangential (horizontal) direction",
+                "max": "",
+                "min": "1",
+                "name": "Nwppc_tan",
+                "type": "int",
+                "unit": "-",
+                "value": 1
+            },
+            {
+                "desc": "(advanced) cf schematics, winding strand insulation thickness [m]",
+                "max": "",
+                "min": "0",
+                "name": "Wins_wire",
+                "type": "float",
+                "unit": "m",
+                "value": 0
+            },
+            {
+                "desc": "winding overhang factor which describes the fact that random round wire end-windings can be more or less compressed (0.5 for small motors, 0.8 for large motors) - can be used to tune the average turn length (relevant if type_cond==1)",
+                "max": "",
+                "min": "0",
+                "name": "Kwoh",
+                "type": "float",
+                "unit": "-",
+                "value": 0.5
+            }
+        ]
+    },
     "CondType21": {
         "constants": [
             {
@@ -676,7 +766,12 @@
             "comp_height",
             "comp_surface",
             "comp_width",
-            "plot"
+            "plot",
+            "comp_width_wire",
+            "comp_height_wire",
+            "comp_nb_circumferential_wire",
+            "comp_nb_radial_wire",
+            "is_round_wire"
         ],
         "mother": "Conductor",
         "name": "CondType21",
@@ -724,7 +819,12 @@
         "is_internal": false,
         "methods": [
             "comp_surface_active",
-            "comp_surface"
+            "comp_surface",
+            "comp_width_wire",
+            "comp_height_wire",
+            "comp_nb_circumferential_wire",
+            "comp_nb_radial_wire",
+            "is_round_wire"
         ],
         "mother": "Conductor",
         "name": "CondType22",
@@ -752,6 +852,7 @@
         "daughters": [
             "CondType11",
             "CondType12",
+            "CondType13",
             "CondType21",
             "CondType22"
         ],
@@ -1424,7 +1525,7 @@
             }
         ]
     },
-    "Electrical": {
+    "ElecLUTdq": {
         "constants": [
             {
                 "name": "VERSION",
@@ -1432,6 +1533,101 @@
             }
         ],
         "daughters": [],
+        "desc": "Electric module object for electrical equivalent circuit simulation",
+        "is_internal": false,
+        "methods": [
+            "run",
+            "comp_LUTdq"
+        ],
+        "mother": "Electrical",
+        "name": "ElecLUTdq",
+        "package": "Simulation",
+        "path": "pyleecan/Generator/ClassesRef/Simulation/ElecLUTdq.csv",
+        "properties": [
+            {
+                "desc": "Number of id values used for interpolation",
+                "max": "",
+                "min": "1",
+                "name": "n_interp",
+                "type": "int",
+                "unit": "",
+                "value": 10
+            },
+            {
+                "desc": "Minimum Id for LUT calculation",
+                "max": "",
+                "min": "",
+                "name": "Id_min",
+                "type": "float",
+                "unit": "Arms",
+                "value": null
+            },
+            {
+                "desc": "Maximum Id for LUT calculation",
+                "max": "",
+                "min": "",
+                "name": "Id_max",
+                "type": "float",
+                "unit": "Arms",
+                "value": null
+            },
+            {
+                "desc": "Minimum Iq for LUT calculation",
+                "max": "",
+                "min": "",
+                "name": "Iq_min",
+                "type": "float",
+                "unit": "Arms",
+                "value": null
+            },
+            {
+                "desc": "Maximum Iq for LUT calculation",
+                "max": "",
+                "min": "",
+                "name": "Iq_max",
+                "type": "float",
+                "unit": "Arms",
+                "value": null
+            },
+            {
+                "desc": "Number of Id for LUT calculation",
+                "max": "",
+                "min": "",
+                "name": "n_Id",
+                "type": "int",
+                "unit": "",
+                "value": 1
+            },
+            {
+                "desc": "Number of Iq for LUT calculation",
+                "max": "",
+                "min": "",
+                "name": "n_Iq",
+                "type": "int",
+                "unit": "",
+                "value": 1
+            },
+            {
+                "desc": "Simulation object to run for LUT calculation",
+                "max": "",
+                "min": "",
+                "name": "LUT_simu",
+                "type": "Simulation",
+                "unit": "",
+                "value": null
+            }
+        ]
+    },
+    "Electrical": {
+        "constants": [
+            {
+                "name": "VERSION",
+                "value": "1"
+            }
+        ],
+        "daughters": [
+            "ElecLUTdq"
+        ],
         "desc": "Electric module object for electrical equivalent circuit simulation",
         "is_internal": false,
         "methods": [
@@ -1655,18 +1851,30 @@
             }
         ],
         "daughters": [
-            "EndWindingCirc"
+            "EndWindingCirc",
+            "EndWindingRect"
         ],
         "desc": "Abstract Class of the machine's end winding",
         "is_internal": false,
         "methods": [
-            "comp_length_endwinding"
+            "comp_length",
+            "comp_inductance"
         ],
         "mother": "",
         "name": "EndWinding",
         "package": "Machine",
         "path": "pyleecan/Generator/ClassesRef/Machine/EndWinding.csv",
-        "properties": []
+        "properties": [
+            {
+                "desc": "Enforced end-winding lekage inductance",
+                "max": "",
+                "min": "0",
+                "name": "Lew_enforced",
+                "type": "float",
+                "unit": "H",
+                "value": 0
+            }
+        ]
     },
     "EndWindingCirc": {
         "constants": [
@@ -1679,7 +1887,8 @@
         "desc": "Class of the machine's end winding assuming a circular shape",
         "is_internal": false,
         "methods": [
-            "comp_length_endwinding"
+            "comp_length",
+            "comp_inductance"
         ],
         "mother": "EndWinding",
         "name": "EndWindingCirc",
@@ -1694,6 +1903,54 @@
                 "type": "float",
                 "unit": "",
                 "value": null
+            }
+        ]
+    },
+    "EndWindingRect": {
+        "constants": [
+            {
+                "name": "VERSION",
+                "value": "1"
+            }
+        ],
+        "daughters": [],
+        "desc": "Class of the machine's end winding assuming a rectangular shape",
+        "is_internal": false,
+        "methods": [
+            "comp_length",
+            "comp_inductance"
+        ],
+        "mother": "EndWinding",
+        "name": "EndWindingRect",
+        "package": "Machine",
+        "path": "pyleecan/Generator/ClassesRef/Machine/EndWindingRect.csv",
+        "properties": [
+            {
+                "desc": "effective coil pitch (override) for length calculation",
+                "max": "",
+                "min": "",
+                "name": "coil_pitch",
+                "type": "float",
+                "unit": "",
+                "value": null
+            },
+            {
+                "desc": "permeance factor related to end winding length",
+                "max": "",
+                "min": "0",
+                "name": "lambda_length",
+                "type": "float",
+                "unit": "",
+                "value": 0
+            },
+            {
+                "desc": "permeance factor related to end winding width",
+                "max": "",
+                "min": "0",
+                "name": "lambda_width",
+                "type": "float",
+                "unit": "",
+                "value": 0
             }
         ]
     },
@@ -3951,6 +4208,7 @@
             "InputCurrent",
             "InputFlux",
             "InputForce",
+            "InputPower",
             "InputVoltage"
         ],
         "desc": "Starting data of the simulation",
@@ -4203,6 +4461,98 @@
             }
         ]
     },
+    "InputPower": {
+        "constants": [
+            {
+                "name": "VERSION",
+                "value": "1"
+            }
+        ],
+        "daughters": [],
+        "desc": "Input to start the electrical module with power input",
+        "is_internal": false,
+        "methods": [
+            "gen_input"
+        ],
+        "mother": "Input",
+        "name": "InputPower",
+        "package": "Simulation",
+        "path": "pyleecan/Generator/ClassesRef/Simulation/InputPower.csv",
+        "properties": [
+            {
+                "desc": "Rotation direction of the rotor (rot_dir*N0, default value given by ROT_DIR_REF)",
+                "max": "1",
+                "min": "-1",
+                "name": "rot_dir",
+                "type": "int",
+                "unit": "-",
+                "value": null
+            },
+            {
+                "desc": "Rotation direction of the stator phase (phase_dir*(n-1)*pi/qs, default value given by PHASE_DIR_REF)",
+                "max": "1",
+                "min": "-1",
+                "name": "phase_dir",
+                "type": "int",
+                "unit": "",
+                "value": null
+            },
+            {
+                "desc": "Rotation direction of the stator currents (current_dir*2*pi*felec*time, default value given by CURRENT_DIR_REF)",
+                "max": "1",
+                "min": "-1",
+                "name": "current_dir",
+                "type": "int",
+                "unit": "-",
+                "value": null
+            },
+            {
+                "desc": "True to compute voltage/currents only on one time periodicity (use periodicities defined in axes_dict[time])",
+                "max": "",
+                "min": "",
+                "name": "is_periodicity_t",
+                "type": "bool",
+                "unit": "-",
+                "value": 0
+            },
+            {
+                "desc": "True to compute voltage/currents only on one angle periodicity (use periodicities defined in axes_dict[angle])",
+                "max": "",
+                "min": "",
+                "name": "is_periodicity_a",
+                "type": "bool",
+                "unit": "-",
+                "value": 0
+            },
+            {
+                "desc": "Maximum phase voltage",
+                "max": "",
+                "min": "0",
+                "name": "U_max",
+                "type": "float",
+                "unit": "Vrms",
+                "value": null
+            },
+            {
+                "desc": "Maximum current density in slot",
+                "max": "",
+                "min": "0",
+                "name": "J_max",
+                "type": "float",
+                "unit": "A/m\u00c2\u00b2",
+                "value": null
+            },
+            {
+                "desc": "Maximum phase current",
+                "max": "",
+                "min": "0",
+                "name": "I_max",
+                "type": "float",
+                "unit": "A",
+                "value": null
+            }
+        ]
+    },
     "InputVoltage": {
         "constants": [
             {
@@ -4377,6 +4727,7 @@
             "get_Phidqh_mean",
             "get_Phidqh_mag",
             "get_Phidqh_mag_mean",
+            "get_Ploss_dqh_interp",
             "interp_Phi_dqh"
         ],
         "mother": "LUT",
@@ -5042,7 +5393,9 @@
                 "value": "1"
             }
         ],
-        "daughters": [],
+        "daughters": [
+            "LossFEMM"
+        ],
         "desc": "Losses module object that containt the loss models. See method add_model for implementation details.",
         "is_internal": false,
         "methods": [
@@ -5081,6 +5434,85 @@
                 "type": "str",
                 "unit": "-",
                 "value": "Pyleecan.Loss"
+            }
+        ]
+    },
+    "LossFEMM": {
+        "constants": [
+            {
+                "name": "VERSION",
+                "value": "1"
+            }
+        ],
+        "daughters": [],
+        "desc": "Loss module dedicated to FEMM developed in https://www.femm.info/wiki/SPMLoss",
+        "is_internal": false,
+        "methods": [
+            "run",
+            "comp_axes",
+            "comp_loss",
+            "comp_loss_density_core",
+            "comp_loss_density_joule",
+            "comp_loss_density_magnet"
+        ],
+        "mother": "Loss",
+        "name": "LossFEMM",
+        "package": "Simulation",
+        "path": "pyleecan/Generator/ClassesRef/Simulation/LossFEMM.csv",
+        "properties": [
+            {
+                "desc": "eddy current loss coefficients",
+                "max": "",
+                "min": "",
+                "name": "Ce",
+                "type": "float",
+                "unit": "W/(m3*T2*Hz2)",
+                "value": null
+            },
+            {
+                "desc": "hysteresis loss coefficients",
+                "max": "",
+                "min": "",
+                "name": "Ch",
+                "type": "float",
+                "unit": "W/(m3*T2*Hz)",
+                "value": null
+            },
+            {
+                "desc": "proximity loss coefficients",
+                "max": "",
+                "min": "",
+                "name": "Cp",
+                "type": "float",
+                "unit": "W/(m3*T2*Hz2)",
+                "value": null
+            },
+            {
+                "desc": "True to save loss density map as meshsolution",
+                "max": "",
+                "min": "",
+                "name": "is_get_meshsolution",
+                "type": "bool",
+                "unit": "",
+                "value": 0
+            },
+            {
+                "desc": "Average stator temperature for Electrical calculation",
+                "max": "",
+                "min": "",
+                "name": "Tsta",
+                "type": "float",
+                "unit": "deg Celsius",
+                "value": 20
+            },
+            {
+                "desc": "Average rotor temperature for Electrical calculation",
+                "max": "",
+                "min": "",
+                "name": "Trot",
+                "type": "float",
+                "unit": "deg Celsius",
+                "value": 20
             }
         ]
     },
@@ -6279,6 +6711,15 @@
                 "type": "float",
                 "unit": "deg Celsius",
                 "value": 20
+            },
+            {
+                "desc": "True to consider rotor periodicity over time instead of stator",
+                "max": "",
+                "min": "",
+                "name": "is_periodicity_rotor",
+                "type": "bool",
+                "unit": "",
+                "value": 0
             }
         ]
     },
@@ -8057,7 +8498,8 @@
             "get_Is",
             "get_Us",
             "store",
-            "get_electrical"
+            "get_electrical",
+            "get_Jrms_max"
         ],
         "mother": "",
         "name": "OutElec",
@@ -8137,19 +8579,19 @@
                 "value": null
             },
             {
-                "desc": "Theoretical Average Electromagnetic Power",
+                "desc": "Average Electromagnetic power",
                 "max": "",
                 "min": "",
-                "name": "Pem_av_ref",
+                "name": "Pem_av",
                 "type": "float",
                 "unit": "W",
                 "value": null
             },
             {
-                "desc": "Theoretical Average Electromagnetic torque",
+                "desc": "Average Electromagnetic torque",
                 "max": "",
                 "min": "",
-                "name": "Tem_av_ref",
+                "name": "Tem_av",
                 "type": "float",
                 "unit": "N.m",
                 "value": null
@@ -8188,6 +8630,24 @@
                 "name": "eec",
                 "type": "EEC",
                 "unit": "",
+                "value": null
+            },
+            {
+                "desc": "Useful power (Pem_av minus losses)",
+                "max": "",
+                "min": "",
+                "name": "P_useful",
+                "type": "float",
+                "unit": "W",
+                "value": null
+            },
+            {
+                "desc": "Maximum RMS current density in slots",
+                "max": "",
+                "min": "0",
+                "name": "Jrms_max",
+                "type": "float",
+                "unit": "A/m\u00c2\u00b2",
                 "value": null
             }
         ]
@@ -8559,7 +9019,10 @@
         "is_internal": false,
         "methods": [
             "get_loss",
-            "get_loss_dist"
+            "get_loss_dist",
+            "get_loss_group",
+            "get_loss_overall",
+            "store"
         ],
         "mother": "",
         "name": "OutLoss",
@@ -8582,7 +9045,7 @@
                 "name": "meshsol_list",
                 "type": "[MeshSolution]",
                 "unit": "",
-                "value": ""
+                "value": null
             },
             {
                 "desc": "Internal dict to index losses",
@@ -8601,6 +9064,69 @@
                 "type": "str",
                 "unit": "-",
                 "value": "Pyleecan.Loss"
+            },
+            {
+                "desc": "Dict containing axes data used for Magnetics",
+                "max": "",
+                "min": "",
+                "name": "axes_dict",
+                "type": "{SciDataTool.Classes.DataND.Data}",
+                "unit": "",
+                "value": "None"
+            },
+            {
+                "desc": "Stator core losses due to hysteresis and eddy currents",
+                "max": "",
+                "min": "",
+                "name": "Pstator",
+                "type": "float",
+                "unit": "W",
+                "value": null
+            },
+            {
+                "desc": "Rotor core losses due to hysteresis and eddy currents",
+                "max": "",
+                "min": "",
+                "name": "Protor",
+                "type": "float",
+                "unit": "W",
+                "value": null
+            },
+            {
+                "desc": "Magnet eddy current losses",
+                "max": "",
+                "min": "",
+                "name": "Pmagnet",
+                "type": "float",
+                "unit": "W",
+                "value": null
+            },
+            {
+                "desc": "Stator core losses",
+                "max": "",
+                "min": "",
+                "name": "Pprox",
+                "type": "float",
+                "unit": "W",
+                "value": null
+            },
+            {
+                "desc": "Stator core losses",
+                "max": "",
+                "min": "",
+                "name": "Pjoule",
+                "type": "float",
+                "unit": "W",
+                "value": null
+            },
+            {
+                "desc": "Dict containing coefficients to rebuild loss polynom function of frequency",
+                "max": "",
+                "min": "",
+                "name": "coeff_dict",
+                "type": "dict",
+                "unit": "",
+                "value": -1
             }
         ]
     },
@@ -9360,28 +9886,10 @@
         "path": "pyleecan/Generator/ClassesRef/Post/PostLUT.csv",
         "properties": [
             {
-                "desc": "Look-Up Table to enforce",
-                "max": "",
-                "min": "",
-                "name": "LUT",
-                "type": "LUT",
-                "unit": "",
-                "value": null
-            },
-            {
                 "desc": "True to save LUT in PostLUT",
                 "max": "",
                 "min": "",
                 "name": "is_save_LUT",
-                "type": "bool",
-                "unit": "",
-                "value": 1
-            },
-            {
-                "desc": "True to store LUT in PostLUT",
-                "max": "",
-                "min": "",
-                "name": "is_store_LUT",
                 "type": "bool",
                 "unit": "",
                 "value": 1
@@ -10316,6 +10824,7 @@
             "comp_surface",
             "comp_surface_active",
             "comp_surface_opening",
+            "comp_width",
             "comp_width_opening",
             "convert_to_SlotUD2",
             "get_is_stator",

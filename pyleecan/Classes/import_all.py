@@ -16,6 +16,7 @@ from ..Classes.CellMat import CellMat
 from ..Classes.Circle import Circle
 from ..Classes.CondType11 import CondType11
 from ..Classes.CondType12 import CondType12
+from ..Classes.CondType13 import CondType13
 from ..Classes.CondType21 import CondType21
 from ..Classes.CondType22 import CondType22
 from ..Classes.Conductor import Conductor
@@ -27,12 +28,14 @@ from ..Classes.EEC import EEC
 from ..Classes.EEC_LSRPM import EEC_LSRPM
 from ..Classes.EEC_PMSM import EEC_PMSM
 from ..Classes.EEC_SCIM import EEC_SCIM
+from ..Classes.ElecLUTdq import ElecLUTdq
 from ..Classes.Electrical import Electrical
 from ..Classes.Elmer import Elmer
 from ..Classes.ElmerResults import ElmerResults
 from ..Classes.ElmerResultsVTU import ElmerResultsVTU
 from ..Classes.EndWinding import EndWinding
 from ..Classes.EndWindingCirc import EndWindingCirc
+from ..Classes.EndWindingRect import EndWindingRect
 from ..Classes.FPGNSeg import FPGNSeg
 from ..Classes.FPGNTri import FPGNTri
 from ..Classes.Force import Force
@@ -71,6 +74,7 @@ from ..Classes.Input import Input
 from ..Classes.InputCurrent import InputCurrent
 from ..Classes.InputFlux import InputFlux
 from ..Classes.InputForce import InputForce
+from ..Classes.InputPower import InputPower
 from ..Classes.InputVoltage import InputVoltage
 from ..Classes.Interpolation import Interpolation
 from ..Classes.LUT import LUT
@@ -87,6 +91,7 @@ from ..Classes.LamSquirrelCageMag import LamSquirrelCageMag
 from ..Classes.Lamination import Lamination
 from ..Classes.Line import Line
 from ..Classes.Loss import Loss
+from ..Classes.LossFEMM import LossFEMM
 from ..Classes.LossModel import LossModel
 from ..Classes.LossModelBertotti import LossModelBertotti
 from ..Classes.LossModelWinding import LossModelWinding
