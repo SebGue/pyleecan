@@ -509,7 +509,12 @@
             "comp_surface",
             "comp_width",
             "plot",
-            "plot_schematics"
+            "plot_schematics",
+            "comp_width_wire",
+            "comp_height_wire",
+            "comp_nb_circumferential_wire",
+            "comp_nb_radial_wire",
+            "is_round_wire"
         ],
         "mother": "Conductor",
         "name": "CondType11",
@@ -860,13 +865,8 @@
         "is_internal": false,
         "methods": [
             "check",
-            "comp_phi_skin",
-            "comp_psi_skin",
-            "comp_phip_skin",
-            "comp_psip_skin",
-            "comp_skin_effect",
-            "comp_power",
-            "comp_skin_effect_round_wire",
+            "comp_skin_effect_resistance",
+            "comp_skin_effect_inductance",
             "comp_temperature_effect"
         ],
         "mother": "",
@@ -1222,6 +1222,15 @@
                 "type": "float",
                 "unit": "Ohm",
                 "value": null
+            },
+            {
+                "desc": "Magnetic model for flux linkage calculation",
+                "max": "",
+                "min": "",
+                "name": "fluxlink",
+                "type": "Magnetics",
+                "unit": "-",
+                "value": null
             }
         ]
     },
@@ -1293,15 +1302,6 @@
         "package": "Simulation",
         "path": "pyleecan/Generator/ClassesRef/Simulation/EEC_PMSM.csv",
         "properties": [
-            {
-                "desc": "Magnetic model for flux linkage calculation",
-                "max": "",
-                "min": "",
-                "name": "fluxlink",
-                "type": "Magnetics",
-                "unit": "-",
-                "value": null
-            },
             {
                 "desc": "Stator winding inductance along d-axis",
                 "max": "",
@@ -6475,6 +6475,15 @@
                 "max": "",
                 "min": "",
                 "name": "is_fast_draw",
+                "type": "bool",
+                "unit": "",
+                "value": 1
+            },
+            {
+                "desc": "True to calculate torque from integration of energy derivate over rotor elements",
+                "max": "",
+                "min": "",
+                "name": "is_calc_torque_energy",
                 "type": "bool",
                 "unit": "",
                 "value": 1
