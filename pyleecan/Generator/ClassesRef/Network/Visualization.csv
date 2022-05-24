@@ -1,0 +1,10 @@
+﻿Variable name,Unit,Description (EN),Size,Type,Default value,Minimum value,Maximum value,,Package,Inherit,Methods,Constant Name,Constant Value,Class description
+Bx,T,Magnetic filed value in the x-direction,0,float,0,0,,,Network,MultiPhysLumped,plot_flux_line,,,Visaulization of simulation results
+By,T,Magnetic filed value in the y-direction,0,float,0,0,,,,,plot_flux_vector,,,
+cell_materials,,Cells used for te domain discretization,0,int,1,1,,,,,,,,
+m,,Number of discretization points along the y-axis,0,int,1,1,,,,,,,,
+n,,Number of discretization points along the x-axis,0,int,1,1,,,,,,,,
+x,m,Coordinate of the point along the x-axis,0,float,0,0,,,,,,,,
+y,m,Coordinate of the point along the y-axis,0,float,0,0,,,,,,,,
+x_dual,m,Coordinate of center cell along the x-axis,0,float,0,0,,,,,,,,
+y_dual,m,Coordinate of center cell along the y-axis,0,float,0,0,,,,,,,,
