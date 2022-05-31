@@ -74,4 +74,16 @@ def LoadMaterial(file_path_json):
     else:
         winding_mat = {}
 
-    return magnet_mat, rotor_mat, stator_mat, winding_mat
+    # Get Shaft material properties
+    if dict_SPMSM["shaft"]["mat_type"]["is_isotropic"] == False:
+        shaft_mat = {
+            "rotor_permeance": dict_SPMSM["shaft"]["mat_type"]["mag"]["BH_curve"][
+                "value"
+            ]
+        }  # non-linear case
+    else:
+        shaft_mat = {
+            "rotor_permeance": dict_SPMSM["shaft"]["mat_type"]["mag"]["mur_lin"]
+        }  # linear case
+
+    return magnet_mat, rotor_mat, stator_mat, winding_mat, shaft_mat
