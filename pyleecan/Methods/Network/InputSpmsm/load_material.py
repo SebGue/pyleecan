@@ -3,7 +3,7 @@
 from pyleecan.Functions.load import load_json
 
 
-def LoadMaterial(file_path_json):
+def load_material(file_path_json):
     """Load the stator and rotor material characteristics of an SPMSM machine
 
     Parameters
@@ -21,6 +21,8 @@ def LoadMaterial(file_path_json):
         The linear or non-linear material properties of the stator
     winding_mat: float
         The material properties of the winding and insulation
+    shaft_mat: float
+        The linear or non-linear material properties of the shaft
     """
 
     # Load the SPMSM machine from the .json file
