@@ -3,7 +3,7 @@
 from pyleecan.Functions.load import load_json
 
 
-def load_material(file_path_json):
+def LoadMaterial(file_path_json):
     """Load the stator and rotor material characteristics of an SPMSM machine
 
     Parameters
@@ -74,18 +74,21 @@ def load_material(file_path_json):
             ]["mag"]["mur_lin"],
         }
     else:
-        winding_mat = {}
+        winding_mat = {"winding_material": "Not defined"}
 
     # Get Shaft material properties
-    if dict_SPMSM["shaft"]["mat_type"]["is_isotropic"] == False:
-        shaft_mat = {
-            "rotor_permeance": dict_SPMSM["shaft"]["mat_type"]["mag"]["BH_curve"][
-                "value"
-            ]
-        }  # non-linear case
+    if dict_SPMSM["shaft"] != None:
+        if dict_SPMSM["shaft"]["mat_type"]["is_isotropic"] == False:
+            shaft_mat = {
+                "shaft_permeance": dict_SPMSM["shaft"]["mat_type"]["mag"]["BH_curve"][
+                    "value"
+                ]
+            }  # non-linear case
+        else:
+            shaft_mat = {
+                "shaft_permeance": dict_SPMSM["shaft"]["mat_type"]["mag"]["mur_lin"]
+            }  # linear case
     else:
-        shaft_mat = {
-            "rotor_permeance": dict_SPMSM["shaft"]["mat_type"]["mag"]["mur_lin"]
-        }  # linear case
+        shaft_mat = {"shaft_permeance": "Not defined"}
 
     return magnet_mat, rotor_mat, stator_mat, winding_mat, shaft_mat
