@@ -4,7 +4,7 @@ from pyleecan.Functions.load import load_json
 
 
 def load_parameters(file_path_json):
-    """Load the stator and rotor material characteristics of an PM machine
+    """Load the stator and rotor parameters of an PM machine
 
     Parameters
     ----------
@@ -30,7 +30,7 @@ def load_parameters(file_path_json):
         "rotor_Rext": dict_PM["rotor"]["Rext"],
         "rotor_Rint": dict_PM["rotor"]["Rint"],
         "rotor_poles_Zs": dict_PM["rotor"]["slot"]["Zs"],
-        # Magnet
+        # Magnet height and width
         "magnet_height_Hmag": dict_PM["rotor"]["slot"]["Hmag"],
         "magnet_width_Wmag": dict_PM["rotor"]["slot"]["Wmag"],
     }
@@ -39,7 +39,7 @@ def load_parameters(file_path_json):
     stator_param = {
         "stator_Rext": dict_PM["stator"]["Rext"],
         "stator_Rint": dict_PM["stator"]["Rint"],
-        # Stator slot
+        # Stator slot parameters
         "stator_tooth_tip_height_H0": dict_PM["stator"]["slot"]["H0"],
         "stator_tooth_tip_width_W0": dict_PM["stator"]["slot"]["W0"],
         "stator_slot_length_H2": dict_PM["stator"]["slot"]["H2"],
