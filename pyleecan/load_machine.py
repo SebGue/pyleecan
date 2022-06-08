@@ -34,4 +34,4 @@ def load_machine(file_path):
     }
 
 
-print(load_machine("C:/Users/pc/Downloads/SPMSM_264s44p.json"))
+print(load_machine("C:/Users/pc/Downloads/SPMSM_264s44p.json"))  # only for test
