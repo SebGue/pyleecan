@@ -1,3 +1,4 @@
+from matplotlib import cm
 from numpy import (
     real,
     min as np_min,
@@ -7,7 +8,8 @@ from numpy import (
 from ....definitions import config_dict
 import pyvista as pv
 
-COLOR_MAP = config_dict["PLOT"]["COLOR_DICT"]["COLOR_MAP"]
+# COLOR_MAP = config_dict["PLOT"]["COLOR_DICT"]["COLOR_MAP"]
+COLOR_MAP = cm.get_cmap("hsv")
 
 
 def plot_mesh_field(
@@ -31,3 +33,7 @@ def plot_mesh_field(
         clim=clim,
         scalar_bar_args=sargs,
     )
+
+    mesh_point = mesh_pv.cell_data_to_point_data()
+    contours = mesh_point.contour()
+    p.add_mesh(contours, color="black", line_width=3)
