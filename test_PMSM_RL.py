@@ -40,6 +40,7 @@ def test_FEMM_SPMSM():
         # Periodicity
         is_periodicity_t=True,
         is_periodicity_a=True,
+        angle_rotor_initial=0,
     )
 
     simu.mag = MagFEMM(
@@ -49,7 +50,7 @@ def test_FEMM_SPMSM():
         is_get_meshsolution=True,  # Get the mesh solution
         is_fast_draw=True,
         is_calc_torque_energy=False,
-        Kmesh_fineness=1,  # Define the mesh fineness
+        Kmesh_fineness=10,  # Define the mesh fineness
     )
 
     out = simu.run()
@@ -102,8 +103,25 @@ def test_FEMM_SPMSM():
 
         # Plot the magnetic flux density mapping
         out.mag.meshsolution.plot_contour(
+            # "time[1]",
             label="B",
             is_show_fig=True,
+            # win_title=True,
+            title="Flux Density Mapping B",
+            win_title="Flux_Density_B",
+        )
+
+        # Plot the mesh of the machine under study
+        out.mag.meshsolution.plot_mesh(
+            # group_names=["stator core", "airgap", "rotor core"],
+            is_show_fig=True,
+        )
+
+        # Plot the flux field mapping (flux density + flux lines)
+        out.plot_B_mesh(
+            is_show_fig=True,
+            title="Flux Density and lines Mapping",
+            win_title="Flux_Density_B",
         )
 
     return out, Br_rms, harmonics, EM_torque
