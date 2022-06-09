@@ -50,7 +50,7 @@ def test_FEMM_SPMSM():
         is_get_meshsolution=True,  # Get the mesh solution
         is_fast_draw=True,
         is_calc_torque_energy=False,
-        Kmesh_fineness=10,  # Define the mesh fineness
+        Kmesh_fineness=3,  # Define the mesh fineness
     )
 
     out = simu.run()
