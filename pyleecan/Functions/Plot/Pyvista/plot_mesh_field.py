@@ -17,7 +17,7 @@ def plot_mesh_field(
     sargs,
     field_name,
     clim=None,
-    mesh_pv=None,
+    mesh_pv=1,
     field=None,
     phase=1,
 ):
@@ -34,6 +34,12 @@ def plot_mesh_field(
         scalar_bar_args=sargs,
     )
 
-    mesh_point = mesh_pv.cell_data_to_point_data()
-    contours = mesh_point.contour()
-    p.add_mesh(contours, color="black", line_width=3)
+    # streamlines = mesh_pv.streamlines(n_points=40, source_center=(2.35, 0.08, 0))
+    # mesh_point = mesh_pv.cell_data_to_point_data()
+    # streamlines = mesh_point.streamlines_evenly_spaced_2D(
+    #     start_position=(2.35, 0.08, 0.0),
+    #     separating_distance=3,
+    #     separating_distance_ratio=0.2,
+    #     compute_vorticity=False,  # vorticity already exists in dataset
+    # )
+    # p.add_mesh(streamlines.tube(radius=0.01), color="black")
