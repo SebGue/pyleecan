@@ -5891,6 +5891,26 @@
             }
         ]
     },
+    "MachineInput": {
+        "constants": [
+            {
+                "name": "VERSION",
+                "value": "1"
+            }
+        ],
+        "daughters": [],
+        "desc": "Abstract class to get machine geometrical inputs and materials",
+        "is_internal": false,
+        "methods": [
+            "load_machine",
+            "load_material"
+        ],
+        "mother": "",
+        "name": "MachineInput",
+        "package": "Machine",
+        "path": "pyleecan/Generator/ClassesRef/Simulation/MachineInput.csv",
+        "properties": []
+    },
     "MachineLSPM": {
         "constants": [
             {
