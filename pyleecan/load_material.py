@@ -3,7 +3,7 @@
 from pyleecan.Functions.load import load
 
 
-def load_machine(file_path):
+def load_material(file_path):
     """Loads the stator and rotor material characteristics of a PM machine
 
     Parameters
@@ -78,4 +78,4 @@ def load_machine(file_path):
     }
 
 
-print(load_machine("C:/Users/pc/Downloads/SPMSM_264s44p.json"))  # only for test
+# print(load_material("C:/Users/pc/Downloads/SPMSM_264s44p.json"))  # only for test
