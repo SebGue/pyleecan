@@ -1,9 +1,43 @@
 # -*- coding: utf-8 -*-
 
-from ....pyleecan.Functions.load import load
+from .....pyleecan.Functions.load import load
 
 
 def load_machine(file_path):
+    """Loads the geometrical input parameters of a PM machine
+
+    Parameters
+    ----------
+    file_path: str
+        path to the file of the machine to be loaded
+
+    Returns
+    -------
+    height_magnet: float
+        The height of the magnet of the PM machine
+    width_magnet_av: float
+        The width of the magnet of the PM machine
+    stator_diameter_ext: float
+        The outer diameter of the stator
+    stator_diameter_int: float
+        The inner diameter of the stator
+    height_slotw: float
+        The active height of the stator slot
+    width_slotw_av: float
+        The width of the stator slot, which is approximated as the ration of the slot surface to the slot height
+    height_yoke_stator: float
+        The height of the stator yoke
+    stator_pole_pairs: float
+        The number of the stator slots
+    rotor_diameter_ext: float
+        The outer diameter of the rotor
+    rotor_diameter_int: float
+        The inner diameter of the rotor
+    rotor_pole_pairs:float
+        The number of the rotor poles
+    height_yoke_rotor: float
+        The height of the rotor yoke
+    """
     # Load Machine file
     Machine = load(file_path)
 
