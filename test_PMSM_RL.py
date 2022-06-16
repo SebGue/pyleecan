@@ -6,9 +6,7 @@ from pyleecan.Classes.Simu1 import Simu1
 from pyleecan.Classes.OPdq import OPdq
 from pyleecan.Classes.MagFEMM import MagFEMM
 
-
 from pyleecan.Functions.load import load
-
 from pyleecan.definitions import DATA_DIR
 
 from matplotlib import pyplot as plt
@@ -26,10 +24,9 @@ def test_FEMM_SPMSM():
     # Import the simulation
     simu = Simu1(name="test_FEMM", machine=machine)
 
-    # Ic = 230 * np.exp(1j * 140 * np.pi / 180)
-
-    # Definition of the current ans speed
-    Ic = 0
+    # Definition of current and speed
+    Ic = 230 * np.exp(1j * 140 * np.pi / 180)  # Current under on-load conditions
+    # Ic = 0 # Current under no-load condition
     SPEED = 0
 
     # Definition of time, angular discretization and operating point
@@ -43,6 +40,7 @@ def test_FEMM_SPMSM():
         angle_rotor_initial=0,
     )
 
+    # Performing the magnetic simulation using FEMM
     simu.mag = MagFEMM(
         is_periodicity_a=True,
         is_periodicity_t=True,
@@ -50,7 +48,7 @@ def test_FEMM_SPMSM():
         is_get_meshsolution=True,  # Get the mesh solution
         is_fast_draw=True,
         is_calc_torque_energy=False,
-        Kmesh_fineness=3,  # Define the mesh fineness
+        Kmesh_fineness=5,  # Define the mesh fineness
     )
 
     out = simu.run()
