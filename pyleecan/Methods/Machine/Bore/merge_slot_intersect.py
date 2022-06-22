@@ -33,8 +33,8 @@ def merge_slot_intersect(self, radius_desc_list, prop_dict, sym):
     if sym != 1 and radius_desc_list[-1]["label"] == "Radius":
         radius_desc_list[-1]["end_angle"] = 2 * pi / sym
 
-    # Replace Arc radius from desc by lines from shape
-    for ii, desc_dict in enumerate(radius_desc_list):
+    # Replace Arc radius from desc by lines from actual bore shape
+    for desc_dict in radius_desc_list:
         if desc_dict["label"] == "Radius":
             desc_dict["lines"] = cut_lines_between_angles(
                 radius_lines, desc_dict["begin_angle"], desc_dict["end_angle"]
