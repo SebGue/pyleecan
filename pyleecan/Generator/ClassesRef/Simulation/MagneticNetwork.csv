@@ -1,0 +1,14 @@
+﻿Variable name,Unit,Description (EN),Size,Type,Default value,Minimum value,Maximum value,,Package,Inherit,Methods,Constant Name,Constant Value,Class description
+,,,,,,,,,Machine,,assembler,VERSION,1,Abstract class to solve the electric machines using the reluctance network
+,,,,,,,,,,,geometry_linear_motor,,,
+,,,,,,,,,,,geometry_linear_motor_separetion,,,
+,,,,,,,,,,,plot,,,
+,,,,,,,,,,,post_processing,,,
+,,,,,,,,,,,pre_processing,,,
+,,,,,,,,,,,RN_linear_motor,,,
+,,,,,,,,,,,run,,,
+,,,,,,,,,,,run_non_linear,,,
+,,,,,,,,,,,run_radial,,,
+,,,,,,,,,,,solver_linear_model,,,
+,,,,,,,,,,,solver_non_linear_model,,,
+,,,,,,,,,,,solver_plus_non_linear_model.py,,,

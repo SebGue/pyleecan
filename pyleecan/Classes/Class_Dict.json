@@ -7094,6 +7094,37 @@
             }
         ]
     },
+    "MagneticNetwork": {
+        "constants": [
+            {
+                "name": "VERSION",
+                "value": "1"
+            }
+        ],
+        "daughters": [],
+        "desc": "Abstract class to solve the electric machines using the reluctance network",
+        "is_internal": false,
+        "methods": [
+            "assembler",
+            "geometry_linear_motor",
+            "geometry_linear_motor_separetion",
+            "plot",
+            "post_processing",
+            "pre_processing",
+            "RN_linear_motor",
+            "run",
+            "run_non_linear",
+            "run_radial",
+            "solver_linear_model",
+            "solver_non_linear_model",
+            "solver_plus_non_linear_model.py"
+        ],
+        "mother": "",
+        "name": "MagneticNetwork",
+        "package": "Machine",
+        "path": "pyleecan/Generator/ClassesRef/Simulation/MagneticNetwork.csv",
+        "properties": []
+    },
     "Magnetics": {
         "constants": [
             {

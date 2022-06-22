@@ -5,9 +5,18 @@ Created on Fri Jun  3 09:10:31 2022
 @author: LAP02
 """
 
-from pre_processing import save_mesh,init_reluc,init_point,init_cell,init_permeabilty_cell,init_permeabilty_cell,init_mesh_BC,numeroting_unknows
+from pre_processing import (
+    save_mesh,
+    init_reluc,
+    init_point,
+    init_cell,
+    init_permeabilty_cell,
+    init_permeabilty_cell,
+    init_mesh_BC,
+    numeroting_unknows,
+)
 from post_processing import add_BC_to_F
-from assembler import assembly,right_member_assembly
+from assembler import assembly, right_member_assembly
 import time
 
 from threadpoolctl import threadpool_info
@@ -28,17 +37,20 @@ os.environ["MKL_DYNAMIC"] = "FALSE"
 os.environ["OMP_DYNAMIC"] = "FALSE"
 
 import numpy as np
-#Choose beetween chol-mod and scipy sparse linear solver
-Have_cholmod=False
+
+# Choose beetween chol-mod and scipy sparse linear solver
+Have_cholmod = False
 try:
     from sksparse.cholmod import cholesky
-    Have_cholmod=True
+
+    Have_cholmod = True
 except:
     from scipy.sparse.linalg import spsolve
 
 
-
-def linear_model(size_x, size_y, x, y, x_dual, y_dual, pos,BC,geometry,mu0,la,Br,mode):
+def linear_model(
+    size_x, size_y, x, y, x_dual, y_dual, pos, BC, geometry, mu0, la, Br, mode
+):
     """
 
     Parameters
@@ -47,9 +59,9 @@ def linear_model(size_x, size_y, x, y, x_dual, y_dual, pos,BC,geometry,mu0,la,Br
         Size of x.
     size_y : integer
         Size of y.
-    x : nd-array, size: size_x (float) 
+    x : nd-array, size: size_x (float)
         x coordinate.
-    y : nd-array, size: size_x (float) 
+    y : nd-array, size: size_x (float)
         y coordinate.
     pos : integers
         position of the rotor.
@@ -76,69 +88,75 @@ def linear_model(size_x, size_y, x, y, x_dual, y_dual, pos,BC,geometry,mu0,la,Br
         tab of elements
     permeability_cell : nd-array, size: m (float)
         the permeability values of each cell
-    list_coord : nd-array, size: size_x*size_y x 2 (float) 
+    list_coord : nd-array, size: size_x*size_y x 2 (float)
         list of coordinate.
 
     """
     t0 = time.perf_counter()
     import matplotlib.pyplot as plt
+
     # Initialyze nature of elements
-    list_geometry,permeability_materials= geometry(size_x,size_y, pos)   
-   
+    list_geometry, permeability_materials = geometry(size_x, size_y, pos)
 
+    list_coord = init_point(size_x, size_y, x, y)
 
+    permeability_cell = init_permeabilty_cell(
+        size_x, size_y, permeability_materials, list_geometry
+    )
 
-    list_coord=init_point(size_x,size_y,x,y)
+    list_elem = init_cell(size_x, size_y)
 
-    
-    permeability_cell=init_permeabilty_cell(size_x,size_y,permeability_materials,list_geometry)
-    
-    
-    list_elem=init_cell(size_x, size_y)
-    
-    BC_list,Periodic_point = init_mesh_BC(size_x, size_y,BC)
-    
-    Num_Unknowns=numeroting_unknows(list_elem,BC_list,Periodic_point)
-    
-    
+    BC_list, Periodic_point = init_mesh_BC(size_x, size_y, BC)
+
+    Num_Unknowns = numeroting_unknows(list_elem, BC_list, Periodic_point)
+
     t1 = time.perf_counter()
-    print("Assembly geometry:", np.round(t1-t0, 5), "secondes")
-    save_mesh(list_geometry,Num_Unknowns,list_elem,x,y,BC_list)
+    print("Assembly geometry:", np.round(t1 - t0, 5), "secondes")
+    save_mesh(list_geometry, Num_Unknowns, list_elem, x, y, BC_list)
     t2 = time.perf_counter()
-    print("Save mesh:", np.round(t2-t1, 5), "secondes")
+    print("Save mesh:", np.round(t2 - t1, 5), "secondes")
 
     # Assembly all matrice
-    reluc_list=init_reluc(list_elem,list_coord,mu0,la,mode)
+    reluc_list = init_reluc(list_elem, list_coord, mu0, la, mode)
     print(reluc_list)
-    M_csr = assembly(reluc_list, Num_Unknowns, list_elem, permeability_cell,BC_list)
-    
+    M_csr = assembly(reluc_list, Num_Unknowns, list_elem, permeability_cell, BC_list)
+
     t3 = time.perf_counter()
-    print("Assembly matrix", np.round(t3-t2, 5), "secondes")
+    print("Assembly matrix", np.round(t3 - t2, 5), "secondes")
 
     # Assembly RHS
-    E = right_member_assembly(list_geometry, Num_Unknowns, list_elem,list_coord,Br,mu0,mode)
+    E = right_member_assembly(
+        list_geometry, Num_Unknowns, list_elem, list_coord, Br, mu0, mode
+    )
     t4 = time.perf_counter()
 
+    print("Assembly vector:", np.round(t4 - t3, 5), "secondes")
+    print("Total :", np.round(t4 - t2, 5))
 
-    print("Assembly vector:", np.round(t4-t3, 5), "secondes")
-    print("Total :", np.round(t4-t2, 5))
-    
-    #Compute Solution
-    t3= time.perf_counter()
+    # Compute Solution
+    t3 = time.perf_counter()
     if Have_cholmod:
-        
+
         # Compute the solution
         factor = cholesky(M_csr.tocsc())
         F = factor(E)
         t4 = time.perf_counter()
-        print("Time to solve (CholMod):", np.round(t4-t3, 5),
-              "secondes, res:", np.linalg.norm(M_csr@F-E, ord=2))
+        print(
+            "Time to solve (CholMod):",
+            np.round(t4 - t3, 5),
+            "secondes, res:",
+            np.linalg.norm(M_csr @ F - E, ord=2),
+        )
     else:
         F = spsolve(M_csr, E, permc_spec="MMD_AT_PLUS_A", use_umfpack=True)
         t4 = time.perf_counter()
-        print("Time to solve (direct,UMF):", np.round(t4-t3, 5),
-              "secondes, res:", np.linalg.norm(M_csr@F-E, ord=2))
-    
-    F=add_BC_to_F(F,Num_Unknowns, list_elem,BC_list)
-    
-    return F, list_geometry, Num_Unknowns, list_elem, permeability_cell,list_coord
+        print(
+            "Time to solve (direct,UMF):",
+            np.round(t4 - t3, 5),
+            "secondes, res:",
+            np.linalg.norm(M_csr @ F - E, ord=2),
+        )
+
+    F = add_BC_to_F(F, Num_Unknowns, list_elem, BC_list)
+
+    return F, list_geometry, Num_Unknowns, list_elem, permeability_cell, list_coord
