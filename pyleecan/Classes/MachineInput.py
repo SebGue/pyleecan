@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # File generated according to Generator/ClassesRef/Simulation/MachineInput.csv
 # WARNING! All changes made in this file will be lost!
-"""Method code available at https://github.com/Eomys/pyleecan/tree/master/pyleecan/Methods/Machine/MachineInput
+"""Method code available at https://github.com/Eomys/pyleecan/tree/master/pyleecan/Methods/Simulation/MachineInput
 """
 
 from os import linesep
@@ -18,12 +18,12 @@ from ._frozen import FrozenClass
 # Import all class method
 # Try/catch to remove unnecessary dependencies in unused method
 try:
-    from ..Methods.Machine.MachineInput.load_machine import load_machine
+    from ..Methods.Simulation.MachineInput.load_machine import load_machine
 except ImportError as error:
     load_machine = error
 
 try:
-    from ..Methods.Machine.MachineInput.load_material import load_material
+    from ..Methods.Simulation.MachineInput.load_material import load_material
 except ImportError as error:
     load_material = error
 
@@ -38,7 +38,7 @@ class MachineInput(FrozenClass):
     VERSION = 1
 
     # Check ImportError to remove unnecessary dependencies in unused method
-    # cf Methods.Machine.MachineInput.load_machine
+    # cf Methods.Simulation.MachineInput.load_machine
     if isinstance(load_machine, ImportError):
         load_machine = property(
             fget=lambda x: raise_(
@@ -49,7 +49,7 @@ class MachineInput(FrozenClass):
         )
     else:
         load_machine = load_machine
-    # cf Methods.Machine.MachineInput.load_material
+    # cf Methods.Simulation.MachineInput.load_material
     if isinstance(load_material, ImportError):
         load_material = property(
             fget=lambda x: raise_(

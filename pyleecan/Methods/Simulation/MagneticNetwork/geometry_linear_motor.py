@@ -7,18 +7,51 @@ Created on Fri Jun  3 09:51:29 2022
 
 import numpy as np
 
+from pyleecan.Methods.Simulation.MachineInput.load_machine import load_machine
+
 # %%
+
+file_path = (
+    "C:/Users/pc/Documents/MultiLumpedNetwork/pyleecan/Data/Machine/SPMSM_val.json"
+)
+
+Machine = load_machine(file_path)
+
 # Machine's characteristics
-tp = 60e-3  # pole pitch (m)
-tm = 55e-3  # PM length in x direction (m)
-hm = 10e-3  # PM height in y direction (m)
-e = 1e-3  # Air-gap thickness (m)
-hst = 30e-3  # Stator total height (m)
-hs = 20e-3  # Slot height (m)
-hmbi = 10e-3  # Moving armature height (moving back iron height)
-ws = 10e-3  # Slot opening (m)
+# tp = 60e-3  # pole pitch (m)
+tp = (
+    2
+    * np.tan(np.pi / Machine.rotor_pole_pairs)
+    * (Machine.rotor_diameter_int + 0.5 * Machine.height_yoke_rotor)
+)
+
+# tm = 55e-3  # PM length in x direction (m)
+tm = Machine.width_magnet_av
+
+# hm = 10e-3  # PM height in y direction (m)
+hm = Machine.height_magnet
+
+# e = 1e-3  # Air-gap thickness (m)
+e = Machine.stator_diameter_int - Machine.rotor_diameter_ext
+
+# hst = 30e-3  # Stator total height (m)
+hst = Machine.height_yoke_stator
+
+# hs = 20e-3  # Slot height (m)
+hs = Machine.height_slotw
+
+# hmbi = 10e-3  # Moving armature height (moving back iron height)
+hmbi = Machine.height_yoke_rotor
+
+# ws = 10e-3  # Slot opening (m)
+ws = Machine.width_slotw_av
+
 ts = 2 * ws  # Slot pitch (m)
-la = 1  # Active length (m)
+
+# la = 1  # Active length (m)
+la = Machine.active_length
+
+# Material properties
 Br = 1.2  # PM remanent induction (residual induction) (T)
 mu0 = np.pi * 4e-7  # Permeability of vacuum (H/m)
 mur1 = 1  # Relative permeability of air

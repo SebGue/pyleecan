@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # File generated according to Generator/ClassesRef/Simulation/MagneticNetwork.csv
 # WARNING! All changes made in this file will be lost!
-"""Method code available at https://github.com/Eomys/pyleecan/tree/master/pyleecan/Methods/Machine/MagneticNetwork
+"""Method code available at https://github.com/Eomys/pyleecan/tree/master/pyleecan/Methods/Simulation/MagneticNetwork
 """
 
 from os import linesep
@@ -18,75 +18,75 @@ from ._frozen import FrozenClass
 # Import all class method
 # Try/catch to remove unnecessary dependencies in unused method
 try:
-    from ..Methods.Machine.MagneticNetwork.assembler import assembler
+    from ..Methods.Simulation.MagneticNetwork.assembler import assembler
 except ImportError as error:
     assembler = error
 
 try:
-    from ..Methods.Machine.MagneticNetwork.geometry_linear_motor import (
+    from ..Methods.Simulation.MagneticNetwork.geometry_linear_motor import (
         geometry_linear_motor,
     )
 except ImportError as error:
     geometry_linear_motor = error
 
 try:
-    from ..Methods.Machine.MagneticNetwork.geometry_linear_motor_separetion import (
+    from ..Methods.Simulation.MagneticNetwork.geometry_linear_motor_separetion import (
         geometry_linear_motor_separetion,
     )
 except ImportError as error:
     geometry_linear_motor_separetion = error
 
 try:
-    from ..Methods.Machine.MagneticNetwork.plot import plot
+    from ..Methods.Simulation.MagneticNetwork.plot import plot
 except ImportError as error:
     plot = error
 
 try:
-    from ..Methods.Machine.MagneticNetwork.post_processing import post_processing
+    from ..Methods.Simulation.MagneticNetwork.post_processing import post_processing
 except ImportError as error:
     post_processing = error
 
 try:
-    from ..Methods.Machine.MagneticNetwork.pre_processing import pre_processing
+    from ..Methods.Simulation.MagneticNetwork.pre_processing import pre_processing
 except ImportError as error:
     pre_processing = error
 
 try:
-    from ..Methods.Machine.MagneticNetwork.RN_linear_motor import RN_linear_motor
+    from ..Methods.Simulation.MagneticNetwork.RN_linear_motor import RN_linear_motor
 except ImportError as error:
     RN_linear_motor = error
 
 try:
-    from ..Methods.Machine.MagneticNetwork.run import run
+    from ..Methods.Simulation.MagneticNetwork.run import run
 except ImportError as error:
     run = error
 
 try:
-    from ..Methods.Machine.MagneticNetwork.run_non_linear import run_non_linear
+    from ..Methods.Simulation.MagneticNetwork.run_non_linear import run_non_linear
 except ImportError as error:
     run_non_linear = error
 
 try:
-    from ..Methods.Machine.MagneticNetwork.run_radial import run_radial
+    from ..Methods.Simulation.MagneticNetwork.run_radial import run_radial
 except ImportError as error:
     run_radial = error
 
 try:
-    from ..Methods.Machine.MagneticNetwork.solver_linear_model import (
+    from ..Methods.Simulation.MagneticNetwork.solver_linear_model import (
         solver_linear_model,
     )
 except ImportError as error:
     solver_linear_model = error
 
 try:
-    from ..Methods.Machine.MagneticNetwork.solver_non_linear_model import (
+    from ..Methods.Simulation.MagneticNetwork.solver_non_linear_model import (
         solver_non_linear_model,
     )
 except ImportError as error:
     solver_non_linear_model = error
 
 try:
-    from ..Methods.Machine.MagneticNetwork.solver_plus_non_linear_model.py import py
+    from ..Methods.Simulation.MagneticNetwork.solver_plus_non_linear_model.py import py
 except ImportError as error:
     py = error
 
@@ -101,7 +101,7 @@ class MagneticNetwork(FrozenClass):
     VERSION = 1
 
     # Check ImportError to remove unnecessary dependencies in unused method
-    # cf Methods.Machine.MagneticNetwork.assembler
+    # cf Methods.Simulation.MagneticNetwork.assembler
     if isinstance(assembler, ImportError):
         assembler = property(
             fget=lambda x: raise_(
@@ -112,7 +112,7 @@ class MagneticNetwork(FrozenClass):
         )
     else:
         assembler = assembler
-    # cf Methods.Machine.MagneticNetwork.geometry_linear_motor
+    # cf Methods.Simulation.MagneticNetwork.geometry_linear_motor
     if isinstance(geometry_linear_motor, ImportError):
         geometry_linear_motor = property(
             fget=lambda x: raise_(
@@ -124,7 +124,7 @@ class MagneticNetwork(FrozenClass):
         )
     else:
         geometry_linear_motor = geometry_linear_motor
-    # cf Methods.Machine.MagneticNetwork.geometry_linear_motor_separetion
+    # cf Methods.Simulation.MagneticNetwork.geometry_linear_motor_separetion
     if isinstance(geometry_linear_motor_separetion, ImportError):
         geometry_linear_motor_separetion = property(
             fget=lambda x: raise_(
@@ -136,7 +136,7 @@ class MagneticNetwork(FrozenClass):
         )
     else:
         geometry_linear_motor_separetion = geometry_linear_motor_separetion
-    # cf Methods.Machine.MagneticNetwork.plot
+    # cf Methods.Simulation.MagneticNetwork.plot
     if isinstance(plot, ImportError):
         plot = property(
             fget=lambda x: raise_(
@@ -145,7 +145,7 @@ class MagneticNetwork(FrozenClass):
         )
     else:
         plot = plot
-    # cf Methods.Machine.MagneticNetwork.post_processing
+    # cf Methods.Simulation.MagneticNetwork.post_processing
     if isinstance(post_processing, ImportError):
         post_processing = property(
             fget=lambda x: raise_(
@@ -157,7 +157,7 @@ class MagneticNetwork(FrozenClass):
         )
     else:
         post_processing = post_processing
-    # cf Methods.Machine.MagneticNetwork.pre_processing
+    # cf Methods.Simulation.MagneticNetwork.pre_processing
     if isinstance(pre_processing, ImportError):
         pre_processing = property(
             fget=lambda x: raise_(
@@ -169,7 +169,7 @@ class MagneticNetwork(FrozenClass):
         )
     else:
         pre_processing = pre_processing
-    # cf Methods.Machine.MagneticNetwork.RN_linear_motor
+    # cf Methods.Simulation.MagneticNetwork.RN_linear_motor
     if isinstance(RN_linear_motor, ImportError):
         RN_linear_motor = property(
             fget=lambda x: raise_(
@@ -181,7 +181,7 @@ class MagneticNetwork(FrozenClass):
         )
     else:
         RN_linear_motor = RN_linear_motor
-    # cf Methods.Machine.MagneticNetwork.run
+    # cf Methods.Simulation.MagneticNetwork.run
     if isinstance(run, ImportError):
         run = property(
             fget=lambda x: raise_(
@@ -190,7 +190,7 @@ class MagneticNetwork(FrozenClass):
         )
     else:
         run = run
-    # cf Methods.Machine.MagneticNetwork.run_non_linear
+    # cf Methods.Simulation.MagneticNetwork.run_non_linear
     if isinstance(run_non_linear, ImportError):
         run_non_linear = property(
             fget=lambda x: raise_(
@@ -202,7 +202,7 @@ class MagneticNetwork(FrozenClass):
         )
     else:
         run_non_linear = run_non_linear
-    # cf Methods.Machine.MagneticNetwork.run_radial
+    # cf Methods.Simulation.MagneticNetwork.run_radial
     if isinstance(run_radial, ImportError):
         run_radial = property(
             fget=lambda x: raise_(
@@ -213,7 +213,7 @@ class MagneticNetwork(FrozenClass):
         )
     else:
         run_radial = run_radial
-    # cf Methods.Machine.MagneticNetwork.solver_linear_model
+    # cf Methods.Simulation.MagneticNetwork.solver_linear_model
     if isinstance(solver_linear_model, ImportError):
         solver_linear_model = property(
             fget=lambda x: raise_(
@@ -225,7 +225,7 @@ class MagneticNetwork(FrozenClass):
         )
     else:
         solver_linear_model = solver_linear_model
-    # cf Methods.Machine.MagneticNetwork.solver_non_linear_model
+    # cf Methods.Simulation.MagneticNetwork.solver_non_linear_model
     if isinstance(solver_non_linear_model, ImportError):
         solver_non_linear_model = property(
             fget=lambda x: raise_(
@@ -237,7 +237,7 @@ class MagneticNetwork(FrozenClass):
         )
     else:
         solver_non_linear_model = solver_non_linear_model
-    # cf Methods.Machine.MagneticNetwork.solver_plus_non_linear_model.py
+    # cf Methods.Simulation.MagneticNetwork.solver_plus_non_linear_model.py
     if isinstance(py, ImportError):
         py = property(
             fget=lambda x: raise_(

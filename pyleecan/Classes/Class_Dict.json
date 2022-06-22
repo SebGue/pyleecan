@@ -6397,7 +6397,7 @@
         ],
         "mother": "",
         "name": "MachineInput",
-        "package": "Machine",
+        "package": "Simulation",
         "path": "pyleecan/Generator/ClassesRef/Simulation/MachineInput.csv",
         "properties": []
     },
@@ -7121,7 +7121,7 @@
         ],
         "mother": "",
         "name": "MagneticNetwork",
-        "package": "Machine",
+        "package": "Simulation",
         "path": "pyleecan/Generator/ClassesRef/Simulation/MagneticNetwork.csv",
         "properties": []
     },
