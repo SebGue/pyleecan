@@ -5,7 +5,7 @@ Created on Fri Jun  3 10:46:17 2022
 @author: LAP02
 """
 from solver_linear_model import linear_model
-from geometry_linear_motor import geometry
+import geometry_linear_motor
 from post_processing import compute_B_square
 import numpy as np
 import meshio
@@ -37,7 +37,19 @@ BC = ["P", "HD", "P", "HD"]
 mode = "cartesian"
 
 F, list_geometry, Num_unknowns, list_elem, permeability_cell, list_coord = linear_model(
-    size_x, size_y, x, y, x_dual, y_dual, pos, BC, geometry, mu0, la, Br, mode
+    size_x,
+    size_y,
+    x,
+    y,
+    x_dual,
+    y_dual,
+    pos,
+    BC,
+    geometry_linear_motor,
+    mu0,
+    la,
+    Br,
+    mode,
 )
 
 view_contour_flux(F, x, y, size_x, size_y, list_geometry)

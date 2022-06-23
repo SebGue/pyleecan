@@ -7,8 +7,6 @@ pyleecan/__init__.py
 pyleecan/__main__.py
 pyleecan/default_config_dict.py
 pyleecan/definitions.py
-pyleecan/load_machine.py
-pyleecan/load_material.py
 pyleecan/loggers.py
 pyleecan/run_GUI.py
 pyleecan/tmp
@@ -1806,7 +1804,6 @@ pyleecan/Methods/Simulation/MagFEMM/get_path_save.py
 pyleecan/Methods/Simulation/MagFEMM/get_path_save_fem.py
 pyleecan/Methods/Simulation/MagFEMM/solve_FEMM.py
 pyleecan/Methods/Simulation/MagFEMM/solve_FEMM_parallel.py
-pyleecan/Methods/Simulation/MagneticNetwork/RN_linear_motor.py
 pyleecan/Methods/Simulation/MagneticNetwork/__init__.py
 pyleecan/Methods/Simulation/MagneticNetwork/assembler.py
 pyleecan/Methods/Simulation/MagneticNetwork/geometry_linear_motor.py
@@ -1819,7 +1816,6 @@ pyleecan/Methods/Simulation/MagneticNetwork/run_non_linear.py
 pyleecan/Methods/Simulation/MagneticNetwork/run_radial.py
 pyleecan/Methods/Simulation/MagneticNetwork/solver_linear_model.py
 pyleecan/Methods/Simulation/MagneticNetwork/solver_non_linear_model.py
-pyleecan/Methods/Simulation/MagneticNetwork/solver_plus_non_linear_model.py
 pyleecan/Methods/Simulation/Magnetics/__init__.py
 pyleecan/Methods/Simulation/Magnetics/comp_I_mag.py
 pyleecan/Methods/Simulation/Magnetics/comp_axes.py

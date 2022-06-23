@@ -18,6 +18,7 @@ from pre_processing import (
 from post_processing import add_BC_to_F
 from assembler import assembly, right_member_assembly
 import time
+import geometry_linear_motor
 
 from threadpoolctl import threadpool_info
 import os
@@ -49,7 +50,7 @@ except:
 
 
 def linear_model(
-    size_x, size_y, x, y, x_dual, y_dual, pos, BC, geometry, mu0, la, Br, mode
+    self, size_x, size_y, x, y, x_dual, y_dual, pos, BC, geometry, mu0, la, Br, mode
 ):
     """
 
@@ -92,21 +93,24 @@ def linear_model(
         list of coordinate.
 
     """
+
     t0 = time.perf_counter()
     import matplotlib.pyplot as plt
 
     # Initialyze nature of elements
-    list_geometry, permeability_materials = geometry(size_x, size_y, pos)
-
-    list_coord = init_point(size_x, size_y, x, y)
-
-    permeability_cell = init_permeabilty_cell(
-        size_x, size_y, permeability_materials, list_geometry
+    list_geometry, permeability_materials = geometry_linear_motor(
+        self.size_x, self.size_y, self.pos
     )
 
-    list_elem = init_cell(size_x, size_y)
+    list_coord = init_point(self.size_x, self.size_y, self.x, self.y)
 
-    BC_list, Periodic_point = init_mesh_BC(size_x, size_y, BC)
+    permeability_cell = init_permeabilty_cell(
+        self.size_x, self.size_y, permeability_materials, list_geometry
+    )
+
+    list_elem = init_cell(self.size_x, self.size_y)
+
+    BC_list, Periodic_point = init_mesh_BC(self.size_x, self.size_y, self.BC)
 
     Num_Unknowns = numeroting_unknows(list_elem, BC_list, Periodic_point)
 
@@ -117,7 +121,7 @@ def linear_model(
     print("Save mesh:", np.round(t2 - t1, 5), "secondes")
 
     # Assembly all matrice
-    reluc_list = init_reluc(list_elem, list_coord, mu0, la, mode)
+    reluc_list = init_reluc(list_elem, list_coord, self.mu0, self.la, self.mode)
     print(reluc_list)
     M_csr = assembly(reluc_list, Num_Unknowns, list_elem, permeability_cell, BC_list)
 
@@ -126,7 +130,7 @@ def linear_model(
 
     # Assembly RHS
     E = right_member_assembly(
-        list_geometry, Num_Unknowns, list_elem, list_coord, Br, mu0, mode
+        list_geometry, Num_Unknowns, list_elem, list_coord, self.Br, self.mu0, self.mode
     )
     t4 = time.perf_counter()
 

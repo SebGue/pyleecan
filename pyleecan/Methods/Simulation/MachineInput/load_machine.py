@@ -65,6 +65,8 @@ def load_machine(file_path):
     rotor_pole_pairs = Machine.rotor.get_pole_pair_number()
     height_yoke_rotor = Machine.rotor.comp_height_yoke()
 
+    e = Machine.stator.Rint - Machine.rotor.Rext
+
     return {
         "magnet_height": height_magnet,
         "magnet_average_width": width_magnet_av,
@@ -78,4 +80,5 @@ def load_machine(file_path):
         "rotor_diameter_int": rotor_diameter_int,
         "rotor_pole_pairs": rotor_pole_pairs,
         "magnet_height": height_yoke_rotor,
+        "e": e,
     }
