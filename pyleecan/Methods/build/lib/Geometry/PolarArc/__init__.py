@@ -1,0 +1,4 @@
+class AnglePolarArcError(Exception):
+    """ """
+
+    pass

@@ -52,9 +52,9 @@ install_requires = [
 ]
 # Pyleecan optional dependancies
 full_require = [
-    'deap>=1.3.1',
-    'smoot>=0.1.0',
-    'gmsh-sdk>=4.6.0',
+    "deap>=1.3.1",
+    "smoot>=0.1.0",
+    "gmsh-sdk>=4.6.0",
 ]
 
 # Pyleecan Test dependancies
@@ -70,16 +70,16 @@ tests_require = [
 
 setuptools.setup(
     name="pyleecan",
-    version=PYLEECAN_VERSION,
-    author="Pyleecan Developers",
-    author_email="pyleecan@framalistes.org",
-    description="Python Library for Electrical Engineering Computational Analysis",
+    # version=PYLEECAN_VERSION,
+    # author="Pyleecan Developers",
+    # author_email="pyleecan@framalistes.org",
+    # description="Python Library for Electrical Engineering Computational Analysis",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/Eomys/pyleecan",
-    download_url="https://github.com/Eomys/pyleecan/archive/"
-    + PYLEECAN_VERSION
-    + ".tar.gz",
+    # url="https://github.com/Eomys/pyleecan",
+    # download_url="https://github.com/Eomys/pyleecan/archive/"
+    # + PYLEECAN_VERSION
+    # + ".tar.gz",
     packages=setuptools.find_packages(exclude=["Tests*", "Tutorials*"]),
     package_data={
         # Include any *.json files found in pyleecan:
@@ -96,6 +96,6 @@ setuptools.setup(
     install_requires=install_requires,
     extras_require={
         "test": tests_require,
-        "full": full_require
+        "full": full_require,
     },  # Enables to install the test dependancies using pip install pyleecan[test]
 )

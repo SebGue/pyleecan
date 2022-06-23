@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # File generated according to Generator/ClassesRef/Simulation/MachineInput.csv
 # WARNING! All changes made in this file will be lost!
-"""Method code available at https://github.com/Eomys/pyleecan/tree/master/pyleecan/Methods/Machine/MachineInput
+"""Method code available at https://github.com/Eomys/pyleecan/tree/master/pyleecan/Methods/Simulation/MachineInput
 """
 
 from os import linesep
@@ -10,20 +10,20 @@ from logging import getLogger
 from ._check import check_var, raise_
 from ..Functions.get_logger import get_logger
 from ..Functions.save import save
-from ..Functions.copy import copy
 from ..Functions.load import load_init_dict
 from ..Functions.Load.import_class import import_class
+from copy import deepcopy
 from ._frozen import FrozenClass
 
 # Import all class method
 # Try/catch to remove unnecessary dependencies in unused method
 try:
-    from ..Methods.Machine.MachineInput.load_machine import load_machine
+    from ..Methods.Simulation.MachineInput.load_machine import load_machine
 except ImportError as error:
     load_machine = error
 
 try:
-    from ..Methods.Machine.MachineInput.load_material import load_material
+    from ..Methods.Simulation.MachineInput.load_material import load_material
 except ImportError as error:
     load_material = error
 
@@ -38,7 +38,7 @@ class MachineInput(FrozenClass):
     VERSION = 1
 
     # Check ImportError to remove unnecessary dependencies in unused method
-    # cf Methods.Machine.MachineInput.load_machine
+    # cf Methods.Simulation.MachineInput.load_machine
     if isinstance(load_machine, ImportError):
         load_machine = property(
             fget=lambda x: raise_(
@@ -49,7 +49,7 @@ class MachineInput(FrozenClass):
         )
     else:
         load_machine = load_machine
-    # cf Methods.Machine.MachineInput.load_material
+    # cf Methods.Simulation.MachineInput.load_material
     if isinstance(load_material, ImportError):
         load_material = property(
             fget=lambda x: raise_(
@@ -60,9 +60,8 @@ class MachineInput(FrozenClass):
         )
     else:
         load_material = load_material
-    # save and copy methods are available in all object
+    # generic save method is available in all object
     save = save
-    copy = copy
     # get_logger method is available in all object
     get_logger = get_logger
 
@@ -137,6 +136,14 @@ class MachineInput(FrozenClass):
         # The class name is added to the dict for deserialisation purpose
         MachineInput_dict["__class__"] = "MachineInput"
         return MachineInput_dict
+
+    def copy(self):
+        """Creates a deepcopy of the object"""
+
+        # Handle deepcopy of all the properties
+        # Creates new object of the same type with the copied properties
+        obj_copy = type(self)()
+        return obj_copy
 
     def _set_None(self):
         """Set all the properties to None (except pyleecan object)"""

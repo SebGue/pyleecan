@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from .....pyleecan.Functions.load import load
+from pyleecan.Functions.load import load
 
 
 def load_machine(file_path):
@@ -13,6 +13,8 @@ def load_machine(file_path):
 
     Returns
     -------
+    active_length: float
+        The active height of the PM machine
     height_magnet: float
         The height of the magnet of the PM machine
     width_magnet_av: float
@@ -40,6 +42,9 @@ def load_machine(file_path):
     """
     # Load Machine file
     Machine = load(file_path)
+
+    # Get the machine active length : supposed that active_length(rotor) = active_length(stator)
+    active_length = Machine.rotor.L1
 
     # Get magnet geometrical parameters
     height_magnet = Machine.rotor.slot.comp_height_active()
