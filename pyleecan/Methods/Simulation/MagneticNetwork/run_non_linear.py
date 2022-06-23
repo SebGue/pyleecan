@@ -11,78 +11,76 @@ import numpy as np
 import meshio
 
 
-la = 1  # Active length (m)
-Br = 1.2  # PM remanent induction (residual induction) (T)
-mu0 = np.pi * 4e-7  # Permeability of vacuum (H/m)
+def run_non_linear(self):
+    la = 1  # Active length (m)
+    Br = 1.2  # PM remanent induction (residual induction) (T)
+    mu0 = np.pi * 4e-7  # Permeability of vacuum (H/m)
 
+    pos = 5
+    x_min = 0
+    x_max = 0.06
 
-pos = 5
-x_min = 0
-x_max = 0.06
+    y_min = 0
+    y_max = 0.051
 
+    size_x = 121
+    size_y = 103
 
-y_min = 0
-y_max = 0.051
+    x = np.linspace(x_min, x_max, size_x)
+    y = np.linspace(y_min, y_max, size_y)
 
-size_x = 121
-size_y = 103
+    x_dual = (x[1:] + x[: size_x - 1]) / 2
+    y_dual = (y[1:] + y[: size_y - 1]) / 2
 
-x = np.linspace(x_min, x_max, size_x)
-y = np.linspace(y_min, y_max, size_y)
+    BC = ["AP", "HD", "AP", "HD"]
 
-x_dual = (x[1:] + x[: size_x - 1]) / 2
-y_dual = (y[1:] + y[: size_y - 1]) / 2
+    sol0 = None
+    (
+        F,
+        list_geometry,
+        Num_unknowns,
+        list_elem,
+        permeability_cell,
+        list_coord,
+    ) = non_linear_model(size_x, size_y, x, y, pos, geometry, sol0, BC, la, mu0, Br)
 
-BC = ["AP", "HD", "AP", "HD"]
+    Bx, By = compute_B_square(F, list_elem, list_coord, la)
 
-sol0 = None
-(
-    F,
-    list_geometry,
-    Num_unknowns,
-    list_elem,
-    permeability_cell,
-    list_coord,
-) = non_linear_model(size_x, size_y, x, y, pos, geometry, sol0, BC, la, mu0, Br)
+    B = np.stack((Bx.flatten(), By.flatten()), axis=-1)
 
-Bx, By = compute_B_square(F, list_elem, list_coord, la)
+    temp = np.zeros((list_elem.shape[0], 3))
+    temp[:, 0] = Bx.flatten()
+    temp[:, 1] = By.flatten()
+    B = temp
 
+    temp = np.zeros((list_coord.shape[0], 3))
+    temp[:, 0:2] = list_coord
 
-B = np.stack((Bx.flatten(), By.flatten()), axis=-1)
+    list_coord = temp
 
-temp = np.zeros((list_elem.shape[0], 3))
-temp[:, 0] = Bx.flatten()
-temp[:, 1] = By.flatten()
-B = temp
+    points = list_coord
+    cells = [
+        ("quad", list_elem),
+    ]
 
-temp = np.zeros((list_coord.shape[0], 3))
-temp[:, 0:2] = list_coord
+    mesh = meshio.Mesh(
+        points,
+        cells,
+        # Optionally provide extra data on points, cells, etc.
+        point_data={"Flux": F},
+        # Each item in cell data must match the cells array
+        cell_data={
+            "B": [B],
+            "Materials": [list_geometry],
+            "Permeability": [permeability_cell],
+        },
+    )
+    mesh.write(
+        "mymesh.xdmf",  # str, os.PathLike, or buffer/open file
+        # file_format="vtk",  # optional if first argument is a path; inferred from extension
+    )
 
-list_coord = temp
+    # Alternative with the same options
+    # meshio.write_points_cells("mymesh.vtu", points, cells)
 
-points = list_coord
-cells = [
-    ("quad", list_elem),
-]
-
-mesh = meshio.Mesh(
-    points,
-    cells,
-    # Optionally provide extra data on points, cells, etc.
-    point_data={"Flux": F},
-    # Each item in cell data must match the cells array
-    cell_data={
-        "B": [B],
-        "Materials": [list_geometry],
-        "Permeability": [permeability_cell],
-    },
-)
-mesh.write(
-    "mymesh.xdmf",  # str, os.PathLike, or buffer/open file
-    # file_format="vtk",  # optional if first argument is a path; inferred from extension
-)
-
-# Alternative with the same options
-# meshio.write_points_cells("mymesh.vtu", points, cells)
-
-print("mesh saved", list_coord.shape, list_elem.shape)
+    print("mesh saved", list_coord.shape, list_elem.shape)

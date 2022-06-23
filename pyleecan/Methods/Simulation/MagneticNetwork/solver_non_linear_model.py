@@ -50,6 +50,7 @@ except:
 
 
 def mu_non_linear(
+    self,
     Phi,
     permeability_cell,
     list_geometry,
@@ -95,28 +96,28 @@ def mu_non_linear(
     materials = np.array([5, 7])
     mu_r0 = 7500
 
-    Phi = add_BC_to_F(Phi, Num_Unknowns, list_elem, BC_list)
-    Bx, By = compute_B_square(Phi, list_elem, list_coord, la)
+    self.Phi = add_BC_to_F(self.Phi, self.Num_Unknowns, self.list_elem, self.BC_list)
+    Bx, By = compute_B_square(self.Phi, self.list_elem, self.list_coord, self.la)
     B_norm = np.sqrt(Bx * Bx + By * By)
 
-    H = B_norm / (mu0 * permeability_cell)
-    mask = (list_geometry == materials[0]) + (list_geometry == materials[1])
+    H = B_norm / (self.mu0 * self.permeability_cell)
+    mask = (self.list_geometry == materials[0]) + (self.list_geometry == materials[1])
     print(
         "H=",
         np.round(H[mask].max(), 5),
         "A/m, mu=",
-        np.round(permeability_cell[mask].min(), 5),
+        np.round(self.permeability_cell[mask].min(), 5),
         "H/m",
     )
 
-    permeability_cell[mask] = 1 + (2 * B_sat / (np.pi * mu0 * H[mask])) * np.arctan(
-        np.pi * (mu_r0 - 1) * mu0 * H[mask] / (2 * B_sat)
-    )
+    self.permeability_cell[mask] = 1 + (
+        2 * B_sat / (np.pi * self.mu0 * H[mask])
+    ) * np.arctan(np.pi * (mu_r0 - 1) * self.mu0 * H[mask] / (2 * B_sat))
     # print(permeability_cell[mask])
     return permeability_cell
 
 
-def non_linear_model(size_x, size_y, x, y, pos, geometry, sol0, BC, la, mu0, Br):
+def non_linear_model(self, size_x, size_y, x, y, pos, geometry, sol0, BC, la, mu0, Br):
     """
 
     Parameters
@@ -162,28 +163,30 @@ def non_linear_model(size_x, size_y, x, y, pos, geometry, sol0, BC, la, mu0, Br)
     """
     t0 = time.perf_counter()
     # Initialyze nature of elements
-    h_x = (x.max() - x.min()) / (size_x - 1)
-    h_y = (y.max() - y.min()) / (size_y - 1)
-    list_geometry, permeability_materials = geometry(size_x, size_y, h_x, h_y, pos)
+    h_x = (self.x.max() - self.x.min()) / (self.size_x - 1)
+    h_y = (self.y.max() - self.y.min()) / (self.size_y - 1)
+    list_geometry, permeability_materials = self.geometry(
+        self.size_x, self.size_y, h_x, h_y, self.pos
+    )
 
     non_linear_area = np.array([5, 7], dtype=np.int32)
 
     # Initialyze mesh
-    list_coord = init_point(size_x, size_y, x, y)
+    list_coord = init_point(self.size_x, self.size_y, self.x, self.y)
 
     permeability_cell = init_permeabilty_cell(
-        size_x, size_y, permeability_materials, list_geometry
+        self.size_x, self.size_y, permeability_materials, list_geometry
     )
 
-    list_elem = init_cell(size_x, size_y)
+    list_elem = init_cell(self.size_x, self.size_y)
 
-    BC_list, Periodic_point = init_mesh_BC(size_x, size_y, BC)
+    BC_list, Periodic_point = init_mesh_BC(self.size_x, self.size_y, self.BC)
 
     Num_Unknowns = numeroting_unknows(list_elem, BC_list, Periodic_point)
 
     nn = Num_Unknowns.max() + 1
 
-    reluc_list = init_reluc(list_elem, list_coord, mu0, la)
+    reluc_list = init_reluc(list_elem, list_coord, self.mu0, self.la)
 
     t1 = time.perf_counter()
     print("Assembly geometry:", np.round(t1 - t0, 5), "secondes")
@@ -194,7 +197,7 @@ def non_linear_model(size_x, size_y, x, y, pos, geometry, sol0, BC, la, mu0, Br)
 
     # Assembly RHS
     E = right_member_assembly(
-        list_geometry, Num_Unknowns, list_elem, list_coord, Br, mu0
+        list_geometry, Num_Unknowns, list_elem, list_coord, self.Br, self.mu0
     )
 
     t4 = time.perf_counter()
@@ -256,8 +259,8 @@ def non_linear_model(size_x, size_y, x, y, pos, geometry, sol0, BC, la, mu0, Br)
             list_elem,
             BC_list,
             list_coord,
-            la,
-            mu0,
+            self.la,
+            self.mu0,
         )
         # Update matrix
         M_non_lin = csr_matrix((nn, nn), dtype=np.float64)

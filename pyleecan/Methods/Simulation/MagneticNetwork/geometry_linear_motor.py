@@ -141,4 +141,6 @@ def geometry_linear_motor(self, file_path, size_x, size_y, pos_pm):
                 cells_materials[num_elem] = 7
         else:
             print("Wrong geometry")
-    return cells_materials, permeabilty_materials
+
+    geometry = {tp, hm, tm, e, hst, hs, hmbi, ws, ts, la}
+    return cells_materials, permeabilty_materials, geometry

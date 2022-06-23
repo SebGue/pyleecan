@@ -17,7 +17,7 @@ from assembler import assembly, right_member_assembly
 import numpy as np
 import matplotlib.pyplot as plt
 
-# %%
+
 # Machine's characteristics
 tp = 60e-3  # pole pitch (m)
 tm = 55e-3  # PM length in x direction (m)

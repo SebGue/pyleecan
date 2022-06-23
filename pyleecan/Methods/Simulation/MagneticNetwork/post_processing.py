@@ -8,7 +8,7 @@ Created on Fri Jun  3 09:11:39 2022
 import numpy as np
 
 
-def compute_B_square(F, list_elem, list_coord, la):
+def compute_B_square(self, F, list_elem, list_coord, la):
     """
     Compute the magnetic field from the flux F and the mesh.
 
@@ -33,18 +33,30 @@ def compute_B_square(F, list_elem, list_coord, la):
     """
 
     h_x = np.linalg.norm(
-        list_coord[list_elem[:, 0]] - list_coord[list_elem[:, 1]], axis=1, ord=2
+        self.list_coord[self.list_elem[:, 0]] - self.list_coord[self.list_elem[:, 1]],
+        axis=1,
+        ord=2,
     )
     h_y = np.linalg.norm(
-        list_coord[list_elem[:, 1]] - list_coord[list_elem[:, 2]], axis=1, ord=2
+        self.list_coord[self.list_elem[:, 1]] - self.list_coord[self.list_elem[:, 2]],
+        axis=1,
+        ord=2,
     )
 
     # Compute B
-    Bx1 = (F[list_elem[:, 2]] - F[list_elem[:, 1]]) / (h_y * la)
-    Bx2 = (F[list_elem[:, 3]] - F[list_elem[:, 0]]) / (h_y * la)
+    Bx1 = (self.F[self.list_elem[:, 2]] - self.F[self.list_elem[:, 1]]) / (
+        h_y * self.la
+    )
+    Bx2 = (self.F[self.list_elem[:, 3]] - self.F[self.list_elem[:, 0]]) / (
+        h_y * self.la
+    )
 
-    By1 = (F[list_elem[:, 0]] - F[list_elem[:, 1]]) / (h_x * la)
-    By2 = (F[list_elem[:, 3]] - F[list_elem[:, 2]]) / (h_x * la)
+    By1 = (self.F[self.list_elem[:, 0]] - self.F[self.list_elem[:, 1]]) / (
+        h_x * self.la
+    )
+    By2 = (self.F[self.list_elem[:, 3]] - self.F[self.list_elem[:, 2]]) / (
+        h_x * self.la
+    )
 
     Bx = (Bx1 + Bx2) / 2
     By = (By1 + By2) / 2
@@ -52,65 +64,45 @@ def compute_B_square(F, list_elem, list_coord, la):
     return Bx, By
 
 
-<<<<<<< .mine
-def compute_B_radial(F, list_elem,list_coord,la):
-    
-    
-    h_theta1=np.abs(list_coord[list_elem[:, 0],0]-list_coord[list_elem[:, 1],0])
-    h_theta2=np.abs(list_coord[list_elem[:, 2],0]-list_coord[list_elem[:, 3],0])
-    
-    h_r=np.abs(list_coord[list_elem[:, 0],1]-list_coord[list_elem[:, 3],1])
-    theta=list_coord[list_elem[:, 0],1]
-    
+def compute_B_radial(self, F, list_elem, list_coord, la):
+
+    h_theta1 = np.abs(
+        self.list_coord[self.list_elem[:, 0], 0]
+        - self.list_coord[self.list_elem[:, 1], 0]
+    )
+    h_theta2 = np.abs(
+        self.list_coord[self.list_elem[:, 2], 0]
+        - self.list_coord[self.list_elem[:, 3], 0]
+    )
+
+    h_r = np.abs(
+        self.list_coord[self.list_elem[:, 0], 1]
+        - self.list_coord[self.list_elem[:, 3], 1]
+    )
+    theta = self.list_coord[self.list_elem[:, 0], 1]
+
     # Compute B
-    Btheta1 = (F[list_elem[:, 2]]-F[list_elem[:, 1]])/(h_theta1*theta*la)
-    Btheta2 = (F[list_elem[:, 3]]-F[list_elem[:, 0]])/(h_theta2*theta*la)
-    
-    Br1 = (F[list_elem[:, 0]]-F[list_elem[:, 1]])/(h_r*la)
-    Br2 = (F[list_elem[:, 3]]-F[list_elem[:, 2]])/(h_r*la)
+    Btheta1 = (self.F[self.list_elem[:, 2]] - self.F[self.list_elem[:, 1]]) / (
+        h_theta1 * theta * self.la
+    )
+    Btheta2 = (self.F[self.list_elem[:, 3]] - self.F[self.list_elem[:, 0]]) / (
+        h_theta2 * theta * self.la
+    )
 
+    Br1 = (self.F[self.list_elem[:, 0]] - self.F[self.list_elem[:, 1]]) / (
+        h_r * self.la
+    )
+    Br2 = (self.F[self.list_elem[:, 3]] - self.F[self.list_elem[:, 2]]) / (
+        h_r * self.la
+    )
 
-    Btheta = (Btheta1+Btheta2)/2
-    Br = (Br1+Br2)/2
-    
-
-    
+    Btheta = (Btheta1 + Btheta2) / 2
+    Br = (Br1 + Br2) / 2
 
     return Btheta, Br
 
 
-
-def add_BC_to_F(F,Num_Unknowns, list_elem,BC_list):
-=======
-def add_BC_to_F(F, Num_Unknowns, list_elem, BC_list):
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
->>>>>>> .theirs
+def add_BC_to_F(self, F, Num_Unknowns, list_elem, BC_list):
     """
     Add boundary condition to the the flux.
 
@@ -133,13 +125,13 @@ def add_BC_to_F(F, Num_Unknowns, list_elem, BC_list):
     """
     # post processing procedure to add boundary condition
 
-    F_full = np.zeros(Num_Unknowns.size)
-    mask = Num_Unknowns != -1
+    F_full = np.zeros(self.Num_Unknowns.size)
+    mask = self.Num_Unknowns != -1
 
-    F_full[mask] = F[Num_Unknowns[mask]]
+    F_full[mask] = self.F[self.Num_Unknowns[mask]]
 
-    if 3 in BC_list:
-        mask_AP = BC_list == 3
+    if 3 in self.BC_list:
+        mask_AP = self.BC_list == 3
         F_full[mask_AP] = -F_full[mask_AP]
 
     return F_full
