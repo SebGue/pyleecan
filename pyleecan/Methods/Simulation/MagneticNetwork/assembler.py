@@ -302,10 +302,13 @@ def right_member_assembly(cells_materials, Num_Unknowns, list_elem,list_coord,Br
         RHS
 
     """
+    mask_magnet = cells_materials == 4
+    
     nn = Num_Unknowns.max()+1
     if mode=="cartesian":
         h_x=np.linalg.norm(list_coord[list_elem[:, 0]]-list_coord[list_elem[:, 1]],axis=1,ord=2)
         h_y=np.linalg.norm(list_coord[list_elem[:, 1]]-list_coord[list_elem[:, 2]],axis=1,ord=2)
+        FMMPM = Br*h_x[0]*0.5/mu0
         
     elif mode=="polar":
         theta=np.abs(list_coord[list_elem[:, 0],0]-list_coord[list_elem[:, 1],0])
@@ -315,6 +318,7 @@ def right_member_assembly(cells_materials, Num_Unknowns, list_elem,list_coord,Br
         h_x=0.5*(R0+R1)*theta
         h_y=np.abs(R1-R0)
         print("ok",h_x,h_y)
+        FMMPM = Br*np.mean(h_x[mask_magnet])*0.5/mu0
         
 
 
@@ -330,19 +334,19 @@ def right_member_assembly(cells_materials, Num_Unknowns, list_elem,list_coord,Br
     JA,JB,JC=0,0,0
 
 
-    mask_magnet = cells_materials == 4
+    
 
-    FMMPM = Br*h_x[0]*0.5/mu0
+    
     #FMMPM = 0
     i1 = Num_Unknowns[list_elem[mask_magnet, 0]]
     i2 = Num_Unknowns[list_elem[mask_magnet, 1]]
     i3 = Num_Unknowns[list_elem[mask_magnet, 2]]
     i4 = Num_Unknowns[list_elem[mask_magnet, 3]]
 
-    E[i1] -= FMMPM
-    E[i2] += FMMPM
-    E[i3] += FMMPM
-    E[i4] -= FMMPM
+    E[i1] += FMMPM
+    E[i2] -= FMMPM
+    E[i3] -= FMMPM
+    E[i4] += FMMPM
 
 
     mask_winding= cells_materials == 1

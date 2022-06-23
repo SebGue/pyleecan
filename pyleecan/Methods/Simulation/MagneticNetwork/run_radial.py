@@ -7,8 +7,8 @@ Created on Fri Jun  3 10:46:17 2022
 """
 from solver_linear_model import linear_model
 from geometry_linear_motor import geometry
-from post_processing import compute_B_square
-from plot import view_contour_flux
+from post_processing import compute_B_square,compute_B_radial
+from plot import view_contour_flux,view_contour_flux2,Plot_B
 import numpy as np
 import meshio
 
@@ -18,7 +18,7 @@ Br = 1.2          # PM remanent induction (residual induction) (T)
 mu0 = np.pi*4e-7    # Permeability of vacuum (H/m)
 
 
-pos=2
+pos=80
 x_min = 0
 x_max = 0.06
 
@@ -26,7 +26,7 @@ x_max = 0.06
 y_min = 0
 y_max = 0.051
 
-density=1
+density=4
 size_r= density*51+1
 size_theta = density*60+1
 
@@ -48,7 +48,9 @@ list_cart=np.stack((x,y),axis=-1)
 
 view_contour_flux(F,x,y,x.shape[1],x.shape[0], list_geometry)
 
-Bx,By=compute_B_square(F, list_elem,list_coord,la)
+Bx,By=compute_B_radial(F, list_elem,list_coord,la)
+
+Norm=np.sqrt(Bx**2+By**2)
 
 
 B=np.stack((Bx,By),axis=-1)
@@ -59,7 +61,7 @@ temp[:,1]=By.flatten()
 B=temp
 
 temp=np.zeros((list_coord.shape[0],3))
-temp[:,0:2]=list_coord
+temp[:,0:2]=np.array([x.flatten(),y.flatten()]).T
 
 list_coord=temp
 
@@ -77,7 +79,7 @@ mesh = meshio.Mesh(
     cell_data={"B": [B],"Materials":[list_geometry]},
 )
 mesh.write(
-    "mymesh.xdmf",  # str, os.PathLike, or buffer/open file
+    "mymesh_radial.xdmf",  # str, os.PathLike, or buffer/open file
     # file_format="vtk",  # optional if first argument is a path; inferred from extension
 )
 
