@@ -330,8 +330,27 @@ def right_member_assembly(
         RHS
 
     """
+<<<<<<< HEAD
     nn = self.Num_Unknowns.max() + 1
     if self.mode == "cartesian":
+=======
+<<<<<<< .mine
+    mask_magnet = cells_materials == 4
+    
+    nn = Num_Unknowns.max()+1
+    if mode=="cartesian":
+        h_x=np.linalg.norm(list_coord[list_elem[:, 0]]-list_coord[list_elem[:, 1]],axis=1,ord=2)
+        h_y=np.linalg.norm(list_coord[list_elem[:, 1]]-list_coord[list_elem[:, 2]],axis=1,ord=2)
+        FMMPM = Br*h_x[0]*0.5/mu0
+        
+    elif mode=="polar":
+        theta=np.abs(list_coord[list_elem[:, 0],0]-list_coord[list_elem[:, 1],0])
+        R0=list_coord[list_elem[:, 0],1]
+        R1=list_coord[list_elem[:, 3],1]
+=======
+    nn = Num_Unknowns.max() + 1
+    if mode == "cartesian":
+>>>>>>> d554fc47b3af2f48da14201affb93979c912b84b
         h_x = np.linalg.norm(
             self.list_coord[self.list_elem[:, 0]]
             - self.list_coord[self.list_elem[:, 1]],
@@ -345,6 +364,7 @@ def right_member_assembly(
             ord=2,
         )
 
+<<<<<<< HEAD
     elif self.mode == "polar":
         theta = np.abs(
             self.list_coord[self.list_elem[:, 0], 0]
@@ -352,6 +372,26 @@ def right_member_assembly(
         )
         R0 = self.list_coord[self.list_elem[:, 0], 1]
         R1 = self.list_coord[self.list_elem[:, 3], 1]
+=======
+
+
+
+>>>>>>> .theirs
+
+<<<<<<< .mine
+        h_x=0.5*(R0+R1)*theta
+        h_y=np.abs(R1-R0)
+        print("ok",h_x,h_y)
+        FMMPM = Br*np.mean(h_x[mask_magnet])*0.5/mu0
+        
+=======
+    elif mode == "polar":
+        theta = np.abs(list_coord[list_elem[:, 0], 0] - list_coord[list_elem[:, 1], 0])
+        R0 = list_coord[list_elem[:, 0], 1]
+        R1 = list_coord[list_elem[:, 3], 1]
+>>>>>>> d554fc47b3af2f48da14201affb93979c912b84b
+
+>>>>>>> .theirs
 
         h_x = 0.5 * (R0 + R1) * theta
         h_y = np.abs(R1 - R0)
@@ -368,6 +408,7 @@ def right_member_assembly(
     JB = J * np.cos(wt)
     JA, JB, JC = 0, 0, 0
 
+<<<<<<< HEAD
     mask_magnet = self.cells_materials == 4
 
     FMMPM = self.Br * h_x[0] * 0.5 / self.mu0
@@ -376,11 +417,26 @@ def right_member_assembly(
     i2 = self.Num_Unknowns[self.list_elem[mask_magnet, 1]]
     i3 = self.Num_Unknowns[self.list_elem[mask_magnet, 2]]
     i4 = self.Num_Unknowns[self.list_elem[mask_magnet, 3]]
+=======
+    
 
-    E[i1] -= FMMPM
-    E[i2] += FMMPM
-    E[i3] += FMMPM
-    E[i4] -= FMMPM
+<<<<<<< .mine
+    
+    #FMMPM = 0
+=======
+    FMMPM = Br * h_x[0] * 0.5 / mu0
+    # FMMPM = 0
+>>>>>>> .theirs
+    i1 = Num_Unknowns[list_elem[mask_magnet, 0]]
+    i2 = Num_Unknowns[list_elem[mask_magnet, 1]]
+    i3 = Num_Unknowns[list_elem[mask_magnet, 2]]
+    i4 = Num_Unknowns[list_elem[mask_magnet, 3]]
+>>>>>>> d554fc47b3af2f48da14201affb93979c912b84b
+
+    E[i1] += FMMPM
+    E[i2] -= FMMPM
+    E[i3] -= FMMPM
+    E[i4] += FMMPM
 
     mask_winding = self.cells_materials == 1
     S = h_x[mask_winding] * h_y[mask_winding] / 4

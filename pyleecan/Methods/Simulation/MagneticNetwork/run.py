@@ -16,7 +16,11 @@ Br = 1.2  # PM remanent induction (residual induction) (T)
 mu0 = np.pi * 4e-7  # Permeability of vacuum (H/m)
 
 
+<<<<<<< .mine
+pos=41
+=======
 pos = 45
+>>>>>>> .theirs
 x_min = 0
 x_max = 0.06
 
@@ -24,8 +28,15 @@ x_max = 0.06
 y_min = 0
 y_max = 0.051
 
+<<<<<<< .mine
+mul=2
+size_x=int(60*mul)+1
+size_y=int(51*mul)+1
+=======
 size_x = 61
 size_y = 52
+
+>>>>>>> .theirs
 
 x = np.linspace(x_min, x_max, size_x)
 y = np.linspace(y_min, y_max, size_y)
@@ -51,7 +62,7 @@ F, list_geometry, Num_unknowns, list_elem, permeability_cell, list_coord = linea
     Br,
     mode,
 )
-
+print("Inconnues:",Num_unknowns.max()+1)
 view_contour_flux(F, x, y, size_x, size_y, list_geometry)
 
 Bx, By = compute_B_square(F, list_elem, list_coord, la)
