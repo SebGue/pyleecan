@@ -6,74 +6,69 @@ Created on Fri Jun  3 09:51:29 2022
 """
 
 import numpy as np
-
-from pyleecan.Methods.Simulation.MachineInput.load_machine import load_machine
-
-# %%
-
-file_path = (
-    "C:/Users/pc/Documents/MultiLumpedNetwork/pyleecan/Data/Machine/SPMSM_val.json"
-)
-
-Machine = load_machine(file_path)
-
-# Machine's characteristics
-# tp = 60e-3  # pole pitch (m)
-tp = (
-    2
-    * np.tan(np.pi / Machine.rotor_pole_pairs)
-    * (Machine.rotor_diameter_int + 0.5 * Machine.height_yoke_rotor)
-)
-
-# tm = 55e-3  # PM length in x direction (m)
-tm = Machine.width_magnet_av
-
-# hm = 10e-3  # PM height in y direction (m)
-hm = Machine.height_magnet
-
-# e = 1e-3  # Air-gap thickness (m)
-e = Machine.stator_diameter_int - Machine.rotor_diameter_ext
-
-# hst = 30e-3  # Stator total height (m)
-hst = Machine.height_yoke_stator
-
-# hs = 20e-3  # Slot height (m)
-hs = Machine.height_slotw
-
-# hmbi = 10e-3  # Moving armature height (moving back iron height)
-hmbi = Machine.height_yoke_rotor
-
-# ws = 10e-3  # Slot opening (m)
-ws = Machine.width_slotw_av
-
-ts = 2 * ws  # Slot pitch (m)
-
-# la = 1  # Active length (m)
-la = Machine.active_length
-
-# Material properties
-Br = 1.2  # PM remanent induction (residual induction) (T)
-mu0 = np.pi * 4e-7  # Permeability of vacuum (H/m)
-mur1 = 1  # Relative permeability of air
-mur2 = 7500  # Relative permeability of statot iron
-mur3 = 7500
+from pyleecan.Functions.load import load
 
 
-#%%
+def geometry_linear_motor(self, file_path, size_x, size_y, pos_pm):
 
+    # Load machine object
+    Machine = load(self.file_path)
 
-list_materials = ["bob1", "bob2", "bob3", "air", "iron1", "PM", "iron3"]
+    # Machine's characteristics
+    # tp = 60e-3  # pole pitch (m)
+    tp = (
+        2
+        * np.tan(np.pi / Machine.rotor.get_pole_pair_number())
+        * (Machine.rotor.Rint + 0.5 * Machine.rotor.comp_height_yoke())
+    )
 
-permeabilty_materials = np.array([1, 1, 1, 1, 7500, 1, 7500])
+    # hm = 10e-3  # PM height in y direction (m)
+    hm = Machine.rotor.slot.comp_height_active()
 
-x = 0.06
-y = 0.051
+    # tm = 55e-3  # PM length in x direction (m)
+    tm = Machine.rotor.slot.comp_surface() / hm
 
+    # e = 1e-3  # Air-gap thickness (m)
+    e = Machine.stator.Rint - Machine.rotor.Rext
 
-def geometry(size_x, size_y, pos_pm):
-    print(size_x, size_y)
-    h_x = x / (size_x - 1)
-    h_y = y / (size_y - 1)
+    # hst = 30e-3  # Stator total height (m)
+    hst = Machine.stator.comp_height_yoke()
+
+    # hs = 20e-3  # Slot height (m)
+    hs = Machine.stator.slot.comp_height_active()
+
+    # hmbi = 10e-3  # Moving armature height (moving back iron height)
+    hmbi = Machine.rotor.comp_height_yoke()
+
+    # ws = 10e-3  # Slot opening (m)
+    ws = Machine.stator.slot.comp_surface() / hs
+
+    ts = 2 * ws  # Slot pitch (m)
+
+    # la = 1  # Active length (m)
+    la = Machine.rotor.L1
+
+    # Material properties
+    Br = 1.2  # PM remanent induction (residual induction) (T)
+    mu0 = np.pi * 4e-7  # Permeability of vacuum (H/m)
+    mur1 = 1  # Relative permeability of air
+    mur2 = 7500  # Relative permeability of statot iron
+    mur3 = 7500
+
+    list_materials = ["bob1", "bob2", "bob3", "air", "iron1", "PM", "iron3"]
+
+    permeabilty_materials = np.array([1, 1, 1, 1, 7500, 1, 7500])
+
+    # x and y positions
+    x = 0.06
+    y = 0.051
+
+    # print(self.size_x, self.size_y)
+
+    # Definition of x-axis and y-axis steps
+    h_x = x / (self.size_x - 1)
+    h_y = y / (self.size_y - 1)
+
     # % Number of elements in the stator armature
     m0s = round(
         (ts - ws) / 2 / h_x
@@ -94,8 +89,8 @@ def geometry(size_x, size_y, pos_pm):
     # Number of elements in the magnetic air-gap (hm + e) in y direction
     p1 = round((hm + e) / h_y)
 
-    m = size_y - 1
-    n = size_x - 1
+    m = self.size_y - 1
+    n = self.size_x - 1
     nn = m * n
     print(nn)
     cells_materials = np.zeros(nn, dtype=np.uint16)
@@ -125,26 +120,25 @@ def geometry(size_x, size_y, pos_pm):
             for j in range(n):
                 num_elem = n * i + j
                 cells_materials[num_elem] = 4
-        ##
+            ##
         elif p1 <= i < p1 + p0 - p0m:
             for j in range(n):
                 num_elem = n * i + j
-                if pos_pm + 2 * m1m >= n:
-                    if (pos_pm + 2 * m1m) % n < j <= pos_pm % n:
+                if self.pos_pm + 2 * m1m >= n:
+                    if (self.pos_pm + 2 * m1m) % n < j <= self.pos_pm % n:
                         cells_materials[num_elem] = 4
                     else:
                         cells_materials[num_elem] = 6
                 else:
-                    if pos_pm <= j < (pos_pm + 2 * m1m):
+                    if self.pos_pm <= j < (self.pos_pm + 2 * m1m):
                         cells_materials[num_elem] = 6
                     else:
                         cells_materials[num_elem] = 4
-        ##
+            ##
         elif i < p1:
             for j in range(n):
                 num_elem = n * i + j
                 cells_materials[num_elem] = 7
         else:
             print("Wrong geometry")
-
     return cells_materials, permeabilty_materials
