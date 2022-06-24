@@ -64,9 +64,9 @@ def run_radial(self):
     y = (list_coord[:, 1] * np.sin(list_coord[:, 0])).reshape(size_r, size_theta)
     list_cart = np.stack((x, y), axis=-1)
 
-    gr = view_contour_flux(F, x, y, x.shape[1], x.shape[0], list_geometry)
+    gr = self.view_contour_flux(F, x, y, x.shape[1], x.shape[0], list_geometry)
 
-    Bx, By = compute_B_square(F, list_elem, list_coord, la)
+    Bx, By = self.compute_B_square(F, list_elem, list_coord, la)
 
     B = np.stack((Bx, By), axis=-1)
 
@@ -104,4 +104,3 @@ def run_radial(self):
     print("mesh saved", list_coord.shape, list_elem.shape)
 
     return gr, Bx, By
-    self.run_radial()
