@@ -4,6 +4,7 @@ Created on Fri Jun  3 09:10:31 2022
 
 @author: LAP02
 """
+
 """
 from pre_processing import (
     save_mesh,
@@ -24,6 +25,8 @@ import time
 
 from threadpoolctl import threadpool_info
 import os
+
+# from pyleecan.Classes.MagneticNetwork import MagneticNetwork
 
 threads = "1"
 os.environ["OMP_NUM_THREADS"] = threads  # export OMP_NUM_THREADS=4
@@ -51,7 +54,7 @@ except:
     from scipy.sparse.linalg import spsolve
 
 
-def linear_model(
+def solver_linear_model(
     self, size_x, size_y, x, y, x_dual, y_dual, pos, BC, geometry, mu0, la, Br, mode
 ):
     """
@@ -100,39 +103,41 @@ def linear_model(
     import matplotlib.pyplot as plt
 
     # Initialyze nature of elements
-    list_geometry, permeability_materials = geometry_linear_motor(
-        self.size_x, self.size_y, self.pos
+    list_geometry, permeability_materials = self.geometry_linear_motor(
+        size_x, size_y, pos
     )
 
-    list_coord = init_point(self.size_x, self.size_y, self.x, self.y)
+    list_coord = self.init_point(size_x, size_y, x, y)
 
-    permeability_cell = init_permeabilty_cell(
-        self.size_x, self.size_y, permeability_materials, list_geometry
+    permeability_cell = self.init_permeabilty_cell(
+        size_x, size_y, permeability_materials, list_geometry
     )
 
-    list_elem = init_cell(self.size_x, self.size_y)
+    list_elem = self.init_cell(size_x, size_y)
 
-    BC_list, Periodic_point = init_mesh_BC(self.size_x, self.size_y, self.BC)
+    BC_list, Periodic_point = self.init_mesh_BC(size_x, size_y, BC)
 
-    Num_Unknowns = numeroting_unknows(list_elem, BC_list, Periodic_point)
+    Num_Unknowns = self.numeroting_unknows(list_elem, BC_list, Periodic_point)
 
     t1 = time.perf_counter()
     print("Assembly geometry:", np.round(t1 - t0, 5), "secondes")
-    save_mesh(list_geometry, Num_Unknowns, list_elem, x, y, BC_list)
+    self.save_mesh(list_geometry, Num_Unknowns, list_elem, x, y, BC_list)
     t2 = time.perf_counter()
     print("Save mesh:", np.round(t2 - t1, 5), "secondes")
 
     # Assembly all matrice
-    reluc_list = init_reluc(list_elem, list_coord, self.mu0, self.la, self.mode)
+    reluc_list = self.init_reluc(list_elem, list_coord, mu0, la, mode)
     print(reluc_list)
-    M_csr = assembly(reluc_list, Num_Unknowns, list_elem, permeability_cell, BC_list)
+    M_csr = self.assembly(
+        reluc_list, Num_Unknowns, list_elem, permeability_cell, BC_list
+    )
 
     t3 = time.perf_counter()
     print("Assembly matrix", np.round(t3 - t2, 5), "secondes")
 
     # Assembly RHS
-    E = right_member_assembly(
-        list_geometry, Num_Unknowns, list_elem, list_coord, self.Br, self.mu0, self.mode
+    E = self.right_member_assembly(
+        list_geometry, Num_Unknowns, list_elem, list_coord, Br, mu0, mode
     )
     t4 = time.perf_counter()
 
@@ -163,6 +168,6 @@ def linear_model(
             np.linalg.norm(M_csr @ F - E, ord=2),
         )
 
-    F = add_BC_to_F(F, Num_Unknowns, list_elem, BC_list)
+    F = self.add_BC_to_F(F, Num_Unknowns, list_elem, BC_list)
 
     return F, list_geometry, Num_Unknowns, list_elem, permeability_cell, list_coord

@@ -44,7 +44,7 @@ def run_radial(self):
         list_elem,
         permeability_cell,
         list_coord,
-    ) = self.linear_model(
+    ) = self.solver_linear_model(
         size_theta,
         size_r,
         theta,
@@ -53,7 +53,7 @@ def run_radial(self):
         r_dual,
         pos,
         BC,
-        self.geometry,
+        self.geometry_linear_motor,
         mu0,
         la,
         Br,
@@ -65,6 +65,7 @@ def run_radial(self):
     list_cart = np.stack((x, y), axis=-1)
 
     gr = self.view_contour_flux(F, x, y, x.shape[1], x.shape[0], list_geometry)
+    print(self.view_contour_flux(F, x, y, x.shape[1], x.shape[0], list_geometry))
 
     Bx, By = self.compute_B_square(F, list_elem, list_coord, la)
 

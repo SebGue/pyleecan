@@ -7110,20 +7110,41 @@
             "geometry_linear_motor_separetion",
             "plot",
             "post_processing",
-            "pre_processing",
-            "RN_linear_motor",
             "run",
             "run_non_linear",
             "run_radial",
             "solver_linear_model",
             "solver_non_linear_model",
-            "solver_plus_non_linear_model.py"
+            "pre_processing.init_cell",
+            "pre_processing.init_mesh_BC",
+            "pre_processing.init_permeabilty_cell",
+            "pre_processing.init_point",
+            "pre_processing.init_reluc",
+            "pre_processing.numeroting_unknows",
+            "pre_processing.save_mesh",
+            "assembler.assembly",
+            "assembler.assembly_one_area",
+            "assembler.right_member_assembly",
+            "post_processing.add_BC_to_F",
+            "post_processing.compute_B_radial",
+            "post_processing.compute_B_square"
         ],
         "mother": "",
         "name": "MagneticNetwork",
         "package": "Simulation",
         "path": "pyleecan/Generator/ClassesRef/Simulation/MagneticNetwork.csv",
-        "properties": []
+        "properties": [
+            {
+                "as_dict": "",
+                "desc": "file path of the .json file of the defined machine",
+                "max": "",
+                "min": "",
+                "name": "file_path",
+                "type": "",
+                "unit": "-",
+                "value": ""
+            }
+        ]
     },
     "Magnetics": {
         "constants": [

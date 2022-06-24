@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from .....pyleecan.Functions.load import load
+from pyleecan.Functions.load import load
 
 
 def load_material(file_path):

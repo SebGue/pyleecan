@@ -47,16 +47,6 @@ except ImportError as error:
     post_processing = error
 
 try:
-    from ..Methods.Simulation.MagneticNetwork.pre_processing import pre_processing
-except ImportError as error:
-    pre_processing = error
-
-try:
-    from ..Methods.Simulation.MagneticNetwork.RN_linear_motor import RN_linear_motor
-except ImportError as error:
-    RN_linear_motor = error
-
-try:
     from ..Methods.Simulation.MagneticNetwork.run import run
 except ImportError as error:
     run = error
@@ -86,9 +76,89 @@ except ImportError as error:
     solver_non_linear_model = error
 
 try:
-    from ..Methods.Simulation.MagneticNetwork.solver_plus_non_linear_model.py import py
+    from ..Methods.Simulation.MagneticNetwork.pre_processing.init_cell import init_cell
 except ImportError as error:
-    py = error
+    init_cell = error
+
+try:
+    from ..Methods.Simulation.MagneticNetwork.pre_processing.init_mesh_BC import (
+        init_mesh_BC,
+    )
+except ImportError as error:
+    init_mesh_BC = error
+
+try:
+    from ..Methods.Simulation.MagneticNetwork.pre_processing.init_permeabilty_cell import (
+        init_permeabilty_cell,
+    )
+except ImportError as error:
+    init_permeabilty_cell = error
+
+try:
+    from ..Methods.Simulation.MagneticNetwork.pre_processing.init_point import (
+        init_point,
+    )
+except ImportError as error:
+    init_point = error
+
+try:
+    from ..Methods.Simulation.MagneticNetwork.pre_processing.init_reluc import (
+        init_reluc,
+    )
+except ImportError as error:
+    init_reluc = error
+
+try:
+    from ..Methods.Simulation.MagneticNetwork.pre_processing.numeroting_unknows import (
+        numeroting_unknows,
+    )
+except ImportError as error:
+    numeroting_unknows = error
+
+try:
+    from ..Methods.Simulation.MagneticNetwork.pre_processing.save_mesh import save_mesh
+except ImportError as error:
+    save_mesh = error
+
+try:
+    from ..Methods.Simulation.MagneticNetwork.assembler.assembly import assembly
+except ImportError as error:
+    assembly = error
+
+try:
+    from ..Methods.Simulation.MagneticNetwork.assembler.assembly_one_area import (
+        assembly_one_area,
+    )
+except ImportError as error:
+    assembly_one_area = error
+
+try:
+    from ..Methods.Simulation.MagneticNetwork.assembler.right_member_assembly import (
+        right_member_assembly,
+    )
+except ImportError as error:
+    right_member_assembly = error
+
+try:
+    from ..Methods.Simulation.MagneticNetwork.post_processing.add_BC_to_F import (
+        add_BC_to_F,
+    )
+except ImportError as error:
+    add_BC_to_F = error
+
+try:
+    from ..Methods.Simulation.MagneticNetwork.post_processing.compute_B_radial import (
+        compute_B_radial,
+    )
+except ImportError as error:
+    compute_B_radial = error
+
+try:
+    from ..Methods.Simulation.MagneticNetwork.post_processing.compute_B_square import (
+        compute_B_square,
+    )
+except ImportError as error:
+    compute_B_square = error
 
 
 from numpy import isnan
@@ -157,30 +227,6 @@ class MagneticNetwork(FrozenClass):
         )
     else:
         post_processing = post_processing
-    # cf Methods.Simulation.MagneticNetwork.pre_processing
-    if isinstance(pre_processing, ImportError):
-        pre_processing = property(
-            fget=lambda x: raise_(
-                ImportError(
-                    "Can't use MagneticNetwork method pre_processing: "
-                    + str(pre_processing)
-                )
-            )
-        )
-    else:
-        pre_processing = pre_processing
-    # cf Methods.Simulation.MagneticNetwork.RN_linear_motor
-    if isinstance(RN_linear_motor, ImportError):
-        RN_linear_motor = property(
-            fget=lambda x: raise_(
-                ImportError(
-                    "Can't use MagneticNetwork method RN_linear_motor: "
-                    + str(RN_linear_motor)
-                )
-            )
-        )
-    else:
-        RN_linear_motor = RN_linear_motor
     # cf Methods.Simulation.MagneticNetwork.run
     if isinstance(run, ImportError):
         run = property(
@@ -237,37 +283,184 @@ class MagneticNetwork(FrozenClass):
         )
     else:
         solver_non_linear_model = solver_non_linear_model
-    # cf Methods.Simulation.MagneticNetwork.solver_plus_non_linear_model.py
-    if isinstance(py, ImportError):
-        py = property(
+    # cf Methods.Simulation.MagneticNetwork.pre_processing.init_cell
+    if isinstance(init_cell, ImportError):
+        init_cell = property(
             fget=lambda x: raise_(
-                ImportError("Can't use MagneticNetwork method py: " + str(py))
+                ImportError(
+                    "Can't use MagneticNetwork method init_cell: " + str(init_cell)
+                )
             )
         )
     else:
-        py = py
+        init_cell = init_cell
+    # cf Methods.Simulation.MagneticNetwork.pre_processing.init_mesh_BC
+    if isinstance(init_mesh_BC, ImportError):
+        init_mesh_BC = property(
+            fget=lambda x: raise_(
+                ImportError(
+                    "Can't use MagneticNetwork method init_mesh_BC: "
+                    + str(init_mesh_BC)
+                )
+            )
+        )
+    else:
+        init_mesh_BC = init_mesh_BC
+    # cf Methods.Simulation.MagneticNetwork.pre_processing.init_permeabilty_cell
+    if isinstance(init_permeabilty_cell, ImportError):
+        init_permeabilty_cell = property(
+            fget=lambda x: raise_(
+                ImportError(
+                    "Can't use MagneticNetwork method init_permeabilty_cell: "
+                    + str(init_permeabilty_cell)
+                )
+            )
+        )
+    else:
+        init_permeabilty_cell = init_permeabilty_cell
+    # cf Methods.Simulation.MagneticNetwork.pre_processing.init_point
+    if isinstance(init_point, ImportError):
+        init_point = property(
+            fget=lambda x: raise_(
+                ImportError(
+                    "Can't use MagneticNetwork method init_point: " + str(init_point)
+                )
+            )
+        )
+    else:
+        init_point = init_point
+    # cf Methods.Simulation.MagneticNetwork.pre_processing.init_reluc
+    if isinstance(init_reluc, ImportError):
+        init_reluc = property(
+            fget=lambda x: raise_(
+                ImportError(
+                    "Can't use MagneticNetwork method init_reluc: " + str(init_reluc)
+                )
+            )
+        )
+    else:
+        init_reluc = init_reluc
+    # cf Methods.Simulation.MagneticNetwork.pre_processing.numeroting_unknows
+    if isinstance(numeroting_unknows, ImportError):
+        numeroting_unknows = property(
+            fget=lambda x: raise_(
+                ImportError(
+                    "Can't use MagneticNetwork method numeroting_unknows: "
+                    + str(numeroting_unknows)
+                )
+            )
+        )
+    else:
+        numeroting_unknows = numeroting_unknows
+    # cf Methods.Simulation.MagneticNetwork.pre_processing.save_mesh
+    if isinstance(save_mesh, ImportError):
+        save_mesh = property(
+            fget=lambda x: raise_(
+                ImportError(
+                    "Can't use MagneticNetwork method save_mesh: " + str(save_mesh)
+                )
+            )
+        )
+    else:
+        save_mesh = save_mesh
+    # cf Methods.Simulation.MagneticNetwork.assembler.assembly
+    if isinstance(assembly, ImportError):
+        assembly = property(
+            fget=lambda x: raise_(
+                ImportError(
+                    "Can't use MagneticNetwork method assembly: " + str(assembly)
+                )
+            )
+        )
+    else:
+        assembly = assembly
+    # cf Methods.Simulation.MagneticNetwork.assembler.assembly_one_area
+    if isinstance(assembly_one_area, ImportError):
+        assembly_one_area = property(
+            fget=lambda x: raise_(
+                ImportError(
+                    "Can't use MagneticNetwork method assembly_one_area: "
+                    + str(assembly_one_area)
+                )
+            )
+        )
+    else:
+        assembly_one_area = assembly_one_area
+    # cf Methods.Simulation.MagneticNetwork.assembler.right_member_assembly
+    if isinstance(right_member_assembly, ImportError):
+        right_member_assembly = property(
+            fget=lambda x: raise_(
+                ImportError(
+                    "Can't use MagneticNetwork method right_member_assembly: "
+                    + str(right_member_assembly)
+                )
+            )
+        )
+    else:
+        right_member_assembly = right_member_assembly
+    # cf Methods.Simulation.MagneticNetwork.post_processing.add_BC_to_F
+    if isinstance(add_BC_to_F, ImportError):
+        add_BC_to_F = property(
+            fget=lambda x: raise_(
+                ImportError(
+                    "Can't use MagneticNetwork method add_BC_to_F: " + str(add_BC_to_F)
+                )
+            )
+        )
+    else:
+        add_BC_to_F = add_BC_to_F
+    # cf Methods.Simulation.MagneticNetwork.post_processing.compute_B_radial
+    if isinstance(compute_B_radial, ImportError):
+        compute_B_radial = property(
+            fget=lambda x: raise_(
+                ImportError(
+                    "Can't use MagneticNetwork method compute_B_radial: "
+                    + str(compute_B_radial)
+                )
+            )
+        )
+    else:
+        compute_B_radial = compute_B_radial
+    # cf Methods.Simulation.MagneticNetwork.post_processing.compute_B_square
+    if isinstance(compute_B_square, ImportError):
+        compute_B_square = property(
+            fget=lambda x: raise_(
+                ImportError(
+                    "Can't use MagneticNetwork method compute_B_square: "
+                    + str(compute_B_square)
+                )
+            )
+        )
+    else:
+        compute_B_square = compute_B_square
     # generic save method is available in all object
     save = save
     # get_logger method is available in all object
     get_logger = get_logger
 
-    def __init__(self, init_dict=None, init_str=None):
-        """Constructor of the class. Can be use in two ways :
+    def __init__(self, file_path=-1, init_dict=None, init_str=None):
+        """Constructor of the class. Can be use in three ways :
         - __init__ (arg1 = 1, arg3 = 5) every parameters have name and default values
-            for Matrix, None will initialise the property with an empty Matrix
-            for pyleecan type, None will call the default constructor
-        - __init__ (init_dict = d) d must be a dictionary wiht every properties as keys
+            for pyleecan type, -1 will call the default constructor
+        - __init__ (init_dict = d) d must be a dictionary with property names as keys
+        - __init__ (init_str = s) s must be a string
+        s is the file path to load
 
         ndarray or list can be given for Vector and Matrix
         object or dict can be given for pyleecan Object"""
 
+        if init_str is not None:  # Load from a file
+            init_dict = load_init_dict(init_str)[1]
         if init_dict is not None:  # Initialisation by dict
-            assert "__class__" in init_dict
-            assert init_dict["__class__"] == "MagneticNetwork"
-        if init_str is not None:  # Initialisation by str
-            assert type(init_str) is str
-        # The class is frozen, for now it's impossible to add new properties
+            assert type(init_dict) is dict
+            # Overwrite default value with init_dict content
+            if "file_path" in list(init_dict.keys()):
+                file_path = init_dict["file_path"]
+        # Set the properties (value check and convertion are done in setter)
         self.parent = None
+        self.file_path = file_path
+
+        # The class is frozen, for now it's impossible to add new properties
         self._freeze()
 
     def __str__(self):
@@ -280,12 +473,19 @@ class MagneticNetwork(FrozenClass):
             MagneticNetwork_str += (
                 "parent = " + str(type(self.parent)) + " object" + linesep
             )
+        MagneticNetwork_str += "file_path = " + str(self.file_path) + linesep + linesep
         return MagneticNetwork_str
 
     def __eq__(self, other):
         """Compare two objects (skip parent)"""
 
         if type(other) != type(self):
+            return False
+        if isinstance(self.file_path, np.ndarray) and not np.array_equal(
+            other.file_path, self.file_path
+        ):
+            return False
+        elif other.file_path != self.file_path:
             return False
         return True
 
@@ -297,6 +497,27 @@ class MagneticNetwork(FrozenClass):
         if type(other) != type(self):
             return ["type(" + name + ")"]
         diff_list = list()
+        if (other.file_path is None and self.file_path is not None) or (
+            other.file_path is not None and self.file_path is None
+        ):
+            diff_list.append(name + ".file_path")
+        elif self.file_path is None:
+            pass
+        elif isinstance(self.file_path, np.ndarray) and not np.array_equal(
+            other.file_path, self.file_path
+        ):
+            diff_list.append(name + ".file_path")
+        elif hasattr(self.file_path, "compare"):
+            diff_list.extend(
+                self.file_path.compare(
+                    other.file_path,
+                    name=name + ".file_path",
+                    ignore_list=ignore_list,
+                    is_add_value=is_add_value,
+                )
+            )
+        elif other._file_path != self._file_path:
+            diff_list.append(name + ".file_path")
         # Filter ignore differences
         diff_list = list(filter(lambda x: x not in ignore_list, diff_list))
         return diff_list
@@ -305,6 +526,7 @@ class MagneticNetwork(FrozenClass):
         """Return the size in memory of the object (including all subobject)"""
 
         S = 0  # Full size of the object
+        S += getsizeof(self.file_path)
         return S
 
     def as_dict(self, type_handle_ndarray=0, keep_function=False, **kwargs):
@@ -319,6 +541,27 @@ class MagneticNetwork(FrozenClass):
         """
 
         MagneticNetwork_dict = dict()
+        if self.file_path is None:
+            MagneticNetwork_dict["file_path"] = None
+        elif isinstance(self.file_path, np.ndarray):
+            if type_handle_ndarray == 0:
+                MagneticNetwork_dict["file_path"] = self.file_path.tolist()
+            elif type_handle_ndarray == 1:
+                MagneticNetwork_dict["file_path"] = self.file_path.copy()
+            elif type_handle_ndarray == 2:
+                MagneticNetwork_dict["file_path"] = self.file_path
+            else:
+                raise Exception(
+                    "Unknown type_handle_ndarray: " + str(type_handle_ndarray)
+                )
+        elif hasattr(self.file_path, "as_dict"):
+            MagneticNetwork_dict["file_path"] = self.file_path.as_dict(
+                type_handle_ndarray=type_handle_ndarray,
+                keep_function=keep_function,
+                **kwargs
+            )
+        else:
+            MagneticNetwork_dict["file_path"] = self.file_path
         # The class name is added to the dict for deserialisation purpose
         MagneticNetwork_dict["__class__"] = "MagneticNetwork"
         return MagneticNetwork_dict
@@ -327,10 +570,54 @@ class MagneticNetwork(FrozenClass):
         """Creates a deepcopy of the object"""
 
         # Handle deepcopy of all the properties
+        if hasattr(self.file_path, "copy"):
+            file_path_val = self.file_path.copy()
+        else:
+            file_path_val = self.file_path
         # Creates new object of the same type with the copied properties
-        obj_copy = type(self)()
+        obj_copy = type(self)(file_path=file_path_val)
         return obj_copy
 
     def _set_None(self):
         """Set all the properties to None (except pyleecan object)"""
-        pass
+
+        if hasattr(self.file_path, "_set_None"):
+            self.file_path._set_None()
+        else:
+            self.file_path = None
+
+    def _get_file_path(self):
+        """getter of file_path"""
+        return self._file_path
+
+    def _set_file_path(self, value):
+        """setter of file_path"""
+        if isinstance(value, dict) and "__class__" in value:
+            try:
+                class_obj = import_class(
+                    "pyleecan.Classes", value.get("__class__"), "file_path"
+                )
+            except:
+                class_obj = import_class(
+                    "SciDataTool.Classes", value.get("__class__"), "file_path"
+                )
+            value = class_obj(init_dict=value)
+        elif type(value) is list:
+            try:
+                value = np.array(value)
+            except:
+                pass
+        check_var("file_path", value, "")
+        self._file_path = value
+
+        if hasattr(self._file_path, "parent"):
+            self._file_path.parent = self
+
+    file_path = property(
+        fget=_get_file_path,
+        fset=_set_file_path,
+        doc=u"""file path of the .json file of the defined machine
+
+        :Type: 
+        """,
+    )

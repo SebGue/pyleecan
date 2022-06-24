@@ -9,7 +9,7 @@ import numpy as np
 from pyleecan.Functions.load import load
 
 
-def geometry_linear_motor(self, file_path, size_x, size_y, pos_pm):
+def geometry_linear_motor(self, size_x, size_y, pos_pm):
 
     # Load machine object
     Machine = load(self.file_path)
@@ -29,7 +29,7 @@ def geometry_linear_motor(self, file_path, size_x, size_y, pos_pm):
     tm = Machine.rotor.slot.comp_surface() / hm
 
     # e = 1e-3  # Air-gap thickness (m)
-    e = Machine.stator.Rint - Machine.rotor.Rext
+    e = Machine.comp_width_airgap_mec()
 
     # hst = 30e-3  # Stator total height (m)
     hst = Machine.stator.comp_height_yoke()
@@ -66,8 +66,8 @@ def geometry_linear_motor(self, file_path, size_x, size_y, pos_pm):
     # print(self.size_x, self.size_y)
 
     # Definition of x-axis and y-axis steps
-    h_x = x / (self.size_x - 1)
-    h_y = y / (self.size_y - 1)
+    h_x = x / (size_x - 1)
+    h_y = y / (size_y - 1)
 
     # % Number of elements in the stator armature
     m0s = round(
@@ -89,8 +89,8 @@ def geometry_linear_motor(self, file_path, size_x, size_y, pos_pm):
     # Number of elements in the magnetic air-gap (hm + e) in y direction
     p1 = round((hm + e) / h_y)
 
-    m = self.size_y - 1
-    n = self.size_x - 1
+    m = size_y - 1
+    n = size_x - 1
     nn = m * n
     print(nn)
     cells_materials = np.zeros(nn, dtype=np.uint16)
@@ -124,13 +124,13 @@ def geometry_linear_motor(self, file_path, size_x, size_y, pos_pm):
         elif p1 <= i < p1 + p0 - p0m:
             for j in range(n):
                 num_elem = n * i + j
-                if self.pos_pm + 2 * m1m >= n:
-                    if (self.pos_pm + 2 * m1m) % n < j <= self.pos_pm % n:
+                if pos_pm + 2 * m1m >= n:
+                    if (pos_pm + 2 * m1m) % n < j <= pos_pm % n:
                         cells_materials[num_elem] = 4
                     else:
                         cells_materials[num_elem] = 6
                 else:
-                    if self.pos_pm <= j < (self.pos_pm + 2 * m1m):
+                    if pos_pm <= j < (pos_pm + 2 * m1m):
                         cells_materials[num_elem] = 6
                     else:
                         cells_materials[num_elem] = 4
@@ -142,5 +142,5 @@ def geometry_linear_motor(self, file_path, size_x, size_y, pos_pm):
         else:
             print("Wrong geometry")
 
-    geometry = {tp, hm, tm, e, hst, hs, hmbi, ws, ts, la}
-    return cells_materials, permeabilty_materials, geometry
+    # geometry = {tp, hm, tm, e, hst, hs, hmbi, ws, ts, la}
+    return cells_materials, permeabilty_materials

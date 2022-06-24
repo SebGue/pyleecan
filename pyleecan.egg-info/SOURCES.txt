@@ -9,6 +9,7 @@ pyleecan/default_config_dict.py
 pyleecan/definitions.py
 pyleecan/loggers.py
 pyleecan/run_GUI.py
+pyleecan/test.py
 pyleecan/tmp
 pyleecan.egg-info/PKG-INFO
 pyleecan.egg-info/SOURCES.txt
@@ -1816,7 +1817,6 @@ pyleecan/Methods/Simulation/MagneticNetwork/run_non_linear.py
 pyleecan/Methods/Simulation/MagneticNetwork/run_radial.py
 pyleecan/Methods/Simulation/MagneticNetwork/solver_linear_model.py
 pyleecan/Methods/Simulation/MagneticNetwork/solver_non_linear_model.py
-pyleecan/Methods/Simulation/MagneticNetwork/test.py
 pyleecan/Methods/Simulation/Magnetics/__init__.py
 pyleecan/Methods/Simulation/Magnetics/comp_I_mag.py
 pyleecan/Methods/Simulation/Magnetics/comp_axes.py

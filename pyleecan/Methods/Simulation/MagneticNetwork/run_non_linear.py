@@ -4,17 +4,17 @@ Created on Fri Jun  3 10:46:17 2022
 
 @author: LAP02
 """
-from solver_non_linear_model import non_linear_model
-from geometry_linear_motor import geometry
-from post_processing import compute_B_square
+# from solver_non_linear_model import non_linear_model
+# from geometry_linear_motor import geometry
+# from post_processing import compute_B_square
 import numpy as np
 import meshio
 
 
 def run_non_linear(self):
-    la = 1  # Active length (m)
-    Br = 1.2  # PM remanent induction (residual induction) (T)
-    mu0 = np.pi * 4e-7  # Permeability of vacuum (H/m)
+    # la = 1  # Active length (m)
+    # Br = 1.2  # PM remanent induction (residual induction) (T)
+    # mu0 = np.pi * 4e-7  # Permeability of vacuum (H/m)
 
     pos = 5
     x_min = 0
@@ -42,9 +42,21 @@ def run_non_linear(self):
         list_elem,
         permeability_cell,
         list_coord,
-    ) = non_linear_model(size_x, size_y, x, y, pos, geometry, sol0, BC, la, mu0, Br)
+    ) = self.solver_non_linear_model(
+        size_x,
+        size_y,
+        x,
+        y,
+        pos,
+        self.geometry_linear_motor,
+        sol0,
+        BC,
+        self.la,
+        self.mu0,
+        self.Br,
+    )
 
-    Bx, By = compute_B_square(F, list_elem, list_coord, la)
+    Bx, By = self.compute_B_square(F, list_elem, list_coord, self.la)
 
     B = np.stack((Bx.flatten(), By.flatten()), axis=-1)
 

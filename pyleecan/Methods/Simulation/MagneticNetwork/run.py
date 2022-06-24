@@ -4,9 +4,9 @@ Created on Fri Jun  3 10:46:17 2022
 
 @author: LAP02
 """
-from solver_linear_model import linear_model
-import geometry_linear_motor
-from post_processing import compute_B_square
+# from solver_linear_model import linear_model
+# import geometry_linear_motor
+# from post_processing import compute_B_square
 import numpy as np
 import meshio
 from plot import view_contour_flux
@@ -44,7 +44,7 @@ def run(self):
         list_elem,
         permeability_cell,
         list_coord,
-    ) = linear_model(
+    ) = self.solver_linear_model(
         size_x,
         size_y,
         x,
@@ -53,7 +53,7 @@ def run(self):
         y_dual,
         pos,
         BC,
-        geometry_linear_motor,
+        self.geometry,
         mu0,
         la,
         Br,
@@ -62,7 +62,7 @@ def run(self):
     print("Inconnues:", Num_unknowns.max() + 1)
     view_contour_flux(F, x, y, size_x, size_y, list_geometry)
 
-    Bx, By = compute_B_square(F, list_elem, list_coord, la)
+    Bx, By = self.compute_B_square(F, list_elem, list_coord, la)
 
     temp = np.zeros((list_elem.shape[0], 3))
     temp[:, 0] = Bx.flatten()
