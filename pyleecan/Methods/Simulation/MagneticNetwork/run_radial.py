@@ -4,10 +4,10 @@ Created on Fri Jun  3 10:46:17 2022
 
 @author: LAP02
 """
-from solver_linear_model import linear_model
-import geometry_linear_motor
-from post_processing import compute_B_square
-from plot import view_contour_flux
+# from solver_linear_model import linear_model
+# import geometry_linear_motor
+# from post_processing import compute_B_square
+# from plot import view_contour_flux
 import numpy as np
 import meshio
 
@@ -44,7 +44,7 @@ def run_radial(self):
         list_elem,
         permeability_cell,
         list_coord,
-    ) = linear_model(
+    ) = self.linear_model(
         size_theta,
         size_r,
         theta,
@@ -53,7 +53,7 @@ def run_radial(self):
         r_dual,
         pos,
         BC,
-        geometry_linear_motor,
+        self.geometry,
         mu0,
         la,
         Br,

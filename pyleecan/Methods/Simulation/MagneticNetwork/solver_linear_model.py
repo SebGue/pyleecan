@@ -4,7 +4,7 @@ Created on Fri Jun  3 09:10:31 2022
 
 @author: LAP02
 """
-
+"""
 from pre_processing import (
     save_mesh,
     init_reluc,
@@ -17,8 +17,10 @@ from pre_processing import (
 )
 from post_processing import add_BC_to_F
 from assembler import assembly, right_member_assembly
+"""
 import time
-import geometry_linear_motor
+
+# import geometry_linear_motor
 
 from threadpoolctl import threadpool_info
 import os

@@ -4,7 +4,7 @@ Created on Fri Jun  3 09:37:51 2022
 
 @author: LAP02
 """
-
+"""
 from pre_processing import (
     save_mesh,
     init_reluc,
@@ -17,6 +17,7 @@ from pre_processing import (
 )
 from post_processing import add_BC_to_F, compute_B_square
 from assembler import assembly, right_member_assembly, assembly_one_area
+"""
 import time
 
 from threadpoolctl import threadpool_info
@@ -96,8 +97,10 @@ def mu_non_linear(
     materials = np.array([5, 7])
     mu_r0 = 7500
 
-    self.Phi = add_BC_to_F(self.Phi, self.Num_Unknowns, self.list_elem, self.BC_list)
-    Bx, By = compute_B_square(self.Phi, self.list_elem, self.list_coord, self.la)
+    self.Phi = self.add_BC_to_F(
+        self.Phi, self.Num_Unknowns, self.list_elem, self.BC_list
+    )
+    Bx, By = self.compute_B_square(self.Phi, self.list_elem, self.list_coord, self.la)
     B_norm = np.sqrt(Bx * Bx + By * By)
 
     H = B_norm / (self.mu0 * self.permeability_cell)
@@ -172,21 +175,21 @@ def non_linear_model(self, size_x, size_y, x, y, pos, geometry, sol0, BC, la, mu
     non_linear_area = np.array([5, 7], dtype=np.int32)
 
     # Initialyze mesh
-    list_coord = init_point(self.size_x, self.size_y, self.x, self.y)
+    list_coord = self.init_point(self.size_x, self.size_y, self.x, self.y)
 
-    permeability_cell = init_permeabilty_cell(
+    permeability_cell = self.init_permeabilty_cell(
         self.size_x, self.size_y, permeability_materials, list_geometry
     )
 
-    list_elem = init_cell(self.size_x, self.size_y)
+    list_elem = self.init_cell(self.size_x, self.size_y)
 
-    BC_list, Periodic_point = init_mesh_BC(self.size_x, self.size_y, self.BC)
+    BC_list, Periodic_point = self.init_mesh_BC(self.size_x, self.size_y, self.BC)
 
-    Num_Unknowns = numeroting_unknows(list_elem, BC_list, Periodic_point)
+    Num_Unknowns = self.numeroting_unknows(list_elem, BC_list, Periodic_point)
 
     nn = Num_Unknowns.max() + 1
 
-    reluc_list = init_reluc(list_elem, list_coord, self.mu0, self.la)
+    reluc_list = self.init_reluc(list_elem, list_coord, self.mu0, self.la)
 
     t1 = time.perf_counter()
     print("Assembly geometry:", np.round(t1 - t0, 5), "secondes")
@@ -196,7 +199,7 @@ def non_linear_model(self, size_x, size_y, x, y, pos, geometry, sol0, BC, la, mu
     t3 = time.perf_counter()
 
     # Assembly RHS
-    E = right_member_assembly(
+    E = self.right_member_assembly(
         list_geometry, Num_Unknowns, list_elem, list_coord, self.Br, self.mu0
     )
 
@@ -210,7 +213,7 @@ def non_linear_model(self, size_x, size_y, x, y, pos, geometry, sol0, BC, la, mu
 
     # Togather area of the matrix
     for i in range(0, permeability_materials.size):
-        Matrix = assembly_one_area(
+        Matrix = self.assembly_one_area(
             i + 1,
             reluc_list,
             list_geometry,
@@ -266,7 +269,7 @@ def non_linear_model(self, size_x, size_y, x, y, pos, geometry, sol0, BC, la, mu
         M_non_lin = csr_matrix((nn, nn), dtype=np.float64)
 
         for j in non_linear_area:
-            Matrix = assembly_one_area(
+            Matrix = self.assembly_one_area(
                 j,
                 reluc_list,
                 list_geometry,
@@ -311,6 +314,6 @@ def non_linear_model(self, size_x, size_y, x, y, pos, geometry, sol0, BC, la, mu
         np.linalg.norm(M_csr @ F - E, ord=2),
     )
 
-    F = add_BC_to_F(F, Num_Unknowns, list_elem, BC_list)
+    F = self.add_BC_to_F(F, Num_Unknowns, list_elem, BC_list)
 
     return F, list_geometry, Num_Unknowns, list_elem, permeability_cell, list_coord
