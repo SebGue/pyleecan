@@ -36,12 +36,51 @@ def init_mesh_BC(self, size_x, size_y, BC):
     BC_list = np.zeros(nn2, dtype=np.uint8)
     Periodic_point = np.zeros(0, dtype=np.uint16)
 
-    if np.all(BC == ["HD", "HD", "HD", "HD"]):
+    if np.all(BC == ["P", "HD", "P", "HD"]):
         # Initialyze the BC list
-        BC_list[1 : size_x - 1] = 1
-        BC_list[size_x * (size_y - 1) + 1 : nn2 - 1] = 1
-        BC_list[::size_y] = 1
-        BC_list[size_x - 1 :: size_y] = 1
+        # Vertical BC
+        BC_list[::size_x] = 2
+        BC_list[size_x - 1 :: size_x] = 2
+        # Horizontal BC
+        BC_list[:size_x] = 1
+        BC_list[size_x * (size_y - 1) : nn2] = 1
+
+        Periodic_point = -np.ones((size_y - 2, 2), dtype=np.int32)
+        Periodic_point[:, 0] = np.arange(0, size_x * (size_y - 2), size_x) + size_x
+        Periodic_point[:, 1] = Periodic_point[:, 0] + size_x - 1
+
+    elif np.all(BC == ["AP", "HD", "AP", "HD"]):
+        # Initialyze the BC list
+        # Vertical BC
+        BC_list[::size_x] = 2
+        BC_list[size_x - 1 :: size_x] = 3
+        # Horizontal BC
+        BC_list[:size_x] = 1
+        BC_list[size_x * (size_y - 1) : nn2] = 1
+
+        Periodic_point = -np.ones((size_y - 2, 2), dtype=np.int32)
+        Periodic_point[:, 0] = np.arange(0, size_x * (size_y - 2), size_x) + size_x
+        Periodic_point[:, 1] = Periodic_point[:, 0] + size_x - 1
+
+    elif np.all(BC == ["AP", "NA", "AP", "HD"]):
+        # Initialyze the BC list
+        # Vertical BC
+        BC_list[::size_x] = 2
+        BC_list[size_x - 1 :: size_x] = 3
+        # Horizontal BC
+        BC_list[size_x * (size_y - 1) : nn2] = 1
+
+        Periodic_point = -np.ones((size_y - 1, 2), dtype=np.int32)
+        Periodic_point[:, 0] = np.arange(0, size_x * (size_y - 1), size_x)
+        Periodic_point[:, 1] = Periodic_point[:, 0] + size_x - 1
+
+    elif np.all(BC == ["AP", "HD", "AP", "NA"]):
+        # Initialyze the BC list
+        # Vertical BC
+        BC_list[::size_x] = 2
+        BC_list[size_x - 1 :: size_x] = 3
+        # Horizontal BC
+        BC_list[:size_x] = 1
 
         Periodic_point = -np.ones((size_y - 1, 2), dtype=np.int32)
         Periodic_point[:, 0] = np.arange(size_x, size_x * (size_y), size_x)
@@ -72,6 +111,8 @@ def init_mesh_BC(self, size_x, size_y, BC):
         Periodic_point[:, 1] = Periodic_point[:, 0] + size_x - 1
 
     else:
-        print("wrong boundary conditions")
+        raise NameError(
+            "This boundary condition doesn't exist in this code or it's wrong"
+        )
 
     return BC_list, Periodic_point

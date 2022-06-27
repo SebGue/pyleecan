@@ -19,14 +19,14 @@ is_show_fig = True
 
 def test_FEMM_SPMSM():
 
-    machine = load(join(DATA_DIR, "Machine", "SPMSM_264s44p.json"))
+    machine = load(join(DATA_DIR, "Machine", "SPMSM_val.json"))
 
     # Import the simulation
     simu = Simu1(name="test_FEMM", machine=machine)
 
     # Definition of current and speed
-    Ic = 230 * np.exp(1j * 140 * np.pi / 180)  # Current under on-load conditions
-    # Ic = 0 # Current under no-load condition
+    # Ic = 230 * np.exp(1j * 140 * np.pi / 180)  # Current under on-load conditions
+    Ic = 0  # Current under no-load condition
     SPEED = 0
 
     # Definition of time, angular discretization and operating point
@@ -97,7 +97,7 @@ def test_FEMM_SPMSM():
     if is_show_fig:
 
         # plot the air gap flux density on one line only
-        # out.mag.B.plot_2D_Data("angle", "time[1]", component_list=["radial"])
+        out.mag.B.plot_2D_Data("angle", "time[1]", component_list=["radial"])
 
         # Plot the magnetic flux density mapping
         out.mag.meshsolution.plot_contour(

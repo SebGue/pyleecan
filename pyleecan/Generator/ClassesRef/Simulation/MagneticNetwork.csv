@@ -2,7 +2,9 @@
 file_path,-,file path of the .json file of the defined machine,,,,,,,Simulation,,assembler,VERSION,1,Abstract class to solve the electric machines using the reluctance network
 ,,,,,,,,,,,geometry_linear_motor,,,
 ,,,,,,,,,,,geometry_linear_motor_separetion,,,
-,,,,,,,,,,,plot,,,
+,,,,,,,,,,,plot.Plot_B,,,
+,,,,,,,,,,,plot.view_contour_flux,,,
+,,,,,,,,,,,plot.view_contour_flux2,,,
 ,,,,,,,,,,,post_processing,,,
 ,,,,,,,,,,,run,,,
 ,,,,,,,,,,,run_non_linear,,,

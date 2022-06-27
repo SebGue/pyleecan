@@ -37,9 +37,23 @@ except ImportError as error:
     geometry_linear_motor_separetion = error
 
 try:
-    from ..Methods.Simulation.MagneticNetwork.plot import plot
+    from ..Methods.Simulation.MagneticNetwork.plot.Plot_B import Plot_B
 except ImportError as error:
-    plot = error
+    Plot_B = error
+
+try:
+    from ..Methods.Simulation.MagneticNetwork.plot.view_contour_flux import (
+        view_contour_flux,
+    )
+except ImportError as error:
+    view_contour_flux = error
+
+try:
+    from ..Methods.Simulation.MagneticNetwork.plot.view_contour_flux2 import (
+        view_contour_flux2,
+    )
+except ImportError as error:
+    view_contour_flux2 = error
 
 try:
     from ..Methods.Simulation.MagneticNetwork.post_processing import post_processing
@@ -206,15 +220,39 @@ class MagneticNetwork(FrozenClass):
         )
     else:
         geometry_linear_motor_separetion = geometry_linear_motor_separetion
-    # cf Methods.Simulation.MagneticNetwork.plot
-    if isinstance(plot, ImportError):
-        plot = property(
+    # cf Methods.Simulation.MagneticNetwork.plot.Plot_B
+    if isinstance(Plot_B, ImportError):
+        Plot_B = property(
             fget=lambda x: raise_(
-                ImportError("Can't use MagneticNetwork method plot: " + str(plot))
+                ImportError("Can't use MagneticNetwork method Plot_B: " + str(Plot_B))
             )
         )
     else:
-        plot = plot
+        Plot_B = Plot_B
+    # cf Methods.Simulation.MagneticNetwork.plot.view_contour_flux
+    if isinstance(view_contour_flux, ImportError):
+        view_contour_flux = property(
+            fget=lambda x: raise_(
+                ImportError(
+                    "Can't use MagneticNetwork method view_contour_flux: "
+                    + str(view_contour_flux)
+                )
+            )
+        )
+    else:
+        view_contour_flux = view_contour_flux
+    # cf Methods.Simulation.MagneticNetwork.plot.view_contour_flux2
+    if isinstance(view_contour_flux2, ImportError):
+        view_contour_flux2 = property(
+            fget=lambda x: raise_(
+                ImportError(
+                    "Can't use MagneticNetwork method view_contour_flux2: "
+                    + str(view_contour_flux2)
+                )
+            )
+        )
+    else:
+        view_contour_flux2 = view_contour_flux2
     # cf Methods.Simulation.MagneticNetwork.post_processing
     if isinstance(post_processing, ImportError):
         post_processing = property(

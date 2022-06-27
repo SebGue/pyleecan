@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def Plot_B(Bx, By, x, y, x_dual, y_dual, cell_materials, m, n):
+def Plot_B(self, Bx, By, x, y, x_dual, y_dual, cell_materials, m, n):
     """
 
     Parameters
@@ -69,50 +69,5 @@ def Plot_B(Bx, By, x, y, x_dual, y_dual, cell_materials, m, n):
     )
     cbar = plt.colorbar()
     cbar.ax.set_title("B (Tesla)")
-    plt.show()
-
-
-def view_contour_flux(F, x, y, size_x, size_y, cell_materials):
-    # Plot flux
-    plt.pcolormesh(
-        x,
-        y,
-        cell_materials.reshape((size_y - 1, size_x - 1)),
-        cmap="Paired",
-        edgecolors=None,
-        facecolors="none",
-        alpha=0.6,
-    )
-
-    ct = plt.contour(
-        x, y, F.reshape((size_y, size_x)), cmap="jet", levels=18, alpha=1, linewidths=1
-    )
-    cbar = plt.colorbar(ct)
-    cbar.ax.set_title("$Wb (Weber, Wb=T\cdot m^2)$")
-    plt.show()
-    return
-
-
-def view_contour_flux2(F, x, y, size_x, size_y, cell_materials):
-    # Plot flux
-    plt.pcolormesh(
-        x,
-        y,
-        cell_materials.reshape((size_y - 1, size_x - 1)),
-        cmap="Paired",
-        edgecolors=None,
-        facecolors="none",
-        alpha=0.6,
-    )
-
-    ct = plt.contour(
-        F.reshape((size_y - 1, size_x - 1)),
-        cmap="jet",
-        levels=18,
-        alpha=1,
-        linewidths=1,
-    )
-    cbar = plt.colorbar(ct)
-    cbar.ax.set_title("$Wb (Weber, Wb=T\cdot m^2)$")
     plt.show()
     return
