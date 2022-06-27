@@ -10,21 +10,30 @@ import numpy as np
 
 
 def view_contour_flux(self, F, x, y, size_x, size_y, cell_materials):
-    # Plot flux
-    plt.pcolormesh(
-        x,
-        y,
-        cell_materials.reshape((size_y - 1, size_x - 1)),
-        cmap="Paired",
-        edgecolors=None,
-        facecolors="none",
-        alpha=0.6,
-    )
+    try:
+        # Plot flux
+        plt.pcolormesh(
+            x,
+            y,
+            cell_materials.reshape((size_y - 1, size_x - 1)),
+            cmap="Paired",
+            edgecolors=None,
+            facecolors="none",
+            alpha=0.6,
+        )
 
-    ct = plt.contour(
-        x, y, F.reshape((size_y, size_x)), cmap="jet", levels=18, alpha=1, linewidths=1
-    )
-    cbar = plt.colorbar(ct)
-    cbar.ax.set_title("$Wb (Weber, Wb=T\cdot m^2)$")
-    plt.show()
-    return
+        ct = plt.contour(
+            x,
+            y,
+            F.reshape((size_y, size_x)),
+            cmap="jet",
+            levels=18,
+            alpha=1,
+            linewidths=1,
+        )
+        cbar = plt.colorbar(ct)
+        cbar.ax.set_title("$Wb (Weber, Wb=T\cdot m^2)$")
+        plt.show()
+
+    except IndexError:
+        print("Array is empty")

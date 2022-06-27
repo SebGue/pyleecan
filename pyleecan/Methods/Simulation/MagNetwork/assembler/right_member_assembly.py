@@ -33,11 +33,10 @@ def right_member_assembly(
     """
 
     nn = Num_Unknowns.max() + 1
-    if mode == "cartesian":
+    mask_magnet = cells_materials == 4
 
-        mask_magnet = cells_materials == 4
-
-    nn = Num_Unknowns.max() + 1
+    np.savetxt("cell_materials.csv", cells_materials)
+    print("non-zero in mak magnet?", mask_magnet.sum())
     if mode == "cartesian":
         h_x = np.linalg.norm(
             list_coord[list_elem[:, 0]] - list_coord[list_elem[:, 1]], axis=1, ord=2
@@ -51,30 +50,10 @@ def right_member_assembly(
         theta = np.abs(list_coord[list_elem[:, 0], 0] - list_coord[list_elem[:, 1], 0])
         R0 = list_coord[list_elem[:, 0], 1]
         R1 = list_coord[list_elem[:, 3], 1]
-        h_x = np.linalg.norm(
-            list_coord[list_elem[:, 0]] - list_coord[list_elem[:, 1]],
-            axis=1,
-            ord=2,
-        )
-        h_y = np.linalg.norm(
-            list_coord[list_elem[:, 1]] - list_coord[list_elem[:, 2]],
-            axis=1,
-            ord=2,
-        )
-
-    elif mode == "polar":
-        theta = np.abs(list_coord[list_elem[:, 0], 0] - list_coord[list_elem[:, 1], 0])
-        R0 = list_coord[list_elem[:, 0], 1]
-        R1 = list_coord[list_elem[:, 3], 1]
 
         h_x = 0.5 * (R0 + R1) * theta
         h_y = np.abs(R1 - R0)
-        print("ok", h_x, h_y)
         FMMPM = Br * np.mean(h_x[mask_magnet]) * 0.5 / mu0
-
-        h_x = 0.5 * (R0 + R1) * theta
-        h_y = np.abs(R1 - R0)
-        print("ok", h_x, h_y)
 
     # FMMPM=0
     # print("FMMPM:", FMMPM)
@@ -87,16 +66,6 @@ def right_member_assembly(
     JB = J * np.cos(wt)
     JA, JB, JC = 0, 0, 0
 
-    mask_magnet = cells_materials == 4
-
-    FMMPM = Br * h_x[0] * 0.5 / mu0
-    # FMMPM = 0
-    i1 = Num_Unknowns[list_elem[mask_magnet, 0]]
-    i2 = Num_Unknowns[list_elem[mask_magnet, 1]]
-    i3 = Num_Unknowns[list_elem[mask_magnet, 2]]
-    i4 = Num_Unknowns[list_elem[mask_magnet, 3]]
-
-    # FMMPM = 0
     i1 = Num_Unknowns[list_elem[mask_magnet, 0]]
     i2 = Num_Unknowns[list_elem[mask_magnet, 1]]
     i3 = Num_Unknowns[list_elem[mask_magnet, 2]]
@@ -107,40 +76,40 @@ def right_member_assembly(
     E[i3] -= FMMPM
     E[i4] += FMMPM
 
-    mask_winding = cells_materials == 1
-    S = h_x[mask_winding] * h_y[mask_winding] / 4
-    i1 = Num_Unknowns[list_elem[mask_winding, 0]]
-    i2 = Num_Unknowns[list_elem[mask_winding, 1]]
-    i3 = Num_Unknowns[list_elem[mask_winding, 2]]
-    i4 = Num_Unknowns[list_elem[mask_winding, 3]]
+    # mask_winding = cells_materials == 1
+    # S = h_x[mask_winding] * h_y[mask_winding] / 4
+    # i1 = Num_Unknowns[list_elem[mask_winding, 0]]
+    # i2 = Num_Unknowns[list_elem[mask_winding, 1]]
+    # i3 = Num_Unknowns[list_elem[mask_winding, 2]]
+    # i4 = Num_Unknowns[list_elem[mask_winding, 3]]
 
-    E[i1] += JA * S
-    E[i2] += JA * S
-    E[i3] += JA * S
-    E[i4] += JA * S
+    # E[i1] += JA * S
+    # E[i2] += JA * S
+    # E[i3] += JA * S
+    # E[i4] += JA * S
 
-    mask_winding = cells_materials == 2
-    S = h_x[mask_winding] * h_y[mask_winding] / 4
-    i1 = Num_Unknowns[list_elem[mask_winding, 0]]
-    i2 = Num_Unknowns[list_elem[mask_winding, 1]]
-    i3 = Num_Unknowns[list_elem[mask_winding, 2]]
-    i4 = Num_Unknowns[list_elem[mask_winding, 3]]
+    # mask_winding = cells_materials == 2
+    # S = h_x[mask_winding] * h_y[mask_winding] / 4
+    # i1 = Num_Unknowns[list_elem[mask_winding, 0]]
+    # i2 = Num_Unknowns[list_elem[mask_winding, 1]]
+    # i3 = Num_Unknowns[list_elem[mask_winding, 2]]
+    # i4 = Num_Unknowns[list_elem[mask_winding, 3]]
 
-    E[i1] += JB * S
-    E[i2] += JB * S
-    E[i3] += JB * S
-    E[i4] += JB * S
+    # E[i1] += JB * S
+    # E[i2] += JB * S
+    # E[i3] += JB * S
+    # E[i4] += JB * S
 
-    mask_winding = cells_materials == 3
-    S = h_x[mask_winding] * h_y[mask_winding] / 4
-    i1 = Num_Unknowns[list_elem[mask_winding, 0]]
-    i2 = Num_Unknowns[list_elem[mask_winding, 1]]
-    i3 = Num_Unknowns[list_elem[mask_winding, 2]]
-    i4 = Num_Unknowns[list_elem[mask_winding, 3]]
+    # mask_winding = cells_materials == 3
+    # S = h_x[mask_winding] * h_y[mask_winding] / 4
+    # i1 = Num_Unknowns[list_elem[mask_winding, 0]]
+    # i2 = Num_Unknowns[list_elem[mask_winding, 1]]
+    # i3 = Num_Unknowns[list_elem[mask_winding, 2]]
+    # i4 = Num_Unknowns[list_elem[mask_winding, 3]]
 
-    E[i1] += JC * S
-    E[i2] += JC * S
-    E[i3] += JC * S
-    E[i4] += JC * S
+    # E[i1] += JC * S
+    # E[i2] += JC * S
+    # E[i3] += JC * S
+    # E[i4] += JC * S
 
     return E

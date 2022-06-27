@@ -108,7 +108,7 @@ def solver_linear_model(
     )
 
     list_coord = self.init_point(size_x, size_y, x, y)
-
+    print("Permeability", permeability_materials)
     permeability_cell = self.init_permeabilty_cell(
         size_x, size_y, permeability_materials, list_geometry
     )
@@ -116,11 +116,11 @@ def solver_linear_model(
     list_elem = self.init_cell(size_x, size_y)
 
     BC_list, Periodic_point = self.init_mesh_BC(size_x, size_y, BC)
-    print("output", Periodic_point.shape)
+
     Num_Unknowns = self.numeroting_unknows(list_elem, BC_list, Periodic_point)
 
     t1 = time.perf_counter()
-    print("Assembly geometry:", np.round(t1 - t0, 5), "secondes")
+    print("Assembly geometry:", np.round(t1 - t0, 5), "seconds")
     self.save_mesh(list_geometry, Num_Unknowns, list_elem, x, y, BC_list)
     t2 = time.perf_counter()
     print("Save mesh:", np.round(t2 - t1, 5), "secondes")
@@ -139,6 +139,7 @@ def solver_linear_model(
     E = self.right_member_assembly(
         list_geometry, Num_Unknowns, list_elem, list_coord, Br, mu0, mode
     )
+
     t4 = time.perf_counter()
 
     print("Assembly vector:", np.round(t4 - t3, 5), "secondes")

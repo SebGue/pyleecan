@@ -16,22 +16,25 @@ def geometry_linear_motor(self, size_x, size_y, pos_pm):
 
     # Machine's characteristics
     # tp = 60e-3  # pole pitch (m)
-    tp = Machine.rotor.slot.comp_width_opening()
+    tp = (
+        np.pi * Machine.stator.Rint / Machine.rotor.get_pole_pair_number()
+    )  # Ref:https://www.slideshare.net/monprado1/11-basic-concepts-of-a-machine-77442134
 
     # hm = 10e-3  # PM height in y direction (m)
     hm = Machine.rotor.slot.comp_height_active()
 
     # tm = 55e-3  # PM length in x direction (m)
-    tm = Machine.rotor.slot.comp_surface() / hm
+    tm = 2 * Machine.rotor.slot.comp_surface_active() / hm
+    #  tm = Machine.rotor.slot.comp_width_opening(is_curved=True)
 
     # e = 1e-3  # Air-gap thickness (m)
     e = Machine.comp_width_airgap_mec()
 
-    # hst = 30e-3  # Stator total height (m)
-    hst = Machine.stator.comp_height_yoke()
-
     # hs = 20e-3  # Slot height (m)
     hs = Machine.stator.slot.comp_height_active()
+
+    # hst = 30e-3  # Stator total height (m)
+    hst = Machine.stator.comp_height_yoke() + hs
 
     # hmbi = 10e-3  # Moving armature height (moving back iron height)
     hmbi = Machine.rotor.comp_height_yoke()
@@ -138,5 +141,9 @@ def geometry_linear_motor(self, size_x, size_y, pos_pm):
         else:
             print("Wrong geometry")
 
-    # geometry = {tp, hm, tm, e, hst, hs, hmbi, ws, ts, la}
+    # geometry = {
+    #     "tp": tp,
+    #     "tm": tm,
+    #     "hst": hst,
+    # }
     return cells_materials, permeabilty_materials

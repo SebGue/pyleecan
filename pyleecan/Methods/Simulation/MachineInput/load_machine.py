@@ -44,7 +44,7 @@ def load_machine(file_path):
     # Load Machine file
     Machine = load(file_path)
 
-    tp1 = Machine.rotor.slot.comp_width_opening()
+    tp1 = Machine.rotor.slot.comp_width_opening(is_curved=True)
 
     # hm = 10e-3  # PM height in y direction (m)
     hm = Machine.rotor.slot.comp_height_active()

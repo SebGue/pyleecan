@@ -48,6 +48,6 @@ def init_reluc(self, list_elem, list_coord, mu0, la, mode):
         R_reluc[:, 2] = (np.log(R_MEAN / R0)) / (mu0 * theta * la)
         R_reluc[:, 3] = 0.5 * theta / (mu0 * la * np.log(R1 / R0))
     else:
-        print("Wrong mode, choice between ")
+        raise NameError("Wrong mode, choice between 'cartesian' and 'polar'")
 
     return R_reluc
