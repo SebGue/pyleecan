@@ -116,7 +116,7 @@ def solver_linear_model(
     list_elem = self.init_cell(size_x, size_y)
 
     BC_list, Periodic_point = self.init_mesh_BC(size_x, size_y, BC)
-
+    print("output", Periodic_point.shape)
     Num_Unknowns = self.numeroting_unknows(list_elem, BC_list, Periodic_point)
 
     t1 = time.perf_counter()

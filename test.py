@@ -8,5 +8,6 @@ load_machine(file_path)
 MagneticNetwork(file_path)
 
 MagneticNetwork(file_path).geometry_linear_motor
+MagneticNetwork(file_path).solver_linear_model
 
 MagneticNetwork(file_path).run_radial

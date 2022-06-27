@@ -16,11 +16,7 @@ def geometry_linear_motor(self, size_x, size_y, pos_pm):
 
     # Machine's characteristics
     # tp = 60e-3  # pole pitch (m)
-    tp = (
-        2
-        * np.tan(np.pi / Machine.rotor.get_pole_pair_number())
-        * (Machine.rotor.Rint + 0.5 * Machine.rotor.comp_height_yoke())
-    )
+    tp = Machine.rotor.slot.comp_width_opening()
 
     # hm = 10e-3  # PM height in y direction (m)
     hm = Machine.rotor.slot.comp_height_active()

@@ -71,23 +71,6 @@ def init_mesh_BC(self, size_x, size_y, BC):
         Periodic_point[:, 0] = np.arange(size_x, size_x * (size_y), size_x)
         Periodic_point[:, 1] = Periodic_point[:, 0] + size_x - 1
 
-    elif np.all(BC == ["P", "P", "P", "P"]):
-        # Initialyze the BC list
-        BC_list[1 : size_x - 1] = 2
-        BC_list[size_x * (size_y - 1) + 1 : nn2 - 1] = 2
-
-        BC_list[::size_y] = 2
-        BC_list[size_x - 1 :: size_y] = 2
-
-    elif np.all(BC == ["P", "AP", "P", "AP"]):
-        # Initialyze the BC list
-        # Vertical
-        BC_list[::size_y] = 2
-        BC_list[size_x - 1 :: size_y] = 3
-
-        # Horizontal
-        BC_list[:size_x] = 2
-        BC_list[size_x * (size_y - 1) :] = 2
     else:
         print("wrong boundary conditions")
 

@@ -43,6 +43,48 @@ def load_machine(file_path):
     """
     # Load Machine file
     Machine = load(file_path)
+
+    tp1 = Machine.rotor.slot.comp_width_opening()
+
+    # hm = 10e-3  # PM height in y direction (m)
+    hm = Machine.rotor.slot.comp_height_active()
+
+    # tm = 55e-3  # PM length in x direction (m)
+    tm = Machine.rotor.slot.comp_surface_active() / hm
+
+    # e = 1e-3  # Air-gap thickness (m)
+    e = Machine.comp_width_airgap_mec()
+
+    # hst = 30e-3  # Stator total height (m)
+    hst = Machine.stator.comp_height_yoke()
+
+    # hs = 20e-3  # Slot height (m)
+    hs = Machine.stator.slot.comp_height_active()
+
+    # hmbi = 10e-3  # Moving armature height (moving back iron height)
+    hmbi = Machine.rotor.comp_height_yoke()
+
+    # ws = 10e-3  # Slot opening (m)
+    ws = Machine.stator.slot.comp_surface() / hs
+
+    ts = 2 * ws  # Slot pitch (m)
+
+    # la = 1  # Active length (m)
+    la = Machine.rotor.L1
+
+    return {
+        "tp1": tp1,
+        "hm": hm,
+        "tm": tm,
+        "e": e,
+        "hst": hst,
+        "hs": hs,
+        "hmbi": hmbi,
+        "ws": ws,
+        "ts": ts,
+        "la": la,
+    }
+
     """
     # Get the machine active length : supposed that active_length(rotor) = active_length(stator)
     active_length = Machine.rotor.L1
@@ -84,36 +126,3 @@ def load_machine(file_path):
         "e": e,
     }
     """
-    tp = (
-        2
-        * np.tan(np.pi / Machine.rotor.get_pole_pair_number())
-        * (Machine.rotor.Rint + 0.5 * Machine.rotor.comp_height_yoke())
-    )
-
-    # hm = 10e-3  # PM height in y direction (m)
-    hm = Machine.rotor.slot.comp_height_active()
-
-    # tm = 55e-3  # PM length in x direction (m)
-    tm = (Machine.rotor.slot.comp_surface_active() / hm) * 0.000001
-
-    # e = 1e-3  # Air-gap thickness (m)
-    e = Machine.comp_width_airgap_mec()
-
-    # hst = 30e-3  # Stator total height (m)
-    hst = Machine.stator.comp_height_yoke()
-
-    # hs = 20e-3  # Slot height (m)
-    hs = Machine.stator.slot.comp_height_active()
-
-    # hmbi = 10e-3  # Moving armature height (moving back iron height)
-    hmbi = Machine.rotor.comp_height_yoke()
-
-    # ws = 10e-3  # Slot opening (m)
-    ws = Machine.stator.slot.comp_surface() / hs
-
-    ts = 2 * ws  # Slot pitch (m)
-
-    # la = 1  # Active length (m)
-    la = Machine.rotor.L1
-
-    return {tp, hm, tm, e, hst, hs, hmbi, ws, ts, la}
