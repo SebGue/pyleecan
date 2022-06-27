@@ -21,6 +21,8 @@ def test_FEMM_SPMSM():
 
     machine = load(join(DATA_DIR, "Machine", "SPMSM_val.json"))
 
+    pole_pairs = 2
+
     # Import the simulation
     simu = Simu1(name="test_FEMM", machine=machine)
 
@@ -31,8 +33,9 @@ def test_FEMM_SPMSM():
 
     # Definition of time, angular discretization and operating point
     simu.input = InputCurrent(
-        Nt_tot=10 * 44,  # time steps (time discretization)
-        Na_tot=2000 * 44,  # number of points in the air gap (angle discretization)
+        Nt_tot=10 * pole_pairs,  # time steps (time discretization)
+        Na_tot=2000
+        * pole_pairs,  # number of points in the air gap (angle discretization)
         OP=OPdq(N0=SPEED, Id_ref=Ic.real, Iq_ref=Ic.imag),  # operating point
         # Periodicity
         is_periodicity_t=True,
@@ -48,7 +51,7 @@ def test_FEMM_SPMSM():
         is_get_meshsolution=True,  # Get the mesh solution
         is_fast_draw=True,
         is_calc_torque_energy=False,
-        Kmesh_fineness=5,  # Define the mesh fineness
+        Kmesh_fineness=3,  # Define the mesh fineness
     )
 
     out = simu.run()

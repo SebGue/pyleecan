@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# File generated according to Generator/ClassesRef/Simulation/MagneticNetwork.csv
+# File generated according to Generator/ClassesRef/Simulation/MagNetwork.csv
 # WARNING! All changes made in this file will be lost!
-"""Method code available at https://github.com/Eomys/pyleecan/tree/master/pyleecan/Methods/Simulation/MagneticNetwork
+"""Method code available at https://github.com/Eomys/pyleecan/tree/master/pyleecan/Methods/Simulation/MagNetwork
 """
 
 from os import linesep
@@ -18,157 +18,145 @@ from ._frozen import FrozenClass
 # Import all class method
 # Try/catch to remove unnecessary dependencies in unused method
 try:
-    from ..Methods.Simulation.MagneticNetwork.assembler import assembler
+    from ..Methods.Simulation.MagNetwork.assembler import assembler
 except ImportError as error:
     assembler = error
 
 try:
-    from ..Methods.Simulation.MagneticNetwork.geometry_linear_motor import (
+    from ..Methods.Simulation.MagNetwork.geometry_linear_motor import (
         geometry_linear_motor,
     )
 except ImportError as error:
     geometry_linear_motor = error
 
 try:
-    from ..Methods.Simulation.MagneticNetwork.geometry_linear_motor_separetion import (
+    from ..Methods.Simulation.MagNetwork.geometry_linear_motor_separetion import (
         geometry_linear_motor_separetion,
     )
 except ImportError as error:
     geometry_linear_motor_separetion = error
 
 try:
-    from ..Methods.Simulation.MagneticNetwork.plot.Plot_B import Plot_B
+    from ..Methods.Simulation.MagNetwork.plot.Plot_B import Plot_B
 except ImportError as error:
     Plot_B = error
 
 try:
-    from ..Methods.Simulation.MagneticNetwork.plot.view_contour_flux import (
-        view_contour_flux,
-    )
+    from ..Methods.Simulation.MagNetwork.plot.view_contour_flux import view_contour_flux
 except ImportError as error:
     view_contour_flux = error
 
 try:
-    from ..Methods.Simulation.MagneticNetwork.plot.view_contour_flux2 import (
+    from ..Methods.Simulation.MagNetwork.plot.view_contour_flux2 import (
         view_contour_flux2,
     )
 except ImportError as error:
     view_contour_flux2 = error
 
 try:
-    from ..Methods.Simulation.MagneticNetwork.post_processing import post_processing
+    from ..Methods.Simulation.MagNetwork.post_processing import post_processing
 except ImportError as error:
     post_processing = error
 
 try:
-    from ..Methods.Simulation.MagneticNetwork.run import run
+    from ..Methods.Simulation.MagNetwork.run import run
 except ImportError as error:
     run = error
 
 try:
-    from ..Methods.Simulation.MagneticNetwork.run_non_linear import run_non_linear
+    from ..Methods.Simulation.MagNetwork.run_non_linear import run_non_linear
 except ImportError as error:
     run_non_linear = error
 
 try:
-    from ..Methods.Simulation.MagneticNetwork.run_radial import run_radial
+    from ..Methods.Simulation.MagNetwork.run_radial import run_radial
 except ImportError as error:
     run_radial = error
 
 try:
-    from ..Methods.Simulation.MagneticNetwork.solver_linear_model import (
-        solver_linear_model,
-    )
+    from ..Methods.Simulation.MagNetwork.solver_linear_model import solver_linear_model
 except ImportError as error:
     solver_linear_model = error
 
 try:
-    from ..Methods.Simulation.MagneticNetwork.solver_non_linear_model import (
+    from ..Methods.Simulation.MagNetwork.solver_non_linear_model import (
         solver_non_linear_model,
     )
 except ImportError as error:
     solver_non_linear_model = error
 
 try:
-    from ..Methods.Simulation.MagneticNetwork.pre_processing.init_cell import init_cell
+    from ..Methods.Simulation.MagNetwork.pre_processing.init_cell import init_cell
 except ImportError as error:
     init_cell = error
 
 try:
-    from ..Methods.Simulation.MagneticNetwork.pre_processing.init_mesh_BC import (
-        init_mesh_BC,
-    )
+    from ..Methods.Simulation.MagNetwork.pre_processing.init_mesh_BC import init_mesh_BC
 except ImportError as error:
     init_mesh_BC = error
 
 try:
-    from ..Methods.Simulation.MagneticNetwork.pre_processing.init_permeabilty_cell import (
+    from ..Methods.Simulation.MagNetwork.pre_processing.init_permeabilty_cell import (
         init_permeabilty_cell,
     )
 except ImportError as error:
     init_permeabilty_cell = error
 
 try:
-    from ..Methods.Simulation.MagneticNetwork.pre_processing.init_point import (
-        init_point,
-    )
+    from ..Methods.Simulation.MagNetwork.pre_processing.init_point import init_point
 except ImportError as error:
     init_point = error
 
 try:
-    from ..Methods.Simulation.MagneticNetwork.pre_processing.init_reluc import (
-        init_reluc,
-    )
+    from ..Methods.Simulation.MagNetwork.pre_processing.init_reluc import init_reluc
 except ImportError as error:
     init_reluc = error
 
 try:
-    from ..Methods.Simulation.MagneticNetwork.pre_processing.numeroting_unknows import (
+    from ..Methods.Simulation.MagNetwork.pre_processing.numeroting_unknows import (
         numeroting_unknows,
     )
 except ImportError as error:
     numeroting_unknows = error
 
 try:
-    from ..Methods.Simulation.MagneticNetwork.pre_processing.save_mesh import save_mesh
+    from ..Methods.Simulation.MagNetwork.pre_processing.save_mesh import save_mesh
 except ImportError as error:
     save_mesh = error
 
 try:
-    from ..Methods.Simulation.MagneticNetwork.assembler.assembly import assembly
+    from ..Methods.Simulation.MagNetwork.assembler.assembly import assembly
 except ImportError as error:
     assembly = error
 
 try:
-    from ..Methods.Simulation.MagneticNetwork.assembler.assembly_one_area import (
+    from ..Methods.Simulation.MagNetwork.assembler.assembly_one_area import (
         assembly_one_area,
     )
 except ImportError as error:
     assembly_one_area = error
 
 try:
-    from ..Methods.Simulation.MagneticNetwork.assembler.right_member_assembly import (
+    from ..Methods.Simulation.MagNetwork.assembler.right_member_assembly import (
         right_member_assembly,
     )
 except ImportError as error:
     right_member_assembly = error
 
 try:
-    from ..Methods.Simulation.MagneticNetwork.post_processing.add_BC_to_F import (
-        add_BC_to_F,
-    )
+    from ..Methods.Simulation.MagNetwork.post_processing.add_BC_to_F import add_BC_to_F
 except ImportError as error:
     add_BC_to_F = error
 
 try:
-    from ..Methods.Simulation.MagneticNetwork.post_processing.compute_B_radial import (
+    from ..Methods.Simulation.MagNetwork.post_processing.compute_B_radial import (
         compute_B_radial,
     )
 except ImportError as error:
     compute_B_radial = error
 
 try:
-    from ..Methods.Simulation.MagneticNetwork.post_processing.compute_B_square import (
+    from ..Methods.Simulation.MagNetwork.post_processing.compute_B_square import (
         compute_B_square,
     )
 except ImportError as error:
@@ -179,292 +167,282 @@ from numpy import isnan
 from ._check import InitUnKnowClassError
 
 
-class MagneticNetwork(FrozenClass):
+class MagNetwork(FrozenClass):
     """Abstract class to solve the electric machines using the reluctance network"""
 
     VERSION = 1
 
     # Check ImportError to remove unnecessary dependencies in unused method
-    # cf Methods.Simulation.MagneticNetwork.assembler
+    # cf Methods.Simulation.MagNetwork.assembler
     if isinstance(assembler, ImportError):
         assembler = property(
             fget=lambda x: raise_(
-                ImportError(
-                    "Can't use MagneticNetwork method assembler: " + str(assembler)
-                )
+                ImportError("Can't use MagNetwork method assembler: " + str(assembler))
             )
         )
     else:
         assembler = assembler
-    # cf Methods.Simulation.MagneticNetwork.geometry_linear_motor
+    # cf Methods.Simulation.MagNetwork.geometry_linear_motor
     if isinstance(geometry_linear_motor, ImportError):
         geometry_linear_motor = property(
             fget=lambda x: raise_(
                 ImportError(
-                    "Can't use MagneticNetwork method geometry_linear_motor: "
+                    "Can't use MagNetwork method geometry_linear_motor: "
                     + str(geometry_linear_motor)
                 )
             )
         )
     else:
         geometry_linear_motor = geometry_linear_motor
-    # cf Methods.Simulation.MagneticNetwork.geometry_linear_motor_separetion
+    # cf Methods.Simulation.MagNetwork.geometry_linear_motor_separetion
     if isinstance(geometry_linear_motor_separetion, ImportError):
         geometry_linear_motor_separetion = property(
             fget=lambda x: raise_(
                 ImportError(
-                    "Can't use MagneticNetwork method geometry_linear_motor_separetion: "
+                    "Can't use MagNetwork method geometry_linear_motor_separetion: "
                     + str(geometry_linear_motor_separetion)
                 )
             )
         )
     else:
         geometry_linear_motor_separetion = geometry_linear_motor_separetion
-    # cf Methods.Simulation.MagneticNetwork.plot.Plot_B
+    # cf Methods.Simulation.MagNetwork.plot.Plot_B
     if isinstance(Plot_B, ImportError):
         Plot_B = property(
             fget=lambda x: raise_(
-                ImportError("Can't use MagneticNetwork method Plot_B: " + str(Plot_B))
+                ImportError("Can't use MagNetwork method Plot_B: " + str(Plot_B))
             )
         )
     else:
         Plot_B = Plot_B
-    # cf Methods.Simulation.MagneticNetwork.plot.view_contour_flux
+    # cf Methods.Simulation.MagNetwork.plot.view_contour_flux
     if isinstance(view_contour_flux, ImportError):
         view_contour_flux = property(
             fget=lambda x: raise_(
                 ImportError(
-                    "Can't use MagneticNetwork method view_contour_flux: "
+                    "Can't use MagNetwork method view_contour_flux: "
                     + str(view_contour_flux)
                 )
             )
         )
     else:
         view_contour_flux = view_contour_flux
-    # cf Methods.Simulation.MagneticNetwork.plot.view_contour_flux2
+    # cf Methods.Simulation.MagNetwork.plot.view_contour_flux2
     if isinstance(view_contour_flux2, ImportError):
         view_contour_flux2 = property(
             fget=lambda x: raise_(
                 ImportError(
-                    "Can't use MagneticNetwork method view_contour_flux2: "
+                    "Can't use MagNetwork method view_contour_flux2: "
                     + str(view_contour_flux2)
                 )
             )
         )
     else:
         view_contour_flux2 = view_contour_flux2
-    # cf Methods.Simulation.MagneticNetwork.post_processing
+    # cf Methods.Simulation.MagNetwork.post_processing
     if isinstance(post_processing, ImportError):
         post_processing = property(
             fget=lambda x: raise_(
                 ImportError(
-                    "Can't use MagneticNetwork method post_processing: "
+                    "Can't use MagNetwork method post_processing: "
                     + str(post_processing)
                 )
             )
         )
     else:
         post_processing = post_processing
-    # cf Methods.Simulation.MagneticNetwork.run
+    # cf Methods.Simulation.MagNetwork.run
     if isinstance(run, ImportError):
         run = property(
             fget=lambda x: raise_(
-                ImportError("Can't use MagneticNetwork method run: " + str(run))
+                ImportError("Can't use MagNetwork method run: " + str(run))
             )
         )
     else:
         run = run
-    # cf Methods.Simulation.MagneticNetwork.run_non_linear
+    # cf Methods.Simulation.MagNetwork.run_non_linear
     if isinstance(run_non_linear, ImportError):
         run_non_linear = property(
             fget=lambda x: raise_(
                 ImportError(
-                    "Can't use MagneticNetwork method run_non_linear: "
-                    + str(run_non_linear)
+                    "Can't use MagNetwork method run_non_linear: " + str(run_non_linear)
                 )
             )
         )
     else:
         run_non_linear = run_non_linear
-    # cf Methods.Simulation.MagneticNetwork.run_radial
+    # cf Methods.Simulation.MagNetwork.run_radial
     if isinstance(run_radial, ImportError):
         run_radial = property(
             fget=lambda x: raise_(
                 ImportError(
-                    "Can't use MagneticNetwork method run_radial: " + str(run_radial)
+                    "Can't use MagNetwork method run_radial: " + str(run_radial)
                 )
             )
         )
     else:
         run_radial = run_radial
-    # cf Methods.Simulation.MagneticNetwork.solver_linear_model
+    # cf Methods.Simulation.MagNetwork.solver_linear_model
     if isinstance(solver_linear_model, ImportError):
         solver_linear_model = property(
             fget=lambda x: raise_(
                 ImportError(
-                    "Can't use MagneticNetwork method solver_linear_model: "
+                    "Can't use MagNetwork method solver_linear_model: "
                     + str(solver_linear_model)
                 )
             )
         )
     else:
         solver_linear_model = solver_linear_model
-    # cf Methods.Simulation.MagneticNetwork.solver_non_linear_model
+    # cf Methods.Simulation.MagNetwork.solver_non_linear_model
     if isinstance(solver_non_linear_model, ImportError):
         solver_non_linear_model = property(
             fget=lambda x: raise_(
                 ImportError(
-                    "Can't use MagneticNetwork method solver_non_linear_model: "
+                    "Can't use MagNetwork method solver_non_linear_model: "
                     + str(solver_non_linear_model)
                 )
             )
         )
     else:
         solver_non_linear_model = solver_non_linear_model
-    # cf Methods.Simulation.MagneticNetwork.pre_processing.init_cell
+    # cf Methods.Simulation.MagNetwork.pre_processing.init_cell
     if isinstance(init_cell, ImportError):
         init_cell = property(
             fget=lambda x: raise_(
-                ImportError(
-                    "Can't use MagneticNetwork method init_cell: " + str(init_cell)
-                )
+                ImportError("Can't use MagNetwork method init_cell: " + str(init_cell))
             )
         )
     else:
         init_cell = init_cell
-    # cf Methods.Simulation.MagneticNetwork.pre_processing.init_mesh_BC
+    # cf Methods.Simulation.MagNetwork.pre_processing.init_mesh_BC
     if isinstance(init_mesh_BC, ImportError):
         init_mesh_BC = property(
             fget=lambda x: raise_(
                 ImportError(
-                    "Can't use MagneticNetwork method init_mesh_BC: "
-                    + str(init_mesh_BC)
+                    "Can't use MagNetwork method init_mesh_BC: " + str(init_mesh_BC)
                 )
             )
         )
     else:
         init_mesh_BC = init_mesh_BC
-    # cf Methods.Simulation.MagneticNetwork.pre_processing.init_permeabilty_cell
+    # cf Methods.Simulation.MagNetwork.pre_processing.init_permeabilty_cell
     if isinstance(init_permeabilty_cell, ImportError):
         init_permeabilty_cell = property(
             fget=lambda x: raise_(
                 ImportError(
-                    "Can't use MagneticNetwork method init_permeabilty_cell: "
+                    "Can't use MagNetwork method init_permeabilty_cell: "
                     + str(init_permeabilty_cell)
                 )
             )
         )
     else:
         init_permeabilty_cell = init_permeabilty_cell
-    # cf Methods.Simulation.MagneticNetwork.pre_processing.init_point
+    # cf Methods.Simulation.MagNetwork.pre_processing.init_point
     if isinstance(init_point, ImportError):
         init_point = property(
             fget=lambda x: raise_(
                 ImportError(
-                    "Can't use MagneticNetwork method init_point: " + str(init_point)
+                    "Can't use MagNetwork method init_point: " + str(init_point)
                 )
             )
         )
     else:
         init_point = init_point
-    # cf Methods.Simulation.MagneticNetwork.pre_processing.init_reluc
+    # cf Methods.Simulation.MagNetwork.pre_processing.init_reluc
     if isinstance(init_reluc, ImportError):
         init_reluc = property(
             fget=lambda x: raise_(
                 ImportError(
-                    "Can't use MagneticNetwork method init_reluc: " + str(init_reluc)
+                    "Can't use MagNetwork method init_reluc: " + str(init_reluc)
                 )
             )
         )
     else:
         init_reluc = init_reluc
-    # cf Methods.Simulation.MagneticNetwork.pre_processing.numeroting_unknows
+    # cf Methods.Simulation.MagNetwork.pre_processing.numeroting_unknows
     if isinstance(numeroting_unknows, ImportError):
         numeroting_unknows = property(
             fget=lambda x: raise_(
                 ImportError(
-                    "Can't use MagneticNetwork method numeroting_unknows: "
+                    "Can't use MagNetwork method numeroting_unknows: "
                     + str(numeroting_unknows)
                 )
             )
         )
     else:
         numeroting_unknows = numeroting_unknows
-    # cf Methods.Simulation.MagneticNetwork.pre_processing.save_mesh
+    # cf Methods.Simulation.MagNetwork.pre_processing.save_mesh
     if isinstance(save_mesh, ImportError):
         save_mesh = property(
             fget=lambda x: raise_(
-                ImportError(
-                    "Can't use MagneticNetwork method save_mesh: " + str(save_mesh)
-                )
+                ImportError("Can't use MagNetwork method save_mesh: " + str(save_mesh))
             )
         )
     else:
         save_mesh = save_mesh
-    # cf Methods.Simulation.MagneticNetwork.assembler.assembly
+    # cf Methods.Simulation.MagNetwork.assembler.assembly
     if isinstance(assembly, ImportError):
         assembly = property(
             fget=lambda x: raise_(
-                ImportError(
-                    "Can't use MagneticNetwork method assembly: " + str(assembly)
-                )
+                ImportError("Can't use MagNetwork method assembly: " + str(assembly))
             )
         )
     else:
         assembly = assembly
-    # cf Methods.Simulation.MagneticNetwork.assembler.assembly_one_area
+    # cf Methods.Simulation.MagNetwork.assembler.assembly_one_area
     if isinstance(assembly_one_area, ImportError):
         assembly_one_area = property(
             fget=lambda x: raise_(
                 ImportError(
-                    "Can't use MagneticNetwork method assembly_one_area: "
+                    "Can't use MagNetwork method assembly_one_area: "
                     + str(assembly_one_area)
                 )
             )
         )
     else:
         assembly_one_area = assembly_one_area
-    # cf Methods.Simulation.MagneticNetwork.assembler.right_member_assembly
+    # cf Methods.Simulation.MagNetwork.assembler.right_member_assembly
     if isinstance(right_member_assembly, ImportError):
         right_member_assembly = property(
             fget=lambda x: raise_(
                 ImportError(
-                    "Can't use MagneticNetwork method right_member_assembly: "
+                    "Can't use MagNetwork method right_member_assembly: "
                     + str(right_member_assembly)
                 )
             )
         )
     else:
         right_member_assembly = right_member_assembly
-    # cf Methods.Simulation.MagneticNetwork.post_processing.add_BC_to_F
+    # cf Methods.Simulation.MagNetwork.post_processing.add_BC_to_F
     if isinstance(add_BC_to_F, ImportError):
         add_BC_to_F = property(
             fget=lambda x: raise_(
                 ImportError(
-                    "Can't use MagneticNetwork method add_BC_to_F: " + str(add_BC_to_F)
+                    "Can't use MagNetwork method add_BC_to_F: " + str(add_BC_to_F)
                 )
             )
         )
     else:
         add_BC_to_F = add_BC_to_F
-    # cf Methods.Simulation.MagneticNetwork.post_processing.compute_B_radial
+    # cf Methods.Simulation.MagNetwork.post_processing.compute_B_radial
     if isinstance(compute_B_radial, ImportError):
         compute_B_radial = property(
             fget=lambda x: raise_(
                 ImportError(
-                    "Can't use MagneticNetwork method compute_B_radial: "
+                    "Can't use MagNetwork method compute_B_radial: "
                     + str(compute_B_radial)
                 )
             )
         )
     else:
         compute_B_radial = compute_B_radial
-    # cf Methods.Simulation.MagneticNetwork.post_processing.compute_B_square
+    # cf Methods.Simulation.MagNetwork.post_processing.compute_B_square
     if isinstance(compute_B_square, ImportError):
         compute_B_square = property(
             fget=lambda x: raise_(
                 ImportError(
-                    "Can't use MagneticNetwork method compute_B_square: "
+                    "Can't use MagNetwork method compute_B_square: "
                     + str(compute_B_square)
                 )
             )
@@ -504,15 +482,13 @@ class MagneticNetwork(FrozenClass):
     def __str__(self):
         """Convert this object in a readeable string (for print)"""
 
-        MagneticNetwork_str = ""
+        MagNetwork_str = ""
         if self.parent is None:
-            MagneticNetwork_str += "parent = None " + linesep
+            MagNetwork_str += "parent = None " + linesep
         else:
-            MagneticNetwork_str += (
-                "parent = " + str(type(self.parent)) + " object" + linesep
-            )
-        MagneticNetwork_str += "file_path = " + str(self.file_path) + linesep + linesep
-        return MagneticNetwork_str
+            MagNetwork_str += "parent = " + str(type(self.parent)) + " object" + linesep
+        MagNetwork_str += "file_path = " + str(self.file_path) + linesep + linesep
+        return MagNetwork_str
 
     def __eq__(self, other):
         """Compare two objects (skip parent)"""
@@ -578,31 +554,31 @@ class MagneticNetwork(FrozenClass):
         and may prevent json serializability.
         """
 
-        MagneticNetwork_dict = dict()
+        MagNetwork_dict = dict()
         if self.file_path is None:
-            MagneticNetwork_dict["file_path"] = None
+            MagNetwork_dict["file_path"] = None
         elif isinstance(self.file_path, np.ndarray):
             if type_handle_ndarray == 0:
-                MagneticNetwork_dict["file_path"] = self.file_path.tolist()
+                MagNetwork_dict["file_path"] = self.file_path.tolist()
             elif type_handle_ndarray == 1:
-                MagneticNetwork_dict["file_path"] = self.file_path.copy()
+                MagNetwork_dict["file_path"] = self.file_path.copy()
             elif type_handle_ndarray == 2:
-                MagneticNetwork_dict["file_path"] = self.file_path
+                MagNetwork_dict["file_path"] = self.file_path
             else:
                 raise Exception(
                     "Unknown type_handle_ndarray: " + str(type_handle_ndarray)
                 )
         elif hasattr(self.file_path, "as_dict"):
-            MagneticNetwork_dict["file_path"] = self.file_path.as_dict(
+            MagNetwork_dict["file_path"] = self.file_path.as_dict(
                 type_handle_ndarray=type_handle_ndarray,
                 keep_function=keep_function,
                 **kwargs
             )
         else:
-            MagneticNetwork_dict["file_path"] = self.file_path
+            MagNetwork_dict["file_path"] = self.file_path
         # The class name is added to the dict for deserialisation purpose
-        MagneticNetwork_dict["__class__"] = "MagneticNetwork"
-        return MagneticNetwork_dict
+        MagNetwork_dict["__class__"] = "MagNetwork"
+        return MagNetwork_dict
 
     def copy(self):
         """Creates a deepcopy of the object"""

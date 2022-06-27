@@ -7036,6 +7036,60 @@
             }
         ]
     },
+    "MagNetwork": {
+        "constants": [
+            {
+                "name": "VERSION",
+                "value": "1"
+            }
+        ],
+        "daughters": [],
+        "desc": "Abstract class to solve the electric machines using the reluctance network",
+        "is_internal": false,
+        "methods": [
+            "assembler",
+            "geometry_linear_motor",
+            "geometry_linear_motor_separetion",
+            "plot.Plot_B",
+            "plot.view_contour_flux",
+            "plot.view_contour_flux2",
+            "post_processing",
+            "run",
+            "run_non_linear",
+            "run_radial",
+            "solver_linear_model",
+            "solver_non_linear_model",
+            "pre_processing.init_cell",
+            "pre_processing.init_mesh_BC",
+            "pre_processing.init_permeabilty_cell",
+            "pre_processing.init_point",
+            "pre_processing.init_reluc",
+            "pre_processing.numeroting_unknows",
+            "pre_processing.save_mesh",
+            "assembler.assembly",
+            "assembler.assembly_one_area",
+            "assembler.right_member_assembly",
+            "post_processing.add_BC_to_F",
+            "post_processing.compute_B_radial",
+            "post_processing.compute_B_square"
+        ],
+        "mother": "",
+        "name": "MagNetwork",
+        "package": "Simulation",
+        "path": "pyleecan/Generator/ClassesRef/Simulation/MagNetwork.csv",
+        "properties": [
+            {
+                "as_dict": "",
+                "desc": "file path of the .json file of the defined machine",
+                "max": "",
+                "min": "",
+                "name": "file_path",
+                "type": "",
+                "unit": "-",
+                "value": ""
+            }
+        ]
+    },
     "Magnet": {
         "constants": [
             {
@@ -7091,60 +7145,6 @@
                 "type": "int",
                 "unit": "",
                 "value": 1
-            }
-        ]
-    },
-    "MagneticNetwork": {
-        "constants": [
-            {
-                "name": "VERSION",
-                "value": "1"
-            }
-        ],
-        "daughters": [],
-        "desc": "Abstract class to solve the electric machines using the reluctance network",
-        "is_internal": false,
-        "methods": [
-            "assembler",
-            "geometry_linear_motor",
-            "geometry_linear_motor_separetion",
-            "plot.Plot_B",
-            "plot.view_contour_flux",
-            "plot.view_contour_flux2",
-            "post_processing",
-            "run",
-            "run_non_linear",
-            "run_radial",
-            "solver_linear_model",
-            "solver_non_linear_model",
-            "pre_processing.init_cell",
-            "pre_processing.init_mesh_BC",
-            "pre_processing.init_permeabilty_cell",
-            "pre_processing.init_point",
-            "pre_processing.init_reluc",
-            "pre_processing.numeroting_unknows",
-            "pre_processing.save_mesh",
-            "assembler.assembly",
-            "assembler.assembly_one_area",
-            "assembler.right_member_assembly",
-            "post_processing.add_BC_to_F",
-            "post_processing.compute_B_radial",
-            "post_processing.compute_B_square"
-        ],
-        "mother": "",
-        "name": "MagneticNetwork",
-        "package": "Simulation",
-        "path": "pyleecan/Generator/ClassesRef/Simulation/MagneticNetwork.csv",
-        "properties": [
-            {
-                "as_dict": "",
-                "desc": "file path of the .json file of the defined machine",
-                "max": "",
-                "min": "",
-                "name": "file_path",
-                "type": "",
-                "unit": "-",
-                "value": ""
             }
         ]
     },
