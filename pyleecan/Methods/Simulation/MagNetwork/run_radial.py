@@ -13,6 +13,12 @@ import meshio
 import matplotlib.pyplot as plt
 from pyleecan.Functions.load import load
 
+from pyleecan.Classes.MeshMat import MeshMat
+from pyleecan.Classes.NodeMat import NodeMat
+from pyleecan.Classes.CellMat import CellMat
+from pyleecan.Classes.MeshSolution import MeshSolution
+from pyleecan.Classes.SolutionMat import SolutionMat
+
 
 def run_radial(self, axes_dict, Is_val=None):
 
@@ -88,7 +94,10 @@ def run_radial(self, axes_dict, Is_val=None):
 
     x = (list_coord[:, 1] * np.cos(list_coord[:, 0])).reshape(size_r, size_theta)
     y = (list_coord[:, 1] * np.sin(list_coord[:, 0])).reshape(size_r, size_theta)
-    list_cart = np.stack((x, y), axis=-1)
+    list_cart = np.zeros((list_coord.shape[0], 2))
+
+    list_cart[:, 0] = x.flatten()
+    list_cart[:, 1] = y.flatten()
 
     self.view_contour_flux(F, x, y, x.shape[1], x.shape[0], list_geometry)
     print(self.view_contour_flux(F, x, y, x.shape[1], x.shape[0], list_geometry))
@@ -105,25 +114,24 @@ def run_radial(self, axes_dict, Is_val=None):
     temp = np.zeros((list_coord.shape[0], 3))
     temp[:, 0:2] = list_coord
 
-    list_coord = temp
-
-    points = list_coord
-    cells = [
-        ("quad", list_elem),
-    ]
-
-    mesh = meshio.Mesh(
-        points,
-        cells,
-        # Optionally provide extra data on points, cells, etc.
-        point_data={"Flux": F},
-        # Each item in cell data must match the cells array
-        cell_data={"B": [B], "Materials": [list_geometry]},
-    )
-    mesh.write(
-        "mymesh.xdmf",  # str, os.PathLike, or buffer/open file
-        # file_format="vtk",  # optional if first argument is a path; inferred from extension
-    )
+    # Launch mesh.io
+    # list_coord = temp
+    # points = list_coord
+    # cells = [
+    #     ("quad", list_elem),
+    # ]
+    # mesh = meshio.Mesh(
+    #     points,
+    #     cells,
+    #     # Optionally provide extra data on points, cells, etc.
+    #     point_data={"Flux": F},
+    #     # Each item in cell data must match the cells array
+    #     cell_data={"B": [B], "Materials": [list_geometry]},
+    # )
+    # mesh.write(
+    #     "mymesh.xdmf",  # str, os.PathLike, or buffer/open file
+    #     # file_format="vtk",  # optional if first argument is a path; inferred from extension
+    # )
 
     # Alternative with the same options
     # meshio.write_points_cells("mymesh.vtu", points, cells)
@@ -134,5 +142,41 @@ def run_radial(self, axes_dict, Is_val=None):
     Bx_airgap, By_airgap = self.comp_flux_airgap_local(
         r, theta, F, list_elem, list_coord, la, Machine.stator.Rext, Machine.rotor.Rext
     )
+    # Add my mesh to pyleecqan
+    print("Solve RN done.")
+    mesh = MeshMat(dimension=3)
+    mesh.node = NodeMat()
+    print("Add points in mesh")
+    for i in range(list_cart.shape[0]):
+        mesh.node.add_node([list_cart[i, 0], list_cart[i, 1], 0])
+    print("Done \nAdd elements in mesh")
+
+    mesh.cell["quad"] = CellMat(nb_node_per_cell=4)
+    for i in range(list_elem.shape[0]):
+        mesh.add_cell(list_elem[i, :], "quad")
+
+    MSol = MeshSolution(mesh=[mesh])
+
+    # print("Done \nAdd material for ech elementss")
+    # for i in range(list_elem.shape[0]):
+    #     MSol.group = {list_materials[list_geometry[i] - 1]: list_elem[i, :]}
+
+    print("Done")
+    # plot the mesh
+    MSol.plot_mesh()
+
+    # plot the flux
+    field = F[np.newaxis]
+    print(field.shape)
+    my_solution = SolutionMat(
+        label="Flux (Weber)",
+        type_cell="point",
+        field=field,
+        indice=np.arange(list_coord.shape[0]),
+        axis_name=["time", "indice"],
+        axis_size=[1, list_coord.shape[0]],
+    )
+    MSol.solution.append(my_solution)
+    MSol.plot_contour()
 
     return Bx, By, Bx_airgap, By_airgap

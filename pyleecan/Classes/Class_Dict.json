@@ -7073,7 +7073,8 @@
             "post_processing.compute_B_radial",
             "post_processing.compute_B_square",
             "comp_flux_airgap",
-            "comp_flux_airgap_local"
+            "comp_flux_airgap_local",
+            "cartesianmeshclass_pyleecan"
         ],
         "mother": "Magnetics",
         "name": "MagNetwork",

@@ -174,6 +174,13 @@ try:
 except ImportError as error:
     comp_flux_airgap_local = error
 
+try:
+    from ..Methods.Simulation.MagNetwork.cartesianmeshclass_pyleecan import (
+        cartesianmeshclass_pyleecan,
+    )
+except ImportError as error:
+    cartesianmeshclass_pyleecan = error
+
 
 from numpy import isnan
 from ._check import InitUnKnowClassError
@@ -485,6 +492,18 @@ class MagNetwork(Magnetics):
         )
     else:
         comp_flux_airgap_local = comp_flux_airgap_local
+    # cf Methods.Simulation.MagNetwork.cartesianmeshclass_pyleecan
+    if isinstance(cartesianmeshclass_pyleecan, ImportError):
+        cartesianmeshclass_pyleecan = property(
+            fget=lambda x: raise_(
+                ImportError(
+                    "Can't use MagNetwork method cartesianmeshclass_pyleecan: "
+                    + str(cartesianmeshclass_pyleecan)
+                )
+            )
+        )
+    else:
+        cartesianmeshclass_pyleecan = cartesianmeshclass_pyleecan
     # generic save method is available in all object
     save = save
     # get_logger method is available in all object
