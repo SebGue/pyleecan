@@ -11,8 +11,8 @@ from pyleecan.Functions.load import load
 
 def geometry_linear_motor(self, size_x, size_y, pos_pm):
 
-    # Load machine object
-    Machine = load(self.file_path)
+    # Get machine object
+    Machine = self.parent.machine
 
     # Machine's characteristics
     # tp = 60e-3  # pole pitch (m)

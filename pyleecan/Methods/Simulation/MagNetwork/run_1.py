@@ -12,7 +12,7 @@ import meshio
 from plot import view_contour_flux
 
 
-def run(self):
+def run_1(self):
     la = 1  # Active length (m)
     Br = 1.2  # PM remanent induction (residual induction) (T)
     mu0 = np.pi * 4e-7  # Permeability of vacuum (H/m)

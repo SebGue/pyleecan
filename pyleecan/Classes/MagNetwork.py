@@ -13,7 +13,7 @@ from ..Functions.save import save
 from ..Functions.load import load_init_dict
 from ..Functions.Load.import_class import import_class
 from copy import deepcopy
-from ._frozen import FrozenClass
+from .Magnetics import Magnetics
 
 # Import all class method
 # Try/catch to remove unnecessary dependencies in unused method
@@ -59,9 +59,9 @@ except ImportError as error:
     post_processing = error
 
 try:
-    from ..Methods.Simulation.MagNetwork.run import run
+    from ..Methods.Simulation.MagNetwork.run_1 import run_1
 except ImportError as error:
-    run = error
+    run_1 = error
 
 try:
     from ..Methods.Simulation.MagNetwork.run_non_linear import run_non_linear
@@ -162,12 +162,24 @@ try:
 except ImportError as error:
     compute_B_square = error
 
+try:
+    from ..Methods.Simulation.MagNetwork.comp_flux_airgap import comp_flux_airgap
+except ImportError as error:
+    comp_flux_airgap = error
+
+try:
+    from ..Methods.Simulation.MagNetwork.comp_flux_airgap_local import (
+        comp_flux_airgap_local,
+    )
+except ImportError as error:
+    comp_flux_airgap_local = error
+
 
 from numpy import isnan
 from ._check import InitUnKnowClassError
 
 
-class MagNetwork(FrozenClass):
+class MagNetwork(Magnetics):
     """Abstract class to solve the electric machines using the reluctance network"""
 
     VERSION = 1
@@ -251,15 +263,15 @@ class MagNetwork(FrozenClass):
         )
     else:
         post_processing = post_processing
-    # cf Methods.Simulation.MagNetwork.run
-    if isinstance(run, ImportError):
-        run = property(
+    # cf Methods.Simulation.MagNetwork.run_1
+    if isinstance(run_1, ImportError):
+        run_1 = property(
             fget=lambda x: raise_(
-                ImportError("Can't use MagNetwork method run: " + str(run))
+                ImportError("Can't use MagNetwork method run_1: " + str(run_1))
             )
         )
     else:
-        run = run
+        run_1 = run_1
     # cf Methods.Simulation.MagNetwork.run_non_linear
     if isinstance(run_non_linear, ImportError):
         run_non_linear = property(
@@ -449,12 +461,59 @@ class MagNetwork(FrozenClass):
         )
     else:
         compute_B_square = compute_B_square
+    # cf Methods.Simulation.MagNetwork.comp_flux_airgap
+    if isinstance(comp_flux_airgap, ImportError):
+        comp_flux_airgap = property(
+            fget=lambda x: raise_(
+                ImportError(
+                    "Can't use MagNetwork method comp_flux_airgap: "
+                    + str(comp_flux_airgap)
+                )
+            )
+        )
+    else:
+        comp_flux_airgap = comp_flux_airgap
+    # cf Methods.Simulation.MagNetwork.comp_flux_airgap_local
+    if isinstance(comp_flux_airgap_local, ImportError):
+        comp_flux_airgap_local = property(
+            fget=lambda x: raise_(
+                ImportError(
+                    "Can't use MagNetwork method comp_flux_airgap_local: "
+                    + str(comp_flux_airgap_local)
+                )
+            )
+        )
+    else:
+        comp_flux_airgap_local = comp_flux_airgap_local
     # generic save method is available in all object
     save = save
     # get_logger method is available in all object
     get_logger = get_logger
 
-    def __init__(self, file_path=-1, init_dict=None, init_str=None):
+    def __init__(
+        self,
+        is_remove_slotS=False,
+        is_remove_slotR=False,
+        is_remove_ventS=False,
+        is_remove_ventR=False,
+        is_mmfs=True,
+        is_mmfr=True,
+        type_BH_stator=0,
+        type_BH_rotor=0,
+        is_periodicity_t=False,
+        is_periodicity_a=False,
+        angle_stator_shift=0,
+        angle_rotor_shift=0,
+        logger_name="Pyleecan.Magnetics",
+        Slice_enforced=None,
+        Nslices_enforced=None,
+        type_distribution_enforced=None,
+        is_current_harm=True,
+        T_mag=20,
+        is_periodicity_rotor=False,
+        init_dict=None,
+        init_str=None,
+    ):
         """Constructor of the class. Can be use in three ways :
         - __init__ (arg1 = 1, arg3 = 5) every parameters have name and default values
             for pyleecan type, -1 will call the default constructor
@@ -470,24 +529,76 @@ class MagNetwork(FrozenClass):
         if init_dict is not None:  # Initialisation by dict
             assert type(init_dict) is dict
             # Overwrite default value with init_dict content
-            if "file_path" in list(init_dict.keys()):
-                file_path = init_dict["file_path"]
+            if "is_remove_slotS" in list(init_dict.keys()):
+                is_remove_slotS = init_dict["is_remove_slotS"]
+            if "is_remove_slotR" in list(init_dict.keys()):
+                is_remove_slotR = init_dict["is_remove_slotR"]
+            if "is_remove_ventS" in list(init_dict.keys()):
+                is_remove_ventS = init_dict["is_remove_ventS"]
+            if "is_remove_ventR" in list(init_dict.keys()):
+                is_remove_ventR = init_dict["is_remove_ventR"]
+            if "is_mmfs" in list(init_dict.keys()):
+                is_mmfs = init_dict["is_mmfs"]
+            if "is_mmfr" in list(init_dict.keys()):
+                is_mmfr = init_dict["is_mmfr"]
+            if "type_BH_stator" in list(init_dict.keys()):
+                type_BH_stator = init_dict["type_BH_stator"]
+            if "type_BH_rotor" in list(init_dict.keys()):
+                type_BH_rotor = init_dict["type_BH_rotor"]
+            if "is_periodicity_t" in list(init_dict.keys()):
+                is_periodicity_t = init_dict["is_periodicity_t"]
+            if "is_periodicity_a" in list(init_dict.keys()):
+                is_periodicity_a = init_dict["is_periodicity_a"]
+            if "angle_stator_shift" in list(init_dict.keys()):
+                angle_stator_shift = init_dict["angle_stator_shift"]
+            if "angle_rotor_shift" in list(init_dict.keys()):
+                angle_rotor_shift = init_dict["angle_rotor_shift"]
+            if "logger_name" in list(init_dict.keys()):
+                logger_name = init_dict["logger_name"]
+            if "Slice_enforced" in list(init_dict.keys()):
+                Slice_enforced = init_dict["Slice_enforced"]
+            if "Nslices_enforced" in list(init_dict.keys()):
+                Nslices_enforced = init_dict["Nslices_enforced"]
+            if "type_distribution_enforced" in list(init_dict.keys()):
+                type_distribution_enforced = init_dict["type_distribution_enforced"]
+            if "is_current_harm" in list(init_dict.keys()):
+                is_current_harm = init_dict["is_current_harm"]
+            if "T_mag" in list(init_dict.keys()):
+                T_mag = init_dict["T_mag"]
+            if "is_periodicity_rotor" in list(init_dict.keys()):
+                is_periodicity_rotor = init_dict["is_periodicity_rotor"]
         # Set the properties (value check and convertion are done in setter)
-        self.parent = None
-        self.file_path = file_path
-
-        # The class is frozen, for now it's impossible to add new properties
-        self._freeze()
+        # Call Magnetics init
+        super(MagNetwork, self).__init__(
+            is_remove_slotS=is_remove_slotS,
+            is_remove_slotR=is_remove_slotR,
+            is_remove_ventS=is_remove_ventS,
+            is_remove_ventR=is_remove_ventR,
+            is_mmfs=is_mmfs,
+            is_mmfr=is_mmfr,
+            type_BH_stator=type_BH_stator,
+            type_BH_rotor=type_BH_rotor,
+            is_periodicity_t=is_periodicity_t,
+            is_periodicity_a=is_periodicity_a,
+            angle_stator_shift=angle_stator_shift,
+            angle_rotor_shift=angle_rotor_shift,
+            logger_name=logger_name,
+            Slice_enforced=Slice_enforced,
+            Nslices_enforced=Nslices_enforced,
+            type_distribution_enforced=type_distribution_enforced,
+            is_current_harm=is_current_harm,
+            T_mag=T_mag,
+            is_periodicity_rotor=is_periodicity_rotor,
+        )
+        # The class is frozen (in Magnetics init), for now it's impossible to
+        # add new properties
 
     def __str__(self):
         """Convert this object in a readeable string (for print)"""
 
         MagNetwork_str = ""
-        if self.parent is None:
-            MagNetwork_str += "parent = None " + linesep
-        else:
-            MagNetwork_str += "parent = " + str(type(self.parent)) + " object" + linesep
-        MagNetwork_str += "file_path = " + str(self.file_path) + linesep + linesep
+        # Get the properties inherited from Magnetics
+        MagNetwork_str += super(MagNetwork, self).__str__()
         return MagNetwork_str
 
     def __eq__(self, other):
@@ -495,11 +606,9 @@ class MagNetwork(FrozenClass):
 
         if type(other) != type(self):
             return False
-        if isinstance(self.file_path, np.ndarray) and not np.array_equal(
-            other.file_path, self.file_path
-        ):
-            return False
-        elif other.file_path != self.file_path:
+
+        # Check the properties inherited from Magnetics
+        if not super(MagNetwork, self).__eq__(other):
             return False
         return True
 
@@ -511,27 +620,13 @@ class MagNetwork(FrozenClass):
         if type(other) != type(self):
             return ["type(" + name + ")"]
         diff_list = list()
-        if (other.file_path is None and self.file_path is not None) or (
-            other.file_path is not None and self.file_path is None
-        ):
-            diff_list.append(name + ".file_path")
-        elif self.file_path is None:
-            pass
-        elif isinstance(self.file_path, np.ndarray) and not np.array_equal(
-            other.file_path, self.file_path
-        ):
-            diff_list.append(name + ".file_path")
-        elif hasattr(self.file_path, "compare"):
-            diff_list.extend(
-                self.file_path.compare(
-                    other.file_path,
-                    name=name + ".file_path",
-                    ignore_list=ignore_list,
-                    is_add_value=is_add_value,
-                )
+
+        # Check the properties inherited from Magnetics
+        diff_list.extend(
+            super(MagNetwork, self).compare(
+                other, name=name, ignore_list=ignore_list, is_add_value=is_add_value
             )
-        elif other._file_path != self._file_path:
-            diff_list.append(name + ".file_path")
+        )
         # Filter ignore differences
         diff_list = list(filter(lambda x: x not in ignore_list, diff_list))
         return diff_list
@@ -540,7 +635,9 @@ class MagNetwork(FrozenClass):
         """Return the size in memory of the object (including all subobject)"""
 
         S = 0  # Full size of the object
-        S += getsizeof(self.file_path)
+
+        # Get size of the properties inherited from Magnetics
+        S += super(MagNetwork, self).__sizeof__()
         return S
 
     def as_dict(self, type_handle_ndarray=0, keep_function=False, **kwargs):
@@ -554,29 +651,14 @@ class MagNetwork(FrozenClass):
         and may prevent json serializability.
         """
 
-        MagNetwork_dict = dict()
-        if self.file_path is None:
-            MagNetwork_dict["file_path"] = None
-        elif isinstance(self.file_path, np.ndarray):
-            if type_handle_ndarray == 0:
-                MagNetwork_dict["file_path"] = self.file_path.tolist()
-            elif type_handle_ndarray == 1:
-                MagNetwork_dict["file_path"] = self.file_path.copy()
-            elif type_handle_ndarray == 2:
-                MagNetwork_dict["file_path"] = self.file_path
-            else:
-                raise Exception(
-                    "Unknown type_handle_ndarray: " + str(type_handle_ndarray)
-                )
-        elif hasattr(self.file_path, "as_dict"):
-            MagNetwork_dict["file_path"] = self.file_path.as_dict(
-                type_handle_ndarray=type_handle_ndarray,
-                keep_function=keep_function,
-                **kwargs
-            )
-        else:
-            MagNetwork_dict["file_path"] = self.file_path
+        # Get the properties inherited from Magnetics
+        MagNetwork_dict = super(MagNetwork, self).as_dict(
+            type_handle_ndarray=type_handle_ndarray,
+            keep_function=keep_function,
+            **kwargs
+        )
         # The class name is added to the dict for deserialisation purpose
+        # Overwrite the mother class name
         MagNetwork_dict["__class__"] = "MagNetwork"
         return MagNetwork_dict
 
@@ -584,54 +666,54 @@ class MagNetwork(FrozenClass):
         """Creates a deepcopy of the object"""
 
         # Handle deepcopy of all the properties
-        if hasattr(self.file_path, "copy"):
-            file_path_val = self.file_path.copy()
+        is_remove_slotS_val = self.is_remove_slotS
+        is_remove_slotR_val = self.is_remove_slotR
+        is_remove_ventS_val = self.is_remove_ventS
+        is_remove_ventR_val = self.is_remove_ventR
+        is_mmfs_val = self.is_mmfs
+        is_mmfr_val = self.is_mmfr
+        type_BH_stator_val = self.type_BH_stator
+        type_BH_rotor_val = self.type_BH_rotor
+        is_periodicity_t_val = self.is_periodicity_t
+        is_periodicity_a_val = self.is_periodicity_a
+        angle_stator_shift_val = self.angle_stator_shift
+        angle_rotor_shift_val = self.angle_rotor_shift
+        logger_name_val = self.logger_name
+        if self.Slice_enforced is None:
+            Slice_enforced_val = None
         else:
-            file_path_val = self.file_path
+            Slice_enforced_val = self.Slice_enforced.copy()
+        Nslices_enforced_val = self.Nslices_enforced
+        type_distribution_enforced_val = self.type_distribution_enforced
+        is_current_harm_val = self.is_current_harm
+        T_mag_val = self.T_mag
+        is_periodicity_rotor_val = self.is_periodicity_rotor
         # Creates new object of the same type with the copied properties
-        obj_copy = type(self)(file_path=file_path_val)
+        obj_copy = type(self)(
+            is_remove_slotS=is_remove_slotS_val,
+            is_remove_slotR=is_remove_slotR_val,
+            is_remove_ventS=is_remove_ventS_val,
+            is_remove_ventR=is_remove_ventR_val,
+            is_mmfs=is_mmfs_val,
+            is_mmfr=is_mmfr_val,
+            type_BH_stator=type_BH_stator_val,
+            type_BH_rotor=type_BH_rotor_val,
+            is_periodicity_t=is_periodicity_t_val,
+            is_periodicity_a=is_periodicity_a_val,
+            angle_stator_shift=angle_stator_shift_val,
+            angle_rotor_shift=angle_rotor_shift_val,
+            logger_name=logger_name_val,
+            Slice_enforced=Slice_enforced_val,
+            Nslices_enforced=Nslices_enforced_val,
+            type_distribution_enforced=type_distribution_enforced_val,
+            is_current_harm=is_current_harm_val,
+            T_mag=T_mag_val,
+            is_periodicity_rotor=is_periodicity_rotor_val,
+        )
         return obj_copy
 
     def _set_None(self):
         """Set all the properties to None (except pyleecan object)"""
 
-        if hasattr(self.file_path, "_set_None"):
-            self.file_path._set_None()
-        else:
-            self.file_path = None
-
-    def _get_file_path(self):
-        """getter of file_path"""
-        return self._file_path
-
-    def _set_file_path(self, value):
-        """setter of file_path"""
-        if isinstance(value, dict) and "__class__" in value:
-            try:
-                class_obj = import_class(
-                    "pyleecan.Classes", value.get("__class__"), "file_path"
-                )
-            except:
-                class_obj = import_class(
-                    "SciDataTool.Classes", value.get("__class__"), "file_path"
-                )
-            value = class_obj(init_dict=value)
-        elif type(value) is list:
-            try:
-                value = np.array(value)
-            except:
-                pass
-        check_var("file_path", value, "")
-        self._file_path = value
-
-        if hasattr(self._file_path, "parent"):
-            self._file_path.parent = self
-
-    file_path = property(
-        fget=_get_file_path,
-        fset=_set_file_path,
-        doc=u"""file path of the .json file of the defined machine
-
-        :Type: 
-        """,
-    )
+        # Set to None the properties inherited from Magnetics
+        super(MagNetwork, self)._set_None()

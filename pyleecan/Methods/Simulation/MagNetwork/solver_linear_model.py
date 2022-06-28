@@ -55,7 +55,23 @@ except:
 
 
 def solver_linear_model(
-    self, size_x, size_y, x, y, x_dual, y_dual, pos, BC, geometry, mu0, la, Br, mode
+    self,
+    size_x,
+    size_y,
+    x,
+    y,
+    x_dual,
+    y_dual,
+    pos,
+    BC,
+    geometry,
+    mu0,
+    la,
+    Br,
+    mode,
+    JA=None,
+    JB=None,
+    JC=None,
 ):
     """
 
@@ -137,7 +153,16 @@ def solver_linear_model(
 
     # Assembly RHS
     E = self.right_member_assembly(
-        list_geometry, Num_Unknowns, list_elem, list_coord, Br, mu0, mode
+        list_geometry,
+        Num_Unknowns,
+        list_elem,
+        list_coord,
+        Br,
+        mu0,
+        mode,
+        JA=JA,
+        JB=JB,
+        JC=JC,
     )
 
     t4 = time.perf_counter()

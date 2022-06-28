@@ -14,9 +14,9 @@ import matplotlib.pyplot as plt
 from pyleecan.Functions.load import load
 
 
-def run_radial(self, file_path):
+def run_radial(self, axes_dict, Is_val=None):
 
-    Machine = load(file_path)
+    Machine = self.parent.machine
     la = 1  # Active length (m)
     Br = 1.2  # PM remanent induction (residual induction) (T)
     mu0 = np.pi * 4e-7  # Permeability of vacuum (H/m)
@@ -32,14 +32,33 @@ def run_radial(self, file_path):
     size_r = density * 51 + 1
     size_theta = density * 60 + 1
 
-    r = np.linspace(0.005, 0.05, size_r)
-    theta = np.linspace(0, np.pi / 2, size_theta)
+    # r = np.linspace(0.005, 0.05, size_r)
+    # theta = np.linspace(0, np.pi / 2, size_theta)
+    r = np.linspace(Machine.rotor.Rint, Machine.stator.Rext, size_r)
+    # Add one extra point so that dual mesh has the correct dimension
+    theta = np.linspace(
+        axes_dict["angle"].initial,
+        axes_dict["angle"].final,
+        axes_dict["angle"].number + 1,
+        endpoint=False,
+    )
 
     r_dual = (r[1:] + r[:-1]) / 2
     theta_dual = (theta[1:] + theta[-1]) / 2
 
     BC = ["AP", "HD", "AP", "HD"]
     mode = "polar"
+
+    # Compute current densities
+    if Is_val is not None:
+        surface_active = self.parent.machine.stator.slot.comp_surface_active()
+        JA = Is_val[0, :] / surface_active
+        JB = Is_val[1, :] / surface_active
+        JC = Is_val[2, :] / surface_active
+    else:
+        JA = None
+        JB = None
+        JC = None
 
     (
         F,
@@ -62,6 +81,9 @@ def run_radial(self, file_path):
         la,
         Br,
         mode,
+        JA=JA,
+        JB=JB,
+        JC=JC,
     )
 
     x = (list_coord[:, 1] * np.cos(list_coord[:, 0])).reshape(size_r, size_theta)
@@ -109,8 +131,8 @@ def run_radial(self, file_path):
     print("mesh saved", list_coord.shape, list_elem.shape)
 
     # Compute 2D curve of the airgap flux density
-    self.comp_flux_airgap_local(
+    Bx_airgap, By_airgap = self.comp_flux_airgap_local(
         r, theta, F, list_elem, list_coord, la, Machine.stator.Rext, Machine.rotor.Rext
     )
 
-    return Bx, By
+    return Bx, By, Bx_airgap, By_airgap

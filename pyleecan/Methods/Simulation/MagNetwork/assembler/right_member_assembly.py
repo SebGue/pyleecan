@@ -5,7 +5,17 @@ from scipy.sparse import coo_matrix
 
 
 def right_member_assembly(
-    self, cells_materials, Num_Unknowns, list_elem, list_coord, Br, mu0, mode
+    self,
+    cells_materials,
+    Num_Unknowns,
+    list_elem,
+    list_coord,
+    Br,
+    mu0,
+    mode,
+    JA=None,
+    JB=None,
+    JC=None,
 ):
     """
     Vector assembler, RHS.
@@ -61,10 +71,11 @@ def right_member_assembly(
     # J=0
     wt = 0
     E = np.zeros(nn, dtype=np.float64)
-    JA = -J * np.cos(wt - 2 * np.pi / 3)
-    JC = -J * np.cos(wt + 2 * np.pi / 3)
-    JB = J * np.cos(wt)
-    JA, JB, JC = 0, 0, 0
+    if JA is None and JB is None and JC is None:
+        JA = -J * np.cos(wt - 2 * np.pi / 3)
+        JC = -J * np.cos(wt + 2 * np.pi / 3)
+        JB = J * np.cos(wt)
+        JA, JB, JC = 0, 0, 0
 
     i1 = Num_Unknowns[list_elem[mask_magnet, 0]]
     i2 = Num_Unknowns[list_elem[mask_magnet, 1]]

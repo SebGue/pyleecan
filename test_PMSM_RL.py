@@ -33,25 +33,27 @@ def test_FEMM_SPMSM():
 
     # Definition of time, angular discretization and operating point
     simu.input = InputCurrent(
-        Nt_tot=10 * pole_pairs,  # time steps (time discretization)
-        Na_tot=2000
-        * pole_pairs,  # number of points in the air gap (angle discretization)
-        OP=OPdq(N0=SPEED, Id_ref=Ic.real, Iq_ref=Ic.imag),  # operating point
+        # Nt_tot=10 * pole_pairs,  # time steps (time discretization)
+        # Na_tot=2000 *pole_pairs,  # number of points in the air gap (angle discretization)
+        # OP=OPdq(N0=SPEED, Id_ref=Ic.real, Iq_ref=Ic.imag),  # operating point
+        OP=OPdq(N0=1000, Id_ref=0, Iq_ref=0),
+        Na_tot=60 * 4,
+        Nt_tot=1,
         # Periodicity
-        is_periodicity_t=True,
+        is_periodicity_t=False,
         is_periodicity_a=True,
-        angle_rotor_initial=0,
+        # angle_rotor_initial=0,
     )
 
     # Performing the magnetic simulation using FEMM
     simu.mag = MagFEMM(
         is_periodicity_a=True,
-        is_periodicity_t=True,
+        is_periodicity_t=False,
         nb_worker=4,  # number of FEMM windows to be opened
         is_get_meshsolution=True,  # Get the mesh solution
         is_fast_draw=True,
         is_calc_torque_energy=False,
-        Kmesh_fineness=3,  # Define the mesh fineness
+        Kmesh_fineness=2,  # Define the mesh fineness
     )
 
     out = simu.run()
@@ -100,7 +102,10 @@ def test_FEMM_SPMSM():
     if is_show_fig:
 
         # plot the air gap flux density on one line only
-        out.mag.B.plot_2D_Data("angle", "time[1]", component_list=["radial"])
+        # out.mag.B.plot_2D_Data("angle", "time[1]", component_list=["radial"])
+        out.mag.B.plot_2D_Data(
+            "angle", component_list=["radial"]
+        )  # plot only the radial component for a null time
 
         # Plot the magnetic flux density mapping
         out.mag.meshsolution.plot_contour(

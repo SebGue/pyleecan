@@ -1,4 +1,4 @@
-# Method to compute the air gap magnetic flux density
+# Method to compute the air gap magnetic flux density localy
 # -*- coding: utf-8 -*-
 import matplotlib.pyplot as plt
 import numpy as np
@@ -34,4 +34,4 @@ def comp_flux_airgap_local(
     plt.legend()
     plt.show()
 
-    return
+    return Bx[i, :], By[i, :]

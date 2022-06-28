@@ -7054,7 +7054,7 @@
             "plot.view_contour_flux",
             "plot.view_contour_flux2",
             "post_processing",
-            "run",
+            "run_1",
             "run_non_linear",
             "run_radial",
             "solver_linear_model",
@@ -7071,24 +7071,15 @@
             "assembler.right_member_assembly",
             "post_processing.add_BC_to_F",
             "post_processing.compute_B_radial",
-            "post_processing.compute_B_square"
+            "post_processing.compute_B_square",
+            "comp_flux_airgap",
+            "comp_flux_airgap_local"
         ],
-        "mother": "",
+        "mother": "Magnetics",
         "name": "MagNetwork",
         "package": "Simulation",
         "path": "pyleecan/Generator/ClassesRef/Simulation/MagNetwork.csv",
-        "properties": [
-            {
-                "as_dict": "",
-                "desc": "file path of the .json file of the defined machine",
-                "max": "",
-                "min": "",
-                "name": "file_path",
-                "type": "",
-                "unit": "-",
-                "value": ""
-            }
-        ]
+        "properties": []
     },
     "Magnet": {
         "constants": [
@@ -7157,7 +7148,8 @@
         ],
         "daughters": [
             "MagElmer",
-            "MagFEMM"
+            "MagFEMM",
+            "MagNetwork"
         ],
         "desc": "Magnetic module abstract object",
         "is_internal": false,
