@@ -10,9 +10,13 @@ Created on Fri Jun  3 10:46:17 2022
 # from plot import view_contour_flux
 import numpy as np
 import meshio
+import matplotlib.pyplot as plt
+from pyleecan.Functions.load import load
 
 
-def run_radial(self):
+def run_radial(self, file_path):
+
+    Machine = load(file_path)
     la = 1  # Active length (m)
     Br = 1.2  # PM remanent induction (residual induction) (T)
     mu0 = np.pi * 4e-7  # Permeability of vacuum (H/m)
@@ -103,5 +107,10 @@ def run_radial(self):
     # meshio.write_points_cells("mymesh.vtu", points, cells)
 
     print("mesh saved", list_coord.shape, list_elem.shape)
+
+    # Compute 2D curve of the airgap flux density
+    self.comp_flux_airgap_local(
+        r, theta, F, list_elem, list_coord, la, Machine.stator.Rext, Machine.rotor.Rext
+    )
 
     return Bx, By
