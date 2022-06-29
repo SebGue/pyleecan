@@ -15,17 +15,37 @@ import numpy as np
 
 
 def cartesianmeshclass_pyleecan(self):
+
+    Machine = self.parent.machine
     # Machine's characteristics
-    la = 1  # Active length (m)
-    Br = 1.2  # PM remanent induction (residual induction) (T)
+    la = Machine.rotor.L1  # Active length (m)
+
+    # Br = 1.2  # PM remanent induction (residual induction) (T)
+    Br = Machine.rotor.magnet.mat_type.mag.Brm20
     mu0 = np.pi * 4e-7  # Permeability of vacuum (H/m)
     mur1 = 1  # Relative permeability of air
-    mur2 = 7500  # Relative permeability of statot iron
-    mur3 = 7500
+
+    # mur2 = 7500  # Relative permeability of statot iron
+    mur2 = Machine.stator.mat_type.mag.mur_lin
+
+    # mur3 = 7500
+    mur3 = Machine.rotor.mat_type.mag.mur_lin
+
+    # Relative permeability of the winding
+    if Machine.stator.winding.conductor.cond_mat.mag != None:
+        mur_bob = Machine.stator.winding.conductor.cond_mat.mag.mur_lin
+    else:
+        mur_bob = 1
+
+    # Relative permeabiltity of the PM
+    mur_PM = Machine.rotor.magnet.mat_type.mag.mur_lin
 
     list_materials = ["bob1", "bob2", "bob3", "air", "iron1", "PM", "iron3"]
 
-    permeabilty_materials = np.array([1, 1, 1, 1, 7500, 1, 7500])
+    # permeabilty_materials = np.array([1, 1, 1, 1, 7500, 1, 7500])
+    permeabilty_materials = np.array(
+        [mur_bob, mur_bob, mur_bob, mur1, mur2, mur_PM, mur3]
+    )
 
     x_min = 0
     x_max = 0.06

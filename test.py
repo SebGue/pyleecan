@@ -7,6 +7,8 @@ from pyleecan.Classes.OPdq import OPdq
 from pyleecan.Classes.ForceMT import ForceMT
 from pyleecan.Functions.Plot import dict_2D
 from pyleecan.Classes.MagFEMM import MagFEMM
+from os.path import join
+from Tests import save_validation_path as save_path
 
 
 file_path = "C:/Users/pc/Downloads/SPMSM_val.json"
@@ -64,17 +66,16 @@ simu2.mag = MagFEMM(
 simu2.force = ForceMT()
 
 # Run both simulations
-out = simu.run()
-# out2 = simu2.run()
+out = simu.run()  # MagNetwork
+out2 = simu2.run()  # FEMM
 
 
 # plot the 2D flux density curve
 out.mag.B.plot_2D_Data("angle")
-"""
-# Compute the harmonics
-simu.force = ForceMT()
-simu2.force = ForceMT()
+out2.mag.B.plot_2D_Data("angle")
 
+# Compute the harmonics
+"""
 out.force.AGSF.plot_2D_Data(
     "wavenumber=[0,10]",
     "time[0]",
@@ -85,25 +86,48 @@ out.force.AGSF.plot_2D_Data(
 )
 """
 
-# # Plot the results
-# out.mag.B.plot_2D_Data(
-#     # "time",
-#     "angle[0]{°}",
-#     data_list=[out2.mag.B],
-#     legend_list=["Periodic", "Full"],
-#     is_show_fig=True,
-#     **dict_2D
-# )
+# Plot the results
+out.mag.B.plot_2D_Data(
+    # "time",
+    "angle[0]{°}",
+    # data_list=[out2.mag.B],
+    data_list=[out.mag.B],
+    legend_list=["Periodic", "Full"],
+    is_show_fig=True,
+    **dict_2D
+)
 
-# # Compute the harmonics using the Maxwell tensor
-# out.force.AGSF.plot_2D_Data(
-#     "wavenumber=[0,10]",
-#     "time[0]",
-#     data_list=[out2.force.AGSF],
-#     legend_list=["Periodic", "Full"],
-#     is_show_fig=True,
-#     **dict_2D
-# )
+out2.mag.B.plot_2D_Data(
+    # "time",
+    "angle[0]{°}",
+    # data_list=[out2.mag.B],
+    data_list=[out2.mag.B],
+    legend_list=["Periodic", "Full"],
+    save_path=join(save_path, simu2.name + "_B_space_FEMM.png"),
+    is_show_fig=False,
+    **dict_2D
+)
+
+# Compute the harmonics using the Maxwell tensor
+out.force.AGSF.plot_2D_Data(
+    "wavenumber=[0,10]",
+    "time[0]",
+    # data_list=[out2.force.AGSF],
+    data_list=[out.force.AGSF],
+    legend_list=["Periodic", "Full"],
+    is_show_fig=True,
+    **dict_2D
+)
+
+out2.force.AGSF.plot_2D_Data(
+    "wavenumber=[0,10]",
+    "time[0]",
+    data_list=[out2.force.AGSF],
+    legend_list=["Periodic", "Full"],
+    save_path=join(save_path, simu.name + "_P_space_fft_FEMM.png"),
+    is_show_fig=False,
+    **dict_2D
+)
 
 # out.force.AGSF.plot_2D_Data(
 #     "freqs",
@@ -112,7 +136,6 @@ out.force.AGSF.plot_2D_Data(
 #     legend_list=["Periodic", "Full"],
 #     save_path=join(save_path, simu.name + "_B_space.png"),
 #     is_show_fig=False,
-#     is_show_fig=True,
 #     **dict_2D
 # )
 

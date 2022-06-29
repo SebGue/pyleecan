@@ -23,8 +23,10 @@ from pyleecan.Classes.SolutionMat import SolutionMat
 def run_radial(self, axes_dict, Is_val=None):
 
     Machine = self.parent.machine
-    la = 1  # Active length (m)
-    Br = 1.2  # PM remanent induction (residual induction) (T)
+    la = Machine.rotor.L1  # Active length (m)
+
+    # Br = 1.2  # PM remanent induction (residual induction) (T)
+    Br = Machine.rotor.magnet.mat_type.mag.Brm20
     mu0 = np.pi * 4e-7  # Permeability of vacuum (H/m)
 
     pos = 2

@@ -11,11 +11,8 @@ def compute_B_radial(self, F, list_elem, list_coord, la):
     theta = list_coord[list_elem[:, 0], 1]
 
     # Compute B
-    # Btheta1 = (F[list_elem[:, 2]] - F[list_elem[:, 1]]) / (h_theta1 * theta * la)
-    # Btheta2 = (F[list_elem[:, 3]] - F[list_elem[:, 0]]) / (h_theta2 * theta * la)
-
-    Btheta1 = (F[list_elem[:, 2]] - F[list_elem[:, 1]]) / (h_theta1 * la)
-    Btheta2 = (F[list_elem[:, 3]] - F[list_elem[:, 0]]) / (h_theta2 * la)
+    Btheta1 = (F[list_elem[:, 2]] - F[list_elem[:, 1]]) / (h_theta1 * theta * la)
+    Btheta2 = (F[list_elem[:, 3]] - F[list_elem[:, 0]]) / (h_theta2 * theta * la)
 
     Br1 = (F[list_elem[:, 0]] - F[list_elem[:, 1]]) / (h_r * la)
     Br2 = (F[list_elem[:, 3]] - F[list_elem[:, 2]]) / (h_r * la)
