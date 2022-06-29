@@ -28,6 +28,7 @@ def init_point(self, size_x, size_y, x, y):
     list_coord = np.zeros((size_x * size_y, 2))
     for i in range(x.size):
         for j in range(y.size):
+
             list_coord[x.size * j + i, :] = np.array([x[i], y[j]])
 
     return list_coord

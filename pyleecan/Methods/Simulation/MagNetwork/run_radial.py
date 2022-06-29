@@ -31,17 +31,24 @@ def run_radial(self, axes_dict, Is_val=None):
 
     pos = 2
     x_min = 0
-    x_max = 0.06
+    x_max = round(
+        (
+            np.pi
+            * 2
+            * (Machine.rotor.Rext + 0.5 * (Machine.stator.Rint - Machine.rotor.Rext))
+            / Machine.rotor.get_pole_pair_number()
+        ),
+        2,
+    )  # equal to tp, in meters
+    # x_max = 0.06
 
     y_min = 0
-    y_max = 0.051
+    y_max = Machine.stator.Rext - Machine.rotor.Rint  # in meters
 
     density = 1
-    size_r = density * 51 + 1
-    size_theta = density * 60 + 1
+    size_r = (int)(density * y_max * 1000 + 1)  # step of discretization of r
+    size_theta = (int)(density * x_max * 1000 + 1)  # step of discretization of theta
 
-    # r = np.linspace(0.005, 0.05, size_r)
-    # theta = np.linspace(0, np.pi / 2, size_theta)
     r = np.linspace(Machine.rotor.Rint, Machine.stator.Rext, size_r)
     # Add one extra point so that dual mesh has the correct dimension
     theta = np.linspace(

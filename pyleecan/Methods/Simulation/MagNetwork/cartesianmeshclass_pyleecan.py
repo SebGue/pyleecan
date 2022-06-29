@@ -48,14 +48,16 @@ def cartesianmeshclass_pyleecan(self):
     )
 
     x_min = 0
-    x_max = 0.06
+    x_max = (
+        np.pi * Machine.stator.Rint / Machine.rotor.get_pole_pair_number()
+    )  # equal to tp, in meters
 
     y_min = 0
-    y_max = 0.051
+    y_max = Machine.stator.Rext  # in meters
 
     mul = 2
-    size_x = int(60 * mul) + 1
-    size_y = int(51 * mul) + 1
+    size_x = int(x_max * 1000 * mul) + 1
+    size_y = int(y_max * 1000 * mul) + 1
 
     x = np.linspace(x_min, x_max, size_x)
     y = np.linspace(y_min, y_max, size_y)
