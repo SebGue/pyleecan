@@ -10,8 +10,11 @@ def right_member_assembly(
     Num_Unknowns,
     list_elem,
     list_coord,
+    reluc_list,
+    list_permeability,
     Br,
     mu0,
+    la,
     mode,
     JA=None,
     JB=None,
@@ -42,11 +45,12 @@ def right_member_assembly(
 
     """
 
-    nn = Num_Unknowns.max() + 1
     mask_magnet = cells_materials == 4
+    mu_pm = mu0 * list_permeability[4 - 1]
+    nn = Num_Unknowns.max() + 1
 
-    np.savetxt("cell_materials.csv", cells_materials)
-    print("non-zero in mak magnet?", mask_magnet.sum())
+    # np.savetxt("cell_materials.csv", cells_materials)
+    # print("non-zero in mak magnet?", mask_magnet.sum())
     if mode == "cartesian":
         h_x = np.linalg.norm(
             list_coord[list_elem[:, 0]] - list_coord[list_elem[:, 1]], axis=1, ord=2
@@ -54,73 +58,100 @@ def right_member_assembly(
         h_y = np.linalg.norm(
             list_coord[list_elem[:, 1]] - list_coord[list_elem[:, 2]], axis=1, ord=2
         )
-        FMMPM = Br * h_x[0] * 0.5 / mu0
+        FMMPM = 0.5 * Br * la * h_y[mask_magnet] / mu_pm
 
     elif mode == "polar":
-        theta = np.abs(list_coord[list_elem[:, 0], 0] - list_coord[list_elem[:, 1], 0])
-        R0 = list_coord[list_elem[:, 0], 1]
-        R1 = list_coord[list_elem[:, 3], 1]
+        R1 = list_coord[list_elem[:, 1], 0]
+        R2 = list_coord[list_elem[:, 1], -1]
+        sigma_R = np.abs(R2 - R1)
+        sigma_theta = np.abs(
+            list_coord[list_elem[:, 0], 1] - list_coord[list_elem[:, 0], 0]
+        )
 
-        h_x = 0.5 * (R0 + R1) * theta
-        h_y = np.abs(R1 - R0)
-        FMMPM = Br * np.mean(h_x[mask_magnet]) * 0.5 / mu0
+        FMMPM = 0.5 * Br * la * sigma_R[mask_magnet] / mu_pm
 
-    # FMMPM=0
-    # print("FMMPM:", FMMPM)
-    J = 5e6
-    # J=0
-    wt = 0
+    ##Initailyze returned vector -> RHS
     E = np.zeros(nn, dtype=np.float64)
-    if JA is None and JB is None and JC is None:
-        JA = -J * np.cos(wt - 2 * np.pi / 3)
-        JC = -J * np.cos(wt + 2 * np.pi / 3)
-        JB = J * np.cos(wt)
-        JA, JB, JC = 0, 0, 0
 
+    ####Permanant Magnet assembling
     i1 = Num_Unknowns[list_elem[mask_magnet, 0]]
     i2 = Num_Unknowns[list_elem[mask_magnet, 1]]
     i3 = Num_Unknowns[list_elem[mask_magnet, 2]]
     i4 = Num_Unknowns[list_elem[mask_magnet, 3]]
 
-    E[i1] += FMMPM
-    E[i2] -= FMMPM
-    E[i3] -= FMMPM
-    E[i4] += FMMPM
+    E[i1] += FMMPM * reluc_list[mask_magnet, 0]
+    E[i2] -= FMMPM * reluc_list[mask_magnet, 1]
+    E[i3] -= FMMPM * reluc_list[mask_magnet, 2]
+    E[i4] += FMMPM * reluc_list[mask_magnet, 3]
 
-    # mask_winding = cells_materials == 1
-    # S = h_x[mask_winding] * h_y[mask_winding] / 4
-    # i1 = Num_Unknowns[list_elem[mask_winding, 0]]
-    # i2 = Num_Unknowns[list_elem[mask_winding, 1]]
-    # i3 = Num_Unknowns[list_elem[mask_winding, 2]]
-    # i4 = Num_Unknowns[list_elem[mask_winding, 3]]
+    ####Winding assembling
+    if JA is None and JB is None and JC is None:
+        # Phase 1
+        mask_winding = cells_materials == 1
 
-    # E[i1] += JA * S
-    # E[i2] += JA * S
-    # E[i3] += JA * S
-    # E[i4] += JA * S
+        if mode == "cartesian":
+            S = h_x[mask_winding] * h_y[mask_winding] / 4
+        elif mode == "polar":
+            S = (
+                0.5
+                * sigma_theta[mask_winding]
+                * (R2[mask_winding] ** 2 - R1[mask_winding] ** 2)
+                / 4
+            )
 
-    # mask_winding = cells_materials == 2
-    # S = h_x[mask_winding] * h_y[mask_winding] / 4
-    # i1 = Num_Unknowns[list_elem[mask_winding, 0]]
-    # i2 = Num_Unknowns[list_elem[mask_winding, 1]]
-    # i3 = Num_Unknowns[list_elem[mask_winding, 2]]
-    # i4 = Num_Unknowns[list_elem[mask_winding, 3]]
+        i1 = Num_Unknowns[list_elem[mask_winding, 0]]
+        i2 = Num_Unknowns[list_elem[mask_winding, 1]]
+        i3 = Num_Unknowns[list_elem[mask_winding, 2]]
+        i4 = Num_Unknowns[list_elem[mask_winding, 3]]
 
-    # E[i1] += JB * S
-    # E[i2] += JB * S
-    # E[i3] += JB * S
-    # E[i4] += JB * S
+        E[i1] += JA * S
+        E[i2] += JA * S
+        E[i3] += JA * S
+        E[i4] += JA * S
 
-    # mask_winding = cells_materials == 3
-    # S = h_x[mask_winding] * h_y[mask_winding] / 4
-    # i1 = Num_Unknowns[list_elem[mask_winding, 0]]
-    # i2 = Num_Unknowns[list_elem[mask_winding, 1]]
-    # i3 = Num_Unknowns[list_elem[mask_winding, 2]]
-    # i4 = Num_Unknowns[list_elem[mask_winding, 3]]
+        # Phase 2
+        mask_winding = cells_materials == 2
 
-    # E[i1] += JC * S
-    # E[i2] += JC * S
-    # E[i3] += JC * S
-    # E[i4] += JC * S
+        if mode == "cartesian":
+            S = h_x[mask_winding] * h_y[mask_winding] / 4
+        elif mode == "polar":
+            S = (
+                0.5
+                * sigma_theta[mask_winding]
+                * (R2[mask_winding] ** 2 - R1[mask_winding] ** 2)
+                / 4
+            )
+
+        i1 = Num_Unknowns[list_elem[mask_winding, 0]]
+        i2 = Num_Unknowns[list_elem[mask_winding, 1]]
+        i3 = Num_Unknowns[list_elem[mask_winding, 2]]
+        i4 = Num_Unknowns[list_elem[mask_winding, 3]]
+
+        E[i1] += JB * S
+        E[i2] += JB * S
+        E[i3] += JB * S
+        E[i4] += JB * S
+
+        ###Phase 3
+        mask_winding = cells_materials == 3
+        if mode == "cartesian":
+            S = h_x[mask_winding] * h_y[mask_winding] / 4
+        elif mode == "polar":
+            S = (
+                0.5
+                * sigma_theta[mask_winding]
+                * (R2[mask_winding] ** 2 - R1[mask_winding] ** 2)
+                / 4
+            )
+
+        i1 = Num_Unknowns[list_elem[mask_winding, 0]]
+        i2 = Num_Unknowns[list_elem[mask_winding, 1]]
+        i3 = Num_Unknowns[list_elem[mask_winding, 2]]
+        i4 = Num_Unknowns[list_elem[mask_winding, 3]]
+
+        E[i1] += JC * S
+        E[i2] += JC * S
+        E[i3] += JC * S
+        E[i4] += JC * S
 
     return E

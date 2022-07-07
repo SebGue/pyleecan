@@ -37,14 +37,18 @@ def init_mesh_BC(self, size_x, size_y, BC):
     Periodic_point = np.zeros(0, dtype=np.uint16)
 
     if np.all(BC == ["P", "HD", "P", "HD"]):
+
         # Initialyze the BC list
+
         # Vertical BC
         BC_list[::size_x] = 2
         BC_list[size_x - 1 :: size_x] = 2
+
         # Horizontal BC
         BC_list[:size_x] = 1
         BC_list[size_x * (size_y - 1) : nn2] = 1
 
+        # Connexion of periodic points
         Periodic_point = -np.ones((size_y - 2, 2), dtype=np.int32)
         Periodic_point[:, 0] = np.arange(0, size_x * (size_y - 2), size_x) + size_x
         Periodic_point[:, 1] = Periodic_point[:, 0] + size_x - 1

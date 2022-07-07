@@ -18,6 +18,8 @@ def init_reluc(self, list_elem, list_coord, mu0, la, mode):
         Reluctance of each elements
     """
     R_reluc = np.zeros((list_elem.shape[0], 4))
+
+    # Reluctances in the case of the cartesian coordiante system
     if mode == "cartesian":
         # length and width
         h_x = np.linalg.norm(
@@ -36,6 +38,7 @@ def init_reluc(self, list_elem, list_coord, mu0, la, mode):
         R_reluc[:, 2] = 0.5 / (mu0 * la) * h_y / h_x
         R_reluc[:, 3] = 0.5 / (mu0 * la) * h_x / h_y
 
+    # Reluctances in the case of the polar coordiante system
     elif mode == "polar":
         theta = np.abs(list_coord[list_elem[:, 0], 0] - list_coord[list_elem[:, 1], 0])
         R0 = list_coord[list_elem[:, 0], 1]

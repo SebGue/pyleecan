@@ -4,21 +4,6 @@ Created on Fri Jun  3 09:10:31 2022
 
 @author: LAP02
 """
-
-"""
-from pre_processing import (
-    save_mesh,
-    init_reluc,
-    init_point,
-    init_cell,
-    init_permeabilty_cell,
-    init_permeabilty_cell,
-    init_mesh_BC,
-    numeroting_unknows,
-)
-from post_processing import add_BC_to_F
-from assembler import assembly, right_member_assembly
-"""
 import time
 
 # import geometry_linear_motor
@@ -43,6 +28,7 @@ os.environ["MKL_DYNAMIC"] = "FALSE"
 os.environ["OMP_DYNAMIC"] = "FALSE"
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 # Choose beetween chol-mod and scipy sparse linear solver
 Have_cholmod = False
@@ -116,15 +102,16 @@ def solver_linear_model(
     """
 
     t0 = time.perf_counter()
-    import matplotlib.pyplot as plt
 
-    # Initialyze nature of elements
+    # initialize the cells of materials and their permeability
     list_geometry, permeability_materials = self.geometry_linear_motor(
         size_x, size_y, pos
     )
 
+    # initialize the list_coord which contains the grid of points
     list_coord = self.init_point(size_x, size_y, x, y)
-    print("Permeability", permeability_materials)
+    # print("Permeability", permeability_materials)
+
     permeability_cell = self.init_permeabilty_cell(
         size_x, size_y, permeability_materials, list_geometry
     )
@@ -135,15 +122,20 @@ def solver_linear_model(
 
     Num_Unknowns = self.numeroting_unknows(list_elem, BC_list, Periodic_point)
 
+    # Mesuring the performance time
     t1 = time.perf_counter()
-    print("Assembly geometry:", np.round(t1 - t0, 5), "seconds")
+
+    # print("Assembly geometry:", np.round(t1 - t0, 5), "seconds")
     self.save_mesh(list_geometry, Num_Unknowns, list_elem, x, y, BC_list)
+
     t2 = time.perf_counter()
+    # Saving mesh time
     print("Save mesh:", np.round(t2 - t1, 5), "secondes")
 
     # Assembly all matrice
     reluc_list = self.init_reluc(list_elem, list_coord, mu0, la, mode)
-    print(reluc_list)
+    # print(reluc_list)
+
     M_csr = self.assembly(
         reluc_list, Num_Unknowns, list_elem, permeability_cell, BC_list
     )
@@ -151,14 +143,17 @@ def solver_linear_model(
     t3 = time.perf_counter()
     print("Assembly matrix", np.round(t3 - t2, 5), "secondes")
 
-    # Assembly RHS
+    # Assembly RHS containing the sources
     E = self.right_member_assembly(
         list_geometry,
         Num_Unknowns,
         list_elem,
         list_coord,
+        reluc_list,
+        permeability_materials,
         Br,
         mu0,
+        la,
         mode,
         JA=JA,
         JB=JB,

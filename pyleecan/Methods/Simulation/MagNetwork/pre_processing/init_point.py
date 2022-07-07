@@ -5,8 +5,8 @@ import numpy as np
 
 def init_point(self, size_x, size_y, x, y):
     """
-    Initaialyze grid of point, of size size_x * size_y.
-    And coordinate x,y (vectors).
+    Initialize the grid of point, of size size_x * size_y.
+    And coordinates x,y (vectors).
 
     Parameters
     ----------

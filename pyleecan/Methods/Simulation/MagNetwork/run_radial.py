@@ -31,16 +31,9 @@ def run_radial(self, axes_dict, Is_val=None):
 
     pos = 2
     x_min = 0
-    x_max = round(
-        (
-            np.pi
-            * 2
-            * (Machine.rotor.Rext + 0.5 * (Machine.stator.Rint - Machine.rotor.Rext))
-            / Machine.rotor.get_pole_pair_number()
-        ),
-        2,
-    )  # equal to tp, in meters
-    # x_max = 0.06
+    # Theta angle represented by x_max
+    # x_max = 2 * np.pi / Machine.comp_periodicity_spatial()[0]
+    x_max = 0.06
 
     y_min = 0
     y_max = Machine.stator.Rext - Machine.rotor.Rint  # in meters
