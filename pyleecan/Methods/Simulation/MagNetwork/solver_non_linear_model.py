@@ -178,7 +178,7 @@ def non_linear_model(self, size_x, size_y, x, y, pos, geometry, sol0, BC, la, mu
     list_coord = self.init_point(self.size_x, self.size_y, self.x, self.y)
 
     permeability_cell = self.init_permeabilty_cell(
-        self.size_x, self.size_y, permeability_materials, list_geometry
+        self.size_x, self.size_y, permeability_materials, mu0, list_geometry
     )
 
     list_elem = self.init_cell(self.size_x, self.size_y)

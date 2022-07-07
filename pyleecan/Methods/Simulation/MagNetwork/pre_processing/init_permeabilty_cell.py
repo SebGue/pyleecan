@@ -4,7 +4,7 @@ import numpy as np
 
 
 def init_permeabilty_cell(
-    self, size_x, size_y, permeability_materials, cells_materials
+    self, size_x, size_y, permeability_materials, mu0, cells_materials
 ):
     """
     Initaialyze the permeabilty in each cell.
@@ -27,6 +27,6 @@ def init_permeabilty_cell(
 
     """
     permeability_cell = np.zeros((size_y - 1) * (size_x - 1), dtype=np.float64)
-    permeability_cell[...] = permeability_materials[cells_materials - 1]
+    permeability_cell[...] = permeability_materials[cells_materials - 1] * mu0
 
     return permeability_cell

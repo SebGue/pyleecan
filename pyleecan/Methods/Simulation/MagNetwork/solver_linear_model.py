@@ -113,7 +113,7 @@ def solver_linear_model(
     # print("Permeability", permeability_materials)
 
     permeability_cell = self.init_permeabilty_cell(
-        size_x, size_y, permeability_materials, list_geometry
+        size_x, size_y, permeability_materials, mu0, list_geometry
     )
 
     list_elem = self.init_cell(size_x, size_y)

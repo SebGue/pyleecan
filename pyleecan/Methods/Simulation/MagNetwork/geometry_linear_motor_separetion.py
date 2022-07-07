@@ -230,7 +230,7 @@ Num_Unknowns_rotor = numeroting_unknows(
 )
 
 permeability_cell_rotor = init_permeabilty_cell(
-    size_x, size_y_rotor, permeability_materials, list_geometry_rotor
+    size_x, size_y_rotor, permeability_materials, mu0, list_geometry_rotor
 )
 
 
@@ -266,7 +266,7 @@ Num_Unknowns_stator = numeroting_unknows(
     list_elem_stator, BC_list_stator, Periodic_point_stator, reatach_stator
 )
 permeability_cell_stator = init_permeabilty_cell(
-    size_x, size_y_stator, permeability_materials, list_geometry_stator
+    size_x, size_y_stator, permeability_materials, mu0, list_geometry_stator
 )
 
 

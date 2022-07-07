@@ -61,11 +61,11 @@ def right_member_assembly(
         FMMPM = 0.5 * Br * la * h_y[mask_magnet] / mu_pm
 
     elif mode == "polar":
-        R1 = list_coord[list_elem[:, 1], 0]
-        R2 = list_coord[list_elem[:, 1], -1]
+        R1 = list_coord[list_elem[:, 0], 1]
+        R2 = list_coord[list_elem[:, -1], 1]
         sigma_R = np.abs(R2 - R1)
         sigma_theta = np.abs(
-            list_coord[list_elem[:, 0], 1] - list_coord[list_elem[:, 0], 0]
+            list_coord[list_elem[:, 1], 0] - list_coord[list_elem[:, 0], 0]
         )
 
         FMMPM = 0.5 * Br * la * sigma_R[mask_magnet] / mu_pm
