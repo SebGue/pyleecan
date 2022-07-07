@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from pyleecan.Classes.MagNetwork import MagNetwork
 from pyleecan.Classes.MachineInput import load_machine
 from pyleecan.Functions.load import load

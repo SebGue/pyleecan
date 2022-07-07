@@ -38,5 +38,5 @@ def test_slot_10():
         save_path=join(save_path, "Lamination.msh"),
         mesh_size=5e-3,
         Nlayer=20,
-        display=False,
+        display=True,
     )

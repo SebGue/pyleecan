@@ -1,5 +1,6 @@
 ﻿Variable name,Unit,Description (EN),Size,Type,Default value,Minimum value,Maximum value,,Package,Inherit,Methods,Constant Name,Constant Value,Class description
 ,,,,,,,,,Simulation,Magnetics,assembler,VERSION,1,Abstract class to solve the electric machines using the reluctance network
+,,,,,,,,,,,generalize_geometry,,,
 ,,,,,,,,,,,geometry_linear_motor,,,
 ,,,,,,,,,,,geometry_linear_motor_separetion,,,
 ,,,,,,,,,,,plot.Plot_B,,,

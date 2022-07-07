@@ -31,16 +31,16 @@ def geometry_linear_motor(self, size_x, size_y, pos_pm):
     e = Machine.comp_width_airgap_mec()
 
     # hs = 20e-3  # Stator slot height (m)
-    hs = Machine.stator.slot.comp_height_active()
+    hs = Machine.stator.slot.comp_height()
 
     # hst = 30e-3  # Stator total height (m)
-    hst = Machine.stator.comp_height_yoke() + hs
+    hst = Machine.stator.Rext - Machine.stator.Rint
 
     # hmbi = 10e-3  # Moving armature height (moving back iron height)
     hmbi = Machine.rotor.comp_height_yoke()
 
     # ws = 10e-3  # Slot opening (m)
-    ws = Machine.stator.slot.comp_surface() / hs
+    ws = Machine.stator.slot.comp_width()
 
     ts = 2 * ws  # Slot pitch (m)
 
@@ -78,7 +78,7 @@ def geometry_linear_motor(self, size_x, size_y, pos_pm):
     )
 
     # x and y positions
-    x = tp
+    x = 0.06
     y = Machine.stator.Rext - Machine.rotor.Rint
 
     # print(size_x, size_y)

@@ -23,6 +23,11 @@ except ImportError as error:
     assembler = error
 
 try:
+    from ..Methods.Simulation.MagNetwork.generalize_geometry import generalize_geometry
+except ImportError as error:
+    generalize_geometry = error
+
+try:
     from ..Methods.Simulation.MagNetwork.geometry_linear_motor import (
         geometry_linear_motor,
     )
@@ -201,6 +206,18 @@ class MagNetwork(Magnetics):
         )
     else:
         assembler = assembler
+    # cf Methods.Simulation.MagNetwork.generalize_geometry
+    if isinstance(generalize_geometry, ImportError):
+        generalize_geometry = property(
+            fget=lambda x: raise_(
+                ImportError(
+                    "Can't use MagNetwork method generalize_geometry: "
+                    + str(generalize_geometry)
+                )
+            )
+        )
+    else:
+        generalize_geometry = generalize_geometry
     # cf Methods.Simulation.MagNetwork.geometry_linear_motor
     if isinstance(geometry_linear_motor, ImportError):
         geometry_linear_motor = property(

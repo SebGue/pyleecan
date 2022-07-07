@@ -7048,6 +7048,7 @@
         "is_internal": false,
         "methods": [
             "assembler",
+            "generalize_geometry",
             "geometry_linear_motor",
             "geometry_linear_motor_separetion",
             "plot.Plot_B",
