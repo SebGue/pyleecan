@@ -142,7 +142,7 @@ def run_radial(self, axes_dict, Is_val=None):
 
     # Compute 2D curve of the airgap flux density
     Bx_airgap, By_airgap = self.comp_flux_airgap_local(
-        r, theta, F, list_elem, list_coord, la, Machine.stator.Rext, Machine.rotor.Rext
+        r, theta, F, list_elem, list_coord, la, Machine.comp_Rgap_mec()
     )
     # Add my mesh to pyleecqan
     print("Solve RN done.")
