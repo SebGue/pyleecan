@@ -13,7 +13,7 @@ from Tests import save_validation_path as save_path
 
 
 # file_path = "C:/Users/pc/AppData/Roaming/pyleecan/Machine/Benchmark.json"
-file_path = "C:/Users/pc/Downloads/SPMSM_val.json"
+file_path = "C:/Users/LAP02/Downloads/SPMSM_val.json"
 
 SPMSM_val = load(file_path)
 
