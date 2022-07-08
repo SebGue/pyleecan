@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from pyleecan.Classes.MagNetwork import MagNetwork
 from pyleecan.Classes.MachineInput import load_machine
 from pyleecan.Functions.load import load
@@ -22,6 +21,8 @@ load_machine(file_path)
 # Create the simulation object of the MagNetwork
 simu = Simu1(name="test_magnetwork", machine=SPMSM_val)
 
+# simu.machine.stator.Rext - simu.machine.rotor.Rint
+
 # Define Inputs and discretizations
 # MagNetwork simulation
 simu.input = InputCurrent(
@@ -43,7 +44,7 @@ simu.mag = MagNetwork(
 
 simu.force = ForceMT()
 
-# Create the simulation object of the MagNetwork
+# Create the simulation object of the FEMM
 simu2 = Simu1(name="test_FEMM", machine=SPMSM_val)
 
 # FEMM simulation
@@ -71,10 +72,9 @@ simu2.force = ForceMT()
 out = simu.run()  # MagNetwork
 out2 = simu2.run()  # FEMM
 
-
-# plot the 2D flux density curve
-out.mag.B.plot_2D_Data("angle")
-out2.mag.B.plot_2D_Data("angle")
+# plot the radial and tangential 2D flux density curve
+# out.mag.B.plot_2D_Data("angle")
+# out2.mag.B.plot_2D_Data("angle")
 
 # Compute the harmonics
 """
@@ -88,48 +88,50 @@ out.force.AGSF.plot_2D_Data(
 )
 """
 
-# Plot the results
-out.mag.B.plot_2D_Data(
-    # "time",
-    "angle[0]{°}",
-    # data_list=[out2.mag.B],
-    data_list=[out.mag.B],
-    legend_list=["Periodic", "Full"],
-    is_show_fig=True,
-    **dict_2D
-)
+# # Plot the results of the MagNetwork harmonics
+# out.mag.B.plot_2D_Data(
+#     # "time",
+#     "angle[0]{°}",
+#     # data_list=[out2.mag.B],
+#     data_list=[out.mag.B],
+#     legend_list=["Periodic", "Full"],
+#     is_show_fig=True,
+#     **dict_2D
+# )
 
-out2.mag.B.plot_2D_Data(
-    # "time",
-    "angle[0]{°}",
-    # data_list=[out2.mag.B],
-    data_list=[out2.mag.B],
-    legend_list=["Periodic", "Full"],
-    save_path=join(save_path, simu2.name + "_B_space_FEMM.png"),
-    is_show_fig=False,
-    **dict_2D
-)
+# compute the harmonics of the FEMM
+# out2.mag.B.plot_2D_Data(
+#     # "time",
+#     "angle[0]{°}",
+#     # data_list=[out2.mag.B],
+#     data_list=[out2.mag.B],
+#     legend_list=["Periodic", "Full"],
+#     save_path=join(save_path, simu2.name + "_B_space_FEMM.png"),
+#     is_show_fig=False,
+#     **dict_2D
+# )
 
-# Compute the harmonics using the Maxwell tensor
-out.force.AGSF.plot_2D_Data(
-    "wavenumber=[0,10]",
-    "time[0]",
-    # data_list=[out2.force.AGSF],
-    data_list=[out.force.AGSF],
-    legend_list=["Periodic", "Full"],
-    is_show_fig=True,
-    **dict_2D
-)
+# # Compute the harmonics using the Maxwell tensor of the MagNetwork class
+# out.force.AGSF.plot_2D_Data(
+#     "wavenumber=[0,10]",
+#     "time[0]",
+#     # data_list=[out2.force.AGSF],
+#     data_list=[out.force.AGSF],
+#     legend_list=["Periodic", "Full"],
+#     is_show_fig=True,
+#     **dict_2D
+# )
 
-out2.force.AGSF.plot_2D_Data(
-    "wavenumber=[0,10]",
-    "time[0]",
-    data_list=[out2.force.AGSF],
-    legend_list=["Periodic", "Full"],
-    save_path=join(save_path, simu.name + "_P_space_fft_FEMM.png"),
-    is_show_fig=False,
-    **dict_2D
-)
+# Compute the harmonics of the FEMM
+# out2.force.AGSF.plot_2D_Data(
+#     "wavenumber=[0,10]",
+#     "time[0]",
+#     data_list=[out2.force.AGSF],
+#     legend_list=["Periodic", "Full"],
+#     save_path=join(save_path, simu.name + "_P_space_fft_FEMM.png"),
+#     is_show_fig=False,
+#     **dict_2D
+# )
 
 # out.force.AGSF.plot_2D_Data(
 #     "freqs",
@@ -141,4 +143,27 @@ out2.force.AGSF.plot_2D_Data(
 #     **dict_2D
 # )
 
+# Comparison of the radial 2D flux density curve between MagNetwork and FEMM
+out.mag.B.plot_2D_Data(
+    "angle",
+    component_list=["radial"],
+    data_list=[out2.mag.B],
+    legend_list=["MagNetwork", "FEMM"],
+)
+
+# Comparison of the tangential 2D flux density curve between MagNetwork and FEMM
+out.mag.B.plot_2D_Data(
+    "angle",
+    component_list=["tangential"],
+    data_list=[out2.mag.B],
+    legend_list=["MagNetwork", "FEMM"],
+)
+
+# Comparison of the fft between MagNetwork and FEMM
+out.mag.B.plot_2D_Data(
+    "wavenumber=[0,10]",
+    component_list=["radial"],
+    data_list=[out2.mag.B],
+    legend_list=["MagNetwork", "FEMM"],
+)
 pass
