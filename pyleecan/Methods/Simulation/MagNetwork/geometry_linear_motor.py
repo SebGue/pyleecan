@@ -20,6 +20,8 @@ def geometry_linear_motor(self, size_x, size_y, pos_pm):
         np.pi * Machine.stator.Rint / Machine.rotor.get_pole_pair_number()
     )  # Ref:https://www.slideshare.net/monprado1/11-basic-concepts-of-a-machine-77442134
 
+    # tp = 2 * np.pi / Machine.comp_periodicity_spatial()[0]
+
     # hm = 10e-3  # PM height in y direction (m)
     hm = Machine.rotor.slot.comp_height_active()
 
@@ -42,7 +44,20 @@ def geometry_linear_motor(self, size_x, size_y, pos_pm):
     # ws = 10e-3  # Slot opening (m)
     ws = Machine.stator.slot.comp_width()
 
-    ts = 2 * ws  # Slot pitch (m)
+    # Stator yoke
+    sy = Machine.stator.comp_height_yoke()
+
+    # Stator tooth width (m)
+    wt = (
+        Machine.stator.get_Rbo()
+        * 2
+        * np.sin(
+            2 * np.pi / Machine.stator.get_Zs()
+            - float(np.arcsin(ws / (2 * Machine.stator.get_Rbo())))
+        )
+    )
+
+    ts = ws + wt  # Slot pitch (m)
 
     # la = 1  # Active length (m)
     la = Machine.rotor.L1
@@ -70,51 +85,81 @@ def geometry_linear_motor(self, size_x, size_y, pos_pm):
     # Relative permeabiltity of the PM
     mur_PM = Machine.rotor.magnet.mat_type.mag.mur_lin
 
-    list_materials = ["bob1", "bob2", "bob3", "air", "iron1", "PM", "iron3"]
+    # Generalize the materials list and their linear permeabilities for a specific number of windings
+    list_materials = []
+    permeabilty_materials = np.array([])
 
-    # permeabilty_materials = np.array([1, 1, 1, 1, 7500, 1, 7500])
-    permeabilty_materials = np.array(
-        [mur_bob, mur_bob, mur_bob, mur1, mur2, mur_PM, mur3]
-    )
+    for i in range(
+        (int)(Machine.stator.get_Zs() / (2 * Machine.comp_periodicity_spatial()[0]))
+    ):
+        # list_materials = ["bob1", "bob2", "bob3", "air", "iron1", "PM", "iron3"]
+        list_materials.append("bob[i]")
+        np.append(permeabilty_materials, [mur_bob])
+
+    list_materials += ["air", "iron1", "PM", "iron3"]
+
+    np.append(permeabilty_materials, [mur1, mur2, mur_PM, mur3])
 
     # x and y positions
-    x = 0.06
+    x = tp
     y = Machine.stator.Rext - Machine.rotor.Rint
 
-    # print(size_x, size_y)
-
     # Definition of x-axis and y-axis steps
-    h_x = x / (size_x - 1)
+    # h_x = x / (size_x - 1)
+    h_theta = (2 * np.pi / Machine.comp_periodicity_spatial()[0]) / (size_x - 1)
     h_y = y / (size_y - 1)
 
-    # % Number of elements in the stator armature
-    m0s = round(
-        (ts - ws) / 2 / h_x
-    )  # Number of elements in half a tooth in x direction
-    m1s = round(ws / h_x)
-    # Number of elements in the stator back iron in y direction
-    p0s = round((hst - hs) / h_y)
-    m = 12 * m0s  # Total number of elements of the stator in x direction
-    p = 3 * p0s  # Total number of element of stator in y direction
+    # Number of elements in the stator armature
+    # Number of elements in 1/2 tooth in x-axis direction
+    # m0s = round(wt / 2 / h_x)
+    # m1s = round(wt / h_x)
+    angle_t = self.generalize_geometry[
+        "angle_tooth"
+    ]  # output from the generalize_geometry method to calculate the stator tooth opening
+    theta_m0s = round(angle_t / 2 / h_theta)
+    theta_m1s = round(angle_t / h_theta)
+
+    # Number of elements in the stator back-iron in y-axis direction, generalized
+    p0s = round(sy / h_y)
+
+    # Total number of elements of the stator in x direction
+    m = Machine.stator.get_Zs() * theta_m0s
+
+    # Total number of element of stator in y direction
+    p = (int)(
+        Machine.stator.get_Zs() / (2 * Machine.rotor.comp_periodicity_spatial()[0])
+    ) * p0s
 
     # Number of elements in the moving armature (the air-gap is supposed to be part of the moving armature)
     # Number of elements in half the air-gap between two adjacent PM in x direction
-    m0m = round((tp - tm) / 2 / h_x)
-    m1m = round(tm / 2 / h_x)
+    m0m = round((tp - tm) / 2 / h_theta)
+    m1m = round(tm / 2 / h_theta)
     p0m = round(e / h_y)  # Number of elements in the air-gap in y direction
+
     # Number of elements in the moving armature iron in y direction
     p0 = round(hmbi / h_y)
+
     # Number of elements in the magnetic air-gap (hm + e) in y direction
     p1 = round((hm + e) / h_y)
 
+    # Number of elements in the y-axis direction
     m = size_y - 1
+
+    # Number of elements in the x-axis direction
     n = size_x - 1
+
+    # Total number of elements
     nn = m * n
-    print(nn)
+
+    # Attribute an array of nn size of zeros to cells_materials
     cells_materials = np.zeros(nn, dtype=np.uint16)
 
+    # Attribute an array of nn size of False statements to mask_magnet
     mask_magnet = np.zeros(nn, dtype=np.bool_)
+
+    # Assign true entities tothe elements representing the
     mask_magnet[n * p1 - n : n * (p1 + p0 - p0m) + n] = True
+
     ### Geometry assembly
     for i in range(m):
         if m - p0s <= i:
@@ -125,11 +170,11 @@ def geometry_linear_motor(self, size_x, size_y, pos_pm):
         elif p0 + p1 <= i < n - p0s:
             for j in range(n):
                 num_elem = n * i + j
-                if m0s <= j < m0s + m1s:
+                if theta_m0s <= j < theta_m0s + theta_m1s:
                     cells_materials[num_elem] = 1
-                elif 3 * m0s + m1s <= j < 3 * m0s + 2 * m1s:
+                elif 3 * theta_m0s + theta_m1s <= j < 3 * theta_m0s + 2 * theta_m1s:
                     cells_materials[num_elem] = 2
-                elif 5 * m0s + 2 * m1s <= j < 5 * m0s + 3 * m1s:
+                elif 5 * theta_m0s + 2 * theta_m1s <= j < 5 * theta_m0s + 3 * theta_m1s:
                     cells_materials[num_elem] = 3
                 else:
                     cells_materials[num_elem] = 5
@@ -160,9 +205,4 @@ def geometry_linear_motor(self, size_x, size_y, pos_pm):
         else:
             print("Wrong geometry")
 
-    # geometry = {
-    #     "tp": tp,
-    #     "tm": tm,
-    #     "hst": hst,
-    # }
     return cells_materials, permeabilty_materials
