@@ -30,19 +30,29 @@ def run_radial(self, axes_dict, Is_val=None):
     mu0 = np.pi * 4e-7  # Permeability of vacuum (H/m)
 
     pos = 2
-    x_min = 0
-    # Theta angle represented by x_max
-    # x_max = 2 * np.pi / Machine.comp_periodicity_spatial()[0]
-    x_max = 0.06
 
+    x_min = 0
+
+    # Theta angle represented by x_max
+    x_max = np.pi / Machine.comp_periodicity_spatial()[0]
+
+    # Definition of the y-axis
     y_min = 0
     y_max = Machine.stator.Rext - Machine.rotor.Rint  # in meters
 
+    # Density of the mesh
     density = 1
+
+    # Size of the mesh according to r
     size_r = (int)(density * y_max * 1000 + 1)  # step of discretization of r
+
+    # Size of mesh according to theta
     size_theta = (int)(density * x_max * 1000 + 1)  # step of discretization of theta
 
+    # Definition of the r-axis
     r = np.linspace(Machine.rotor.Rint, Machine.stator.Rext, size_r)
+
+    # Definition of the theta-axis
     # Add one extra point so that dual mesh has the correct dimension
     theta = np.linspace(
         axes_dict["angle"].initial,
@@ -51,10 +61,16 @@ def run_radial(self, axes_dict, Is_val=None):
         endpoint=False,
     )
 
+    # Definition of the r_dual of the dual mesh
     r_dual = (r[1:] + r[:-1]) / 2
+
+    # Definition of the theta_dual of the dual mesh
     theta_dual = (theta[1:] + theta[-1]) / 2
 
+    # Definition of the boundary conditions list
     BC = ["AP", "HD", "AP", "HD"]
+
+    # Definition of the mode, polar in the case of radial geometry
     mode = "polar"
 
     # Compute current densities
@@ -96,12 +112,14 @@ def run_radial(self, axes_dict, Is_val=None):
 
     x = (list_coord[:, 1] * np.cos(list_coord[:, 0])).reshape(size_r, size_theta)
     y = (list_coord[:, 1] * np.sin(list_coord[:, 0])).reshape(size_r, size_theta)
+
     list_cart = np.zeros((list_coord.shape[0], 2))
 
     list_cart[:, 0] = x.flatten()
     list_cart[:, 1] = y.flatten()
 
     self.view_contour_flux(F, x, y, x.shape[1], x.shape[0], list_geometry)
+
     print(self.view_contour_flux(F, x, y, x.shape[1], x.shape[0], list_geometry))
 
     Bx, By = self.compute_B_square(F, list_elem, list_coord, la)
@@ -144,7 +162,7 @@ def run_radial(self, axes_dict, Is_val=None):
     Bx_airgap, By_airgap = self.comp_flux_airgap_local(
         r, theta, F, list_elem, list_coord, la, Machine.comp_Rgap_mec()
     )
-    # Add my mesh to pyleecqan
+    # Add my mesh to pyleecan
     print("Solve RN done.")
     mesh = MeshMat(dimension=3)
     mesh.node = NodeMat()

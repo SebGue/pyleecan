@@ -5,7 +5,7 @@ Created on Fri Jun  3 09:51:29 2022
 @author: LAP02
 """
 
-from tkinter.ttk import _TreeviewColumnDict
+# from tkinter.ttk import _TreeviewColumnDict
 from turtle import st
 import numpy as np
 from pyleecan.Functions.load import load
@@ -23,7 +23,7 @@ def geometry_linear_motor(self, size_x, size_y, pos_pm):
         np.pi * Machine.stator.Rint / Machine.rotor.get_pole_pair_number()
     )  # Ref:https://www.slideshare.net/monprado1/11-basic-concepts-of-a-machine-77442134
 
-    angle_tp = np.pi / Machine.rotor.get_pole_pair_number()
+    angle_tp = np.pi / Machine.comp_periodicity_spatial()[0]
 
     # tp = 2 * np.pi / Machine.comp_periodicity_spatial()[0]
 
@@ -31,7 +31,8 @@ def geometry_linear_motor(self, size_x, size_y, pos_pm):
     hm = Machine.rotor.slot.comp_height_active()
 
     # Compute the angular opening of the rotor magnet
-    angle_magnet = Machine.rotor.slot.comp_angle_opening()
+    # angle_magnet = Machine.rotor.slot.comp_angle_opening()
+    angle_magnet = Machine.rotor.slot.comp_angle_active_eq()
 
     # e = 1e-3  # Air-gap thickness (m)
     e = Machine.comp_width_airgap_mec()
@@ -97,10 +98,10 @@ def geometry_linear_motor(self, size_x, size_y, pos_pm):
     permeabilty_materials = np.array([])
 
     for i in range(
-        (int)(Machine.stator.get_Zs() / (2 * Machine.comp_periodicity_spatial()[0]))
+        round(Machine.stator.get_Zs() / (2 * Machine.comp_periodicity_spatial()[0]))
     ):
         # list_materials = ["bob1", "bob2", "bob3", "air", "iron1", "PM", "iron3"]
-        list_materials.append("bob[i]")
+        list_materials.append("bob" + str(i + 1))
         permeabilty_materials = np.append(permeabilty_materials, [mur_bob])
 
     list_materials += ["air", "iron1", "PM", "iron3"]
@@ -118,20 +119,17 @@ def geometry_linear_motor(self, size_x, size_y, pos_pm):
     # Number of elements in the stator armature
     # Number of elements in 1/2 tooth in x-axis direction
     angle_tooth = (
-        2 * np.pi - Machine.stator.slot.comp_angle_opening() * Machine.stator.get_Zs()
+        2 * np.pi - Machine.stator.slot.comp_angle_active_eq() * Machine.stator.get_Zs()
     ) / Machine.stator.get_Zs()  # stator tooth opening
 
     # Compute the angular opening of the stator slot
-    angle_slot = Machine.stator.slot.comp_angle_opening()
+    angle_slot = round(Machine.stator.slot.comp_angle_active_eq() / h_theta)
     angle_slot = nb_layers * round(
         angle_slot / nb_layers
     )  # angle slot is multiple of number of layers
 
     # Number of elements in half a tooth
     Half_tooth_width = round(angle_tooth / 2 / h_theta)
-
-    # Number of elements in a slot
-    Half_tooth_width1 = round(angle_slot / h_theta)
 
     # Number of elements in a total tooth
     tooth_width = round(angle_tooth / h_theta)
@@ -146,11 +144,11 @@ def geometry_linear_motor(self, size_x, size_y, pos_pm):
     # )
 
     # Total number of element of stator in y direction
-    stator_height = round((Machine.stator.R_ext - Machine.stator.R_int) / h_y)
+    stator_height = round((Machine.stator.Rext - Machine.stator.Rint) / h_y)
 
     # Number of elements in half the air-gap between two adjacent PMs in the theta direction
     half_airgap_PM_width = round(
-        (angle_tp - angle_magnet * 2 * Machine.rotor.get_pole_pair_number())
+        (2 * np.pi - angle_magnet * 2 * Machine.rotor.get_pole_pair_number())
         / (4 * Machine.rotor.get_pole_pair_number())
         / h_theta
     )
@@ -182,6 +180,15 @@ def geometry_linear_motor(self, size_x, size_y, pos_pm):
     # Attribute an array of nn size of zeros to cells_materials
     cells_materials = np.zeros(nn, dtype=np.uint16)
 
+    # Mask magnets
+    mask_magnet = np.zeros(nn, dtype=np.bool_)
+    mask_magnet[
+        total_width * airgap_and_Pm_height
+        - total_width : total_width
+        * (airgap_and_Pm_height + rotor_height - airgap_height)
+        + total_width
+    ] = True
+
     # Assignment of geometry elements
     for i in range(total_height):
 
@@ -202,8 +209,10 @@ def geometry_linear_motor(self, size_x, size_y, pos_pm):
                     )  # air material
                 elif j <= (total_width - half_airgap_PM_width):
                     for PM_idx in range(
-                        Machine.rotor.get_pole_pair_number()
-                        / Machine.comp_periodicity_spatial()[0]
+                        round(
+                            Machine.rotor.get_pole_pair_number()
+                            / Machine.comp_periodicity_spatial()[0]
+                        )
                     ):
                         # Assignment of PM elements
                         if j <= (PM_width + PM_idx * (PM_width + airgap_PM_width)):
@@ -233,9 +242,10 @@ def geometry_linear_motor(self, size_x, size_y, pos_pm):
                     cells_materials[num_elem] = len(permeabilty_materials) - 2  # stator
                 elif j <= (total_width - Half_tooth_width):
                     for slot_idx in range(
-                        Machine.stator.get_Zs()
-                        / 2
-                        * Machine.comp_periodicity_spatial()[0]
+                        round(
+                            Machine.stator.get_Zs()
+                            / (2 * Machine.comp_periodicity_spatial()[0])
+                        )
                     ):
                         # Assignement of the winding elements
                         if j <= (angle_slot + slot_idx * (angle_slot + tooth_width)):
@@ -245,8 +255,9 @@ def geometry_linear_motor(self, size_x, size_y, pos_pm):
                                     (layer + 1) * (angle_slot / nb_layers)
                                     + slot_idx * (angle_slot + tooth_width)
                                 ):
+
                                     cells_materials[num_elem] = (
-                                        layer + slot_idx * nb_layers
+                                        1 + layer + slot_idx * nb_layers
                                     )  # winding layers
                                     break
                         # Assignment of tooth elements
@@ -262,5 +273,7 @@ def geometry_linear_motor(self, size_x, size_y, pos_pm):
             for j in range(total_width):
                 num_elem = total_width * i + j
                 cells_materials[num_elem] = len(permeabilty_materials) - 2  # stator
+    else:
+        print("Wrong geometry")
 
     return cells_materials, permeabilty_materials

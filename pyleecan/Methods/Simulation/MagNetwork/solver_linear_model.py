@@ -110,32 +110,48 @@ def solver_linear_model(
 
     # initialize the list_coord which contains the grid of points
     list_coord = self.init_point(size_x, size_y, x, y)
-    # print("Permeability", permeability_materials)
 
+    # Initialize the permebility cells
     permeability_cell = self.init_permeabilty_cell(
         size_x, size_y, permeability_materials, mu0, list_geometry
     )
 
+    # Initialize the list of the elements in regular grid
     list_elem = self.init_cell(size_x, size_y)
 
+    # Initialize the boundary conditions list
     BC_list, Periodic_point = self.init_mesh_BC(size_x, size_y, BC)
 
+    # Numeroting the system unknowns
     Num_Unknowns = self.numeroting_unknows(list_elem, BC_list, Periodic_point)
 
     # Mesuring the performance time
     t1 = time.perf_counter()
 
     # print("Assembly geometry:", np.round(t1 - t0, 5), "seconds")
+    # Saving the mesh of the geometry
     self.save_mesh(list_geometry, Num_Unknowns, list_elem, x, y, BC_list)
 
     t2 = time.perf_counter()
-    # Saving mesh time
+    # Computing the time of saving the mesh
     print("Save mesh:", np.round(t2 - t1, 5), "secondes")
 
-    # Assembly all matrice
+    print(
+        "list_elem",
+        list_elem,
+        "list_coord",
+        list_coord,
+        "mu0",
+        mu0,
+        "la",
+        la,
+        "mode",
+        mode,
+    )
+    # Initializing the reluctance list
     reluc_list = self.init_reluc(list_elem, list_coord, mu0, la, mode)
-    # print(reluc_list)
 
+    # Assembly of all matrices
     M_csr = self.assembly(
         reluc_list, Num_Unknowns, list_elem, permeability_cell, BC_list
     )
@@ -143,7 +159,7 @@ def solver_linear_model(
     t3 = time.perf_counter()
     print("Assembly matrix", np.round(t3 - t2, 5), "secondes")
 
-    # Assembly RHS containing the sources
+    # Assembly of RHS containing the sources
     E = self.right_member_assembly(
         list_geometry,
         Num_Unknowns,
@@ -165,11 +181,11 @@ def solver_linear_model(
     print("Assembly vector:", np.round(t4 - t3, 5), "secondes")
     print("Total :", np.round(t4 - t2, 5))
 
-    # Compute Solution
+    # Compute the solution
     t3 = time.perf_counter()
     if Have_cholmod:
 
-        # Compute the solution
+        # Compute the solution using cholesky
         factor = cholesky(M_csr.tocsc())
         F = factor(E)
         t4 = time.perf_counter()
@@ -189,6 +205,7 @@ def solver_linear_model(
             np.linalg.norm(M_csr @ F - E, ord=2),
         )
 
+    # Adding the boundary conditions to the flux F
     F = self.add_BC_to_F(F, Num_Unknowns, list_elem, BC_list)
 
     return F, list_geometry, Num_Unknowns, list_elem, permeability_cell, list_coord

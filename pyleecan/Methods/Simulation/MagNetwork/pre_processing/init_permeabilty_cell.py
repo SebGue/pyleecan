@@ -27,6 +27,8 @@ def init_permeabilty_cell(
 
     """
     permeability_cell = np.zeros((size_y - 1) * (size_x - 1), dtype=np.float64)
-    permeability_cell[...] = permeability_materials[cells_materials - 1] * mu0
+    # permeability_cell[...] = permeability_materials[cells_materials - 1] * mu0
+    for i in range(len(permeability_cell)):
+        permeability_cell[i] = permeability_materials[cells_materials[i] - 1] * mu0
 
     return permeability_cell
