@@ -19,22 +19,23 @@ def geometry_linear_motor(self, size_x, size_y, pos_pm):
     # Get machine object
     Machine = self.parent.machine
 
+    if Machine.comp_periodicity_spatial()[1] == True:
+        periodicity = Machine.comp_periodicity_spatial()[0]
+    else:
+        periodicity = Machine.comp_periodicity_spatial()[0] / 2
+
     # Definition of the machine geometrical input parameters
     tp = (
         np.pi * Machine.stator.Rint / Machine.rotor.get_pole_pair_number()
     )  # Ref:https://www.slideshare.net/monprado1/11-basic-concepts-of-a-machine-77442134
 
-    angle_tp = np.pi / Machine.comp_periodicity_spatial()[0]
+    angle_tp = np.pi / periodicity
 
     # Number of PMs per period
-    nb_PM_per_period = round(
-        Machine.rotor.get_pole_pair_number() / Machine.comp_periodicity_spatial()[0]
-    )
+    nb_PM_per_period = round(Machine.rotor.get_pole_pair_number() / periodicity)
 
     # Number of stator teeth per period
-    nb_stator_teeth_per_period = round(
-        Machine.stator.get_Zs() / (2 * Machine.comp_periodicity_spatial()[0])
-    )
+    nb_stator_teeth_per_period = round(Machine.stator.get_Zs() / (2 * periodicity))
 
     # Height of the magnet
     hm = Machine.rotor.slot.comp_height_active()
@@ -128,7 +129,7 @@ def geometry_linear_motor(self, size_x, size_y, pos_pm):
     total_width = size_x - 1
 
     # Definition of x-axis and y-axis steps
-    h_theta = (np.pi / Machine.comp_periodicity_spatial()[0]) / (size_x - 1)
+    h_theta = (np.pi / periodicity) / (size_x - 1)
     h_y = y / (size_y - 1)
 
     # Number of elements in the stator armature
