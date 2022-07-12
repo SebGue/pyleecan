@@ -10,9 +10,14 @@ from pyleecan.Classes.MagFEMM import MagFEMM
 from os.path import join
 from Tests import save_validation_path as save_path
 
-
-# file_path = "C:/Users/pc/AppData/Roaming/pyleecan/Machine/Benchmark.json"
-file_path = "C:/Users/pc/Downloads/SPMSM_val.json"
+# file_path = "C:/Users/pc/Downloads/SPMSM_val.json"  # case study 1
+# file_path = (
+#     "C:/Users/pc/AppData/Roaming/pyleecan/Machine/Benchmark.json"  # case study 2
+# )
+# file_path = "C:/Users/pc/AppData/Roaming/pyleecan/Machine/SPMSM_18s16p_loss.json"  # case study 3
+file_path = (
+    "C:/Users/pc/AppData/Roaming/pyleecan/Machine/SPMSM_skew.json"  # case study 4
+)
 
 SPMSM_val = load(file_path)
 
@@ -27,7 +32,7 @@ simu = Simu1(name="test_magnetwork", machine=SPMSM_val)
 # MagNetwork simulation
 simu.input = InputCurrent(
     OP=OPdq(N0=1000, Id_ref=0, Iq_ref=0),
-    Na_tot=60 * 4,
+    Na_tot=1570 * 4,
     Nt_tot=1,
 )
 
@@ -50,7 +55,7 @@ simu2 = Simu1(name="test_FEMM", machine=SPMSM_val)
 # FEMM simulation
 simu2.input = InputCurrent(
     OP=OPdq(N0=1000, Id_ref=0, Iq_ref=0),
-    Na_tot=60 * 4,
+    Na_tot=1570 * 4,
     Nt_tot=1,
     is_periodicity_t=False,
     is_periodicity_a=True,

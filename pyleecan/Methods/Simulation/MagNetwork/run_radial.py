@@ -61,6 +61,9 @@ def run_radial(self, axes_dict, Is_val=None):
         endpoint=False,
     )
 
+    # angle = np.pi / Machine.comp_periodicity_spatial()[0]
+    # theta = np.linspace(0, angle, size_theta)
+
     # Definition of the r_dual of the dual mesh
     r_dual = (r[1:] + r[:-1]) / 2
 
@@ -120,7 +123,7 @@ def run_radial(self, axes_dict, Is_val=None):
 
     self.view_contour_flux(F, x, y, x.shape[1], x.shape[0], list_geometry)
 
-    print(self.view_contour_flux(F, x, y, x.shape[1], x.shape[0], list_geometry))
+    # print(self.view_contour_flux(F, x, y, x.shape[1], x.shape[0], list_geometry))
 
     Bx, By = self.compute_B_square(F, list_elem, list_coord, la)
 

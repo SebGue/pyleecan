@@ -107,17 +107,20 @@ def solver_linear_model(
     list_geometry, permeability_materials = self.geometry_linear_motor(
         size_x, size_y, pos
     )
+    # print("lengths", size_x, size_y, len(x), len(y))
 
     # initialize the list_coord which contains the grid of points
     list_coord = self.init_point(size_x, size_y, x, y)
+    # print("lengths", size_x, size_y, len(x), len(y))
 
     # Initialize the permebility cells
     permeability_cell = self.init_permeabilty_cell(
         size_x, size_y, permeability_materials, mu0, list_geometry
     )
+    # print("lengths", size_x, size_y, len(x), len(y))
 
     # Initialize the list of the elements in regular grid
-    list_elem = self.init_cell(size_x, size_y)
+    list_elem = self.init_cell(size_x, size_y)  # problem here in init_cell
 
     # Initialize the boundary conditions list
     BC_list, Periodic_point = self.init_mesh_BC(size_x, size_y, BC)
@@ -136,18 +139,6 @@ def solver_linear_model(
     # Computing the time of saving the mesh
     print("Save mesh:", np.round(t2 - t1, 5), "secondes")
 
-    print(
-        "list_elem",
-        list_elem,
-        "list_coord",
-        list_coord,
-        "mu0",
-        mu0,
-        "la",
-        la,
-        "mode",
-        mode,
-    )
     # Initializing the reluctance list
     reluc_list = self.init_reluc(list_elem, list_coord, mu0, la, mode)
 
@@ -179,10 +170,11 @@ def solver_linear_model(
     t4 = time.perf_counter()
 
     print("Assembly vector:", np.round(t4 - t3, 5), "secondes")
-    print("Total :", np.round(t4 - t2, 5))
+    print("Total :", np.round(t4 - t2, 5))  # Blocked here!!!!
 
     # Compute the solution
     t3 = time.perf_counter()
+    print("start solving")
     if Have_cholmod:
 
         # Compute the solution using cholesky
