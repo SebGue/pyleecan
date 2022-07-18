@@ -10,11 +10,11 @@ from pyleecan.Classes.MagFEMM import MagFEMM
 from os.path import join
 from Tests import save_validation_path as save_path
 
-# file_path = "C:/Users/pc/Downloads/SPMSM_val.json"  # case study 1
+file_path = "C:/Users/pc/Downloads/SPMSM_val.json"  # case study 1
 # file_path = (
 #     "C:/Users/pc/AppData/Roaming/pyleecan/Machine/Benchmark.json"  # case study 2
 # )
-file_path = "C:/Users/pc/AppData/Roaming/pyleecan/Machine/SPMSM_18s16p_loss.json"  # case study 3
+# file_path = "C:/Users/pc/AppData/Roaming/pyleecan/Machine/SPMSM_18s16p_loss.json"  # case study 3
 # file_path = (
 #     "C:/Users/pc/AppData/Roaming/pyleecan/Machine/SPMSM_skew.json"  # case study 4
 # )

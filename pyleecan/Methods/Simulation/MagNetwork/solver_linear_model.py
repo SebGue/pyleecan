@@ -110,8 +110,11 @@ def solver_linear_model(
     # print("lengths", size_x, size_y, len(x), len(y))
 
     # initialize the list_coord which contains the grid of points
-    list_coord = self.init_point(size_x, size_y, x, y)
+    # okay for cartesian disretisation
+    # list_coord = self.init_point(size_x, size_y, x, y)
     # print("lengths", size_x, size_y, len(x), len(y))
+
+    # for the radial discretisation:
 
     # Initialize the permebility cells
     permeability_cell = self.init_permeabilty_cell(

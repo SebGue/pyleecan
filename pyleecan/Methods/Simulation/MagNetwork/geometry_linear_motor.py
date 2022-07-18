@@ -37,6 +37,9 @@ def geometry_linear_motor(self, size_x, size_y, pos_pm):
     # Number of stator teeth per period
     nb_stator_teeth_per_period = round(Machine.stator.get_Zs() / (2 * periodicity))
 
+    # Outer radius of the rotor + PM
+    height_rotor_PM = Machine.rotor.comp_radius_mec()
+
     # Height of the magnet
     hm = Machine.rotor.slot.comp_height_active()
 
@@ -177,7 +180,7 @@ def geometry_linear_motor(self, size_x, size_y, pos_pm):
     airgap_height = round(e / h_y)
 
     # Number of elements in the moving armature iron in y direction
-    rotor_height = round(hmbi / h_y)
+    rotor_height = round((height_rotor_PM - hm - Machine.rotor.Rint) / h_y)
 
     # Number of elements in the magnetic air-gap (hm + e) in y direction
     airgap_and_Pm_height = round((hm + e) / h_y)

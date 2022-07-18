@@ -83,6 +83,7 @@ def init_mesh_BC(self, size_x, size_y, BC):
         # Vertical BC
         BC_list[::size_x] = 2
         BC_list[size_x - 1 :: size_x] = 3
+
         # Horizontal BC
         BC_list[:size_x] = 1
 
