@@ -27,7 +27,7 @@ simu = Simu1(name="test_magnetwork", machine=SPMSM_val)
 # MagNetwork simulation
 simu.input = InputCurrent(
     OP=OPdq(N0=1000, Id_ref=0, Iq_ref=0),
-    Na_tot=60 * 4,
+    Na_tot=180* 4,
     Nt_tot=1,
 )
 
@@ -50,10 +50,11 @@ simu2 = Simu1(name="test_FEMM", machine=SPMSM_val)
 # FEMM simulation
 simu2.input = InputCurrent(
     OP=OPdq(N0=1000, Id_ref=0, Iq_ref=0),
-    Na_tot=60 * 4,
+    Na_tot=61 * 4,
     Nt_tot=1,
     is_periodicity_t=False,
     is_periodicity_a=True,
+    angle_rotor_initial=1.0E-12,
 )
 # Definition of the magnetic simulation: with periodicity for theFEMM
 simu2.mag = MagFEMM(
@@ -145,7 +146,7 @@ out.force.AGSF.plot_2D_Data(
 
 # Comparison of the radial 2D flux density curve between MagNetwork and FEMM
 out.mag.B.plot_2D_Data(
-    "angle",
+    "angle[smallestperiod]{°}",
     component_list=["radial"],
     data_list=[out2.mag.B],
     legend_list=["MagNetwork", "FEMM"],
@@ -153,7 +154,7 @@ out.mag.B.plot_2D_Data(
 
 # Comparison of the tangential 2D flux density curve between MagNetwork and FEMM
 out.mag.B.plot_2D_Data(
-    "angle",
+    "angle[smallestperiod]{°}",
     component_list=["tangential"],
     data_list=[out2.mag.B],
     legend_list=["MagNetwork", "FEMM"],

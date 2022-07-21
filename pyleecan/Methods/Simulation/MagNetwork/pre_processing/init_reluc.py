@@ -44,12 +44,12 @@ def init_reluc(self, list_elem, list_coord, mu0, la, mode):
         R0 = list_coord[list_elem[:, 0], 1]
         R1 = list_coord[list_elem[:, 3], 1]
 
-        R_MEAN = (R0 + R1) / 2
 
-        R_reluc[:, 0] = (np.log(R1 / R_MEAN)) / (mu0 * theta * la)
-        R_reluc[:, 1] = 0.5 * theta / (mu0 * la * np.log(R1 / R0))
-        R_reluc[:, 2] = (np.log(R_MEAN / R0)) / (mu0 * theta * la)
-        R_reluc[:, 3] = 0.5 * theta / (mu0 * la * np.log(R1 / R0))
+        ln=np.log(R1 / R0)
+        R_reluc[:, 0] = 0.5* ln / (mu0 * theta * la)
+        R_reluc[:, 1] = 0.5 * theta / (mu0 * la * ln)
+        R_reluc[:, 2] = R_reluc[:, 0]
+        R_reluc[:, 3] = R_reluc[:, 1]
     else:
         raise NameError("Wrong mode, choice between 'cartesian' and 'polar'")
 

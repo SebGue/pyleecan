@@ -8,6 +8,7 @@ Created on Fri Jun  3 10:46:17 2022
 # import geometry_linear_motor
 # from post_processing import compute_B_square
 # from plot import view_contour_flux
+from re import S
 import numpy as np
 import meshio
 import matplotlib.pyplot as plt
@@ -29,7 +30,7 @@ def run_radial(self, axes_dict, Is_val=None):
     Br = Machine.rotor.magnet.mat_type.mag.Brm20
     mu0 = np.pi * 4e-7  # Permeability of vacuum (H/m)
 
-    pos = 2
+    pos = 8
     x_min = 0
     # Theta angle represented by x_max
     # x_max = 2 * np.pi / Machine.comp_periodicity_spatial()[0]
@@ -38,11 +39,19 @@ def run_radial(self, axes_dict, Is_val=None):
     y_min = 0
     y_max = Machine.stator.Rext - Machine.rotor.Rint  # in meters
 
+    # Density of the mesh
     density = 1
-    size_r = (int)(density * y_max * 1000 + 1)  # step of discretization of r
-    size_theta = (int)(density * x_max * 1000 + 1)  # step of discretization of theta
 
+    # Size of the mesh according to r
+    size_r = 154 # step of discretization of r
+
+    # Size of mesh according to theta
+    size_theta = 181  # step of discretization of theta
+
+    # Definition of the r-axis
     r = np.linspace(Machine.rotor.Rint, Machine.stator.Rext, size_r)
+
+    # Definition of the theta-axis
     # Add one extra point so that dual mesh has the correct dimension
     theta = np.linspace(
         axes_dict["angle"].initial,
@@ -52,7 +61,7 @@ def run_radial(self, axes_dict, Is_val=None):
     )
 
     r_dual = (r[1:] + r[:-1]) / 2
-    theta_dual = (theta[1:] + theta[-1]) / 2
+    theta_dual = (theta[1:] + theta[:-1]) / 2
 
     BC = ["AP", "HD", "AP", "HD"]
     mode = "polar"
@@ -102,7 +111,7 @@ def run_radial(self, axes_dict, Is_val=None):
     list_cart[:, 1] = y.flatten()
 
     self.view_contour_flux(F, x, y, x.shape[1], x.shape[0], list_geometry)
-    print(self.view_contour_flux(F, x, y, x.shape[1], x.shape[0], list_geometry))
+    
 
     Bx, By = self.compute_B_square(F, list_elem, list_coord, la)
 
@@ -144,41 +153,41 @@ def run_radial(self, axes_dict, Is_val=None):
     Bx_airgap, By_airgap = self.comp_flux_airgap_local(
         r, theta, F, list_elem, list_coord, la, Machine.comp_Rgap_mec()
     )
-    # Add my mesh to pyleecqan
-    print("Solve RN done.")
-    mesh = MeshMat(dimension=3)
-    mesh.node = NodeMat()
-    print("Add points in mesh")
-    for i in range(list_cart.shape[0]):
-        mesh.node.add_node([list_cart[i, 0], list_cart[i, 1], 0])
-    print("Done \nAdd elements in mesh")
+    # # Add my mesh to pyleecqan
+    # print("Solve RN done.")
+    # mesh = MeshMat(dimension=3)
+    # mesh.node = NodeMat()
+    # print("Add points in mesh")
+    # for i in range(list_cart.shape[0]):
+    #     mesh.node.add_node([list_cart[i, 0], list_cart[i, 1], 0])
+    # print("Done \nAdd elements in mesh")
 
-    mesh.cell["quad"] = CellMat(nb_node_per_cell=4)
-    for i in range(list_elem.shape[0]):
-        mesh.add_cell(list_elem[i, :], "quad")
-
-    MSol = MeshSolution(mesh=[mesh])
-
-    # print("Done \nAdd material for ech elementss")
+    # mesh.cell["quad"] = CellMat(nb_node_per_cell=4)
     # for i in range(list_elem.shape[0]):
-    #     MSol.group = {list_materials[list_geometry[i] - 1]: list_elem[i, :]}
+    #     mesh.add_cell(list_elem[i, :], "quad")
 
-    print("Done")
-    # plot the mesh
-    MSol.plot_mesh()
+    # MSol = MeshSolution(mesh=[mesh])
 
-    # plot the flux
-    field = F[np.newaxis]
-    print(field.shape)
-    my_solution = SolutionMat(
-        label="Flux (Weber)",
-        type_cell="point",
-        field=field,
-        indice=np.arange(list_coord.shape[0]),
-        axis_name=["time", "indice"],
-        axis_size=[1, list_coord.shape[0]],
-    )
-    MSol.solution.append(my_solution)
-    MSol.plot_contour()
+    # # print("Done \nAdd material for ech elementss")
+    # # for i in range(list_elem.shape[0]):
+    # #     MSol.group = {list_materials[list_geometry[i] - 1]: list_elem[i, :]}
+
+    # print("Done")
+    # # plot the mesh
+    # MSol.plot_mesh()
+
+    # # plot the flux
+    # field = F[np.newaxis]
+    # print(field.shape)
+    # my_solution = SolutionMat(
+    #     label="Flux (Weber)",
+    #     type_cell="point",
+    #     field=field,
+    #     indice=np.arange(list_coord.shape[0]),
+    #     axis_name=["time", "indice"],
+    #     axis_size=[1, list_coord.shape[0]],
+    # )
+    # MSol.solution.append(my_solution)
+    # MSol.plot_contour()
 
     return Bx, By, Bx_airgap, By_airgap
