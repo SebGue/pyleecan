@@ -8,11 +8,11 @@ def assembly_one_area(
     self,
     area_selected,
     reluc_list,
-    list_geometry,
+    list_elements_materials,
     Num_Unknowns,
     list_elem,
-    permeability_cell,
-    BC_list,
+    permeability_element,
+    boundary_condition_list,
 ):
     """
     Matrix massembler for one area (materials) selected.
@@ -29,9 +29,9 @@ def assembly_one_area(
         list of unknowns in the linear system .
     list_elem : nd-array, size: m (integers)
         tab of elements
-    permeability_cell : nd-array, size: m (float)
+    permeability_element : nd-array, size: m (float)
         the permeability values of each cell
-    BC_list : nd-array, size: n (integers)
+    boundary_condition_list : nd-array, size: n (integers)
         data-strurture for BC evaluation.
 
     Returns
@@ -41,122 +41,136 @@ def assembly_one_area(
 
     """
     # Assembly one area of the matrix
-    nn = self.Num_Unknowns.max() + 1
+    N_total_element = self.Num_Unknowns.max() + 1
 
-    mask_area = area_selected == list_geometry
-    permeability_cell = permeability_cell[mask_area]
+    mask_area = area_selected == list_elements_materials
+    permeability_element = permeability_element[mask_area]
     reluc_list = reluc_list[mask_area]
 
-    R_N = reluc_list[:, 0] / permeability_cell
-    R_E = reluc_list[:, 1] / permeability_cell
-    R_S = reluc_list[:, 2] / permeability_cell
-    R_W = reluc_list[:, 3] / permeability_cell
+    reluc_upper = reluc_list[:, 0] / permeability_element
+    reluc_right = reluc_list[:, 1] / permeability_element
+    reluc_down = reluc_list[:, 2] / permeability_element
+    reluc_left = reluc_list[:, 3] / permeability_element
 
     # Select element with no boundary condition  and belonging "ara selected"
-    i1 = Num_Unknowns[list_elem[mask_area, 0]]
-    mask_i1 = i1 != -1
+    index_unknown_1 = Num_Unknowns[list_elem[mask_area, 0]]
+    mask_index_unknown_1 = index_unknown_1 != -1
 
-    i2 = Num_Unknowns[list_elem[mask_area, 1]]
-    mask_i2 = i2 != -1
+    index_unknown_2 = Num_Unknowns[list_elem[mask_area, 1]]
+    mask_index_unknown_2 = index_unknown_2 != -1
 
-    i3 = Num_Unknowns[list_elem[mask_area, 2]]
-    mask_i3 = i3 != -1
+    index_unknown_3 = Num_Unknowns[list_elem[mask_area, 2]]
+    mask_index_unknown_3 = index_unknown_3 != -1
 
-    i4 = Num_Unknowns[list_elem[mask_area, 3]]
-    mask_i4 = i4 != -1
+    index_unknown_4 = Num_Unknowns[list_elem[mask_area, 3]]
+    mask_index_unknown_4 = index_unknown_4 != -1
 
-    if np.all(BC_list[list_elem[mask_area, :]] != 3):
+    if np.all(boundary_condition_list[list_elem[mask_area, :]] != 3):
 
-        mask = mask_i1 * mask_i2
-        I = i1[mask]
-        J = i2[mask]
-        data = -R_S[mask]
-        graph = coo_matrix((data, (I, J)), shape=(nn, nn))
+        mask = mask_index_unknown_1 * mask_index_unknown_2
+        I = index_unknown_1[mask]
+        J = index_unknown_2[mask]
+        data = -reluc_down[mask]
+        graph = coo_matrix((data, (I, J)), shape=(N_total_element, N_total_element))
 
-        mask = mask_i2 * mask_i3
-        I = i2[mask]
-        J = i3[mask]
-        data = -R_E[mask]
-        graph += coo_matrix((data, (I, J)), shape=(nn, nn))
+        mask = mask_index_unknown_2 * mask_index_unknown_3
+        I = index_unknown_2[mask]
+        J = index_unknown_3[mask]
+        data = -reluc_right[mask]
+        graph += coo_matrix((data, (I, J)), shape=(N_total_element, N_total_element))
 
-        mask = mask_i3 * mask_i4
-        I = i3[mask]
-        J = i4[mask]
-        data = -R_N[mask]
-        graph += coo_matrix((data, (I, J)), shape=(nn, nn))
+        mask = mask_index_unknown_3 * mask_index_unknown_4
+        I = index_unknown_3[mask]
+        J = index_unknown_4[mask]
+        data = -reluc_upper[mask]
+        graph += coo_matrix((data, (I, J)), shape=(N_total_element, N_total_element))
 
-        mask = mask_i4 * mask_i1
-        I = i4[mask]
-        J = i1[mask]
-        data = -R_W[mask]
-        graph += coo_matrix((data, (I, J)), shape=(nn, nn))
+        mask = mask_index_unknown_4 * mask_index_unknown_1
+        I = index_unknown_4[mask]
+        J = index_unknown_1[mask]
+        data = -reluc_left[mask]
+        graph += coo_matrix((data, (I, J)), shape=(N_total_element, N_total_element))
     else:
 
-        mask_BC1 = BC_list[list_elem[mask_area, 0]] == 3
-        mask_BC2 = BC_list[list_elem[mask_area, 1]] == 3
-        mask_BC3 = BC_list[list_elem[mask_area, 2]] == 3
-        mask_BC4 = BC_list[list_elem[mask_area, 3]] == 3
+        mask_BC1 = boundary_condition_list[list_elem[mask_area, 0]] == 3
+        mask_BC2 = boundary_condition_list[list_elem[mask_area, 1]] == 3
+        mask_BC3 = boundary_condition_list[list_elem[mask_area, 2]] == 3
+        mask_BC4 = boundary_condition_list[list_elem[mask_area, 3]] == 3
 
         plus_minus = np.array([-1, 1])
 
-        mask = mask_i1 * mask_i2
-        I = i1[mask]
-        J = i2[mask]
+        mask = mask_index_unknown_1 * mask_index_unknown_2
+        I = index_unknown_1[mask]
+        J = index_unknown_2[mask]
         data = (
-            R_S[mask]
+            reluc_down[mask]
             * plus_minus[(np.logical_xor(mask_BC1, mask_BC2)).astype(np.int32)][mask]
         )
-        graph = coo_matrix((data, (I, J)), shape=(nn, nn))
+        graph = coo_matrix((data, (I, J)), shape=(N_total_element, N_total_element))
 
-        mask = mask_i2 * mask_i3
-        I = i2[mask]
-        J = i3[mask]
+        mask = mask_index_unknown_2 * mask_index_unknown_3
+        I = index_unknown_2[mask]
+        J = index_unknown_3[mask]
         data = (
-            R_E[mask]
+            reluc_right[mask]
             * plus_minus[(np.logical_xor(mask_BC2, mask_BC3)).astype(np.int32)][mask]
         )
-        graph += coo_matrix((data, (I, J)), shape=(nn, nn))
+        graph += coo_matrix((data, (I, J)), shape=(N_total_element, N_total_element))
 
-        mask = mask_i3 * mask_i4
-        I = i3[mask]
-        J = i4[mask]
+        mask = mask_index_unknown_3 * mask_index_unknown_4
+        I = index_unknown_3[mask]
+        J = index_unknown_4[mask]
         data = (
-            R_N[mask]
+            reluc_upper[mask]
             * plus_minus[(np.logical_xor(mask_BC3, mask_BC4)).astype(np.int32)][mask]
         )
-        graph += coo_matrix((data, (I, J)), shape=(nn, nn))
+        graph += coo_matrix((data, (I, J)), shape=(N_total_element, N_total_element))
 
-        mask = mask_i4 * mask_i1
-        I = i4[mask]
-        J = i1[mask]
+        mask = mask_index_unknown_4 * mask_index_unknown_1
+        I = index_unknown_4[mask]
+        J = index_unknown_1[mask]
         data = (
-            R_W[mask]
+            reluc_left[mask]
             * plus_minus[(np.logical_xor(mask_BC4, mask_BC1)).astype(np.int32)][mask]
         )
-        graph += coo_matrix((data, (I, J)), shape=(nn, nn))
+        graph += coo_matrix((data, (I, J)), shape=(N_total_element, N_total_element))
 
     # add the symetric part
     graph += graph.T
 
     # Add diagonal
-    i1 = i1[mask_i1]
-    i2 = i2[mask_i2]
-    i3 = i3[mask_i3]
-    i4 = i4[mask_i4]
+    index_unknown_1 = index_unknown_1[mask_index_unknown_1]
+    index_unknown_2 = index_unknown_2[mask_index_unknown_2]
+    index_unknown_3 = index_unknown_3[mask_index_unknown_3]
+    index_unknown_4 = index_unknown_4[mask_index_unknown_4]
 
-    I_Diag = np.unique(np.concatenate([i1, i2, i3, i4]))
+    I_Diag = np.unique(
+        np.concatenate(
+            [index_unknown_1, index_unknown_2, index_unknown_3, index_unknown_4]
+        )
+    )
     Diag = np.zeros(I_Diag.size)
 
-    Diag[np.searchsorted(I_Diag, i1)] = R_S[mask_i1] + R_W[mask_i1]
-    Diag[np.searchsorted(I_Diag, i2)] += R_E[mask_i2] + R_S[mask_i2]
-    Diag[np.searchsorted(I_Diag, i3)] += R_N[mask_i3] + R_E[mask_i3]
-    Diag[np.searchsorted(I_Diag, i4)] += R_N[mask_i4] + R_W[mask_i4]
+    Diag[np.searchsorted(I_Diag, index_unknown_1)] = (
+        reluc_down[mask_index_unknown_1] + reluc_left[mask_index_unknown_1]
+    )
+    Diag[np.searchsorted(I_Diag, index_unknown_2)] += (
+        reluc_right[mask_index_unknown_2] + reluc_down[mask_index_unknown_2]
+    )
+    Diag[np.searchsorted(I_Diag, index_unknown_3)] += (
+        reluc_upper[mask_index_unknown_3] + reluc_right[mask_index_unknown_3]
+    )
+    Diag[np.searchsorted(I_Diag, index_unknown_4)] += (
+        reluc_upper[mask_index_unknown_4] + reluc_left[mask_index_unknown_4]
+    )
 
-    # Diag[np.in1d(I_Diag,i1,assume_unique=True)] = R_S[mask_i1]+R_W[mask_i1]
-    # Diag[np.in1d(I_Diag,i2,assume_unique=True)] += R_E[mask_i2]+R_S[mask_i2]
-    # Diag[np.in1d(I_Diag,i3,assume_unique=True)] += R_N[mask_i3]+R_E[mask_i3]
-    # Diag[np.in1d(I_Diag,i4,assume_unique=True)] += R_N[mask_i4]+R_W[mask_i4]
+    # Diag[np.in1d(I_Diag,index_unknown_1,assume_unique=True)] = reluc_down[mask_index_unknown_1]+reluc_left[mask_index_unknown_1]
+    # Diag[np.in1d(I_Diag,index_unknown_2,assume_unique=True)] += reluc_right[mask_index_unknown_2]+reluc_down[mask_index_unknown_2]
+    # Diag[np.in1d(I_Diag,index_unknown_3,assume_unique=True)] += reluc_upper[mask_index_unknown_3]+reluc_right[mask_index_unknown_3]
+    # Diag[np.in1d(I_Diag,index_unknown_4,assume_unique=True)] += reluc_upper[mask_index_unknown_4]+reluc_left[mask_index_unknown_4]
 
-    graph += coo_matrix((Diag, (I_Diag, I_Diag)), shape=(nn, nn))
+    graph += coo_matrix(
+        (Diag, (I_Diag, I_Diag)), shape=(N_total_element, N_total_element)
+    )
 
     return graph

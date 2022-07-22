@@ -3,15 +3,15 @@
 import numpy as np
 
 
-def init_cell(self, size_x, size_y):
+def init_cell(self, N_point_theta, N_point_r):
     """
     Compute the list of the elements in regular grid.
 
     Parameters
     ----------
-    size_x : integer
+    N_point_theta : integer
         Number of horizontal points.
-    size_y : integer
+    N_point_r : integer
         Number of vertical point.
 
     Returns
@@ -21,12 +21,12 @@ def init_cell(self, size_x, size_y):
 
     """
 
-    list_elem = np.zeros(((size_x - 1) * (size_y - 1), 4), dtype=np.uint16)
-    for i in range(size_y - 1):
-        for j in range(size_x - 1):
-            element = (size_x - 1) * i + j
-            list_elem[element, 0] = size_x * i + j
-            list_elem[element, 1] = size_x * i + j + 1
-            list_elem[element, 2] = size_x * (i + 1) + j + 1
-            list_elem[element, 3] = size_x * (i + 1) + j
+    list_elem = np.zeros(((N_point_theta - 1) * (N_point_r - 1), 4), dtype=np.uint16)
+    for i in range(N_point_r - 1):
+        for j in range(N_point_theta - 1):
+            element = (N_point_theta - 1) * i + j
+            list_elem[element, 0] = N_point_theta * i + j
+            list_elem[element, 1] = N_point_theta * i + j + 1
+            list_elem[element, 2] = N_point_theta * (i + 1) + j + 1
+            list_elem[element, 3] = N_point_theta * (i + 1) + j
     return list_elem

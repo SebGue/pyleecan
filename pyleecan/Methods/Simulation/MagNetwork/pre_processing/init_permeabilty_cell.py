@@ -4,26 +4,28 @@ import numpy as np
 
 
 def init_permeabilty_cell(
-    self, size_x, size_y, permeability_materials, mu0, cells_materials
+    self, N_point_theta, N_point_r, permeability_materials, mu0, list_element_materials
 ):
     """
     Initaialyze the permeabilty in each cell.
     Parameters
     ----------
-    size_x : integer
+    N_point_theta : integer
         Number of horizontal points.
-    size_y : integer
+    N_point_r : integer
         Number of vertical point.
     permeability_materials : nd-array, size: (foat)
         permabilty of each materials.
-    cells_materials : nd-array, size: m (int)
+    list_element_materials : nd-array, size: m (int)
         materials in each cell.
     Returns
     -------
-    permeability_cell : nd-array, size: n (int)
+    permeabiliy_element : nd-array, size: n (int)
         Permeability in each cell.
     """
-    permeability_cell = np.zeros((size_y - 1) * (size_x - 1), dtype=np.float64)
-    permeability_cell[...] = permeability_materials[cells_materials - 1]
+    permeabiliy_element = np.zeros(
+        (N_point_r - 1) * (N_point_theta - 1), dtype=np.float64
+    )
+    permeabiliy_element[...] = permeability_materials[list_element_materials - 1]
 
-    return permeability_cell
+    return permeabiliy_element

@@ -3,13 +3,13 @@
 import numpy as np
 
 
-def compute_B_square(self, F, list_elem, list_coord, la):
+def compute_B_square(self, Phi, list_elem, list_coord, la):
     """
-    Compute the magnetic field from the flux F and the mesh.
+    Compute the magnetic field from the flux Phi and the mesh.
 
     Parameters
     ----------
-    F : nd-array, size: n (float)
+    Phi : nd-array, size: n (float)
         Flux
     list_elem : nd-array, size: m (integers)
         tab of elements
@@ -39,13 +39,13 @@ def compute_B_square(self, F, list_elem, list_coord, la):
     )
 
     # Compute B
-    Bx1 = (F[list_elem[:, 2]] - F[list_elem[:, 1]]) / (h_y * la)
-    Bx2 = (F[list_elem[:, 3]] - F[list_elem[:, 0]]) / (h_y * la)
+    Bx_down = (Phi[list_elem[:, 2]] - Phi[list_elem[:, 1]]) / (h_y * la)
+    Bx_upper = (Phi[list_elem[:, 3]] - Phi[list_elem[:, 0]]) / (h_y * la)
 
-    By1 = (F[list_elem[:, 0]] - F[list_elem[:, 1]]) / (h_x * la)
-    By2 = (F[list_elem[:, 3]] - F[list_elem[:, 2]]) / (h_x * la)
+    By_left = (Phi[list_elem[:, 0]] - Phi[list_elem[:, 1]]) / (h_x * la)
+    By_right = (Phi[list_elem[:, 3]] - Phi[list_elem[:, 2]]) / (h_x * la)
 
-    Bx = (Bx1 + Bx2) / 2
-    By = (By1 + By2) / 2
+    Bx = (Bx_down + Bx_upper) / 2
+    By = (By_left + By_right) / 2
 
     return Bx, By

@@ -9,25 +9,27 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def view_contour_flux(self, F, x, y, size_x, size_y, cell_materials):
+def view_contour_flux(
+    self, phi_matrix, theta, r, N_point_theta, N_point_r, list_element_materials
+):
 
     try:
-        # Plotting cell_materials
+        # Plotting list_element_materials
         plt.pcolormesh(
-            x,
-            y,
-            cell_materials.reshape((size_y - 1, size_x - 1)),
+            theta,
+            r,
+            list_element_materials.reshape((N_point_r - 1, N_point_theta - 1)),
             cmap="Paired",
             edgecolors=None,
             facecolors="none",
             alpha=0.6,
         )
 
-        # plotting the flux F
+        # plotting the flux phi_matrix
         ct = plt.contour(
-            x,
-            y,
-            F.reshape((size_y, size_x)),
+            theta,
+            r,
+            phi_matrix.reshape((N_point_r, N_point_theta)),
             cmap="jet",
             levels=18,
             alpha=1,

@@ -41,13 +41,13 @@ except:
 
 def solver_linear_model(
     self,
-    size_x,
-    size_y,
-    x,
-    y,
+    N_point_theta,
+    N_point_r,
+    theta,
+    r,
     x_dual,
     y_dual,
-    pos,
+    rotor_shift,
     BC,
     geometry,
     mu0,
@@ -61,15 +61,15 @@ def solver_linear_model(
     """
     Parameters
     ----------
-    size_x : integer
-        Size of x.
-    size_y : integer
-        Size of y.
-    x : nd-array, size: size_x (float)
-        x coordinate.
-    y : nd-array, size: size_x (float)
-        y coordinate.
-    pos : integers
+    N_point_theta : integer
+        Size of theta.
+    N_point_r : integer
+        Size of r.
+    theta : nd-array, size: N_point_theta (float)
+        theta coordinate.
+    r : nd-array, size: N_point_theta (float)
+        r coordinate.
+    rotor_shift : integers
         position of the rotor.
     geometry : object function
         function to initialyze model.
@@ -83,17 +83,17 @@ def solver_linear_model(
         Caracterization of the permanent magnet.
     Returns
     -------
-    F : size: n (float)
+    Phi : size: N_point_theta (float)
         The flux on each point of the mesh.
     list_geomerty: nd-array, size: m (integers)
         contains the material of each cells (elements)
-    Num_Unknowns : nd-array, size: n (integers)
+    Num_Unknowns : nd-array, size: N_point_theta (integers)
         list of unknowns in the linear system .
     list_elem : nd-array, size: m (integers)
         tab of elements
     permeability_cell : nd-array, size: m (float)
         the permeability values of each cell
-    list_coord : nd-array, size: size_x*size_y x 2 (float)
+    list_coord : nd-array, size: N_point_theta*N_point_r theta 2 (float)
         list of coordinate.
     """
 
@@ -101,28 +101,34 @@ def solver_linear_model(
 
     # initialize the cells of materials and their permeability
     list_geometry, permeability_materials = self.geometry_linear_motor(
-        size_x, size_y, pos
+        N_point_theta, N_point_r, rotor_shift
     )
 
     # initialize the list_coord which contains the grid of points
-    list_coord = self.init_point(size_x, size_y, x, y)
+    list_coord = self.init_point(N_point_theta, N_point_r, theta, r)
     # print("Permeability", permeability_materials)
 
     permeability_cell = self.init_permeabilty_cell(
-        size_x, size_y, permeability_materials, mu0, list_geometry
+        N_point_theta, N_point_r, permeability_materials, mu0, list_geometry
     )
 
-    list_elem = self.init_cell(size_x, size_y)
+    list_elem = self.init_cell(N_point_theta, N_point_r)
 
-    BC_list, Periodic_point = self.init_mesh_BC(size_x, size_y, BC)
+    list_boundary_condition, Periodic_point = self.init_mesh_BC(
+        N_point_theta, N_point_r, BC
+    )
 
-    Num_Unknowns = self.numeroting_unknows(list_elem, BC_list, Periodic_point)
+    Num_Unknowns = self.numeroting_unknows(
+        list_elem, list_boundary_condition, Periodic_point
+    )
 
     # Mesuring the performance time
     t1 = time.perf_counter()
 
     # print("Assembly geometry:", np.round(t1 - t0, 5), "seconds")
-    self.save_mesh(list_geometry, Num_Unknowns, list_elem, x, y, BC_list)
+    self.save_mesh(
+        list_geometry, Num_Unknowns, list_elem, theta, r, list_boundary_condition
+    )
 
     t2 = time.perf_counter()
     # Saving mesh time
@@ -133,7 +139,7 @@ def solver_linear_model(
     # print(reluc_list)
 
     M_csr = self.assembly(
-        reluc_list, Num_Unknowns, list_elem, permeability_cell, BC_list
+        reluc_list, Num_Unknowns, list_elem, permeability_cell, list_boundary_condition
     )
 
     t3 = time.perf_counter()
@@ -167,24 +173,24 @@ def solver_linear_model(
 
         # Compute the solution
         factor = cholesky(M_csr.tocsc())
-        F = factor(E)
+        Phi = factor(E)
         t4 = time.perf_counter()
         print(
             "Time to solve (CholMod):",
             np.round(t4 - t3, 5),
             "secondes, res:",
-            np.linalg.norm(M_csr @ F - E, ord=2),
+            np.linalg.norm(M_csr @ Phi - E, ord=2),
         )
     else:
-        F = spsolve(M_csr, E, permc_spec="MMD_AT_PLUS_A", use_umfpack=True)
+        Phi = spsolve(M_csr, E, permc_spec="MMD_AT_PLUS_A", use_umfpack=True)
         t4 = time.perf_counter()
         print(
             "Time to solve (direct,UMF):",
             np.round(t4 - t3, 5),
             "secondes, res:",
-            np.linalg.norm(M_csr @ F - E, ord=2),
+            np.linalg.norm(M_csr @ Phi - E, ord=2),
         )
 
-    F = self.add_BC_to_F(F, Num_Unknowns, list_elem, BC_list)
+    Phi = self.add_BC_to_F(Phi, Num_Unknowns, list_elem, list_boundary_condition)
 
-    return F, list_geometry, Num_Unknowns, list_elem, permeability_cell, list_coord
+    return Phi, list_geometry, Num_Unknowns, list_elem, permeability_cell, list_coord

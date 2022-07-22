@@ -76,9 +76,6 @@ def geometry_linear_motor(self, size_x, size_y, pos_pm):
         )
     )
 
-    # Slot pitch (m)
-    ts = ws + wt
-
     # Number of winding layers
     nb_layers = Machine.stator.winding.Nlayer
 
@@ -134,7 +131,7 @@ def geometry_linear_motor(self, size_x, size_y, pos_pm):
     total_width = size_x - 1
 
     # Definition of x-axis and y-axis steps
-    h_theta = (np.pi / periodicity) * rad_to_deg / (size_x - 1)
+    h_theta = x / (size_x - 1)
     h_y = y / (size_y - 1)
 
     # Number of elements in the stator armature
@@ -195,15 +192,6 @@ def geometry_linear_motor(self, size_x, size_y, pos_pm):
 
     # Attribute an array of nn size of zeros to cells_materials
     cells_materials = np.zeros(nn, dtype=np.uint16)
-
-    # Mask magnets
-    mask_magnet = np.zeros(nn, dtype=np.bool_)
-    mask_magnet[
-        total_width * airgap_and_Pm_height
-        - total_width : total_width
-        * (airgap_and_Pm_height + rotor_height - airgap_height)
-        + total_width
-    ] = True
 
     # Assignment of geometry elements
     for i in range(total_height):

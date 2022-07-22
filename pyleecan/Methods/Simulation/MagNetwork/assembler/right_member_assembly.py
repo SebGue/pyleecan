@@ -6,7 +6,7 @@ from scipy.sparse import coo_matrix
 
 def right_member_assembly(
     self,
-    cells_materials,
+    list_elements_materials,
     Num_Unknowns,
     list_elem,
     list_coord,
@@ -15,7 +15,7 @@ def right_member_assembly(
     Br,
     mu0,
     la,
-    mode,
+    type_coord_sys,
     JA=None,
     JB=None,
     JC=None,
@@ -25,7 +25,7 @@ def right_member_assembly(
 
     Parameters
     ----------
-    cells_materials: nd-array, size: m (integers)
+    list_elements_materials: nd-array, size: m (integers)
         contains the material of each cells (elements)
     Num_Unknowns : nd-array, size: n (integers)
         list of unknowns in the linear system .
@@ -40,28 +40,28 @@ def right_member_assembly(
 
     Returns
     -------
-    E : nd-array, size: Num.unknowns.max()+1
+    RHS : nd-array, size: Num.unknowns.max()+1
         RHS
 
     """
 
     position_permeability_PM = len(list_permeability) - 3
-    mask_magnet = cells_materials == position_permeability_PM
-    mu_pm = list_permeability[position_permeability_PM]  # 4-1???????
-    nn = Num_Unknowns.max() + 1
+    mask_magnet = list_elements_materials == position_permeability_PM
+    mur_PM = list_permeability[position_permeability_PM]  # 4-1???????
+    N_unknowns = Num_Unknowns.max() + 1
 
-    # np.savetxt("cell_materials.csv", cells_materials)
+    # np.savetxt("cell_materials.csv", list_elements_materials)
     # print("non-zero in mak magnet?", mask_magnet.sum())
-    if mode == "cartesian":
+    if type_coord_sys == "cartesian":
         h_x = np.linalg.norm(
             list_coord[list_elem[:, 0]] - list_coord[list_elem[:, 1]], axis=1, ord=2
         )
         h_y = np.linalg.norm(
             list_coord[list_elem[:, 1]] - list_coord[list_elem[:, 2]], axis=1, ord=2
         )
-        FMMPM = 0.5 * Br * la * h_y[mask_magnet] / mu_pm
+        FMMPM = 0.5 * Br * la * h_y[mask_magnet] / mur_PM
 
-    elif mode == "polar":
+    elif type_coord_sys == "polar":
         R1 = list_coord[list_elem[:, 0], 1]
         R2 = list_coord[list_elem[:, -1], 1]
         sigma_R = np.abs(R2 - R1)
@@ -72,27 +72,27 @@ def right_member_assembly(
         FMMPM = 1.05 * Br * la * sigma_R[mask_magnet] * 2
 
     ##Initailyze returned vector -> RHS
-    E = np.zeros(nn, dtype=np.float64)
+    RHS = np.zeros(N_unknowns, dtype=np.float64)
 
     ####Permanant Magnet assembling
-    i1 = Num_Unknowns[list_elem[mask_magnet, 0]]
-    i2 = Num_Unknowns[list_elem[mask_magnet, 1]]
-    i3 = Num_Unknowns[list_elem[mask_magnet, 2]]
-    i4 = Num_Unknowns[list_elem[mask_magnet, 3]]
+    index_unknowns_1 = Num_Unknowns[list_elem[mask_magnet, 0]]
+    index_unknowns_2 = Num_Unknowns[list_elem[mask_magnet, 1]]
+    index_unknowns_3 = Num_Unknowns[list_elem[mask_magnet, 2]]
+    index_unknowns_4 = Num_Unknowns[list_elem[mask_magnet, 3]]
 
-    E[i1] += FMMPM * reluc_list[mask_magnet, 3]
-    E[i2] -= FMMPM * reluc_list[mask_magnet, 1]
-    E[i3] -= FMMPM * reluc_list[mask_magnet, 1]
-    E[i4] += FMMPM * reluc_list[mask_magnet, 3]
+    RHS[index_unknowns_1] += FMMPM * reluc_list[mask_magnet, 3]
+    RHS[index_unknowns_2] -= FMMPM * reluc_list[mask_magnet, 1]
+    RHS[index_unknowns_3] -= FMMPM * reluc_list[mask_magnet, 1]
+    RHS[index_unknowns_4] += FMMPM * reluc_list[mask_magnet, 3]
 
     ####Winding assembling
     if JA is None and JB is None and JC is None:
         # Phase 1
-        mask_winding = cells_materials == 1
+        mask_winding = list_elements_materials == 1
 
-        if mode == "cartesian":
+        if type_coord_sys == "cartesian":
             S = h_x[mask_winding] * h_y[mask_winding] / 4
-        elif mode == "polar":
+        elif type_coord_sys == "polar":
             S = (
                 0.5
                 * sigma_theta[mask_winding]
@@ -100,22 +100,22 @@ def right_member_assembly(
                 / 4
             )
 
-        i1 = Num_Unknowns[list_elem[mask_winding, 0]]
-        i2 = Num_Unknowns[list_elem[mask_winding, 1]]
-        i3 = Num_Unknowns[list_elem[mask_winding, 2]]
-        i4 = Num_Unknowns[list_elem[mask_winding, 3]]
+        index_unknowns_1 = Num_Unknowns[list_elem[mask_winding, 0]]
+        index_unknowns_2 = Num_Unknowns[list_elem[mask_winding, 1]]
+        index_unknowns_3 = Num_Unknowns[list_elem[mask_winding, 2]]
+        index_unknowns_4 = Num_Unknowns[list_elem[mask_winding, 3]]
 
-        E[i1] += JA * S
-        E[i2] += JA * S
-        E[i3] += JA * S
-        E[i4] += JA * S
+        RHS[index_unknowns_1] += JA * S
+        RHS[index_unknowns_2] += JA * S
+        RHS[index_unknowns_3] += JA * S
+        RHS[index_unknowns_4] += JA * S
 
         # Phase 2
-        mask_winding = cells_materials == 2
+        mask_winding = list_elements_materials == 2
 
-        if mode == "cartesian":
+        if type_coord_sys == "cartesian":
             S = h_x[mask_winding] * h_y[mask_winding] / 4
-        elif mode == "polar":
+        elif type_coord_sys == "polar":
             S = (
                 0.5
                 * sigma_theta[mask_winding]
@@ -123,21 +123,21 @@ def right_member_assembly(
                 / 4
             )
 
-        i1 = Num_Unknowns[list_elem[mask_winding, 0]]
-        i2 = Num_Unknowns[list_elem[mask_winding, 1]]
-        i3 = Num_Unknowns[list_elem[mask_winding, 2]]
-        i4 = Num_Unknowns[list_elem[mask_winding, 3]]
+        index_unknowns_1 = Num_Unknowns[list_elem[mask_winding, 0]]
+        index_unknowns_2 = Num_Unknowns[list_elem[mask_winding, 1]]
+        index_unknowns_3 = Num_Unknowns[list_elem[mask_winding, 2]]
+        index_unknowns_4 = Num_Unknowns[list_elem[mask_winding, 3]]
 
-        E[i1] += JB * S
-        E[i2] += JB * S
-        E[i3] += JB * S
-        E[i4] += JB * S
+        RHS[index_unknowns_1] += JB * S
+        RHS[index_unknowns_2] += JB * S
+        RHS[index_unknowns_3] += JB * S
+        RHS[index_unknowns_4] += JB * S
 
         ###Phase 3
-        mask_winding = cells_materials == 3
-        if mode == "cartesian":
+        mask_winding = list_elements_materials == 3
+        if type_coord_sys == "cartesian":
             S = h_x[mask_winding] * h_y[mask_winding] / 4
-        elif mode == "polar":
+        elif type_coord_sys == "polar":
             S = (
                 0.5
                 * sigma_theta[mask_winding]
@@ -145,15 +145,15 @@ def right_member_assembly(
                 / 4
             )
 
-        i1 = Num_Unknowns[list_elem[mask_winding, 0]]
-        i2 = Num_Unknowns[list_elem[mask_winding, 1]]
-        i3 = Num_Unknowns[list_elem[mask_winding, 2]]
-        i4 = Num_Unknowns[list_elem[mask_winding, 3]]
+        index_unknowns_1 = Num_Unknowns[list_elem[mask_winding, 0]]
+        index_unknowns_2 = Num_Unknowns[list_elem[mask_winding, 1]]
+        index_unknowns_3 = Num_Unknowns[list_elem[mask_winding, 2]]
+        index_unknowns_4 = Num_Unknowns[list_elem[mask_winding, 3]]
 
-        E[i1] += JC * S
-        E[i2] += JC * S
-        E[i3] += JC * S
-        E[i4] += JC * S
-    # np.savetxt("Everif.csv",E.reshape((50,60)),fmt="%5.2f")
+        RHS[index_unknowns_1] += JC * S
+        RHS[index_unknowns_2] += JC * S
+        RHS[index_unknowns_3] += JC * S
+        RHS[index_unknowns_4] += JC * S
+    # np.savetxt("Everif.csv",RHS.reshape((50,60)),fmt="%5.2f")
 
-    return E
+    return RHS
