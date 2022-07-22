@@ -24,12 +24,15 @@ def run_radial(self, axes_dict, Is_val=None):
     Br = Machine.rotor.magnet.mat_type.mag.Brm20
     mu0 = np.pi * 4e-7  # Permeability of vacuum (H/m)
 
+    # position of rotor (number of cells of the rotor to be shifted)
+    # TODO set this value according to time and rotor position
     pos = 8
 
     # Size of the mesh according to r
     # Step of discretization of r
     # size_r = round((Machine.stator.Rext - Machine.rotor.Rint) * 1000)
     size_r = 131
+    # size_r = 154
 
     # Size of mesh according to theta
     if Machine.comp_periodicity_spatial()[1] == True:
@@ -94,6 +97,7 @@ def run_radial(self, axes_dict, Is_val=None):
         JC=JC,
     )
 
+    # Transfomration of radial coordinates to cartesian
     x = (list_coord[:, 1] * np.cos(list_coord[:, 0])).reshape(size_r, size_theta)
     y = (list_coord[:, 1] * np.sin(list_coord[:, 0])).reshape(size_r, size_theta)
     list_cart = np.zeros((list_coord.shape[0], 2))
@@ -144,7 +148,7 @@ def run_radial(self, axes_dict, Is_val=None):
     Bx_airgap, By_airgap = self.comp_flux_airgap_local(
         r, theta, F, list_elem, list_coord, la, Machine.comp_Rgap_mec()
     )
-    # # Add my mesh to pyleecqan
+    # # Add my mesh to pyleecan
     # print("Solve RN done.")
     # mesh = MeshMat(dimension=3)
     # mesh.node = NodeMat()

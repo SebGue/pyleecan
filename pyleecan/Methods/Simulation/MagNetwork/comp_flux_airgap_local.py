@@ -6,9 +6,6 @@ import numpy as np
 # def comp_flux_airgap(self, output, axes_dict, Is_val=None, Ir_val=None):
 def comp_flux_airgap_local(self, r, theta, F, list_elem, list_coord, la, Rgap):
 
-    # Getting the machine object
-    Machine = self.parent.machine
-
     # Computing the radial and tangential flux density
     Bx, By = self.compute_B_radial(F, list_elem, list_coord, la)
 
