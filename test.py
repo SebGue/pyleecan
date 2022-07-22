@@ -10,6 +10,7 @@ from pyleecan.Classes.MagFEMM import MagFEMM
 from os.path import join
 from Tests import save_validation_path as save_path
 
+# Defining the validation cases paths
 file_path = "C:/Users/pc/Downloads/SPMSM_val.json"  # case study 1
 # file_path = (
 #     "C:/Users/pc/AppData/Roaming/pyleecan/Machine/Benchmark.json"  # case study 2
@@ -19,48 +20,51 @@ file_path = "C:/Users/pc/Downloads/SPMSM_val.json"  # case study 1
 #     "C:/Users/pc/AppData/Roaming/pyleecan/Machine/SPMSM_skew.json"  # case study 4
 # )
 
+
+# Loading the machine from the file path
 SPMSM_val = load(file_path)
 
-load_machine(file_path)
-
-# Create the simulation object of the MagNetwork
+# Creating the simulation object of the MagNetwork
 simu = Simu1(name="test_magnetwork", machine=SPMSM_val)
 
 # simu.machine.stator.Rext - simu.machine.rotor.Rint
 
-# Define Inputs and discretizations
+# Defining the Inputs and discretizations
 # MagNetwork simulation
 simu.input = InputCurrent(
     OP=OPdq(N0=1000, Id_ref=0, Iq_ref=0),
-    Na_tot=1570 * 4,
+    Na_tot=180 * 4,  # simu.input.Na_tot
     Nt_tot=1,
 )
 
-# Definition of the magnetic simulation: with periodicity for the MagNetwork
+# Defining the magnetic simulation: with periodicity for the MagNetwork
 simu.mag = MagNetwork(
     is_periodicity_a=True,
     is_periodicity_t=False,
 )
 
-# Mesh
+# Cartesian meshing
 # print(simu.mag.cartesianmeshclass_pyleecan())
 
 # Test the MagNetwork simulation
 
+# Initializing the harmonics calculation for simu
 simu.force = ForceMT()
 
-# Create the simulation object of the FEMM
+# Creating the simulation object of the FEMM
 simu2 = Simu1(name="test_FEMM", machine=SPMSM_val)
 
 # FEMM simulation
 simu2.input = InputCurrent(
     OP=OPdq(N0=1000, Id_ref=0, Iq_ref=0),
-    Na_tot=1570 * 4,
+    Na_tot=61 * 4,
     Nt_tot=1,
     is_periodicity_t=False,
     is_periodicity_a=True,
+    angle_rotor_initial=1.0e-12,
 )
-# Definition of the magnetic simulation: with periodicity for theFEMM
+
+# Defining the magnetic simulation: with periodicity for theFEMM
 simu2.mag = MagFEMM(
     is_periodicity_a=True,
     is_periodicity_t=False,
@@ -71,17 +75,18 @@ simu2.mag = MagFEMM(
     Kmesh_fineness=2,  # Define the mesh fineness
 )
 
+# Initializing the harmonics calculation for simu2
 simu2.force = ForceMT()
 
-# Run both simulations
+# Running both simulations
 out = simu.run()  # MagNetwork
 out2 = simu2.run()  # FEMM
 
-# plot the radial and tangential 2D flux density curve
+# plotting the radial and tangential 2D flux density curve
 # out.mag.B.plot_2D_Data("angle")
 # out2.mag.B.plot_2D_Data("angle")
 
-# Compute the harmonics
+# Computing the harmonics
 """
 out.force.AGSF.plot_2D_Data(
     "wavenumber=[0,10]",
@@ -93,7 +98,7 @@ out.force.AGSF.plot_2D_Data(
 )
 """
 
-# # Plot the results of the MagNetwork harmonics
+# # Plotting the results of the MagNetwork harmonics
 # out.mag.B.plot_2D_Data(
 #     # "time",
 #     "angle[0]{°}",
@@ -104,7 +109,7 @@ out.force.AGSF.plot_2D_Data(
 #     **dict_2D
 # )
 
-# compute the harmonics of the FEMM
+# computing the harmonics of the FEMM
 # out2.mag.B.plot_2D_Data(
 #     # "time",
 #     "angle[0]{°}",
@@ -116,7 +121,7 @@ out.force.AGSF.plot_2D_Data(
 #     **dict_2D
 # )
 
-# # Compute the harmonics using the Maxwell tensor of the MagNetwork class
+# # Computing the harmonics using the Maxwell tensor of the MagNetwork class
 # out.force.AGSF.plot_2D_Data(
 #     "wavenumber=[0,10]",
 #     "time[0]",
@@ -127,7 +132,7 @@ out.force.AGSF.plot_2D_Data(
 #     **dict_2D
 # )
 
-# Compute the harmonics of the FEMM
+# Computing the harmonics of the FEMM
 # out2.force.AGSF.plot_2D_Data(
 #     "wavenumber=[0,10]",
 #     "time[0]",
@@ -150,7 +155,7 @@ out.force.AGSF.plot_2D_Data(
 
 # Comparison of the radial 2D flux density curve between MagNetwork and FEMM
 out.mag.B.plot_2D_Data(
-    "angle",
+    "angle[smallestperiod]{°}",
     component_list=["radial"],
     data_list=[out2.mag.B],
     legend_list=["MagNetwork", "FEMM"],
@@ -158,7 +163,7 @@ out.mag.B.plot_2D_Data(
 
 # Comparison of the tangential 2D flux density curve between MagNetwork and FEMM
 out.mag.B.plot_2D_Data(
-    "angle",
+    "angle[smallestperiod]{°}",
     component_list=["tangential"],
     data_list=[out2.mag.B],
     legend_list=["MagNetwork", "FEMM"],

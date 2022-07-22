@@ -38,12 +38,16 @@ def Plot_B(self, Bx, By, x, y, x_dual, y_dual, cell_materials, m, n):
     None.
 
     """
-    # Plot Magnetic field
+    # Getting the norm of the magnetix flux density B
     norm = np.sqrt(Bx ** 2 + By ** 2)
 
     k = 1
     skip = (slice(None, None, k), slice(None, None, k))
+
+    # Defining the mesh grid (x, y)
     X, Y = np.meshgrid(x, y)
+
+    # Plotting cell_materials
     plt.pcolormesh(
         X[skip],
         Y[skip],
@@ -54,7 +58,11 @@ def Plot_B(self, Bx, By, x, y, x_dual, y_dual, cell_materials, m, n):
         alpha=0.6,
         linewidths=0.005,
     )
+
+    # Defining the mesh grid (x_dual, y_dual)
     X, Y = np.meshgrid(x_dual, y_dual)
+
+    # Plotting the magnetic flux density B
     plt.quiver(
         X[skip],
         Y[skip],
@@ -67,7 +75,13 @@ def Plot_B(self, Bx, By, x, y, x_dual, y_dual, cell_materials, m, n):
         scale=30,
         width=0.01,
     )
+
+    # Defining the colorbar
     cbar = plt.colorbar()
+
+    # Defining the graph title
     cbar.ax.set_title("B (Tesla)")
+
+    # Showing the final plot
     plt.show()
     return

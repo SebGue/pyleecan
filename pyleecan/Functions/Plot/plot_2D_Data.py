@@ -1,4 +1,8 @@
 from ...definitions import config_dict
+import warnings
+
+with warnings.catch_warnings():
+    warnings.filterwarnings(action='ignore', message='All-NaN slice encountered'))
 
 # Import values from config dict
 COLOR_LIST = config_dict["PLOT"]["COLOR_DICT"]["COLOR_LIST"]

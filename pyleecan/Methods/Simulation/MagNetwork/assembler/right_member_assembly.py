@@ -45,8 +45,9 @@ def right_member_assembly(
 
     """
 
-    mask_magnet = cells_materials == 4
-    mu_pm = mu0 * list_permeability[4 - 1]
+    position_permeability_PM = len(list_permeability) - 3
+    mask_magnet = cells_materials == position_permeability_PM
+    mu_pm = list_permeability[position_permeability_PM]  # 4-1???????
     nn = Num_Unknowns.max() + 1
 
     # np.savetxt("cell_materials.csv", cells_materials)
@@ -68,7 +69,7 @@ def right_member_assembly(
             list_coord[list_elem[:, 1], 0] - list_coord[list_elem[:, 0], 0]
         )
 
-        FMMPM = 0.5 * Br * la * sigma_R[mask_magnet] / mu_pm
+        FMMPM = 1.05 * Br * la * sigma_R[mask_magnet] * 2
 
     ##Initailyze returned vector -> RHS
     E = np.zeros(nn, dtype=np.float64)
@@ -79,9 +80,9 @@ def right_member_assembly(
     i3 = Num_Unknowns[list_elem[mask_magnet, 2]]
     i4 = Num_Unknowns[list_elem[mask_magnet, 3]]
 
-    E[i1] += FMMPM * reluc_list[mask_magnet, 0]
+    E[i1] += FMMPM * reluc_list[mask_magnet, 3]
     E[i2] -= FMMPM * reluc_list[mask_magnet, 1]
-    E[i3] -= FMMPM * reluc_list[mask_magnet, 2]
+    E[i3] -= FMMPM * reluc_list[mask_magnet, 1]
     E[i4] += FMMPM * reluc_list[mask_magnet, 3]
 
     ####Winding assembling
@@ -153,5 +154,6 @@ def right_member_assembly(
         E[i2] += JC * S
         E[i3] += JC * S
         E[i4] += JC * S
+    # np.savetxt("Everif.csv",E.reshape((50,60)),fmt="%5.2f")
 
     return E

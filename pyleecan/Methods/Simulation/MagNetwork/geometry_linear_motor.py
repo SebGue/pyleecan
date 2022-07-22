@@ -19,6 +19,8 @@ def geometry_linear_motor(self, size_x, size_y, pos_pm):
     # Get machine object
     Machine = self.parent.machine
 
+    rad_to_deg = 180 / np.pi
+
     if Machine.comp_periodicity_spatial()[1] == True:
         periodicity = Machine.comp_periodicity_spatial()[0]
     else:
@@ -29,7 +31,7 @@ def geometry_linear_motor(self, size_x, size_y, pos_pm):
         np.pi * Machine.stator.Rint / Machine.rotor.get_pole_pair_number()
     )  # Ref:https://www.slideshare.net/monprado1/11-basic-concepts-of-a-machine-77442134
 
-    angle_tp = np.pi / periodicity
+    angle_tp = (np.pi / periodicity) * rad_to_deg
 
     # Number of PMs per period
     nb_PM_per_period = round(Machine.rotor.get_pole_pair_number() / periodicity)
@@ -44,7 +46,7 @@ def geometry_linear_motor(self, size_x, size_y, pos_pm):
     hm = Machine.rotor.slot.comp_height_active()
 
     # Compute the angular opening of the rotor magnet
-    angle_magnet = Machine.rotor.slot.comp_angle_active_eq()
+    angle_magnet = Machine.rotor.slot.comp_angle_active_eq() * rad_to_deg
 
     # Air-gap thickness (m)
     e = Machine.comp_width_airgap_mec()
@@ -132,12 +134,14 @@ def geometry_linear_motor(self, size_x, size_y, pos_pm):
     total_width = size_x - 1
 
     # Definition of x-axis and y-axis steps
-    h_theta = (np.pi / periodicity) / (size_x - 1)
+    h_theta = (np.pi / periodicity) * rad_to_deg / (size_x - 1)
     h_y = y / (size_y - 1)
 
     # Number of elements in the stator armature
     # Compute the angular opening of the stator slot
-    angle_slot = round(Machine.stator.slot.comp_angle_active_eq() / h_theta)
+    angle_slot = round(
+        Machine.stator.slot.comp_angle_active_eq() * rad_to_deg / h_theta
+    )
     angle_slot = nb_layers * round(
         angle_slot / nb_layers
     )  # angle slot is multiple of number of layers
@@ -180,7 +184,7 @@ def geometry_linear_motor(self, size_x, size_y, pos_pm):
     airgap_height = round(e / h_y)
 
     # Number of elements in the moving armature iron in y direction
-    rotor_height = round((height_rotor_PM - hm - Machine.rotor.Rint) / h_y)
+    rotor_height = round(hmbi / h_y)
 
     # Number of elements in the magnetic air-gap (hm + e) in y direction
     airgap_and_Pm_height = round((hm + e) / h_y)

@@ -10,8 +10,9 @@ import numpy as np
 
 
 def view_contour_flux(self, F, x, y, size_x, size_y, cell_materials):
+
     try:
-        # Plot flux
+        # Plotting cell_materials
         plt.pcolormesh(
             x,
             y,
@@ -22,6 +23,7 @@ def view_contour_flux(self, F, x, y, size_x, size_y, cell_materials):
             alpha=0.6,
         )
 
+        # plotting the flux F
         ct = plt.contour(
             x,
             y,
@@ -31,8 +33,14 @@ def view_contour_flux(self, F, x, y, size_x, size_y, cell_materials):
             alpha=1,
             linewidths=1,
         )
+
+        # Defining thecolorbar
         cbar = plt.colorbar(ct)
+
+        # Defining the graph title
         cbar.ax.set_title("$Wb (Weber, Wb=T\cdot m^2)$")
+
+        # Showing the final plot
         plt.show()
 
     except IndexError:

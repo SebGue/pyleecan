@@ -8,7 +8,6 @@ def init_permeabilty_cell(
 ):
     """
     Initaialyze the permeabilty in each cell.
-
     Parameters
     ----------
     size_x : integer
@@ -19,16 +18,12 @@ def init_permeabilty_cell(
         permabilty of each materials.
     cells_materials : nd-array, size: m (int)
         materials in each cell.
-
     Returns
     -------
     permeability_cell : nd-array, size: n (int)
         Permeability in each cell.
-
     """
     permeability_cell = np.zeros((size_y - 1) * (size_x - 1), dtype=np.float64)
-    # permeability_cell[...] = permeability_materials[cells_materials - 1] * mu0
-    for i in range(len(permeability_cell)):
-        permeability_cell[i] = permeability_materials[cells_materials[i] - 1] * mu0
+    permeability_cell[...] = permeability_materials[cells_materials - 1]
 
     return permeability_cell
