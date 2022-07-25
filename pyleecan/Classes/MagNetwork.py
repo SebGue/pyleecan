@@ -144,18 +144,9 @@ except ImportError as error:
     add_BC_to_Phi = error
 
 try:
-    from ..Methods.Simulation.MagNetwork.post_processing.compute_B_radial import (
-        compute_B_radial,
-    )
+    from ..Methods.Simulation.MagNetwork.post_processing.compute_B import compute_B
 except ImportError as error:
-    compute_B_radial = error
-
-try:
-    from ..Methods.Simulation.MagNetwork.post_processing.compute_B_square import (
-        compute_B_square,
-    )
-except ImportError as error:
-    compute_B_square = error
+    compute_B = error
 
 try:
     from ..Methods.Simulation.MagNetwork.comp_flux_airgap import comp_flux_airgap
@@ -431,30 +422,15 @@ class MagNetwork(Magnetics):
         )
     else:
         add_BC_to_Phi = add_BC_to_Phi
-    # cf Methods.Simulation.MagNetwork.post_processing.compute_B_radial
-    if isinstance(compute_B_radial, ImportError):
-        compute_B_radial = property(
+    # cf Methods.Simulation.MagNetwork.post_processing.compute_B
+    if isinstance(compute_B, ImportError):
+        compute_B = property(
             fget=lambda x: raise_(
-                ImportError(
-                    "Can't use MagNetwork method compute_B_radial: "
-                    + str(compute_B_radial)
-                )
+                ImportError("Can't use MagNetwork method compute_B: " + str(compute_B))
             )
         )
     else:
-        compute_B_radial = compute_B_radial
-    # cf Methods.Simulation.MagNetwork.post_processing.compute_B_square
-    if isinstance(compute_B_square, ImportError):
-        compute_B_square = property(
-            fget=lambda x: raise_(
-                ImportError(
-                    "Can't use MagNetwork method compute_B_square: "
-                    + str(compute_B_square)
-                )
-            )
-        )
-    else:
-        compute_B_square = compute_B_square
+        compute_B = compute_B
     # cf Methods.Simulation.MagNetwork.comp_flux_airgap
     if isinstance(comp_flux_airgap, ImportError):
         comp_flux_airgap = property(

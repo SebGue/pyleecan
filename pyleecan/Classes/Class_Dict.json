@@ -7049,8 +7049,7 @@
             "assembler.assembly_one_area",
             "assembler.right_member_assembly",
             "post_processing.add_BC_to_Phi",
-            "post_processing.compute_B_radial",
-            "post_processing.compute_B_square",
+            "post_processing.compute_B",
             "comp_flux_airgap",
             "comp_flux_airgap_local",
             "cartesianmeshclass_pyleecan"

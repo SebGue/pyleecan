@@ -57,8 +57,13 @@ def run_radial(self, axes_dict, Is_val=None):
     r_dual = (r[1:] + r[:-1]) / 2
     theta_dual = (theta[1:] + theta[:-1]) / 2
 
-    BC = ["anti_periodic_condition", "homogeneous_Dirichlet_condition", "anti_periodic_condition", "homogeneous_Dirichlet_condition"]
-    type_coord_sys= "polar"
+    BC = [
+        "anti_periodic_condition",
+        "homogeneous_Dirichlet_condition",
+        "anti_periodic_condition",
+        "homogeneous_Dirichlet_condition",
+    ]
+    type_coord_sys = "polar"
 
     # Compute current densities
     if Is_val is not None:
