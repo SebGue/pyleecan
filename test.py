@@ -180,3 +180,4 @@ out.mag.B.plot_2D_Data(
     legend_list=["MagNetwork", "FEMM"],
 )
 pass
+

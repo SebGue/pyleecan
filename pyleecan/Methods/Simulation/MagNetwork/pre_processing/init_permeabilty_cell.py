@@ -26,6 +26,7 @@ def init_permeabilty_cell(
     list_elem_permeability = np.zeros(
         (N_point_r - 1) * (N_point_theta - 1), dtype=np.float64
     )
+
     list_elem_permeability[...] = permeability_materials[list_element_materials - 1]
 
     return list_elem_permeability

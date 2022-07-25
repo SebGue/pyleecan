@@ -53,7 +53,6 @@ def run_radial(
         axes_dict["angle"].number + 1,
         # endpoint=False,
     )
-
     r_dual = (r[1:] + r[:-1]) / 2
     theta_dual = (theta[1:] + theta[:-1]) / 2
 
@@ -104,7 +103,6 @@ def run_radial(
     # Transfomration of radial coordinates to cartesian
     x = (list_coord[:, 1] * np.cos(list_coord[:, 0])).reshape(N_point_r, N_point_theta)
     y = (list_coord[:, 1] * np.sin(list_coord[:, 0])).reshape(N_point_r, N_point_theta)
-    list_cartesian_coord = np.zeros((list_coord.shape[0], 2))
 
     list_cartesian_coord[:, 0] = x.flatten()
     list_cartesian_coord[:, 1] = y.flatten()
@@ -150,15 +148,18 @@ def run_radial(
 
     # Compute 2D curve of the airgap flux density
     Bx_airgap, By_airgap = self.comp_flux_airgap_local(
-        r,
+        r_dual,
         theta,
         Phi,
         list_elem,
         list_coord,
         la,
         Machine.comp_Rgap_mec(),
+        N_point_r,
+        N_point_theta,
         type_coord_sys,
     )
+
     # # Add my mesh to pyleecan
     # print("Solve RN done.")
     # mesh = MeshMat(dimension=3)
@@ -197,3 +198,4 @@ def run_radial(
     # MSol.plot_contour()
 
     return Bx, By, Bx_airgap, By_airgap
+
