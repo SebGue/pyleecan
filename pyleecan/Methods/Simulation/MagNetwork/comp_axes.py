@@ -1,11 +1,12 @@
-def comp_axes(self, theta):
+from pyleecan.Classes.Magnetics import Magnetics
+
+
+def comp_axes(self, output):
 
     # Call Magnetics.comp_axes()
-    Magnetics.comp_axes(self)
+    Magnetics.comp_axes(self, output)
 
-    simu = self.parent
-    output = simu.parent
-    input = input.parent
+    # theta ??
 
     angle = (theta[1:] + theta[:-1]) / 2
 

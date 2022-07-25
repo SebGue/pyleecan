@@ -104,6 +104,7 @@ def run_radial(
     x = (list_coord[:, 1] * np.cos(list_coord[:, 0])).reshape(N_point_r, N_point_theta)
     y = (list_coord[:, 1] * np.sin(list_coord[:, 0])).reshape(N_point_r, N_point_theta)
 
+    list_cartesian_coord = np.zeros(list_coord.shape)
     list_cartesian_coord[:, 0] = x.flatten()
     list_cartesian_coord[:, 1] = y.flatten()
 
@@ -198,4 +199,3 @@ def run_radial(
     # MSol.plot_contour()
 
     return Bx, By, Bx_airgap, By_airgap
-
