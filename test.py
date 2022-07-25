@@ -41,6 +41,8 @@ simu.input = InputCurrent(
 simu.mag = MagNetwork(
     is_periodicity_a=True,
     is_periodicity_t=False,
+    type_model=1,
+    type_coord_sys=2,
 )
 
 # Cartesian meshing

@@ -6381,26 +6381,6 @@
             }
         ]
     },
-    "MachineInput": {
-        "constants": [
-            {
-                "name": "VERSION",
-                "value": "1"
-            }
-        ],
-        "daughters": [],
-        "desc": "Abstract class to get machine geometrical inputs and materials",
-        "is_internal": false,
-        "methods": [
-            "load_machine",
-            "load_material"
-        ],
-        "mother": "",
-        "name": "MachineInput",
-        "package": "Simulation",
-        "path": "pyleecan/Generator/ClassesRef/Simulation/MachineInput.csv",
-        "properties": []
-    },
     "MachineLSPM": {
         "constants": [
             {
@@ -7079,7 +7059,28 @@
         "name": "MagNetwork",
         "package": "Simulation",
         "path": "pyleecan/Generator/ClassesRef/Simulation/MagNetwork.csv",
-        "properties": []
+        "properties": [
+            {
+                "as_dict": "",
+                "desc": "Type of the model to be solved: linear (1) or non-linear (1)",
+                "max": "2",
+                "min": "1",
+                "name": "type_model",
+                "type": "int",
+                "unit": "-",
+                "value": 1
+            },
+            {
+                "as_dict": "",
+                "desc": "Type of the coordinate system: cartesian (1) or radial (2)",
+                "max": "2",
+                "min": "1",
+                "name": "type_coord_sys",
+                "type": "int",
+                "unit": "-",
+                "value": 2
+            }
+        ]
     },
     "Magnet": {
         "constants": [

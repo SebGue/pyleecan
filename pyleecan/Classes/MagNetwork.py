@@ -498,6 +498,8 @@ class MagNetwork(Magnetics):
 
     def __init__(
         self,
+        type_model=1,
+        type_coord_sys=2,
         is_remove_slotS=False,
         is_remove_slotR=False,
         is_remove_ventS=False,
@@ -535,6 +537,10 @@ class MagNetwork(Magnetics):
         if init_dict is not None:  # Initialisation by dict
             assert type(init_dict) is dict
             # Overwrite default value with init_dict content
+            if "type_model" in list(init_dict.keys()):
+                type_model = init_dict["type_model"]
+            if "type_coord_sys" in list(init_dict.keys()):
+                type_coord_sys = init_dict["type_coord_sys"]
             if "is_remove_slotS" in list(init_dict.keys()):
                 is_remove_slotS = init_dict["is_remove_slotS"]
             if "is_remove_slotR" in list(init_dict.keys()):
@@ -574,6 +580,8 @@ class MagNetwork(Magnetics):
             if "is_periodicity_rotor" in list(init_dict.keys()):
                 is_periodicity_rotor = init_dict["is_periodicity_rotor"]
         # Set the properties (value check and convertion are done in setter)
+        self.type_model = type_model
+        self.type_coord_sys = type_coord_sys
         # Call Magnetics init
         super(MagNetwork, self).__init__(
             is_remove_slotS=is_remove_slotS,
@@ -605,6 +613,8 @@ class MagNetwork(Magnetics):
         MagNetwork_str = ""
         # Get the properties inherited from Magnetics
         MagNetwork_str += super(MagNetwork, self).__str__()
+        MagNetwork_str += "type_model = " + str(self.type_model) + linesep
+        MagNetwork_str += "type_coord_sys = " + str(self.type_coord_sys) + linesep
         return MagNetwork_str
 
     def __eq__(self, other):
@@ -615,6 +625,10 @@ class MagNetwork(Magnetics):
 
         # Check the properties inherited from Magnetics
         if not super(MagNetwork, self).__eq__(other):
+            return False
+        if other.type_model != self.type_model:
+            return False
+        if other.type_coord_sys != self.type_coord_sys:
             return False
         return True
 
@@ -633,6 +647,30 @@ class MagNetwork(Magnetics):
                 other, name=name, ignore_list=ignore_list, is_add_value=is_add_value
             )
         )
+        if other._type_model != self._type_model:
+            if is_add_value:
+                val_str = (
+                    " (self="
+                    + str(self._type_model)
+                    + ", other="
+                    + str(other._type_model)
+                    + ")"
+                )
+                diff_list.append(name + ".type_model" + val_str)
+            else:
+                diff_list.append(name + ".type_model")
+        if other._type_coord_sys != self._type_coord_sys:
+            if is_add_value:
+                val_str = (
+                    " (self="
+                    + str(self._type_coord_sys)
+                    + ", other="
+                    + str(other._type_coord_sys)
+                    + ")"
+                )
+                diff_list.append(name + ".type_coord_sys" + val_str)
+            else:
+                diff_list.append(name + ".type_coord_sys")
         # Filter ignore differences
         diff_list = list(filter(lambda x: x not in ignore_list, diff_list))
         return diff_list
@@ -644,6 +682,8 @@ class MagNetwork(Magnetics):
 
         # Get size of the properties inherited from Magnetics
         S += super(MagNetwork, self).__sizeof__()
+        S += getsizeof(self.type_model)
+        S += getsizeof(self.type_coord_sys)
         return S
 
     def as_dict(self, type_handle_ndarray=0, keep_function=False, **kwargs):
@@ -663,6 +703,8 @@ class MagNetwork(Magnetics):
             keep_function=keep_function,
             **kwargs
         )
+        MagNetwork_dict["type_model"] = self.type_model
+        MagNetwork_dict["type_coord_sys"] = self.type_coord_sys
         # The class name is added to the dict for deserialisation purpose
         # Overwrite the mother class name
         MagNetwork_dict["__class__"] = "MagNetwork"
@@ -672,6 +714,8 @@ class MagNetwork(Magnetics):
         """Creates a deepcopy of the object"""
 
         # Handle deepcopy of all the properties
+        type_model_val = self.type_model
+        type_coord_sys_val = self.type_coord_sys
         is_remove_slotS_val = self.is_remove_slotS
         is_remove_slotR_val = self.is_remove_slotR
         is_remove_ventS_val = self.is_remove_ventS
@@ -696,6 +740,8 @@ class MagNetwork(Magnetics):
         is_periodicity_rotor_val = self.is_periodicity_rotor
         # Creates new object of the same type with the copied properties
         obj_copy = type(self)(
+            type_model=type_model_val,
+            type_coord_sys=type_coord_sys_val,
             is_remove_slotS=is_remove_slotS_val,
             is_remove_slotR=is_remove_slotR_val,
             is_remove_ventS=is_remove_ventS_val,
@@ -721,5 +767,47 @@ class MagNetwork(Magnetics):
     def _set_None(self):
         """Set all the properties to None (except pyleecan object)"""
 
+        self.type_model = None
+        self.type_coord_sys = None
         # Set to None the properties inherited from Magnetics
         super(MagNetwork, self)._set_None()
+
+    def _get_type_model(self):
+        """getter of type_model"""
+        return self._type_model
+
+    def _set_type_model(self, value):
+        """setter of type_model"""
+        check_var("type_model", value, "int", Vmin=1, Vmax=2)
+        self._type_model = value
+
+    type_model = property(
+        fget=_get_type_model,
+        fset=_set_type_model,
+        doc=u"""Type of the model to be solved: linear (1) or non-linear (1)
+
+        :Type: int
+        :min: 1
+        :max: 2
+        """,
+    )
+
+    def _get_type_coord_sys(self):
+        """getter of type_coord_sys"""
+        return self._type_coord_sys
+
+    def _set_type_coord_sys(self, value):
+        """setter of type_coord_sys"""
+        check_var("type_coord_sys", value, "int", Vmin=1, Vmax=2)
+        self._type_coord_sys = value
+
+    type_coord_sys = property(
+        fget=_get_type_coord_sys,
+        fset=_set_type_coord_sys,
+        doc=u"""Type of the coordinate system: cartesian (1) or radial (2)
+
+        :Type: int
+        :min: 1
+        :max: 2
+        """,
+    )

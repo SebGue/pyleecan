@@ -1,6 +1,6 @@
 ﻿Variable name,Unit,Description (EN),Size,Type,Default value,Minimum value,Maximum value,,Package,Inherit,Methods,Constant Name,Constant Value,Class description
-,,,,,,,,,Simulation,Magnetics,geometry_motor,VERSION,1,Abstract class to solve the electric machines using the reluctance network
-,,,,,,,,,,,geometry_linear_motor_separetion,,,
+type_model,-,Type of the model to be solved: linear (1) or non-linear (1),1,int,1,1,2,,Simulation,Magnetics,geometry_motor,VERSION,1,Abstract class to solve the electric machines using the reluctance network
+type_coord_sys,-,Type of the coordinate system: cartesian (1) or radial (2),1,int,2,1,2,,,,geometry_linear_motor_separetion,,,
 ,,,,,,,,,,,plot.Plot_B,,,
 ,,,,,,,,,,,plot.view_contour_flux,,,
 ,,,,,,,,,,,plot.view_contour_flux2,,,
