@@ -85,7 +85,7 @@ def cartesianmeshclass_pyleecan(self):
         y_dual,
         pos,
         BC,
-        self.geometry_linear_motor,
+        self.geometry_motor,
         mu0,
         la,
         Br,

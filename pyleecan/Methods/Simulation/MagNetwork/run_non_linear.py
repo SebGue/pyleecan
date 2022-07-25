@@ -48,7 +48,7 @@ def run_non_linear(self):
         x,
         y,
         pos,
-        self.geometry_linear_motor,
+        self.geometry_motor,
         sol0,
         BC,
         self.la,

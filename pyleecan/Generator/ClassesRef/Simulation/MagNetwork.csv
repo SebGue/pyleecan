@@ -1,5 +1,5 @@
 ﻿Variable name,Unit,Description (EN),Size,Type,Default value,Minimum value,Maximum value,,Package,Inherit,Methods,Constant Name,Constant Value,Class description
-,,,,,,,,,Simulation,Magnetics,geometry_linear_motor,VERSION,1,Abstract class to solve the electric machines using the reluctance network
+,,,,,,,,,Simulation,Magnetics,geometry_motor,VERSION,1,Abstract class to solve the electric machines using the reluctance network
 ,,,,,,,,,,,geometry_linear_motor_separetion,,,
 ,,,,,,,,,,,plot.Plot_B,,,
 ,,,,,,,,,,,plot.view_contour_flux,,,
@@ -20,7 +20,7 @@
 ,,,,,,,,,,,assembler.assembly,,,
 ,,,,,,,,,,,assembler.assembly_one_area,,,
 ,,,,,,,,,,,assembler.right_member_assembly,,,
-,,,,,,,,,,,post_processing.add_BC_to_F,,,
+,,,,,,,,,,,post_processing.add_BC_to_Phi,,,
 ,,,,,,,,,,,post_processing.compute_B_radial,,,
 ,,,,,,,,,,,post_processing.compute_B_square,,,
 ,,,,,,,,,,,comp_flux_airgap,,,

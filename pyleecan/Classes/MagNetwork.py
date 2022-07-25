@@ -18,21 +18,9 @@ from .Magnetics import Magnetics
 # Import all class method
 # Try/catch to remove unnecessary dependencies in unused method
 try:
-    from ..Methods.Simulation.MagNetwork.assembler import assembler
+    from ..Methods.Simulation.MagNetwork.geometry_motor import geometry_motor
 except ImportError as error:
-    assembler = error
-
-try:
-    from ..Methods.Simulation.MagNetwork.generalize_geometry import generalize_geometry
-except ImportError as error:
-    generalize_geometry = error
-
-try:
-    from ..Methods.Simulation.MagNetwork.geometry_linear_motor import (
-        geometry_linear_motor,
-    )
-except ImportError as error:
-    geometry_linear_motor = error
+    geometry_motor = error
 
 try:
     from ..Methods.Simulation.MagNetwork.geometry_linear_motor_separetion import (
@@ -64,9 +52,9 @@ except ImportError as error:
     post_processing = error
 
 try:
-    from ..Methods.Simulation.MagNetwork.run_1 import run_1
+    from ..Methods.Simulation.MagNetwork.run_cartesian import run_cartesian
 except ImportError as error:
-    run_1 = error
+    run_cartesian = error
 
 try:
     from ..Methods.Simulation.MagNetwork.run_non_linear import run_non_linear
@@ -149,9 +137,11 @@ except ImportError as error:
     right_member_assembly = error
 
 try:
-    from ..Methods.Simulation.MagNetwork.post_processing.add_BC_to_F import add_BC_to_F
+    from ..Methods.Simulation.MagNetwork.post_processing.add_BC_to_Phi import (
+        add_BC_to_Phi,
+    )
 except ImportError as error:
-    add_BC_to_F = error
+    add_BC_to_Phi = error
 
 try:
     from ..Methods.Simulation.MagNetwork.post_processing.compute_B_radial import (
@@ -197,39 +187,17 @@ class MagNetwork(Magnetics):
     VERSION = 1
 
     # Check ImportError to remove unnecessary dependencies in unused method
-    # cf Methods.Simulation.MagNetwork.assembler
-    if isinstance(assembler, ImportError):
-        assembler = property(
-            fget=lambda x: raise_(
-                ImportError("Can't use MagNetwork method assembler: " + str(assembler))
-            )
-        )
-    else:
-        assembler = assembler
-    # cf Methods.Simulation.MagNetwork.generalize_geometry
-    if isinstance(generalize_geometry, ImportError):
-        generalize_geometry = property(
+    # cf Methods.Simulation.MagNetwork.geometry_motor
+    if isinstance(geometry_motor, ImportError):
+        geometry_motor = property(
             fget=lambda x: raise_(
                 ImportError(
-                    "Can't use MagNetwork method generalize_geometry: "
-                    + str(generalize_geometry)
+                    "Can't use MagNetwork method geometry_motor: " + str(geometry_motor)
                 )
             )
         )
     else:
-        generalize_geometry = generalize_geometry
-    # cf Methods.Simulation.MagNetwork.geometry_linear_motor
-    if isinstance(geometry_linear_motor, ImportError):
-        geometry_linear_motor = property(
-            fget=lambda x: raise_(
-                ImportError(
-                    "Can't use MagNetwork method geometry_linear_motor: "
-                    + str(geometry_linear_motor)
-                )
-            )
-        )
-    else:
-        geometry_linear_motor = geometry_linear_motor
+        geometry_motor = geometry_motor
     # cf Methods.Simulation.MagNetwork.geometry_linear_motor_separetion
     if isinstance(geometry_linear_motor_separetion, ImportError):
         geometry_linear_motor_separetion = property(
@@ -287,15 +255,17 @@ class MagNetwork(Magnetics):
         )
     else:
         post_processing = post_processing
-    # cf Methods.Simulation.MagNetwork.run_1
-    if isinstance(run_1, ImportError):
-        run_1 = property(
+    # cf Methods.Simulation.MagNetwork.run_cartesian
+    if isinstance(run_cartesian, ImportError):
+        run_cartesian = property(
             fget=lambda x: raise_(
-                ImportError("Can't use MagNetwork method run_1: " + str(run_1))
+                ImportError(
+                    "Can't use MagNetwork method run_cartesian: " + str(run_cartesian)
+                )
             )
         )
     else:
-        run_1 = run_1
+        run_cartesian = run_cartesian
     # cf Methods.Simulation.MagNetwork.run_non_linear
     if isinstance(run_non_linear, ImportError):
         run_non_linear = property(
@@ -450,17 +420,17 @@ class MagNetwork(Magnetics):
         )
     else:
         right_member_assembly = right_member_assembly
-    # cf Methods.Simulation.MagNetwork.post_processing.add_BC_to_F
-    if isinstance(add_BC_to_F, ImportError):
-        add_BC_to_F = property(
+    # cf Methods.Simulation.MagNetwork.post_processing.add_BC_to_Phi
+    if isinstance(add_BC_to_Phi, ImportError):
+        add_BC_to_Phi = property(
             fget=lambda x: raise_(
                 ImportError(
-                    "Can't use MagNetwork method add_BC_to_F: " + str(add_BC_to_F)
+                    "Can't use MagNetwork method add_BC_to_Phi: " + str(add_BC_to_Phi)
                 )
             )
         )
     else:
-        add_BC_to_F = add_BC_to_F
+        add_BC_to_Phi = add_BC_to_Phi
     # cf Methods.Simulation.MagNetwork.post_processing.compute_B_radial
     if isinstance(compute_B_radial, ImportError):
         compute_B_radial = property(

@@ -9,7 +9,7 @@ def save_mesh(
     Num_Unknowns,
     list_elem,
     theta,
-    y,
+    r,
     boundary_condition_list,
 ):
     """
@@ -27,8 +27,8 @@ def save_mesh(
     : nd-array, size: size_x (float)
            theta
         coordinate.
-       y : nd-array, size: size_x (float)
-           y coordinate.
+       r : nd-array, size: size_x (float)
+           r coordinate.
        boundary_condition_list : nd-array, size: n (integers)
            data-strurture for BC evaluation.
 
@@ -44,10 +44,11 @@ def save_mesh(
         fmt="%u",
         header=str(permeabiltiy_materials.size) + " " + str(Num_Unknowns.size),
     )
+    ###TO DO: place list_coord in parameter
     list_coord = np.zeros((Num_Unknowns.size, 2))
     for i in range(theta.size):
-        for j in range(y.size):
-            list_coord[theta.size * j + i, :] = np.array([theta[i], y[j]])
+        for j in range(r.size):
+            list_coord[theta.size * j + i, :] = np.array([theta[i], r[j]])
     f_handle.close()
     f_handle = open("mesh.txt", "a")
     np.savetxt(
