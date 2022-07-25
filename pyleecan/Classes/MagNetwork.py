@@ -172,6 +172,11 @@ try:
 except ImportError as error:
     cartesianmeshclass_pyleecan = error
 
+try:
+    from ..Methods.Simulation.MagNetwork.comp_axes import comp_axes
+except ImportError as error:
+    comp_axes = error
+
 
 from numpy import isnan
 from ._check import InitUnKnowClassError
@@ -481,6 +486,15 @@ class MagNetwork(Magnetics):
         )
     else:
         cartesianmeshclass_pyleecan = cartesianmeshclass_pyleecan
+    # cf Methods.Simulation.MagNetwork.comp_axes
+    if isinstance(comp_axes, ImportError):
+        comp_axes = property(
+            fget=lambda x: raise_(
+                ImportError("Can't use MagNetwork method comp_axes: " + str(comp_axes))
+            )
+        )
+    else:
+        comp_axes = comp_axes
     # generic save method is available in all object
     save = save
     # get_logger method is available in all object

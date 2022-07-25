@@ -35,7 +35,7 @@ def init_point(self, N_point_theta, N_point_r, theta, r):
     #     for j in range(N_point_r):
     #         list_coord[N_point_theta * j + i, :] = np.array([r[i], theta[j]])
 
-    list_coord[:, 0] = np.repeat(theta, N_point_r)
-    list_coord[:, 1] = np.tile(r, N_point_theta)
+    list_coord[:, 0] = np.tile(theta, N_point_r)
+    list_coord[:, 1] = np.repeat(r, N_point_theta)
 
     return list_coord

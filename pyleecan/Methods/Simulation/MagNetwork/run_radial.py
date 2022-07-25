@@ -51,7 +51,7 @@ def run_radial(
         axes_dict["angle"].initial,
         axes_dict["angle"].final,
         axes_dict["angle"].number + 1,
-        endpoint=False,
+        # endpoint=False,
     )
 
     r_dual = (r[1:] + r[:-1]) / 2
@@ -112,7 +112,7 @@ def run_radial(
     # Plotting the flux density contour
     self.view_contour_flux(Phi, x, y, N_point_theta, N_point_r, list_geometry)
 
-    Bx, By = self.compute_B_square(Phi, list_elem, list_coord, la)
+    Bx, By = self.compute_B(Phi, list_elem, list_coord, la, type_coord_sys)
 
     B = np.stack((Bx, By), axis=-1)
 
@@ -150,7 +150,14 @@ def run_radial(
 
     # Compute 2D curve of the airgap flux density
     Bx_airgap, By_airgap = self.comp_flux_airgap_local(
-        r, theta, Phi, list_elem, list_coord, la, Machine.comp_Rgap_mec()
+        r,
+        theta,
+        Phi,
+        list_elem,
+        list_coord,
+        la,
+        Machine.comp_Rgap_mec(),
+        type_coord_sys,
     )
     # # Add my mesh to pyleecan
     # print("Solve RN done.")
