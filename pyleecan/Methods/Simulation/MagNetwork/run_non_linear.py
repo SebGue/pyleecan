@@ -4,9 +4,7 @@ Created on Fri Jun  3 10:46:17 2022
 
 @author: LAP02
 """
-# from solver_non_linear_model import non_linear_model
-# from geometry_linear_motor import geometry
-# from post_processing import compute_B_square
+
 import numpy as np
 import meshio
 

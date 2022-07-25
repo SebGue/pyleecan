@@ -52,7 +52,7 @@ def right_member_assembly(
 
     # np.savetxt("cell_materials.csv", list_elements_materials)
     # print("non-zero in mak magnet?", mask_magnet.sum())
-    if type_coord_sys == "cartesian":
+    if type_coord_sys == 1:
         h_x = np.linalg.norm(
             list_coord[list_elem[:, 0]] - list_coord[list_elem[:, 1]], axis=1, ord=2
         )
@@ -61,7 +61,7 @@ def right_member_assembly(
         )
         FMMPM = 0.5 * Br * la * h_y[mask_magnet] / mur_PM
 
-    elif type_coord_sys == "polar":
+    elif type_coord_sys == 2:
         R1 = list_coord[list_elem[:, 0], 1]
         R2 = list_coord[list_elem[:, -1], 1]
         sigma_R = np.abs(R2 - R1)
@@ -90,9 +90,9 @@ def right_member_assembly(
         # Phase 1
         mask_winding = list_elements_materials == 1
 
-        if type_coord_sys == "cartesian":
+        if type_coord_sys == 1:
             S = h_x[mask_winding] * h_y[mask_winding] / 4
-        elif type_coord_sys == "polar":
+        elif type_coord_sys == 2:
             S = (
                 0.5
                 * sigma_theta[mask_winding]
@@ -113,9 +113,9 @@ def right_member_assembly(
         # Phase 2
         mask_winding = list_elements_materials == 2
 
-        if type_coord_sys == "cartesian":
+        if type_coord_sys == 1:
             S = h_x[mask_winding] * h_y[mask_winding] / 4
-        elif type_coord_sys == "polar":
+        elif type_coord_sys == 2:
             S = (
                 0.5
                 * sigma_theta[mask_winding]
@@ -135,9 +135,9 @@ def right_member_assembly(
 
         ###Phase 3
         mask_winding = list_elements_materials == 3
-        if type_coord_sys == "cartesian":
+        if type_coord_sys == 1:
             S = h_x[mask_winding] * h_y[mask_winding] / 4
-        elif type_coord_sys == "polar":
+        elif type_coord_sys == 2:
             S = (
                 0.5
                 * sigma_theta[mask_winding]

@@ -118,6 +118,11 @@ except ImportError as error:
     save_mesh = error
 
 try:
+    from ..Methods.Simulation.MagNetwork.pre_processing.init_mesh import init_mesh
+except ImportError as error:
+    init_mesh = error
+
+try:
     from ..Methods.Simulation.MagNetwork.assembler.assembly import assembly
 except ImportError as error:
     assembly = error
@@ -144,18 +149,9 @@ except ImportError as error:
     add_BC_to_Phi = error
 
 try:
-    from ..Methods.Simulation.MagNetwork.post_processing.compute_B_radial import (
-        compute_B_radial,
-    )
+    from ..Methods.Simulation.MagNetwork.post_processing.compute_B import compute_B
 except ImportError as error:
-    compute_B_radial = error
-
-try:
-    from ..Methods.Simulation.MagNetwork.post_processing.compute_B_square import (
-        compute_B_square,
-    )
-except ImportError as error:
-    compute_B_square = error
+    compute_B = error
 
 try:
     from ..Methods.Simulation.MagNetwork.comp_flux_airgap import comp_flux_airgap
@@ -387,6 +383,15 @@ class MagNetwork(Magnetics):
         )
     else:
         save_mesh = save_mesh
+    # cf Methods.Simulation.MagNetwork.pre_processing.init_mesh
+    if isinstance(init_mesh, ImportError):
+        init_mesh = property(
+            fget=lambda x: raise_(
+                ImportError("Can't use MagNetwork method init_mesh: " + str(init_mesh))
+            )
+        )
+    else:
+        init_mesh = init_mesh
     # cf Methods.Simulation.MagNetwork.assembler.assembly
     if isinstance(assembly, ImportError):
         assembly = property(
@@ -431,30 +436,15 @@ class MagNetwork(Magnetics):
         )
     else:
         add_BC_to_Phi = add_BC_to_Phi
-    # cf Methods.Simulation.MagNetwork.post_processing.compute_B_radial
-    if isinstance(compute_B_radial, ImportError):
-        compute_B_radial = property(
+    # cf Methods.Simulation.MagNetwork.post_processing.compute_B
+    if isinstance(compute_B, ImportError):
+        compute_B = property(
             fget=lambda x: raise_(
-                ImportError(
-                    "Can't use MagNetwork method compute_B_radial: "
-                    + str(compute_B_radial)
-                )
+                ImportError("Can't use MagNetwork method compute_B: " + str(compute_B))
             )
         )
     else:
-        compute_B_radial = compute_B_radial
-    # cf Methods.Simulation.MagNetwork.post_processing.compute_B_square
-    if isinstance(compute_B_square, ImportError):
-        compute_B_square = property(
-            fget=lambda x: raise_(
-                ImportError(
-                    "Can't use MagNetwork method compute_B_square: "
-                    + str(compute_B_square)
-                )
-            )
-        )
-    else:
-        compute_B_square = compute_B_square
+        compute_B = compute_B
     # cf Methods.Simulation.MagNetwork.comp_flux_airgap
     if isinstance(comp_flux_airgap, ImportError):
         comp_flux_airgap = property(
@@ -500,6 +490,8 @@ class MagNetwork(Magnetics):
         self,
         type_model=1,
         type_coord_sys=2,
+        N_point_r=131,
+        rotor_shift=8,
         is_remove_slotS=False,
         is_remove_slotR=False,
         is_remove_ventS=False,
@@ -541,6 +533,10 @@ class MagNetwork(Magnetics):
                 type_model = init_dict["type_model"]
             if "type_coord_sys" in list(init_dict.keys()):
                 type_coord_sys = init_dict["type_coord_sys"]
+            if "N_point_r" in list(init_dict.keys()):
+                N_point_r = init_dict["N_point_r"]
+            if "rotor_shift" in list(init_dict.keys()):
+                rotor_shift = init_dict["rotor_shift"]
             if "is_remove_slotS" in list(init_dict.keys()):
                 is_remove_slotS = init_dict["is_remove_slotS"]
             if "is_remove_slotR" in list(init_dict.keys()):
@@ -582,6 +578,8 @@ class MagNetwork(Magnetics):
         # Set the properties (value check and convertion are done in setter)
         self.type_model = type_model
         self.type_coord_sys = type_coord_sys
+        self.N_point_r = N_point_r
+        self.rotor_shift = rotor_shift
         # Call Magnetics init
         super(MagNetwork, self).__init__(
             is_remove_slotS=is_remove_slotS,
@@ -615,6 +613,8 @@ class MagNetwork(Magnetics):
         MagNetwork_str += super(MagNetwork, self).__str__()
         MagNetwork_str += "type_model = " + str(self.type_model) + linesep
         MagNetwork_str += "type_coord_sys = " + str(self.type_coord_sys) + linesep
+        MagNetwork_str += "N_point_r = " + str(self.N_point_r) + linesep
+        MagNetwork_str += "rotor_shift = " + str(self.rotor_shift) + linesep
         return MagNetwork_str
 
     def __eq__(self, other):
@@ -629,6 +629,10 @@ class MagNetwork(Magnetics):
         if other.type_model != self.type_model:
             return False
         if other.type_coord_sys != self.type_coord_sys:
+            return False
+        if other.N_point_r != self.N_point_r:
+            return False
+        if other.rotor_shift != self.rotor_shift:
             return False
         return True
 
@@ -671,6 +675,30 @@ class MagNetwork(Magnetics):
                 diff_list.append(name + ".type_coord_sys" + val_str)
             else:
                 diff_list.append(name + ".type_coord_sys")
+        if other._N_point_r != self._N_point_r:
+            if is_add_value:
+                val_str = (
+                    " (self="
+                    + str(self._N_point_r)
+                    + ", other="
+                    + str(other._N_point_r)
+                    + ")"
+                )
+                diff_list.append(name + ".N_point_r" + val_str)
+            else:
+                diff_list.append(name + ".N_point_r")
+        if other._rotor_shift != self._rotor_shift:
+            if is_add_value:
+                val_str = (
+                    " (self="
+                    + str(self._rotor_shift)
+                    + ", other="
+                    + str(other._rotor_shift)
+                    + ")"
+                )
+                diff_list.append(name + ".rotor_shift" + val_str)
+            else:
+                diff_list.append(name + ".rotor_shift")
         # Filter ignore differences
         diff_list = list(filter(lambda x: x not in ignore_list, diff_list))
         return diff_list
@@ -684,6 +712,8 @@ class MagNetwork(Magnetics):
         S += super(MagNetwork, self).__sizeof__()
         S += getsizeof(self.type_model)
         S += getsizeof(self.type_coord_sys)
+        S += getsizeof(self.N_point_r)
+        S += getsizeof(self.rotor_shift)
         return S
 
     def as_dict(self, type_handle_ndarray=0, keep_function=False, **kwargs):
@@ -705,6 +735,8 @@ class MagNetwork(Magnetics):
         )
         MagNetwork_dict["type_model"] = self.type_model
         MagNetwork_dict["type_coord_sys"] = self.type_coord_sys
+        MagNetwork_dict["N_point_r"] = self.N_point_r
+        MagNetwork_dict["rotor_shift"] = self.rotor_shift
         # The class name is added to the dict for deserialisation purpose
         # Overwrite the mother class name
         MagNetwork_dict["__class__"] = "MagNetwork"
@@ -716,6 +748,8 @@ class MagNetwork(Magnetics):
         # Handle deepcopy of all the properties
         type_model_val = self.type_model
         type_coord_sys_val = self.type_coord_sys
+        N_point_r_val = self.N_point_r
+        rotor_shift_val = self.rotor_shift
         is_remove_slotS_val = self.is_remove_slotS
         is_remove_slotR_val = self.is_remove_slotR
         is_remove_ventS_val = self.is_remove_ventS
@@ -742,6 +776,8 @@ class MagNetwork(Magnetics):
         obj_copy = type(self)(
             type_model=type_model_val,
             type_coord_sys=type_coord_sys_val,
+            N_point_r=N_point_r_val,
+            rotor_shift=rotor_shift_val,
             is_remove_slotS=is_remove_slotS_val,
             is_remove_slotR=is_remove_slotR_val,
             is_remove_ventS=is_remove_ventS_val,
@@ -769,6 +805,8 @@ class MagNetwork(Magnetics):
 
         self.type_model = None
         self.type_coord_sys = None
+        self.N_point_r = None
+        self.rotor_shift = None
         # Set to None the properties inherited from Magnetics
         super(MagNetwork, self)._set_None()
 
@@ -809,5 +847,41 @@ class MagNetwork(Magnetics):
         :Type: int
         :min: 1
         :max: 2
+        """,
+    )
+
+    def _get_N_point_r(self):
+        """getter of N_point_r"""
+        return self._N_point_r
+
+    def _set_N_point_r(self, value):
+        """setter of N_point_r"""
+        check_var("N_point_r", value, "int")
+        self._N_point_r = value
+
+    N_point_r = property(
+        fget=_get_N_point_r,
+        fset=_set_N_point_r,
+        doc=u"""number of points in the r-direction
+
+        :Type: int
+        """,
+    )
+
+    def _get_rotor_shift(self):
+        """getter of rotor_shift"""
+        return self._rotor_shift
+
+    def _set_rotor_shift(self, value):
+        """setter of rotor_shift"""
+        check_var("rotor_shift", value, "int")
+        self._rotor_shift = value
+
+    rotor_shift = property(
+        fget=_get_rotor_shift,
+        fset=_set_rotor_shift,
+        doc=u"""number of cells to be shifted when changing the rotor position
+
+        :Type: int
         """,
     )

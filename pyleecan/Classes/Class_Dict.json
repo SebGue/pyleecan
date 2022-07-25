@@ -7045,12 +7045,12 @@
             "pre_processing.init_reluc",
             "pre_processing.numeroting_unknows",
             "pre_processing.save_mesh",
+            "pre_processing.init_mesh",
             "assembler.assembly",
             "assembler.assembly_one_area",
             "assembler.right_member_assembly",
             "post_processing.add_BC_to_Phi",
-            "post_processing.compute_B_radial",
-            "post_processing.compute_B_square",
+            "post_processing.compute_B",
             "comp_flux_airgap",
             "comp_flux_airgap_local",
             "cartesianmeshclass_pyleecan"
@@ -7079,6 +7079,26 @@
                 "type": "int",
                 "unit": "-",
                 "value": 2
+            },
+            {
+                "as_dict": "",
+                "desc": "number of points in the r-direction",
+                "max": "",
+                "min": "",
+                "name": "N_point_r",
+                "type": "int",
+                "unit": "-",
+                "value": 131
+            },
+            {
+                "as_dict": "",
+                "desc": "number of cells to be shifted when changing the rotor position",
+                "max": "",
+                "min": "",
+                "name": "rotor_shift",
+                "type": "int",
+                "unit": "-",
+                "value": 8
             }
         ]
     },

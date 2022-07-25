@@ -16,7 +16,9 @@ from pyleecan.Classes.MeshSolution import MeshSolution
 from pyleecan.Classes.SolutionMat import SolutionMat
 
 
-def run_radial(self, axes_dict, Is_val=None):
+def run_radial(
+    self, axes_dict, Is_val=None, type_coord_sys=2, N_point_r=131, rotor_shift=8
+):
 
     Machine = self.parent.machine
     la = Machine.rotor.L1  # Active length (m)
@@ -26,13 +28,18 @@ def run_radial(self, axes_dict, Is_val=None):
 
     # position of rotor (number of cells of the rotor to be shifted)
     # TODO set this value according to time and rotor position
-    rotor_shift = 8
+    # rotor_shift = 8
 
     # Size of the mesh according to r
     # Step of discretization of r
     # N_point_r = round((Machine.stator.Rext - Machine.rotor.Rint) * 1000)
+<<<<<<< .mine
     N_point_r = 52
     # N_point_r = 154
+=======
+
+
+>>>>>>> .theirs
 
     # Size of mesh according to theta
     if Machine.comp_periodicity_spatial()[1] == True:
@@ -40,7 +47,7 @@ def run_radial(self, axes_dict, Is_val=None):
     else:
         periodicity = Machine.comp_periodicity_spatial()[0] / 2
     # step of discretization of theta
-    # Wrong result, to modify and understand, why 180Â° and not 90Â°?
+    # Wrong result, to modify and understand, why 180° and not 90°?
     N_point_theta = round((360 / periodicity)) + 1
     print(N_point_theta)
     N_point_theta=61
@@ -59,8 +66,12 @@ def run_radial(self, axes_dict, Is_val=None):
     r_dual = (r[1:] + r[:-1]) / 2
     theta_dual = (theta[1:] + theta[:-1]) / 2
 
-    BC = ["anti_periodic_condition", "homogeneous_Dirichlet_condition", "anti_periodic_condition", "homogeneous_Dirichlet_condition"]
-    type_coord_sys= "polar"
+    BC = [
+        "anti_periodic_condition",
+        "homogeneous_Dirichlet_condition",
+        "anti_periodic_condition",
+        "homogeneous_Dirichlet_condition",
+    ]
 
     # Compute current densities
     if Is_val is not None:

@@ -1,5 +1,9 @@
 from pyleecan.Classes.MagNetwork import MagNetwork
+<<<<<<< .mine
 #from pyleecan.Classes.MachineInput import load_machine
+=======
+
+>>>>>>> .theirs
 from pyleecan.Functions.load import load
 from pyleecan.Classes.Simu1 import Simu1
 from pyleecan.Classes.InputCurrent import InputCurrent
@@ -43,6 +47,8 @@ simu.mag = MagNetwork(
     is_periodicity_t=False,
     type_model=1,
     type_coord_sys=2,
+    N_point_r=131,
+    rotor_shift=8,
 )
 
 # Cartesian meshing
