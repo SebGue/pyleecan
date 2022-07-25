@@ -20,12 +20,12 @@ def init_permeabilty_cell(
         materials in each cell.
     Returns
     -------
-    permeabiliy_element : nd-array, size: n (int)
+    list_element_materials : nd-array, size: n (int)
         Permeability in each cell.
     """
-    permeabiliy_element = np.zeros(
+    list_element_materials = np.zeros(
         (N_point_r - 1) * (N_point_theta - 1), dtype=np.float64
     )
-    permeabiliy_element[...] = permeability_materials[list_element_materials - 1]
+    list_element_materials[...] = permeability_materials[list_element_materials - 1]
 
-    return permeabiliy_element
+    return list_element_materials

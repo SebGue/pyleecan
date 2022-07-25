@@ -26,13 +26,13 @@ def run_radial(self, axes_dict, Is_val=None):
 
     # position of rotor (number of cells of the rotor to be shifted)
     # TODO set this value according to time and rotor position
-    pos = 8
+    rotor_shift = 8
 
     # Size of the mesh according to r
     # Step of discretization of r
-    # size_r = round((Machine.stator.Rext - Machine.rotor.Rint) * 1000)
-    size_r = 131
-    # size_r = 154
+    # N_point_r = round((Machine.stator.Rext - Machine.rotor.Rint) * 1000)
+    N_point_r = 131
+    # N_point_r = 154
 
     # Size of mesh according to theta
     if Machine.comp_periodicity_spatial()[1] == True:
@@ -40,10 +40,10 @@ def run_radial(self, axes_dict, Is_val=None):
     else:
         periodicity = Machine.comp_periodicity_spatial()[0] / 2
     # step of discretization of theta
-    size_theta = round((360 / periodicity)) + 1
+    N_point_theta = round((360 / periodicity)) + 1
 
     # Definition of the r-axis
-    r = np.linspace(Machine.rotor.Rint, Machine.stator.Rext, size_r)
+    r = np.linspace(Machine.rotor.Rint, Machine.stator.Rext, N_point_r)
 
     # Definition of the theta-axis
     # Add one extra point so that dual mesh has the correct dimension
@@ -57,8 +57,8 @@ def run_radial(self, axes_dict, Is_val=None):
     r_dual = (r[1:] + r[:-1]) / 2
     theta_dual = (theta[1:] + theta[:-1]) / 2
 
-    BC = ["AP", "HD", "AP", "HD"]
-    mode = "polar"
+    BC = ["anti_periodic_condition", "homogeneous_Dirichlet_condition", "anti_periodic_condition", "homogeneous_Dirichlet_condition"]
+    type_coord_sys= "polar"
 
     # Compute current densities
     if Is_val is not None:
@@ -72,43 +72,43 @@ def run_radial(self, axes_dict, Is_val=None):
         JC = None
 
     (
-        F,
+        Phi,
         list_geometry,
         Num_unknowns,
         list_elem,
         permeability_cell,
         list_coord,
     ) = self.solver_linear_model(
-        size_theta,
-        size_r,
+        N_point_theta,
+        N_point_r,
         theta,
         r,
         theta_dual,
         r_dual,
-        pos,
+        rotor_shift,
         BC,
         self.geometry_linear_motor,
         mu0,
         la,
         Br,
-        mode,
+        type_coord_sys,
         JA=JA,
         JB=JB,
         JC=JC,
     )
 
     # Transfomration of radial coordinates to cartesian
-    x = (list_coord[:, 1] * np.cos(list_coord[:, 0])).reshape(size_r, size_theta)
-    y = (list_coord[:, 1] * np.sin(list_coord[:, 0])).reshape(size_r, size_theta)
-    list_cart = np.zeros((list_coord.shape[0], 2))
+    x = (list_coord[:, 1] * np.cos(list_coord[:, 0])).reshape(N_point_r, N_point_theta)
+    y = (list_coord[:, 1] * np.sin(list_coord[:, 0])).reshape(N_point_r, N_point_theta)
+    list_cartesian_coord = np.zeros((list_coord.shape[0], 2))
 
-    list_cart[:, 0] = x.flatten()
-    list_cart[:, 1] = y.flatten()
+    list_cartesian_coord[:, 0] = x.flatten()
+    list_cartesian_coord[:, 1] = y.flatten()
 
     # Plotting the flux density contour
-    self.view_contour_flux(F, x, y, x.shape[1], x.shape[0], list_geometry)
+    self.view_contour_flux(Phi, x, y, N_point_theta, N_point_r, list_geometry)
 
-    Bx, By = self.compute_B_square(F, list_elem, list_coord, la)
+    Bx, By = self.compute_B_square(Phi, list_elem, list_coord, la)
 
     B = np.stack((Bx, By), axis=-1)
 
@@ -146,7 +146,7 @@ def run_radial(self, axes_dict, Is_val=None):
 
     # Compute 2D curve of the airgap flux density
     Bx_airgap, By_airgap = self.comp_flux_airgap_local(
-        r, theta, F, list_elem, list_coord, la, Machine.comp_Rgap_mec()
+        r, theta, Phi, list_elem, list_coord, la, Machine.comp_Rgap_mec()
     )
     # # Add my mesh to pyleecan
     # print("Solve RN done.")
