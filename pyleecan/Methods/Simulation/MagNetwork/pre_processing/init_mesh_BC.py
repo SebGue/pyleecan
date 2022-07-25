@@ -25,7 +25,7 @@ def init_mesh_BC(self, N_point_theta, N_point_r, boundary_condition):
 
     """
     # boundary_condition: Boundary Condition, ["condi0","cond1","cond2","cond3"]
-    # -> "homogenious_Dirichlet_condition": Homogenious Dicrichlet conditions (=0)
+    # -> "homogeneous_Dirichlet_condition": Homogeneous Dicrichlet conditions (=0)
     # -> "periodic_condition" : Periodic contitions
     # -> "anti_periodic_condition": Anti Periodic Condition
     # -> "non_attribuate_condition" :
@@ -41,9 +41,9 @@ def init_mesh_BC(self, N_point_theta, N_point_r, boundary_condition):
         boundary_condition
         == [
             "periodic_condition",
-            "homogenious_Dirichlet_condition",
+            "homogeneous_Dirichlet_condition",
             "periodic_condition",
-            "homogenious_Dirichlet_condition",
+            "homogeneous_Dirichlet_condition",
         ]
     ):
 
@@ -68,9 +68,9 @@ def init_mesh_BC(self, N_point_theta, N_point_r, boundary_condition):
         boundary_condition
         == [
             "anti_periodic_condition",
-            "homogenious_Dirichlet_condition",
+            "homogeneous_Dirichlet_condition",
             "anti_periodic_condition",
-            "homogenious_Dirichlet_condition",
+            "homogeneous_Dirichlet_condition",
         ]
     ):
         # Initialyze the boundary_condition list
@@ -93,7 +93,7 @@ def init_mesh_BC(self, N_point_theta, N_point_r, boundary_condition):
             "anti_periodic_condition",
             "non_attribuate_condition",
             "anti_periodic_condition",
-            "homogenious_Dirichlet_condition",
+            "homogeneous_Dirichlet_condition",
         ]
     ):
         # Initialize the boundary_condition list
@@ -113,7 +113,7 @@ def init_mesh_BC(self, N_point_theta, N_point_r, boundary_condition):
         boundary_condition
         == [
             "anti_periodic_condition",
-            "homogenious_Dirichlet_condition",
+            "homogeneous_Dirichlet_condition",
             "anti_periodic_condition",
             "non_attribuate_condition",
         ]
@@ -138,7 +138,7 @@ def init_mesh_BC(self, N_point_theta, N_point_r, boundary_condition):
             "periodic_condition",
             "non_attribuate_condition",
             "periodic_condition",
-            "homogenious_Dirichlet_condition",
+            "homogeneous_Dirichlet_condition",
         ]
     ):
         # Initialyze the boundary_condition list
@@ -158,7 +158,7 @@ def init_mesh_BC(self, N_point_theta, N_point_r, boundary_condition):
         boundary_condition
         == [
             "periodic_condition",
-            "homogenious_Dirichlet_condition",
+            "homogeneous_Dirichlet_condition",
             "periodic_condition",
             "non_attribuate_condition",
         ]

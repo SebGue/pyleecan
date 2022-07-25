@@ -4,14 +4,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # def comp_flux_airgap(self, output, axes_dict, Is_val=None, Ir_val=None):
-def comp_flux_airgap_local(self, r, theta, Phi, list_elem, list_coord, la, Rgap):
+def comp_flux_airgap_local(self, r, theta, Phi, list_elem, list_coord, la, Rgap,N_point_r,N_point_theta):
 
     # Computing the radial and tangential flux density
     Bx, By = self.compute_B_radial(Phi, list_elem, list_coord, la)
 
     # Reshaping B in a 2D array
-    Bx = Bx.reshape((r.size - 1, theta.size - 1))
-    By = By.reshape((r.size - 1, theta.size - 1))
+    Bx = Bx.reshape((N_point_r-1,N_point_theta-1))
+    By = By.reshape((N_point_r-1,N_point_theta-1))
 
     # Looking for the position in the center of the mecanical airgap
     position = Rgap

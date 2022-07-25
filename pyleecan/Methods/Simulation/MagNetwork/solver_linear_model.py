@@ -107,7 +107,7 @@ def solver_linear_model(
     # print("Permeability", permeability_materials)
 
     list_elem_permability = self.init_permeabilty_cell(
-        N_point_theta, N_point_r, permeability_materials, mu0, list_elem_materials
+        N_point_theta, N_point_r, permeability_materials, list_elem_materials
     )
 
     list_elem = self.init_cell(N_point_theta, N_point_r)
@@ -192,8 +192,8 @@ def solver_linear_model(
             "secondes, res:",
             np.linalg.norm(M_csr @ Phi - RHS, ord=2),
         )
-    # TO DO: Change add_BC_to_F -> add_BC_to_Phi
-    Phi = self.add_BC_to_F(Phi, Num_Unknowns, list_elem, list_boundary_condition)
+
+    Phi = self.add_BC_to_Phi(Phi, Num_Unknowns, list_elem, list_boundary_condition)
 
     return (
         Phi,

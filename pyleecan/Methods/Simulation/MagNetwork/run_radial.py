@@ -31,7 +31,7 @@ def run_radial(self, axes_dict, Is_val=None):
     # Size of the mesh according to r
     # Step of discretization of r
     # N_point_r = round((Machine.stator.Rext - Machine.rotor.Rint) * 1000)
-    N_point_r = 131
+    N_point_r = 52
     # N_point_r = 154
 
     # Size of mesh according to theta
@@ -40,8 +40,10 @@ def run_radial(self, axes_dict, Is_val=None):
     else:
         periodicity = Machine.comp_periodicity_spatial()[0] / 2
     # step of discretization of theta
+    # Wrong result, to modify and understand, why 180° and not 90°?
     N_point_theta = round((360 / periodicity)) + 1
-
+    print(N_point_theta)
+    N_point_theta=61
     # Definition of the r-axis
     r = np.linspace(Machine.rotor.Rint, Machine.stator.Rext, N_point_r)
 
@@ -50,10 +52,10 @@ def run_radial(self, axes_dict, Is_val=None):
     theta = np.linspace(
         axes_dict["angle"].initial,
         axes_dict["angle"].final,
-        axes_dict["angle"].number + 1,
-        endpoint=False,
-    )
+        axes_dict["angle"].number 
 
+    )
+    
     r_dual = (r[1:] + r[:-1]) / 2
     theta_dual = (theta[1:] + theta[:-1]) / 2
 
@@ -100,8 +102,8 @@ def run_radial(self, axes_dict, Is_val=None):
     # Transfomration of radial coordinates to cartesian
     x = (list_coord[:, 1] * np.cos(list_coord[:, 0])).reshape(N_point_r, N_point_theta)
     y = (list_coord[:, 1] * np.sin(list_coord[:, 0])).reshape(N_point_r, N_point_theta)
-    list_cartesian_coord = np.zeros((list_coord.shape[0], 2))
 
+    list_cartesian_coord = np.zeros(list_coord.shape)
     list_cartesian_coord[:, 0] = x.flatten()
     list_cartesian_coord[:, 1] = y.flatten()
 
@@ -146,8 +148,8 @@ def run_radial(self, axes_dict, Is_val=None):
 
     # Compute 2D curve of the airgap flux density
     Bx_airgap, By_airgap = self.comp_flux_airgap_local(
-        r, theta, Phi, list_elem, list_coord, la, Machine.comp_Rgap_mec()
-    )
+        r_dual, theta, Phi, list_elem, list_coord, la, Machine.comp_Rgap_mec(),
+    N_point_r,N_point_theta)
     # # Add my mesh to pyleecan
     # print("Solve RN done.")
     # mesh = MeshMat(dimension=3)

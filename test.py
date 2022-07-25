@@ -1,5 +1,5 @@
 from pyleecan.Classes.MagNetwork import MagNetwork
-from pyleecan.Classes.MachineInput import load_machine
+#from pyleecan.Classes.MachineInput import load_machine
 from pyleecan.Functions.load import load
 from pyleecan.Classes.Simu1 import Simu1
 from pyleecan.Classes.InputCurrent import InputCurrent
@@ -11,7 +11,7 @@ from os.path import join
 from Tests import save_validation_path as save_path
 
 # Defining the validation cases paths
-file_path = "C:/Users/pc/Downloads/SPMSM_val.json"  # case study 1
+file_path = "C:/Users/LAP02/Downloads/SPMSM_val.json"  # case study 1
 # file_path = (
 #     "C:/Users/pc/AppData/Roaming/pyleecan/Machine/Benchmark.json"  # case study 2
 # )
@@ -33,7 +33,7 @@ simu = Simu1(name="test_magnetwork", machine=SPMSM_val)
 # MagNetwork simulation
 simu.input = InputCurrent(
     OP=OPdq(N0=1000, Id_ref=0, Iq_ref=0),
-    Na_tot=180 * 4,  # simu.input.Na_tot
+    Na_tot=61 * 4,  # simu.input.Na_tot
     Nt_tot=1,
 )
 
@@ -59,7 +59,7 @@ simu2 = Simu1(name="test_FEMM", machine=SPMSM_val)
 # FEMM simulation
 simu2.input = InputCurrent(
     OP=OPdq(N0=1000, Id_ref=0, Iq_ref=0),
-    Na_tot=61 * 4,
+    Na_tot=51 * 4,
     Nt_tot=1,
     is_periodicity_t=False,
     is_periodicity_a=True,

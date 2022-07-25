@@ -26,9 +26,9 @@ def init_point(self, N_point_theta, N_point_r, theta, r):
 
     """
     if N_point_theta != theta.size:
-        raise NameError("Wrong number of points in theta direction.")
+        raise NameError("Wrong number of points in theta direction, "+str(N_point_theta)+"!="+str( theta.size))
     if N_point_r != r.size:
-        raise NameError("Wrong number of points in radial direction.")
+        raise NameError("Wrong number of points in radial direction."+str(N_point_r)+"!="+str( r.size))
 
     list_coord = np.zeros((N_point_theta * N_point_r, 2))
     # for i in range(N_point_theta):
