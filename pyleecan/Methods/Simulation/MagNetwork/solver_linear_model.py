@@ -102,54 +102,42 @@ def solver_linear_model(
         N_point_theta, N_point_r, rotor_shift
     )
 
-    # # initialize the list_coord which contains the grid of points
+    # initialize the list_coord which contains the grid of points
     # list_coord = self.init_point(N_point_theta, N_point_r, theta, r)
-    # # print("Permeability", permeability_materials)
-
-    # list_elem_permability = self.init_permeabilty_cell(
-    #     N_point_theta, N_point_r, permeability_materials, mu0, list_elem_materials
-    # )
+    # print("Permeability", permeability_materials)
 
     # list_elem = self.init_cell(N_point_theta, N_point_r)
 
-    # list_boundary_condition, Periodic_point = self.init_mesh_BC(
-    #     N_point_theta, N_point_r, boundary_condition
-    # )
-
-    # Num_Unknowns = self.numeroting_unknows(
-    #     list_elem, list_boundary_condition, Periodic_point
-    # )
-
-    # # Mesuring the performance time
-    # t1 = time.perf_counter()
-
-    # # print("Assembly geometry:", np.round(t1 - t0, 5), "seconds")
-    # self.save_mesh(
-    #     list_elem_materials, Num_Unknowns, list_elem, theta, r, list_boundary_condition
-    # )
-
-    # t2 = time.perf_counter()
-    # # Saving mesh time
-    # print("Save mesh:", np.round(t2 - t1, 5), "secondes")
-
-    # Mesh initialization using init_mesh method
-    (
-        list_coord,
-        list_elem_permability,
-        list_elem,
-        list_boundary_condition,
-        Periodic_point,
-        Num_Unknowns,
-    ) = self.init_mesh(
+    (list_coord, list_elem,) = self.init_mesh(
         N_point_theta,
         N_point_r,
         theta,
         r,
-        permeability_materials,
-        mu0,
-        list_elem_materials,
-        boundary_condition,
     )
+
+    list_elem_permability = self.init_permeabilty_cell(
+        N_point_theta, N_point_r, permeability_materials, mu0, list_elem_materials
+    )
+
+    list_boundary_condition, Periodic_point = self.init_mesh_BC(
+        N_point_theta, N_point_r, boundary_condition
+    )
+
+    Num_Unknowns = self.numeroting_unknows(
+        list_elem, list_boundary_condition, Periodic_point
+    )
+
+    # Mesuring the performance time
+    t1 = time.perf_counter()
+
+    print("Assembly geometry:", np.round(t1 - t0, 5), "seconds")
+    self.save_mesh(
+        list_elem_materials, Num_Unknowns, list_elem, theta, r, list_boundary_condition
+    )
+
+    t2 = time.perf_counter()
+    # Saving mesh time
+    print("Save mesh:", np.round(t2 - t1, 5), "secondes")
 
     # Assembly all matrice
     reluc_list = self.init_reluc(list_elem, list_coord, mu0, la, type_coord_sys)
@@ -163,8 +151,8 @@ def solver_linear_model(
         list_boundary_condition,
     )
 
-    # t3 = time.perf_counter()
-    # print("Assembly matrix", np.round(t3 - t2, 5), "secondes")
+    t3 = time.perf_counter()
+    print("Assembly matrix", np.round(t3 - t2, 5), "secondes")
 
     # Assembly RHS containing the sources
     RHS = self.right_member_assembly(
@@ -183,10 +171,10 @@ def solver_linear_model(
         JC=JC,
     )
 
-    # t4 = time.perf_counter()
+    t4 = time.perf_counter()
 
-    # print("Assembly vector:", np.round(t4 - t3, 5), "secondes")
-    # print("Total :", np.round(t4 - t2, 5))
+    print("Assembly vector:", np.round(t4 - t3, 5), "secondes")
+    print("Total :", np.round(t4 - t2, 5))
 
     # Compute Solution
     t3 = time.perf_counter()
