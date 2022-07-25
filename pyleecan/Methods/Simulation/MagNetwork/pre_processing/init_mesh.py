@@ -15,7 +15,7 @@ def init_mesh(
     list_coord = self.init_point(N_point_theta, N_point_r, theta, r)
 
     list_elem_permability = self.init_permeabilty_cell(
-        N_point_theta, N_point_r, permeability_materials, mu0, list_elem_materials
+        N_point_theta, N_point_r, permeability_materials, list_elem_materials
     )
 
     list_elem = self.init_cell(N_point_theta, N_point_r)

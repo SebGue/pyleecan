@@ -1,9 +1,5 @@
 from pyleecan.Classes.MagNetwork import MagNetwork
-<<<<<<< .mine
 #from pyleecan.Classes.MachineInput import load_machine
-=======
-
->>>>>>> .theirs
 from pyleecan.Functions.load import load
 from pyleecan.Classes.Simu1 import Simu1
 from pyleecan.Classes.InputCurrent import InputCurrent

@@ -17,7 +17,7 @@ from pyleecan.Classes.SolutionMat import SolutionMat
 
 
 def run_radial(
-    self, axes_dict, Is_val=None, type_coord_sys=2, N_point_r=131, rotor_shift=8
+    self, axes_dict, Is_val=None, type_coord_sys="polar", N_point_r=52, rotor_shift=8
 ):
 
     Machine = self.parent.machine
@@ -33,13 +33,8 @@ def run_radial(
     # Size of the mesh according to r
     # Step of discretization of r
     # N_point_r = round((Machine.stator.Rext - Machine.rotor.Rint) * 1000)
-<<<<<<< .mine
     N_point_r = 52
     # N_point_r = 154
-=======
-
-
->>>>>>> .theirs
 
     # Size of mesh according to theta
     if Machine.comp_periodicity_spatial()[1] == True:
@@ -47,7 +42,7 @@ def run_radial(
     else:
         periodicity = Machine.comp_periodicity_spatial()[0] / 2
     # step of discretization of theta
-    # Wrong result, to modify and understand, why 180° and not 90°?
+    # Wrong result, to modify and understand, why 180ï¿½ and not 90ï¿½?
     N_point_theta = round((360 / periodicity)) + 1
     print(N_point_theta)
     N_point_theta=61
@@ -121,7 +116,7 @@ def run_radial(
     # Plotting the flux density contour
     self.view_contour_flux(Phi, x, y, N_point_theta, N_point_r, list_geometry)
 
-    Bx, By = self.compute_B_square(Phi, list_elem, list_coord, la)
+    Bx, By = self.compute_B(Phi, list_elem, list_coord, la,type_coord_sys)
 
     B = np.stack((Bx, By), axis=-1)
 
@@ -160,7 +155,7 @@ def run_radial(
     # Compute 2D curve of the airgap flux density
     Bx_airgap, By_airgap = self.comp_flux_airgap_local(
         r_dual, theta, Phi, list_elem, list_coord, la, Machine.comp_Rgap_mec(),
-    N_point_r,N_point_theta)
+    N_point_r,N_point_theta,type_coord_sys)
     # # Add my mesh to pyleecan
     # print("Solve RN done.")
     # mesh = MeshMat(dimension=3)

@@ -106,15 +106,9 @@ def solver_linear_model(
     # list_coord = self.init_point(N_point_theta, N_point_r, theta, r)
     # # print("Permeability", permeability_materials)
 
-<<<<<<< .mine
     list_elem_permability = self.init_permeabilty_cell(
         N_point_theta, N_point_r, permeability_materials, list_elem_materials
     )
-=======
-    # list_elem_permability = self.init_permeabilty_cell(
-    #     N_point_theta, N_point_r, permeability_materials, mu0, list_elem_materials
-    # )
->>>>>>> .theirs
 
     # list_elem = self.init_cell(N_point_theta, N_point_r)
 
@@ -156,7 +150,7 @@ def solver_linear_model(
         list_elem_materials,
         boundary_condition,
     )
-
+    print(list_coord)
     # Assembly all matrice
     reluc_list = self.init_reluc(list_elem, list_coord, mu0, la, type_coord_sys)
     # print(reluc_list)
@@ -218,7 +212,6 @@ def solver_linear_model(
             np.linalg.norm(M_csr @ Phi - RHS, ord=2),
         )
 
-<<<<<<< .mine
     Phi = self.add_BC_to_Phi(Phi, Num_Unknowns, list_elem, list_boundary_condition)
 
 
@@ -226,15 +219,6 @@ def solver_linear_model(
 
 
 
-=======
-    Phi = self.add_BC_to_Phi(
-        Phi,
-        Num_Unknowns,
-        list_elem,
-        list_boundary_condition,
-    )
-
->>>>>>> .theirs
     return (
         Phi,
         list_elem_materials,

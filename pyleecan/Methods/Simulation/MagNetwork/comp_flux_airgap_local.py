@@ -4,10 +4,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # def comp_flux_airgap(self, output, axes_dict, Is_val=None, Ir_val=None):
-def comp_flux_airgap_local(self, r, theta, Phi, list_elem, list_coord, la, Rgap,N_point_r,N_point_theta):
+def comp_flux_airgap_local(self, r, theta, Phi, list_elem, list_coord, la, Rgap,N_point_r,N_point_theta,type_coord_sys):
 
     # Computing the radial and tangential flux density
-    Bx, By = self.compute_B_radial(Phi, list_elem, list_coord, la)
+    Bx, By = self.compute_B(Phi, list_elem, list_coord, la,type_coord_sys)
 
     # Reshaping B in a 2D array
     Bx = Bx.reshape((N_point_r-1,N_point_theta-1))
