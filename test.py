@@ -1,5 +1,4 @@
 from pyleecan.Classes.MagNetwork import MagNetwork
-from pyleecan.Classes.MachineInput import load_machine
 from pyleecan.Functions.load import load
 from pyleecan.Classes.Simu1 import Simu1
 from pyleecan.Classes.InputCurrent import InputCurrent
