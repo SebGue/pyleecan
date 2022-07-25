@@ -118,6 +118,11 @@ except ImportError as error:
     save_mesh = error
 
 try:
+    from ..Methods.Simulation.MagNetwork.pre_processing.init_mesh import init_mesh
+except ImportError as error:
+    init_mesh = error
+
+try:
     from ..Methods.Simulation.MagNetwork.assembler.assembly import assembly
 except ImportError as error:
     assembly = error
@@ -378,6 +383,15 @@ class MagNetwork(Magnetics):
         )
     else:
         save_mesh = save_mesh
+    # cf Methods.Simulation.MagNetwork.pre_processing.init_mesh
+    if isinstance(init_mesh, ImportError):
+        init_mesh = property(
+            fget=lambda x: raise_(
+                ImportError("Can't use MagNetwork method init_mesh: " + str(init_mesh))
+            )
+        )
+    else:
+        init_mesh = init_mesh
     # cf Methods.Simulation.MagNetwork.assembler.assembly
     if isinstance(assembly, ImportError):
         assembly = property(

@@ -7045,6 +7045,7 @@
             "pre_processing.init_reluc",
             "pre_processing.numeroting_unknows",
             "pre_processing.save_mesh",
+            "pre_processing.init_mesh",
             "assembler.assembly",
             "assembler.assembly_one_area",
             "assembler.right_member_assembly",
