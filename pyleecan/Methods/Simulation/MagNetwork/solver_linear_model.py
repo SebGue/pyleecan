@@ -5,8 +5,6 @@ Created on Fri Jun  3 09:10:31 2022
 """
 import time
 
-# import geometry_linear_motor
-
 from threadpoolctl import threadpool_info
 import os
 
@@ -91,7 +89,7 @@ def solver_linear_model(
         list of unknowns in the linear system .
     list_elem : nd-array, size: m (integers)
         tab of elements
-    permeability_cell : nd-array, size: m (float)
+    list_elem_permability : nd-array, size: m (float)
         the permeability values of each cell
     list_coord : nd-array, size: N_point_theta*N_point_r theta 2 (float)
         list of coordinate.
@@ -100,7 +98,7 @@ def solver_linear_model(
     t0 = time.perf_counter()
 
     # initialize the cells of materials and their permeability
-    list_geometry, permeability_materials = self.geometry_linear_motor(
+    list_elem_materials, permeability_materials = self.geometry_motor(
         N_point_theta, N_point_r, rotor_shift
     )
 
@@ -108,8 +106,8 @@ def solver_linear_model(
     list_coord = self.init_point(N_point_theta, N_point_r, theta, r)
     # print("Permeability", permeability_materials)
 
-    permeability_cell = self.init_permeabilty_cell(
-        N_point_theta, N_point_r, permeability_materials, mu0, list_geometry
+    list_elem_permability = self.init_permeabilty_cell(
+        N_point_theta, N_point_r, permeability_materials, mu0, list_elem_materials
     )
 
     list_elem = self.init_cell(N_point_theta, N_point_r)
@@ -127,7 +125,7 @@ def solver_linear_model(
 
     # print("Assembly geometry:", np.round(t1 - t0, 5), "seconds")
     self.save_mesh(
-        list_geometry, Num_Unknowns, list_elem, theta, r, list_boundary_condition
+        list_elem_materials, Num_Unknowns, list_elem, theta, r, list_boundary_condition
     )
 
     t2 = time.perf_counter()
@@ -139,15 +137,19 @@ def solver_linear_model(
     # print(reluc_list)
 
     M_csr = self.assembly(
-        reluc_list, Num_Unknowns, list_elem, permeability_cell, list_boundary_condition
+        reluc_list,
+        Num_Unknowns,
+        list_elem,
+        list_elem_permability,
+        list_boundary_condition,
     )
 
     t3 = time.perf_counter()
     print("Assembly matrix", np.round(t3 - t2, 5), "secondes")
 
     # Assembly RHS containing the sources
-    E = self.right_member_assembly(
-        list_geometry,
+    RHS = self.right_member_assembly(
+        list_elem_materials,
         Num_Unknowns,
         list_elem,
         list_coord,
@@ -173,24 +175,31 @@ def solver_linear_model(
 
         # Compute the solution
         factor = cholesky(M_csr.tocsc())
-        Phi = factor(E)
+        Phi = factor(RHS)
         t4 = time.perf_counter()
         print(
             "Time to solve (CholMod):",
             np.round(t4 - t3, 5),
             "secondes, res:",
-            np.linalg.norm(M_csr @ Phi - E, ord=2),
+            np.linalg.norm(M_csr @ Phi - RHS, ord=2),
         )
     else:
-        Phi = spsolve(M_csr, E, permc_spec="MMD_AT_PLUS_A", use_umfpack=True)
+        Phi = spsolve(M_csr, RHS, permc_spec="MMD_AT_PLUS_A", use_umfpack=True)
         t4 = time.perf_counter()
         print(
             "Time to solve (direct,UMF):",
             np.round(t4 - t3, 5),
             "secondes, res:",
-            np.linalg.norm(M_csr @ Phi - E, ord=2),
+            np.linalg.norm(M_csr @ Phi - RHS, ord=2),
         )
-
+    # TO DO: Change add_BC_to_F -> add_BC_to_Phi
     Phi = self.add_BC_to_F(Phi, Num_Unknowns, list_elem, list_boundary_condition)
 
-    return Phi, list_geometry, Num_Unknowns, list_elem, permeability_cell, list_coord
+    return (
+        Phi,
+        list_elem_materials,
+        Num_Unknowns,
+        list_elem,
+        list_elem_permability,
+        list_coord,
+    )

@@ -9,7 +9,7 @@ import numpy as np
 import numpy as np
 
 
-def geometry_linear_motor(self, size_x, size_y, pos_pm):
+def geometry_motor(self, size_x, size_y, pos_pm):
 
     # Machine's characteristics
     tp = 60e-3  # pole pitch (m)

@@ -87,7 +87,7 @@ def run_radial(self, axes_dict, Is_val=None):
         r_dual,
         rotor_shift,
         BC,
-        self.geometry_linear_motor,
+        self.geometry_motor,
         mu0,
         la,
         Br,
@@ -130,7 +130,7 @@ def run_radial(self, axes_dict, Is_val=None):
     #     points,
     #     cells,
     #     # Optionally provide extra data on points, cells, etc.
-    #     point_data={"Flux": F},
+    #     point_data={"Flux": Phi},
     #     # Each item in cell data must match the cells array
     #     cell_data={"B": [B], "Materials": [list_geometry]},
     # )
@@ -172,7 +172,7 @@ def run_radial(self, axes_dict, Is_val=None):
     # MSol.plot_mesh()
 
     # # plot the flux
-    # field = F[np.newaxis]
+    # field = Phi[np.newaxis]
     # print(field.shape)
     # my_solution = SolutionMat(
     #     label="Flux (Weber)",

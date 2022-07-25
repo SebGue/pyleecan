@@ -6381,26 +6381,6 @@
             }
         ]
     },
-    "MachineInput": {
-        "constants": [
-            {
-                "name": "VERSION",
-                "value": "1"
-            }
-        ],
-        "daughters": [],
-        "desc": "Abstract class to get machine geometrical inputs and materials",
-        "is_internal": false,
-        "methods": [
-            "load_machine",
-            "load_material"
-        ],
-        "mother": "",
-        "name": "MachineInput",
-        "package": "Simulation",
-        "path": "pyleecan/Generator/ClassesRef/Simulation/MachineInput.csv",
-        "properties": []
-    },
     "MachineLSPM": {
         "constants": [
             {
@@ -7047,15 +7027,13 @@
         "desc": "Abstract class to solve the electric machines using the reluctance network",
         "is_internal": false,
         "methods": [
-            "assembler",
-            "generalize_geometry",
-            "geometry_linear_motor",
+            "geometry_motor",
             "geometry_linear_motor_separetion",
             "plot.Plot_B",
             "plot.view_contour_flux",
             "plot.view_contour_flux2",
             "post_processing",
-            "run_1",
+            "run_cartesian",
             "run_non_linear",
             "run_radial",
             "solver_linear_model",
@@ -7070,7 +7048,7 @@
             "assembler.assembly",
             "assembler.assembly_one_area",
             "assembler.right_member_assembly",
-            "post_processing.add_BC_to_F",
+            "post_processing.add_BC_to_Phi",
             "post_processing.compute_B_radial",
             "post_processing.compute_B_square",
             "comp_flux_airgap",
@@ -7081,7 +7059,28 @@
         "name": "MagNetwork",
         "package": "Simulation",
         "path": "pyleecan/Generator/ClassesRef/Simulation/MagNetwork.csv",
-        "properties": []
+        "properties": [
+            {
+                "as_dict": "",
+                "desc": "Type of the model to be solved: linear (1) or non-linear (1)",
+                "max": "2",
+                "min": "1",
+                "name": "type_model",
+                "type": "int",
+                "unit": "-",
+                "value": 1
+            },
+            {
+                "as_dict": "",
+                "desc": "Type of the coordinate system: cartesian (1) or radial (2)",
+                "max": "2",
+                "min": "1",
+                "name": "type_coord_sys",
+                "type": "int",
+                "unit": "-",
+                "value": 2
+            }
+        ]
     },
     "Magnet": {
         "constants": [

@@ -4,9 +4,7 @@ Created on Fri Jun  3 10:46:17 2022
 
 @author: LAP02
 """
-# from solver_linear_model import linear_model
-# import geometry_linear_motor
-# from post_processing import compute_B_square
+
 import numpy as np
 import meshio
 from plot import view_contour_flux

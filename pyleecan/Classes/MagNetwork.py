@@ -18,21 +18,9 @@ from .Magnetics import Magnetics
 # Import all class method
 # Try/catch to remove unnecessary dependencies in unused method
 try:
-    from ..Methods.Simulation.MagNetwork.assembler import assembler
+    from ..Methods.Simulation.MagNetwork.geometry_motor import geometry_motor
 except ImportError as error:
-    assembler = error
-
-try:
-    from ..Methods.Simulation.MagNetwork.generalize_geometry import generalize_geometry
-except ImportError as error:
-    generalize_geometry = error
-
-try:
-    from ..Methods.Simulation.MagNetwork.geometry_linear_motor import (
-        geometry_linear_motor,
-    )
-except ImportError as error:
-    geometry_linear_motor = error
+    geometry_motor = error
 
 try:
     from ..Methods.Simulation.MagNetwork.geometry_linear_motor_separetion import (
@@ -64,9 +52,9 @@ except ImportError as error:
     post_processing = error
 
 try:
-    from ..Methods.Simulation.MagNetwork.run_1 import run_1
+    from ..Methods.Simulation.MagNetwork.run_cartesian import run_cartesian
 except ImportError as error:
-    run_1 = error
+    run_cartesian = error
 
 try:
     from ..Methods.Simulation.MagNetwork.run_non_linear import run_non_linear
@@ -149,9 +137,11 @@ except ImportError as error:
     right_member_assembly = error
 
 try:
-    from ..Methods.Simulation.MagNetwork.post_processing.add_BC_to_F import add_BC_to_F
+    from ..Methods.Simulation.MagNetwork.post_processing.add_BC_to_Phi import (
+        add_BC_to_Phi,
+    )
 except ImportError as error:
-    add_BC_to_F = error
+    add_BC_to_Phi = error
 
 try:
     from ..Methods.Simulation.MagNetwork.post_processing.compute_B_radial import (
@@ -197,39 +187,17 @@ class MagNetwork(Magnetics):
     VERSION = 1
 
     # Check ImportError to remove unnecessary dependencies in unused method
-    # cf Methods.Simulation.MagNetwork.assembler
-    if isinstance(assembler, ImportError):
-        assembler = property(
-            fget=lambda x: raise_(
-                ImportError("Can't use MagNetwork method assembler: " + str(assembler))
-            )
-        )
-    else:
-        assembler = assembler
-    # cf Methods.Simulation.MagNetwork.generalize_geometry
-    if isinstance(generalize_geometry, ImportError):
-        generalize_geometry = property(
+    # cf Methods.Simulation.MagNetwork.geometry_motor
+    if isinstance(geometry_motor, ImportError):
+        geometry_motor = property(
             fget=lambda x: raise_(
                 ImportError(
-                    "Can't use MagNetwork method generalize_geometry: "
-                    + str(generalize_geometry)
+                    "Can't use MagNetwork method geometry_motor: " + str(geometry_motor)
                 )
             )
         )
     else:
-        generalize_geometry = generalize_geometry
-    # cf Methods.Simulation.MagNetwork.geometry_linear_motor
-    if isinstance(geometry_linear_motor, ImportError):
-        geometry_linear_motor = property(
-            fget=lambda x: raise_(
-                ImportError(
-                    "Can't use MagNetwork method geometry_linear_motor: "
-                    + str(geometry_linear_motor)
-                )
-            )
-        )
-    else:
-        geometry_linear_motor = geometry_linear_motor
+        geometry_motor = geometry_motor
     # cf Methods.Simulation.MagNetwork.geometry_linear_motor_separetion
     if isinstance(geometry_linear_motor_separetion, ImportError):
         geometry_linear_motor_separetion = property(
@@ -287,15 +255,17 @@ class MagNetwork(Magnetics):
         )
     else:
         post_processing = post_processing
-    # cf Methods.Simulation.MagNetwork.run_1
-    if isinstance(run_1, ImportError):
-        run_1 = property(
+    # cf Methods.Simulation.MagNetwork.run_cartesian
+    if isinstance(run_cartesian, ImportError):
+        run_cartesian = property(
             fget=lambda x: raise_(
-                ImportError("Can't use MagNetwork method run_1: " + str(run_1))
+                ImportError(
+                    "Can't use MagNetwork method run_cartesian: " + str(run_cartesian)
+                )
             )
         )
     else:
-        run_1 = run_1
+        run_cartesian = run_cartesian
     # cf Methods.Simulation.MagNetwork.run_non_linear
     if isinstance(run_non_linear, ImportError):
         run_non_linear = property(
@@ -450,17 +420,17 @@ class MagNetwork(Magnetics):
         )
     else:
         right_member_assembly = right_member_assembly
-    # cf Methods.Simulation.MagNetwork.post_processing.add_BC_to_F
-    if isinstance(add_BC_to_F, ImportError):
-        add_BC_to_F = property(
+    # cf Methods.Simulation.MagNetwork.post_processing.add_BC_to_Phi
+    if isinstance(add_BC_to_Phi, ImportError):
+        add_BC_to_Phi = property(
             fget=lambda x: raise_(
                 ImportError(
-                    "Can't use MagNetwork method add_BC_to_F: " + str(add_BC_to_F)
+                    "Can't use MagNetwork method add_BC_to_Phi: " + str(add_BC_to_Phi)
                 )
             )
         )
     else:
-        add_BC_to_F = add_BC_to_F
+        add_BC_to_Phi = add_BC_to_Phi
     # cf Methods.Simulation.MagNetwork.post_processing.compute_B_radial
     if isinstance(compute_B_radial, ImportError):
         compute_B_radial = property(
@@ -528,6 +498,8 @@ class MagNetwork(Magnetics):
 
     def __init__(
         self,
+        type_model=1,
+        type_coord_sys=2,
         is_remove_slotS=False,
         is_remove_slotR=False,
         is_remove_ventS=False,
@@ -565,6 +537,10 @@ class MagNetwork(Magnetics):
         if init_dict is not None:  # Initialisation by dict
             assert type(init_dict) is dict
             # Overwrite default value with init_dict content
+            if "type_model" in list(init_dict.keys()):
+                type_model = init_dict["type_model"]
+            if "type_coord_sys" in list(init_dict.keys()):
+                type_coord_sys = init_dict["type_coord_sys"]
             if "is_remove_slotS" in list(init_dict.keys()):
                 is_remove_slotS = init_dict["is_remove_slotS"]
             if "is_remove_slotR" in list(init_dict.keys()):
@@ -604,6 +580,8 @@ class MagNetwork(Magnetics):
             if "is_periodicity_rotor" in list(init_dict.keys()):
                 is_periodicity_rotor = init_dict["is_periodicity_rotor"]
         # Set the properties (value check and convertion are done in setter)
+        self.type_model = type_model
+        self.type_coord_sys = type_coord_sys
         # Call Magnetics init
         super(MagNetwork, self).__init__(
             is_remove_slotS=is_remove_slotS,
@@ -635,6 +613,8 @@ class MagNetwork(Magnetics):
         MagNetwork_str = ""
         # Get the properties inherited from Magnetics
         MagNetwork_str += super(MagNetwork, self).__str__()
+        MagNetwork_str += "type_model = " + str(self.type_model) + linesep
+        MagNetwork_str += "type_coord_sys = " + str(self.type_coord_sys) + linesep
         return MagNetwork_str
 
     def __eq__(self, other):
@@ -645,6 +625,10 @@ class MagNetwork(Magnetics):
 
         # Check the properties inherited from Magnetics
         if not super(MagNetwork, self).__eq__(other):
+            return False
+        if other.type_model != self.type_model:
+            return False
+        if other.type_coord_sys != self.type_coord_sys:
             return False
         return True
 
@@ -663,6 +647,30 @@ class MagNetwork(Magnetics):
                 other, name=name, ignore_list=ignore_list, is_add_value=is_add_value
             )
         )
+        if other._type_model != self._type_model:
+            if is_add_value:
+                val_str = (
+                    " (self="
+                    + str(self._type_model)
+                    + ", other="
+                    + str(other._type_model)
+                    + ")"
+                )
+                diff_list.append(name + ".type_model" + val_str)
+            else:
+                diff_list.append(name + ".type_model")
+        if other._type_coord_sys != self._type_coord_sys:
+            if is_add_value:
+                val_str = (
+                    " (self="
+                    + str(self._type_coord_sys)
+                    + ", other="
+                    + str(other._type_coord_sys)
+                    + ")"
+                )
+                diff_list.append(name + ".type_coord_sys" + val_str)
+            else:
+                diff_list.append(name + ".type_coord_sys")
         # Filter ignore differences
         diff_list = list(filter(lambda x: x not in ignore_list, diff_list))
         return diff_list
@@ -674,6 +682,8 @@ class MagNetwork(Magnetics):
 
         # Get size of the properties inherited from Magnetics
         S += super(MagNetwork, self).__sizeof__()
+        S += getsizeof(self.type_model)
+        S += getsizeof(self.type_coord_sys)
         return S
 
     def as_dict(self, type_handle_ndarray=0, keep_function=False, **kwargs):
@@ -693,6 +703,8 @@ class MagNetwork(Magnetics):
             keep_function=keep_function,
             **kwargs
         )
+        MagNetwork_dict["type_model"] = self.type_model
+        MagNetwork_dict["type_coord_sys"] = self.type_coord_sys
         # The class name is added to the dict for deserialisation purpose
         # Overwrite the mother class name
         MagNetwork_dict["__class__"] = "MagNetwork"
@@ -702,6 +714,8 @@ class MagNetwork(Magnetics):
         """Creates a deepcopy of the object"""
 
         # Handle deepcopy of all the properties
+        type_model_val = self.type_model
+        type_coord_sys_val = self.type_coord_sys
         is_remove_slotS_val = self.is_remove_slotS
         is_remove_slotR_val = self.is_remove_slotR
         is_remove_ventS_val = self.is_remove_ventS
@@ -726,6 +740,8 @@ class MagNetwork(Magnetics):
         is_periodicity_rotor_val = self.is_periodicity_rotor
         # Creates new object of the same type with the copied properties
         obj_copy = type(self)(
+            type_model=type_model_val,
+            type_coord_sys=type_coord_sys_val,
             is_remove_slotS=is_remove_slotS_val,
             is_remove_slotR=is_remove_slotR_val,
             is_remove_ventS=is_remove_ventS_val,
@@ -751,5 +767,47 @@ class MagNetwork(Magnetics):
     def _set_None(self):
         """Set all the properties to None (except pyleecan object)"""
 
+        self.type_model = None
+        self.type_coord_sys = None
         # Set to None the properties inherited from Magnetics
         super(MagNetwork, self)._set_None()
+
+    def _get_type_model(self):
+        """getter of type_model"""
+        return self._type_model
+
+    def _set_type_model(self, value):
+        """setter of type_model"""
+        check_var("type_model", value, "int", Vmin=1, Vmax=2)
+        self._type_model = value
+
+    type_model = property(
+        fget=_get_type_model,
+        fset=_set_type_model,
+        doc=u"""Type of the model to be solved: linear (1) or non-linear (1)
+
+        :Type: int
+        :min: 1
+        :max: 2
+        """,
+    )
+
+    def _get_type_coord_sys(self):
+        """getter of type_coord_sys"""
+        return self._type_coord_sys
+
+    def _set_type_coord_sys(self, value):
+        """setter of type_coord_sys"""
+        check_var("type_coord_sys", value, "int", Vmin=1, Vmax=2)
+        self._type_coord_sys = value
+
+    type_coord_sys = property(
+        fget=_get_type_coord_sys,
+        fset=_set_type_coord_sys,
+        doc=u"""Type of the coordinate system: cartesian (1) or radial (2)
+
+        :Type: int
+        :min: 1
+        :max: 2
+        """,
+    )
