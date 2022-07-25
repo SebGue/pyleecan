@@ -16,7 +16,7 @@ from pyleecan.Classes.MeshSolution import MeshSolution
 from pyleecan.Classes.SolutionMat import SolutionMat
 
 
-def run_radial(self, axes_dict, Is_val=None):
+def run_radial(self, axes_dict, Is_val=None, N_point_r=131, rotor_shift=8):
 
     Machine = self.parent.machine
     la = Machine.rotor.L1  # Active length (m)
@@ -26,13 +26,11 @@ def run_radial(self, axes_dict, Is_val=None):
 
     # position of rotor (number of cells of the rotor to be shifted)
     # TODO set this value according to time and rotor position
-    rotor_shift = 8
+    # rotor_shift = 8
 
     # Size of the mesh according to r
     # Step of discretization of r
     # N_point_r = round((Machine.stator.Rext - Machine.rotor.Rint) * 1000)
-    N_point_r = 131
-    # N_point_r = 154
 
     # Size of mesh according to theta
     if Machine.comp_periodicity_spatial()[1] == True:

@@ -7078,6 +7078,26 @@
                 "type": "int",
                 "unit": "-",
                 "value": 2
+            },
+            {
+                "as_dict": "",
+                "desc": "number of points in the r-direction",
+                "max": "",
+                "min": "",
+                "name": "N_point_r",
+                "type": "int",
+                "unit": "-",
+                "value": 131
+            },
+            {
+                "as_dict": "",
+                "desc": "number of cells to be shifted when changing the rotor position",
+                "max": "",
+                "min": "",
+                "name": "rotor_shift",
+                "type": "int",
+                "unit": "-",
+                "value": 8
             }
         ]
     },

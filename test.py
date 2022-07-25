@@ -43,6 +43,8 @@ simu.mag = MagNetwork(
     is_periodicity_t=False,
     type_model=1,
     type_coord_sys=2,
+    N_point_r=131,
+    rotor_shift=8,
 )
 
 # Cartesian meshing
