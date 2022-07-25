@@ -11,8 +11,6 @@ def init_mesh(
     mu0,
     list_elem_materials,
     boundary_condition,
-    la,
-    type_coord_sys,
 ):
     list_coord = self.init_point(N_point_theta, N_point_r, theta, r)
 
@@ -34,8 +32,6 @@ def init_mesh(
         list_elem_materials, Num_Unknowns, list_elem, theta, r, list_boundary_condition
     )
 
-    reluc_list = self.init_reluc(list_elem, list_coord, mu0, la, type_coord_sys)
-
     return (
         list_coord,
         list_elem_permability,
@@ -43,5 +39,4 @@ def init_mesh(
         list_boundary_condition,
         Periodic_point,
         Num_Unknowns,
-        reluc_list,
     )

@@ -16,7 +16,9 @@ from pyleecan.Classes.MeshSolution import MeshSolution
 from pyleecan.Classes.SolutionMat import SolutionMat
 
 
-def run_radial(self, axes_dict, Is_val=None, N_point_r=131, rotor_shift=8):
+def run_radial(
+    self, axes_dict, Is_val=None, type_coord_sys=2, N_point_r=131, rotor_shift=8
+):
 
     Machine = self.parent.machine
     la = Machine.rotor.L1  # Active length (m)
@@ -61,7 +63,6 @@ def run_radial(self, axes_dict, Is_val=None, N_point_r=131, rotor_shift=8):
         "anti_periodic_condition",
         "homogeneous_Dirichlet_condition",
     ]
-    type_coord_sys = "polar"
 
     # Compute current densities
     if Is_val is not None:

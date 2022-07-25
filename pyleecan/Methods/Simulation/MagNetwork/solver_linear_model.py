@@ -132,10 +132,6 @@ def solver_linear_model(
     # # Saving mesh time
     # print("Save mesh:", np.round(t2 - t1, 5), "secondes")
 
-    # # Assembly all matrice
-    # reluc_list = self.init_reluc(list_elem, list_coord, mu0, la, type_coord_sys)
-    # # print(reluc_list)
-
     # Mesh initialization using init_mesh method
     (
         list_coord,
@@ -144,7 +140,6 @@ def solver_linear_model(
         list_boundary_condition,
         Periodic_point,
         Num_Unknowns,
-        reluc_list,
     ) = self.init_mesh(
         N_point_theta,
         N_point_r,
@@ -154,9 +149,11 @@ def solver_linear_model(
         mu0,
         list_elem_materials,
         boundary_condition,
-        la,
-        type_coord_sys,
     )
+
+    # Assembly all matrice
+    reluc_list = self.init_reluc(list_elem, list_coord, mu0, la, type_coord_sys)
+    # print(reluc_list)
 
     M_csr = self.assembly(
         reluc_list,
