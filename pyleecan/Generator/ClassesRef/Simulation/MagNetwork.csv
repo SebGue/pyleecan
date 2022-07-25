@@ -26,4 +26,3 @@ rotor_shift,-,number of cells to be shifted when changing the rotor position,1,i
 ,,,,,,,,,,,comp_flux_airgap,,,
 ,,,,,,,,,,,comp_flux_airgap_local,,,
 ,,,,,,,,,,,cartesianmeshclass_pyleecan,,,
-,,,,,,,,,,,comp_axes,,,

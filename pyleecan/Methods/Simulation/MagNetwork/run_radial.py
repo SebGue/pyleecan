@@ -17,7 +17,7 @@ from pyleecan.Classes.SolutionMat import SolutionMat
 
 
 def run_radial(
-    self, axes_dict, Is_val=None, type_coord_sys=2, N_point_r=131, rotor_shift=8
+    self, axes_dict, Is_val=None, type_coord_sys=2, N_point_r=46, rotor_shift=8
 ):
 
     Machine = self.parent.machine
@@ -35,12 +35,14 @@ def run_radial(
     # N_point_r = round((Machine.stator.Rext - Machine.rotor.Rint) * 1000)
 
     # Size of mesh according to theta
-    if Machine.comp_periodicity_spatial()[1] == True:
-        periodicity = Machine.comp_periodicity_spatial()[0]
-    else:
-        periodicity = Machine.comp_periodicity_spatial()[0] / 2
-    # step of discretization of theta
-    N_point_theta = round((360 / periodicity)) + 1
+    # if Machine.comp_periodicity_spatial()[1] == True:
+    #     periodicity = Machine.comp_periodicity_spatial()[0]
+    # else:
+    #     periodicity = Machine.comp_periodicity_spatial()[0] / 2
+    # # step of discretization of theta
+    # N_point_theta = round((360 / periodicity)) + 1
+
+    N_point_theta = 46
 
     # Definition of the r-axis
     r = np.linspace(Machine.rotor.Rint, Machine.stator.Rext, N_point_r)
@@ -149,15 +151,13 @@ def run_radial(
 
     # Compute 2D curve of the airgap flux density
     Bx_airgap, By_airgap = self.comp_flux_airgap_local(
-        r_dual,
+        r,
         theta,
         Phi,
         list_elem,
         list_coord,
         la,
         Machine.comp_Rgap_mec(),
-        N_point_r,
-        N_point_theta,
         type_coord_sys,
     )
 

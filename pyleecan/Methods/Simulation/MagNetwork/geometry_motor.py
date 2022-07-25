@@ -35,7 +35,7 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
     nb_stator_teeth_per_period = round(Machine.stator.get_Zs() / (2 * periodicity))
 
     # Outer radius of the rotor + PM
-    height_rotor_PM = Machine.rotor.comp_radius_mec()
+    # height_rotor_PM = Machine.rotor.comp_radius_mec()
 
     # Height of the magnet
     height_magnet = Machine.rotor.slot.comp_height_active()
