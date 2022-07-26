@@ -10,8 +10,8 @@ from os.path import join
 from Tests import save_validation_path as save_path
 
 # simple tests for geometry discretization
-# file_path = "C:/Users/pc/Downloads/easy_test_MagNetwork.json"
-file_path = "C:/Users/pc/Downloads/easy_test_MagNetwork2.json"
+file_path = "C:/Users/pc/Downloads/easy_test_MagNetwork.json"
+# file_path = "C:/Users/pc/Downloads/easy_test_MagNetwork3.json"
 
 # Defining the validation cases paths
 # file_path = "C:/Users/pc/Downloads/SPMSM_val.json"  # case study 1
@@ -46,7 +46,7 @@ simu.mag = MagNetwork(
     is_periodicity_t=False,
     type_model=1,
     type_coord_sys=2,
-    N_point_r=46,
+    Kmesh_fineness=2,
     rotor_shift=8,
 )
 

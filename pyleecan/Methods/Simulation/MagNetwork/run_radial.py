@@ -17,7 +17,7 @@ from pyleecan.Classes.SolutionMat import SolutionMat
 
 
 def run_radial(
-    self, axes_dict, Is_val=None, type_coord_sys=2, N_point_r=46, rotor_shift=8
+    self, axes_dict, Is_val=None, type_coord_sys=2, Kmesh_fineness=2, rotor_shift=8
 ):
 
     Machine = self.parent.machine
@@ -26,23 +26,12 @@ def run_radial(
     Br = Machine.rotor.magnet.mat_type.mag.Brm20
     mu0 = np.pi * 4e-7  # Permeability of vacuum (H/m)
 
-    # position of rotor (number of cells of the rotor to be shifted)
-    # TODO set this value according to time and rotor position
-    # rotor_shift = 8
+    N_theta = 91
 
-    # Size of the mesh according to r
-    # Step of discretization of r
-    # N_point_r = round((Machine.stator.Rext - Machine.rotor.Rint) * 1000)
-
-    # Size of mesh according to theta
-    # if Machine.comp_periodicity_spatial()[1] == True:
-    #     periodicity = Machine.comp_periodicity_spatial()[0]
-    # else:
-    #     periodicity = Machine.comp_periodicity_spatial()[0] / 2
-    # # step of discretization of theta
-    # N_point_theta = round((360 / periodicity)) + 1
-
-    N_point_theta = 181
+    N_point_r = 1 + Kmesh_fineness * round(
+        (Machine.stator.Rext - Machine.rotor.Rint) * 1000
+    )
+    N_point_theta = 1 + Kmesh_fineness * N_theta
 
     # Definition of the r-axis
     r = np.linspace(Machine.rotor.Rint, Machine.stator.Rext, N_point_r)

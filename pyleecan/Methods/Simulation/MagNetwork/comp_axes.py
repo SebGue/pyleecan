@@ -1,4 +1,5 @@
 from pyleecan.Classes.Magnetics import Magnetics
+import numpy as np
 
 
 def comp_axes(self, output):

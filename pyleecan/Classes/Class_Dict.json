@@ -7082,13 +7082,13 @@
             },
             {
                 "as_dict": "",
-                "desc": "number of points in the r-direction",
+                "desc": "Mesh density",
                 "max": "",
                 "min": "",
-                "name": "N_point_r",
+                "name": "Kmesh_fineness",
                 "type": "int",
                 "unit": "-",
-                "value": 131
+                "value": 2
             },
             {
                 "as_dict": "",
