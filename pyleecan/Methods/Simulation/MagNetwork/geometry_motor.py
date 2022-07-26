@@ -47,7 +47,7 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
     e = Machine.comp_width_airgap_mec()
 
     # Stator slot height (m)
-    height_slot = Machine.stator.slot.comp_height()
+    height_slot = Machine.stator.slot.comp_height_active()
 
     # Stator total height (m)
     height_stator = Machine.stator.Rext - Machine.stator.Rint
@@ -59,7 +59,7 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
     slot_opening = Machine.stator.slot.comp_width()
 
     # Stator yoke
-    height_stator = Machine.stator.comp_height_yoke()
+    height_stator_yoke = Machine.stator.comp_height_yoke()
 
     # Stator tooth width (m)
     wt = (
@@ -122,7 +122,7 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
     y = Machine.stator.Rext - Machine.rotor.Rint
 
     # Number of elements in the y-axis direction
-    total_height = N_point_r - 1
+    N_element_r = N_point_r - 1
 
     # Number of elements in the x-axis direction
     N_element_theta = N_point_theta - 1
@@ -152,7 +152,7 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
     tooth_width = round(angle_tooth)
 
     # Number of elements in the stator back-iron in y-axis direction, generalized
-    stator_iron_height = round(height_stator / h_r)
+    stator_iron_height = round(height_stator_yoke / h_r)
 
     # Total number of elements of the stator in x direction
     # m = round(
@@ -161,7 +161,7 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
     # )
 
     # Total number of element of stator in y direction
-    stator_height = round((Machine.stator.Rext - Machine.stator.Rint) / h_r)
+    stator_height = round(height_stator / h_r)
 
     # Number of elements in the magnet in the theta direction
     PM_width = round(angle_magnet / h_theta)
@@ -185,16 +185,16 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
     # airgap_and_Pm_height = round(Machine.rotor.comp_radius_mec() / h_r)
 
     # Total number of elements
-    N_total_element = total_height * N_element_theta
+    N_total_element = N_element_r * N_element_theta
 
     # Attribute an array of N_total_element size of zeros to cells_materials
     cells_materials = np.zeros(N_total_element, dtype=np.uint16)
 
     # Assignment of geometry elements
-    for i in range(total_height):
+    for i in range(N_element_r):
 
         # Assigning rotor elements
-        if i <= rotor_height:
+        if i < rotor_height:
             for j in range(N_element_theta):
                 num_element = N_element_theta * i + j
                 cells_materials[num_element] = len(
@@ -202,18 +202,18 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
                 )  # rotor material
 
         # Assignment of PM and the airgap between PMs elements
-        elif i <= (rotor_height + airgap_and_Pm_height - airgap_height):
+        elif i < (rotor_height + airgap_and_Pm_height - airgap_height):
 
             for j in range(N_element_theta):
                 num_element = N_element_theta * i + j
 
                 # Assignment of the first half of the airgap elements
-                if j <= half_airgap_PM_width:
+                if j < half_airgap_PM_width:
                     cells_materials[num_element] = (
                         len(permeabilty_materials) - 3
                     )  # air material
 
-                elif j <= (N_element_theta - half_airgap_PM_width):
+                elif j < (N_element_theta - half_airgap_PM_width):
                     for PM_idx in range(nb_PM_per_period):
                         # Assignment of PM elements
                         if (
@@ -224,7 +224,7 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
                             )
                         ) and (
                             j
-                            <= (
+                            < (
                                 half_airgap_PM_width
                                 + (PM_idx + 1) * PM_width
                                 + PM_idx * airgap_PM_width
@@ -244,7 +244,7 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
                             )
                         ) and (
                             j
-                            <= (
+                            < (
                                 half_airgap_PM_width
                                 + PM_idx * (PM_width + airgap_PM_width)
                             )
@@ -260,17 +260,17 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
                     )  # air material
 
         # Assignment of the airgap between the PMs and the stator
-        elif i <= (rotor_height + airgap_and_Pm_height):
+        elif i < (rotor_height + airgap_and_Pm_height):
             for j in range(N_element_theta):
                 num_element = N_element_theta * i + j
                 cells_materials[num_element] = len(permeabilty_materials) - 3  # air
 
-        elif i <= total_height - stator_iron_height:
+        elif i < N_element_r - stator_iron_height:
             for j in range(N_element_theta):
                 num_element = N_element_theta * i + j
 
                 # Assignment of the elements in the first half tooth
-                if j <= Half_tooth_width:
+                if j < Half_tooth_width:
                     cells_materials[num_element] = (
                         len(permeabilty_materials) - 2
                     )  # stator
@@ -286,7 +286,7 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
                             )
                         ) and (
                             j
-                            <= (
+                            < (
                                 Half_tooth_width
                                 + (slot_idx + 1) * angle_slot
                                 + slot_idx * tooth_width
@@ -303,7 +303,7 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
                                     )
                                 ) and (
                                     j
-                                    <= (
+                                    < (
                                         Half_tooth_width
                                         + (slot_idx + 1) * angle_slot
                                         + slot_idx * tooth_width

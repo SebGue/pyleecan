@@ -9,8 +9,12 @@ from pyleecan.Classes.MagFEMM import MagFEMM
 from os.path import join
 from Tests import save_validation_path as save_path
 
+# simple tests for geometry discretization
+# file_path = "C:/Users/pc/Downloads/easy_test_MagNetwork.json"
+file_path = "C:/Users/pc/Downloads/easy_test_MagNetwork2.json"
+
 # Defining the validation cases paths
-file_path = "C:/Users/pc/Downloads/SPMSM_val.json"  # case study 1
+# file_path = "C:/Users/pc/Downloads/SPMSM_val.json"  # case study 1
 # file_path = (
 #     "C:/Users/pc/AppData/Roaming/pyleecan/Machine/Benchmark.json"  # case study 2
 # )
@@ -32,7 +36,7 @@ simu = Simu1(name="test_magnetwork", machine=SPMSM_val)
 # MagNetwork simulation
 simu.input = InputCurrent(
     OP=OPdq(N0=1000, Id_ref=0, Iq_ref=0),
-    Na_tot=180 * 4,  # simu.input.Na_tot
+    Na_tot=45 * 4,  # simu.input.Na_tot
     Nt_tot=1,
 )
 
@@ -42,7 +46,7 @@ simu.mag = MagNetwork(
     is_periodicity_t=False,
     type_model=1,
     type_coord_sys=2,
-    N_point_r=131,
+    N_point_r=46,
     rotor_shift=8,
 )
 
@@ -180,4 +184,3 @@ out.mag.B.plot_2D_Data(
     legend_list=["MagNetwork", "FEMM"],
 )
 pass
-

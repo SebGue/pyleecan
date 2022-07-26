@@ -42,7 +42,7 @@ def run_radial(
     # # step of discretization of theta
     # N_point_theta = round((360 / periodicity)) + 1
 
-    N_point_theta = 46
+    N_point_theta = 181
 
     # Definition of the r-axis
     r = np.linspace(Machine.rotor.Rint, Machine.stator.Rext, N_point_r)
