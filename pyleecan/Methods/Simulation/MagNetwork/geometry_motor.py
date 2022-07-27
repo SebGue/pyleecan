@@ -184,8 +184,53 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
     airgap_and_Pm_height = round((height_magnet + e) / h_r)
     # airgap_and_Pm_height = round(Machine.rotor.comp_radius_mec() / h_r)
 
+    #######################################################################################
+    #######################################################################################
+    # Update and re-calculation of N_element_theta and the dependent parameters
+
+    if (nb_stator_teeth_per_period * (angle_slot + 2 * Half_tooth_width)) == (
+        nb_PM_per_period * (PM_width + 2 * half_airgap_PM_width)
+    ):
+        N_element_theta_kk = N_element_theta
+        N_point_theta = N_element_theta_kk + 1
+
+    for kk in range(
+        1, (nb_PM_per_period * nb_stator_teeth_per_period * round(angle_tp)), 1
+    ):
+
+        N_element_theta_kk = N_element_theta * kk
+        N_point_theta = N_element_theta_kk + 1
+        h_theta = x / (N_point_theta - 1)
+        angle_slot = nb_layers * round(
+            (Machine.stator.slot.comp_angle_active_eq() * rad_to_deg / h_theta)
+            / nb_layers
+        )
+
+        angle_tooth = (
+            N_element_theta_kk - nb_stator_teeth_per_period * angle_slot
+        ) / nb_stator_teeth_per_period
+
+        Half_tooth_width = round(angle_tooth / 2)
+
+        tooth_width = round(angle_tooth)
+
+        PM_width = round(angle_magnet / h_theta)
+
+        half_airgap_PM_width = round(
+            (N_element_theta_kk - PM_width * nb_PM_per_period) / (2 * nb_PM_per_period)
+        )
+
+        airgap_PM_width = half_airgap_PM_width * 2
+
+        if (nb_stator_teeth_per_period * (angle_slot + 2 * Half_tooth_width)) == (
+            nb_PM_per_period * (PM_width + 2 * half_airgap_PM_width)
+        ):
+            break
+    #######################################################################################
+    #######################################################################################
+
     # Total number of elements
-    N_total_element = N_element_r * N_element_theta
+    N_total_element = N_element_r * N_element_theta_kk
 
     # Attribute an array of N_total_element size of zeros to cells_materials
     cells_materials = np.zeros(N_total_element, dtype=np.uint16)
@@ -195,8 +240,8 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
 
         # Assigning rotor elements
         if i < rotor_height:
-            for j in range(N_element_theta):
-                num_element = N_element_theta * i + j
+            for j in range(N_element_theta_kk):
+                num_element = N_element_theta_kk * i + j
                 cells_materials[num_element] = len(
                     permeabilty_materials
                 )  # rotor material
@@ -204,8 +249,8 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
         # Assignment of PM and the airgap between PMs elements
         elif i < (rotor_height + airgap_and_Pm_height - airgap_height):
 
-            for j in range(N_element_theta):
-                num_element = N_element_theta * i + j
+            for j in range(N_element_theta_kk):
+                num_element = N_element_theta_kk * i + j
 
                 # Assignment of the first half of the airgap elements
                 if j < half_airgap_PM_width:
@@ -213,7 +258,7 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
                         len(permeabilty_materials) - 3
                     )  # air material
 
-                elif j < (N_element_theta - half_airgap_PM_width):
+                elif j < (N_element_theta_kk - half_airgap_PM_width):
                     for PM_idx in range(nb_PM_per_period):
                         # Assignment of PM elements
                         if (
@@ -261,13 +306,13 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
 
         # Assignment of the airgap between the PMs and the stator
         elif i < (rotor_height + airgap_and_Pm_height):
-            for j in range(N_element_theta):
-                num_element = N_element_theta * i + j
+            for j in range(N_element_theta_kk):
+                num_element = N_element_theta_kk * i + j
                 cells_materials[num_element] = len(permeabilty_materials) - 3  # air
 
         elif i < N_element_r - stator_iron_height:
-            for j in range(N_element_theta):
-                num_element = N_element_theta * i + j
+            for j in range(N_element_theta_kk):
+                num_element = N_element_theta_kk * i + j
 
                 # Assignment of the elements in the first half tooth
                 if j < Half_tooth_width:
@@ -275,7 +320,7 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
                         len(permeabilty_materials) - 2
                     )  # stator
 
-                elif j <= (N_element_theta - Half_tooth_width):
+                elif j <= (N_element_theta_kk - Half_tooth_width):
                     for slot_idx in range(nb_stator_teeth_per_period):
 
                         # Assignement of the winding elements
@@ -330,8 +375,8 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
 
         # Assignment of the back-iron layer
         else:
-            for j in range(N_element_theta):
-                num_element = N_element_theta * i + j
+            for j in range(N_element_theta_kk):
+                num_element = N_element_theta_kk * i + j
                 cells_materials[num_element] = len(permeabilty_materials) - 2  # stator
 
     ct = plt.pcolormesh(
@@ -342,4 +387,4 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
 
     plt.show()
 
-    return cells_materials, permeabilty_materials
+    return cells_materials, permeabilty_materials, N_point_theta

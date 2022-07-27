@@ -490,7 +490,7 @@ class MagNetwork(Magnetics):
         self,
         type_model=1,
         type_coord_sys=2,
-        Kmesh_fineness=2,
+        Kmesh_fineness=1,
         rotor_shift=8,
         is_remove_slotS=False,
         is_remove_slotR=False,

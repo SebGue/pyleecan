@@ -26,12 +26,21 @@ def run_radial(
     Br = Machine.rotor.magnet.mat_type.mag.Brm20
     mu0 = np.pi * 4e-7  # Permeability of vacuum (H/m)
 
-    N_theta = 91
+    if Machine.comp_periodicity_spatial()[1] == True:
+        periodicity = Machine.comp_periodicity_spatial()[0]
+    else:
+        periodicity = Machine.comp_periodicity_spatial()[0] / 2
+
+    angle_tp = (np.pi / periodicity) * (180 / np.pi)
+
+    N_point_theta = Kmesh_fineness * round(0.5 * angle_tp) + 1
 
     N_point_r = 1 + Kmesh_fineness * round(
         (Machine.stator.Rext - Machine.rotor.Rint) * 1000
     )
-    N_point_theta = 1 + Kmesh_fineness * N_theta
+
+    # Update of N_point_theta
+    N_point_theta = self.geometry_motor(N_point_theta, N_point_r, rotor_shift)[2]
 
     # Definition of the r-axis
     r = np.linspace(Machine.rotor.Rint, Machine.stator.Rext, N_point_r)
@@ -42,8 +51,9 @@ def run_radial(
         axes_dict["angle"].initial,
         axes_dict["angle"].final,
         axes_dict["angle"].number + 1,
-        # endpoint=False,
+        endpoint=False,
     )
+
     r_dual = (r[1:] + r[:-1]) / 2
     theta_dual = (theta[1:] + theta[:-1]) / 2
 

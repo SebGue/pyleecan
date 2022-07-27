@@ -98,9 +98,11 @@ def solver_linear_model(
     t0 = time.perf_counter()
 
     # initialize the cells of materials and their permeability
-    list_elem_materials, permeability_materials = self.geometry_motor(
-        N_point_theta, N_point_r, rotor_shift
-    )
+    list_elem_materials = self.geometry_motor(N_point_theta, N_point_r, rotor_shift)[0]
+
+    permeability_materials = self.geometry_motor(N_point_theta, N_point_r, rotor_shift)[
+        1
+    ]
 
     # initialize the list_coord which contains the grid of points
     # list_coord = self.init_point(N_point_theta, N_point_r, theta, r)

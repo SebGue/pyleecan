@@ -7088,7 +7088,7 @@
                 "name": "Kmesh_fineness",
                 "type": "int",
                 "unit": "-",
-                "value": 2
+                "value": 1
             },
             {
                 "as_dict": "",

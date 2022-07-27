@@ -11,6 +11,7 @@ from Tests import save_validation_path as save_path
 
 # simple tests for geometry discretization
 file_path = "C:/Users/pc/Downloads/easy_test_MagNetwork.json"
+# file_path = "C:/Users/pc/Downloads/easy_test_MagNetwork2.json"
 # file_path = "C:/Users/pc/Downloads/easy_test_MagNetwork3.json"
 
 # Defining the validation cases paths
@@ -36,7 +37,7 @@ simu = Simu1(name="test_magnetwork", machine=SPMSM_val)
 # MagNetwork simulation
 simu.input = InputCurrent(
     OP=OPdq(N0=1000, Id_ref=0, Iq_ref=0),
-    Na_tot=45 * 4,  # simu.input.Na_tot
+    Na_tot=90 * 4,  # simu.input.Na_tot
     Nt_tot=1,
 )
 
@@ -64,7 +65,7 @@ simu2 = Simu1(name="test_FEMM", machine=SPMSM_val)
 # FEMM simulation
 simu2.input = InputCurrent(
     OP=OPdq(N0=1000, Id_ref=0, Iq_ref=0),
-    Na_tot=51 * 4,
+    Na_tot=90 * 4,
     Nt_tot=1,
     is_periodicity_t=False,
     is_periodicity_a=True,
