@@ -20,28 +20,27 @@ def right_member_assembly(
     JB=None,
     JC=None,
 ):
-    """
-    Vector assembler, RHS.
+    """Vector assembler (RHS)
 
     Parameters
     ----------
-    list_elements_materials: nd-array, size: m (integers)
-        contains the material of each cells (elements)
-    Num_Unknowns : nd-array, size: n (integers)
-        list of unknowns in the linear system .
-    list_elem : nd-array, size: m (integers)
-        tab of elements
-    list_coord : nd-array, size: nx2 (flat)
-        coordinate of each point.
+    list_elements_materials: nd-array (size: m of integers)
+        Material of each cell of the motor geometry
+    Num_Unknowns : nd-array (size: n of integers)
+        Unknowns in the linear system
+    list_elem : nd-array (size: m of integers)
+        Elements in the motor geometry
+    list_coord : nd-array (size: n * 2 (flat))
+        Coordinates of each point
     Br : float
-        Caracterization of the permanent magnet.
+        Remeanance flux density of the permanent magnet
     mu0 : float
-        Permaebility in vaccum
+        Permeability of the vaccum
 
     Returns
     -------
     RHS : nd-array, size: Num.unknowns.max()+1
-        RHS
+        Right member vector
 
     """
 

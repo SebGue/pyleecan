@@ -12,21 +12,22 @@ def assembly(
     permeability_element,
     boundary_condition_list,
 ):
-    """
-    Matrix assembler for all parts of the model
+    """Matrix assembler for the motor different elements (rotor + stator + airgap)
 
     Parameters
     ----------
-    reluc_list : nd-array, size: mx4 (float)
-        list contains the values of each reluctance per cell
-    Num_Unknowns : nd-array, size: n (integers)
-        list of unknowns in the linear system
-    list_elem : nd-array, size: m (integers)
-        tab of elements
-    permeability_cell : nd-array, size: m (float)
-        the permeability values of each cell
-    boundary_condition_list : nd-array, size: n (integers)
-        data-strurture for BC evaluation
+    self : MagNetwork
+        A MagNetwork object
+    reluc_list : nd-array (size: m * 4 of floats)
+        Values of each reluctance per cell
+    Num_Unknowns : nd-array (size: n of integers)
+        Unknowns in the linear system
+    list_elem : nd-array (size: m of integers)
+        Mesh cells in the motor geometry
+    permeability_element : nd-array (size: m of floats)
+        Permeability values of each cell
+    boundary_condition_list : nd-array (size: n of integers)
+        Data-strurture for boundary conditions evaluation
 
     Returns
     -------
