@@ -5,24 +5,23 @@ import numpy as np
 
 def init_point(self, N_point_theta, N_point_r, theta, r):
     """
-    Initialize the grid of point, of size size_x * size_y.
-    And coordinates x,y (vectors).
+    Initialize the grid of points (size : N_point_theta * N_point_r) in the r and theta directions
 
     Parameters
     ----------
-    size_x : integer
-        Size of x.
-    size_y : integer
-        Size of y.
-    x : nd-array, size: size_x (float)
-        x coordinate.
-    y : nd-array, size: size_x (float)
-        y coordinate.
+    N_point_theta : integer
+        Discretization point in the theta direction
+    N_point_r : integer
+        Discretization points in the r direction
+    theta : nd-array (size: N_point_theta of floats)
+        Coordinates of points in the theta direction
+    r : nd-array (size: N_point_r of floats)
+        Coordinates of points in the r direction
 
     Returns
     -------
-    list_coord : nd-array, size: size_x*size_y x 2 (float)
-        list of coordinate.
+    list_coord : nd-array (size: N_point_r * N_point_theta * 2 of loats )
+        list of point coordinates
 
     """
     # if N_point_theta != theta.size:

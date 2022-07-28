@@ -17,15 +17,44 @@ from pyleecan.Classes.SolutionMat import SolutionMat
 
 
 def run_radial(
-    self, axes_dict, Is_val=None, type_coord_sys=2, Kmesh_fineness=3, rotor_shift=8
+    self, axes_dict, Is_val=None, type_coord_sys=2, Kmesh_fineness=1, rotor_shift=8
 ):
+    """
+    Solve the MagNetwork in the case of radial coordinate system type
 
+    Parameters
+    ----------
+    self : MagNetwork
+        A MagNetwork object
+    axes_dict : dict
+        Dict containing axes for MagNetwork calculation
+    Is_val: ndarray
+        Stator current matrix accounting for magnetic periodicities
+    type_coord_sys : integer (Default = 2)
+        Type of the coordinate system : 1 for Cartesian and 2 for Radial
+    Kmesh_fineness : integer (Default = 2)
+        Density of mesh cells inside the geometry
+    rotor_shift : integer (Default = 8)
+        Number of rotor mesh cells to be shifted with respect to the stator
+
+    Returns
+    -------
+    Bx : nd-array
+        Flux density in the radial direction
+    By: nd-array
+        Flux density in the theta direction
+    Bx_airgap :
+        Flux density of the airgap in the radial direction
+    By_airgap :
+        Flux density of the airgap in the theta direction
+    """
     Machine = self.parent.machine
+    # Geometry inputs
     la = Machine.rotor.L1  # Active length (m)
-
     Br = Machine.rotor.magnet.mat_type.mag.Brm20
     mu0 = np.pi * 4e-7  # Permeability of vacuum (H/m)
 
+    # Definition of N_point_theta initial value
     if Machine.comp_periodicity_spatial()[1] == True:
         periodicity = Machine.comp_periodicity_spatial()[0]
     else:
@@ -35,25 +64,27 @@ def run_radial(
 
     N_point_theta = Kmesh_fineness * round(0.5 * angle_tp) + 1
 
-    N_point_r = 1 + Kmesh_fineness * round(
-        (Machine.stator.Rext - Machine.rotor.Rint) * 1000
-    )
+    # Definition of N_point_r
+    # N_point_r = 1 + Kmesh_fineness * round(
+    #     (Machine.stator.Rext - Machine.rotor.Rint) * 1000
+    # )
+    N_point_r = 37
 
-    # Update of N_point_theta
+    # Update of N_point_theta verifying condition 1
     N_point_theta = self.geometry_motor(N_point_theta, N_point_r, rotor_shift)[2]
 
     # Definition of the r-axis
     r = np.linspace(Machine.rotor.Rint, Machine.stator.Rext, N_point_r)
 
-    # Definition of the theta_primal-axis
-    # theta_primal = axes_dict["theta_primal"].get_values(is_smallestperiod=True)
-
-    theta_dual = axes_dict["angle"].get_values(is_smallestperiod=True)
+    # Definition of the theta axis
     theta = axes_dict["theta_primal"].get_values(is_smallestperiod=True)
 
+    # Definition of the theta_dual and r_dual axes
+    theta_dual = axes_dict["angle"].get_values(is_smallestperiod=True)
     r_dual = (r[1:] + r[:-1]) / 2
     # theta_dual = (theta[1:] + theta[:-1]) / 2
 
+    # Definition of the boundary conditions
     BC = [
         "anti_periodic_condition",
         "homogeneous_Dirichlet_condition",
@@ -72,6 +103,7 @@ def run_radial(
         JB = None
         JC = None
 
+    # solving the model using the solver_linear_model
     (
         Phi,
         list_geometry,
@@ -98,7 +130,7 @@ def run_radial(
         JC=JC,
     )
 
-    # Transfomration of radial coordinates to cartesian
+    # Transfomration of radial coordinates to cartesian to plot the flux density contour
     x = (list_coord[:, 1] * np.cos(list_coord[:, 0])).reshape(N_point_r, N_point_theta)
     y = (list_coord[:, 1] * np.sin(list_coord[:, 0])).reshape(N_point_r, N_point_theta)
 
@@ -109,6 +141,7 @@ def run_radial(
     # Plotting the flux density contour
     self.view_contour_flux(Phi, x, y, N_point_theta, N_point_r, list_geometry)
 
+    # computing B radial
     Bx, By = self.compute_B(Phi, list_elem, list_coord, la, type_coord_sys)
 
     B = np.stack((Bx, By), axis=-1)

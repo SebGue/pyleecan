@@ -10,6 +10,31 @@ import matplotlib.pyplot as plt
 
 
 def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
+    """Define the discretized geometry of the electric machine under study
+
+    Parameters
+    ----------
+    self : MagNetwork
+        the MagNetwork object to update
+    N_point_theta : integer
+        Number of discretization points in the theta-direction
+    N_point_r : integer
+        Number of discretization points in the r-direction
+    rotor_shift : integer (Default = 8)
+        Number of rotor mesh cells to be shifted with respect to the stator
+
+    Returns
+    -------
+    cells_materials: ndarray
+        The permeability of each cell of the motor geometry
+    permeabilty_materials : array
+        The permeabilities of the materials constituting the motor
+    N_point_theta : integer
+        Updated number of discretization points in the theta-direction according to condition 1
+        {condition 1 :
+        nb_stator_teeth_per_period * (angle_slot + 2 * half_angle_tooth)
+        = nb_PM_per_period * (PM_width + 2 * half_airgap_PM) }
+    """
 
     # Get machine object
     Machine = self.parent.machine
@@ -187,6 +212,7 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
     #######################################################################################
     #######################################################################################
     # Update and re-calculation of N_element_theta and the dependent parameters
+    # Condition 1
 
     if (nb_stator_teeth_per_period * (angle_slot + 2 * Half_tooth_width)) == (
         nb_PM_per_period * (PM_width + 2 * half_airgap_PM_width)
@@ -379,12 +405,13 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
                 num_element = N_element_theta_kk * i + j
                 cells_materials[num_element] = len(permeabilty_materials) - 2  # stator
 
-    ct = plt.pcolormesh(
-        cells_materials.reshape((N_point_r - 1, N_point_theta - 1)),
-        cmap="jet",
-        alpha=0.6,
-    )
+    # Plotting of the geometry : Validation
+    # ct = plt.pcolormesh(
+    #     cells_materials.reshape((N_point_r - 1, N_point_theta - 1)),
+    #     cmap="jet",
+    #     alpha=0.6,
+    # )
 
-    plt.show()
+    # plt.show()
 
     return cells_materials, permeabilty_materials, N_point_theta

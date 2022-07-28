@@ -1,14 +1,9 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Fri Jun  3 09:10:31 2022
-@author: LAP02
-"""
 import time
-
 from threadpoolctl import threadpool_info
 import os
-
-# from pyleecan.Classes.MagneticNetwork import MagneticNetwork
+import numpy as np
+import matplotlib.pyplot as plt
 
 threads = "1"
 os.environ["OMP_NUM_THREADS"] = threads  # export OMP_NUM_THREADS=4
@@ -20,12 +15,8 @@ os.environ["NUMEXPR_NUM_THREADS"] = threads  # export NUMEXPR_NUM_THREADS=6
 # export MKL_DOMAIN_NUM_THREADS="MKL_BLAS=2"
 os.environ["MKL_DOMAIN_NUM_THREADS"] = "MKL_DOMAIN_ALL=1"
 
-
 os.environ["MKL_DYNAMIC"] = "FALSE"
 os.environ["OMP_DYNAMIC"] = "FALSE"
-
-import numpy as np
-import matplotlib.pyplot as plt
 
 # Choose beetween chol-mod and scipy sparse linear solver
 Have_cholmod = False
@@ -56,43 +47,50 @@ def solver_linear_model(
     JB=None,
     JC=None,
 ):
-    """
+    """Compute the MagNetwork of a defined electric motor
+
     Parameters
     ----------
+    self: MagNetwork
+        A MagNetwork object
     N_point_theta : integer
-        Size of theta.
+        Discretization point in the theta direction
     N_point_r : integer
-        Size of r.
-    theta : nd-array, size: N_point_theta (float)
-        theta coordinate.
-    r : nd-array, size: N_point_theta (float)
-        r coordinate.
-    rotor_shift : integers
-        position of the rotor.
-    geometry : object function
-        function to initialyze model.
-    boundary_condition : list of string (condition)
-        List of boundary conditions.
-    la : float
-        depth of the model.
+        Discretization points in the r direction
+    r: array
+        Values of r coordinates
+    theta: array
+        Values of theta coordinates
+    rotor_shift : integer (Default = 8)
+        Number of rotor mesh cells to be shifted with respect to the stator
+    boundary_condition : list of strings
+        Boundary conditions of the simulation
+    geometry : method
+        Initialize the geometry
     mu0 : float
-        permeability of the vaccum.
+        Permeability of the vaccum
+    la : integer
+        Active length of the motor
     Br : float
-        Caracterization of the permanent magnet.
+        Remeanance flux density of the permanent magnet
+    type_coord_sys : integer (Default = 2)
+        Type of the coordinate system : 1 for cartesian, 2 for Radial
+    JA, JB, JC : ndarray
+        Currents of the phase A, B and C respectively of the stator
     Returns
     -------
-    Phi : size: N_point_theta (float)
-        The flux on each point of the mesh.
-    list_geomerty: nd-array, size: m (integers)
-        contains the material of each cells (elements)
-    Num_Unknowns : nd-array, size: N_point_theta (integers)
-        list of unknowns in the linear system .
+    Phi : ndarrya (size : N_point_theta of floats)
+        Flux Phi in each point of the mesh.
+    Num_Unknowns : nd-array (size : N_point_theta of integers)
+        List of unknowns in the linear system
     list_elem : nd-array, size: m (integers)
-        tab of elements
-    list_elem_permability : nd-array, size: m (float)
-        the permeability values of each cell
-    list_coord : nd-array, size: N_point_theta*N_point_r theta 2 (float)
-        list of coordinate.
+        Mesh cells of the motor geometry
+    list_geomerty: nd-array (size : m of integers)
+        Material of each geometry cell
+    list_elem_permability : nd-array (size : m of floats)
+        Permeability of each geometry cell
+    list_coord : nd-array (size : N_point_theta * N_point_r theta * 2 of floats)
+        Coordinates of the geometry
     """
 
     t0 = time.perf_counter()
@@ -103,12 +101,6 @@ def solver_linear_model(
     permeability_materials = self.geometry_motor(N_point_theta, N_point_r, rotor_shift)[
         1
     ]
-
-    # initialize the list_coord which contains the grid of points
-    # list_coord = self.init_point(N_point_theta, N_point_r, theta, r)
-    # print("Permeability", permeability_materials)
-
-    # list_elem = self.init_cell(N_point_theta, N_point_r)
 
     (list_coord, list_elem,) = self.init_mesh(
         N_point_theta,
