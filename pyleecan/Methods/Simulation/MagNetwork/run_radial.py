@@ -17,7 +17,7 @@ from pyleecan.Classes.SolutionMat import SolutionMat
 
 
 def run_radial(
-    self, axes_dict, Is_val=None, type_coord_sys=2, Kmesh_fineness=2, rotor_shift=8
+    self, axes_dict, Is_val=None, type_coord_sys=2, Kmesh_fineness=3, rotor_shift=8
 ):
 
     Machine = self.parent.machine
@@ -45,17 +45,14 @@ def run_radial(
     # Definition of the r-axis
     r = np.linspace(Machine.rotor.Rint, Machine.stator.Rext, N_point_r)
 
-    # Definition of the theta-axis
-    # Add one extra point so that dual mesh has the correct dimension
-    theta = np.linspace(
-        axes_dict["angle"].initial,
-        axes_dict["angle"].final,
-        axes_dict["angle"].number + 1,
-        endpoint=False,
-    )
+    # Definition of the theta_primal-axis
+    # theta_primal = axes_dict["theta_primal"].get_values(is_smallestperiod=True)
+
+    theta_dual = axes_dict["angle"].get_values(is_smallestperiod=True)
+    theta = axes_dict["theta_primal"].get_values(is_smallestperiod=True)
 
     r_dual = (r[1:] + r[:-1]) / 2
-    theta_dual = (theta[1:] + theta[:-1]) / 2
+    # theta_dual = (theta[1:] + theta[:-1]) / 2
 
     BC = [
         "anti_periodic_condition",
