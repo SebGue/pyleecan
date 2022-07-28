@@ -41,7 +41,7 @@ simu = Simu1(name="test_magnetwork", machine=SPMSM_val)
 # MagNetwork simulation
 simu.input = InputCurrent(
     OP=OPdq(N0=1000, Id_ref=0, Iq_ref=0),
-    Na_tot=45 * 4,  # simu.input.Na_tot
+    Na_tot=90 * 4,  # simu.input.Na_tot
     Nt_tot=1,
 )
 
@@ -51,7 +51,7 @@ simu.mag = MagNetwork(
     is_periodicity_t=False,
     type_model=1,
     type_coord_sys=2,
-    Kmesh_fineness=1,
+    Kmesh_fineness=2,
     rotor_shift=8,
 )
 

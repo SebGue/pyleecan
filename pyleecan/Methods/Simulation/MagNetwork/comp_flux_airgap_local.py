@@ -42,8 +42,11 @@ def comp_flux_airgap_local(
     Bx, By = self.compute_B(Phi, list_elem, list_coord, la, type_coord_sys)
 
     # Reshaping B in a 2D array
-    Bx = Bx.reshape((r.size - 1, theta.size - 1))
-    By = By.reshape((r.size - 1, theta.size - 1))
+    # Bx = Bx.reshape((r.size - 1, theta.size - 1))
+    # By = By.reshape((r.size - 1, theta.size - 1))
+
+    Bx = Bx.reshape((r.size, theta.size))
+    By = By.reshape((r.size, theta.size))
 
     # Looking for the position in the center of the mecanical airgap
     position = Rgap

@@ -62,6 +62,7 @@ def init_reluc(self, list_elem, list_coord, mu0, la, type_coord_sys):
         Reluc_list[:, 1] = 0.5 * theta / (mu0 * la * np.log(R3 / R1))
         Reluc_list[:, 2] = np.log(R3 / R2) / (mu0 * theta * la)
         Reluc_list[:, 3] = Reluc_list[:, 1]
+
     else:
         raise NameError("Wrong type_coord_sys, choice between 'cartesian' and 'polar'")
 
