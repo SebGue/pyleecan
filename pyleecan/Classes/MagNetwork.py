@@ -177,6 +177,13 @@ try:
 except ImportError as error:
     comp_axes = error
 
+try:
+    from ..Methods.Simulation.MagNetwork.mesh_solution_pyleecan import (
+        mesh_solution_pyleecan,
+    )
+except ImportError as error:
+    mesh_solution_pyleecan = error
+
 
 from numpy import isnan
 from ._check import InitUnKnowClassError
@@ -495,6 +502,18 @@ class MagNetwork(Magnetics):
         )
     else:
         comp_axes = comp_axes
+    # cf Methods.Simulation.MagNetwork.mesh_solution_pyleecan
+    if isinstance(mesh_solution_pyleecan, ImportError):
+        mesh_solution_pyleecan = property(
+            fget=lambda x: raise_(
+                ImportError(
+                    "Can't use MagNetwork method mesh_solution_pyleecan: "
+                    + str(mesh_solution_pyleecan)
+                )
+            )
+        )
+    else:
+        mesh_solution_pyleecan = mesh_solution_pyleecan
     # generic save method is available in all object
     save = save
     # get_logger method is available in all object

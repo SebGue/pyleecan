@@ -154,28 +154,6 @@ def run_radial(
     temp = np.zeros((list_coord.shape[0], 3))
     temp[:, 0:2] = list_coord
 
-    # Launch mesh.io
-    # list_coord = temp
-    # points = list_coord
-    # cells = [
-    #     ("quad", list_elem),
-    # ]
-    # mesh = meshio.Mesh(
-    #     points,
-    #     cells,
-    #     # Optionally provide extra data on points, cells, etc.
-    #     point_data={"Flux": Phi},
-    #     # Each item in cell data must match the cells array
-    #     cell_data={"B": [B], "Materials": [list_geometry]},
-    # )
-    # mesh.write(
-    #     "mymesh.xdmf",  # str, os.PathLike, or buffer/open file
-    #     # file_format="vtk",  # optional if first argument is a path; inferred from extension
-    # )
-
-    # Alternative with the same options
-    # meshio.write_points_cells("mymesh.vtu", points, cells)
-
     print("mesh saved", list_coord.shape, list_elem.shape)
 
     # Compute 2D curve of the airgap flux density
@@ -189,42 +167,5 @@ def run_radial(
         Machine.comp_Rgap_mec(),
         type_coord_sys,
     )
-
-    # # Add my mesh to pyleecan
-    # print("Solve RN done.")
-    # mesh = MeshMat(dimension=3)
-    # mesh.node = NodeMat()
-    # print("Add points in mesh")
-    # for i in range(list_cart.shape[0]):
-    #     mesh.node.add_node([list_cart[i, 0], list_cart[i, 1], 0])
-    # print("Done \nAdd elements in mesh")
-
-    # mesh.cell["quad"] = CellMat(nb_node_per_cell=4)
-    # for i in range(list_elem.shape[0]):
-    #     mesh.add_cell(list_elem[i, :], "quad")
-
-    # MSol = MeshSolution(mesh=[mesh])
-
-    # # print("Done \nAdd material for ech elementss")
-    # # for i in range(list_elem.shape[0]):
-    # #     MSol.group = {list_materials[list_geometry[i] - 1]: list_elem[i, :]}
-
-    # print("Done")
-    # # plot the mesh
-    # MSol.plot_mesh()
-
-    # # plot the flux
-    # field = Phi[np.newaxis]
-    # print(field.shape)
-    # my_solution = SolutionMat(
-    #     label="Flux (Weber)",
-    #     type_cell="point",
-    #     field=field,
-    #     indice=np.arange(list_coord.shape[0]),
-    #     axis_name=["time", "indice"],
-    #     axis_size=[1, list_coord.shape[0]],
-    # )
-    # MSol.solution.append(my_solution)
-    # MSol.plot_contour()
 
     return Bx, By, Bx_airgap, By_airgap
