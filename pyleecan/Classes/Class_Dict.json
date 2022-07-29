@@ -7100,6 +7100,16 @@
                 "type": "int",
                 "unit": "-",
                 "value": 8
+            },
+            {
+                "as_dict": "",
+                "desc": "number of discretization points in the r-direction",
+                "max": "",
+                "min": "",
+                "name": "N_point_r",
+                "type": "int",
+                "unit": "",
+                "value": 37
             }
         ]
     },

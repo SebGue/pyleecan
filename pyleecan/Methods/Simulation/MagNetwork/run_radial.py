@@ -17,7 +17,13 @@ from pyleecan.Classes.SolutionMat import SolutionMat
 
 
 def run_radial(
-    self, axes_dict, Is_val=None, type_coord_sys=2, Kmesh_fineness=2, rotor_shift=8
+    self,
+    axes_dict,
+    Is_val=None,
+    type_coord_sys=2,
+    N_point_r=37,
+    Kmesh_fineness=2,
+    rotor_shift=8,
 ):
     """
     Solve the MagNetwork in the case of radial coordinate system type
@@ -65,10 +71,9 @@ def run_radial(
     N_point_theta = Kmesh_fineness * round(0.5 * angle_tp) + 1
 
     # Definition of N_point_r
-    N_point_r = 1 + Kmesh_fineness * round(
-        (Machine.stator.Rext - Machine.rotor.Rint) * 1000
-    )
-    # N_point_r = 37
+    # N_point_r = 1 + Kmesh_fineness * round(
+    #     (Machine.stator.Rext - Machine.rotor.Rint) * 1000
+    # )
 
     # Update of N_point_theta verifying condition 1
     N_point_theta = self.geometry_motor(N_point_theta, N_point_r, rotor_shift)[2]

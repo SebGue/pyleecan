@@ -506,6 +506,7 @@ class MagNetwork(Magnetics):
         type_coord_sys=2,
         Kmesh_fineness=1,
         rotor_shift=8,
+        N_point_r=37,
         is_remove_slotS=False,
         is_remove_slotR=False,
         is_remove_ventS=False,
@@ -551,6 +552,8 @@ class MagNetwork(Magnetics):
                 Kmesh_fineness = init_dict["Kmesh_fineness"]
             if "rotor_shift" in list(init_dict.keys()):
                 rotor_shift = init_dict["rotor_shift"]
+            if "N_point_r" in list(init_dict.keys()):
+                N_point_r = init_dict["N_point_r"]
             if "is_remove_slotS" in list(init_dict.keys()):
                 is_remove_slotS = init_dict["is_remove_slotS"]
             if "is_remove_slotR" in list(init_dict.keys()):
@@ -594,6 +597,7 @@ class MagNetwork(Magnetics):
         self.type_coord_sys = type_coord_sys
         self.Kmesh_fineness = Kmesh_fineness
         self.rotor_shift = rotor_shift
+        self.N_point_r = N_point_r
         # Call Magnetics init
         super(MagNetwork, self).__init__(
             is_remove_slotS=is_remove_slotS,
@@ -629,6 +633,7 @@ class MagNetwork(Magnetics):
         MagNetwork_str += "type_coord_sys = " + str(self.type_coord_sys) + linesep
         MagNetwork_str += "Kmesh_fineness = " + str(self.Kmesh_fineness) + linesep
         MagNetwork_str += "rotor_shift = " + str(self.rotor_shift) + linesep
+        MagNetwork_str += "N_point_r = " + str(self.N_point_r) + linesep
         return MagNetwork_str
 
     def __eq__(self, other):
@@ -647,6 +652,8 @@ class MagNetwork(Magnetics):
         if other.Kmesh_fineness != self.Kmesh_fineness:
             return False
         if other.rotor_shift != self.rotor_shift:
+            return False
+        if other.N_point_r != self.N_point_r:
             return False
         return True
 
@@ -713,6 +720,18 @@ class MagNetwork(Magnetics):
                 diff_list.append(name + ".rotor_shift" + val_str)
             else:
                 diff_list.append(name + ".rotor_shift")
+        if other._N_point_r != self._N_point_r:
+            if is_add_value:
+                val_str = (
+                    " (self="
+                    + str(self._N_point_r)
+                    + ", other="
+                    + str(other._N_point_r)
+                    + ")"
+                )
+                diff_list.append(name + ".N_point_r" + val_str)
+            else:
+                diff_list.append(name + ".N_point_r")
         # Filter ignore differences
         diff_list = list(filter(lambda x: x not in ignore_list, diff_list))
         return diff_list
@@ -728,6 +747,7 @@ class MagNetwork(Magnetics):
         S += getsizeof(self.type_coord_sys)
         S += getsizeof(self.Kmesh_fineness)
         S += getsizeof(self.rotor_shift)
+        S += getsizeof(self.N_point_r)
         return S
 
     def as_dict(self, type_handle_ndarray=0, keep_function=False, **kwargs):
@@ -751,6 +771,7 @@ class MagNetwork(Magnetics):
         MagNetwork_dict["type_coord_sys"] = self.type_coord_sys
         MagNetwork_dict["Kmesh_fineness"] = self.Kmesh_fineness
         MagNetwork_dict["rotor_shift"] = self.rotor_shift
+        MagNetwork_dict["N_point_r"] = self.N_point_r
         # The class name is added to the dict for deserialisation purpose
         # Overwrite the mother class name
         MagNetwork_dict["__class__"] = "MagNetwork"
@@ -764,6 +785,7 @@ class MagNetwork(Magnetics):
         type_coord_sys_val = self.type_coord_sys
         Kmesh_fineness_val = self.Kmesh_fineness
         rotor_shift_val = self.rotor_shift
+        N_point_r_val = self.N_point_r
         is_remove_slotS_val = self.is_remove_slotS
         is_remove_slotR_val = self.is_remove_slotR
         is_remove_ventS_val = self.is_remove_ventS
@@ -792,6 +814,7 @@ class MagNetwork(Magnetics):
             type_coord_sys=type_coord_sys_val,
             Kmesh_fineness=Kmesh_fineness_val,
             rotor_shift=rotor_shift_val,
+            N_point_r=N_point_r_val,
             is_remove_slotS=is_remove_slotS_val,
             is_remove_slotR=is_remove_slotR_val,
             is_remove_ventS=is_remove_ventS_val,
@@ -821,6 +844,7 @@ class MagNetwork(Magnetics):
         self.type_coord_sys = None
         self.Kmesh_fineness = None
         self.rotor_shift = None
+        self.N_point_r = None
         # Set to None the properties inherited from Magnetics
         super(MagNetwork, self)._set_None()
 
@@ -895,6 +919,24 @@ class MagNetwork(Magnetics):
         fget=_get_rotor_shift,
         fset=_set_rotor_shift,
         doc=u"""number of cells to be shifted when changing the rotor position
+
+        :Type: int
+        """,
+    )
+
+    def _get_N_point_r(self):
+        """getter of N_point_r"""
+        return self._N_point_r
+
+    def _set_N_point_r(self, value):
+        """setter of N_point_r"""
+        check_var("N_point_r", value, "int")
+        self._N_point_r = value
+
+    N_point_r = property(
+        fget=_get_N_point_r,
+        fset=_set_N_point_r,
+        doc=u"""number of discretization points in the r-direction
 
         :Type: int
         """,

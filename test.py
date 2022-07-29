@@ -51,6 +51,7 @@ simu.mag = MagNetwork(
     is_periodicity_t=False,
     type_model=1,
     type_coord_sys=2,
+    N_point_r=37,
     Kmesh_fineness=2,
     rotor_shift=8,
 )
