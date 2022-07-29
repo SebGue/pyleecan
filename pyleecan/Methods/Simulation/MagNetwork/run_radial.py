@@ -21,9 +21,9 @@ def run_radial(
     axes_dict,
     Is_val=None,
     type_coord_sys=2,
-    N_point_r=37,
-    Kmesh_fineness=2,
-    rotor_shift=8,
+    # N_point_r=37,
+    # Kmesh_fineness=1,
+    # rotor_shift=8,
 ):
     """
     Solve the MagNetwork in the case of radial coordinate system type
@@ -68,7 +68,7 @@ def run_radial(
 
     angle_tp = (np.pi / periodicity) * (180 / np.pi)
 
-    N_point_theta = Kmesh_fineness * round(0.5 * angle_tp) + 1
+    N_point_theta = self.Kmesh_fineness * round(0.5 * angle_tp) + 1
 
     # Definition of N_point_r
     # N_point_r = 1 + Kmesh_fineness * round(
@@ -76,10 +76,12 @@ def run_radial(
     # )
 
     # Update of N_point_theta verifying condition 1
-    N_point_theta = self.geometry_motor(N_point_theta, N_point_r, rotor_shift)[2]
+    N_point_theta = self.geometry_motor(
+        N_point_theta, self.N_point_r, self.rotor_shift
+    )[2]
 
     # Definition of the r-axis
-    r = np.linspace(Machine.rotor.Rint, Machine.stator.Rext, N_point_r)
+    r = np.linspace(Machine.rotor.Rint, Machine.stator.Rext, self.N_point_r)
 
     # Definition of the theta axis
     theta = axes_dict["theta_primal"].get_values(is_smallestperiod=True)
@@ -118,12 +120,12 @@ def run_radial(
         list_coord,
     ) = self.solver_linear_model(
         N_point_theta,
-        N_point_r,
+        self.N_point_r,
         theta,
         r,
         theta_dual,
         r_dual,
-        rotor_shift,
+        self.rotor_shift,
         BC,
         self.geometry_motor,
         mu0,
@@ -136,15 +138,19 @@ def run_radial(
     )
 
     # Transfomration of radial coordinates to cartesian to plot the flux density contour
-    x = (list_coord[:, 1] * np.cos(list_coord[:, 0])).reshape(N_point_r, N_point_theta)
-    y = (list_coord[:, 1] * np.sin(list_coord[:, 0])).reshape(N_point_r, N_point_theta)
+    x = (list_coord[:, 1] * np.cos(list_coord[:, 0])).reshape(
+        self.N_point_r, N_point_theta
+    )
+    y = (list_coord[:, 1] * np.sin(list_coord[:, 0])).reshape(
+        self.N_point_r, N_point_theta
+    )
 
     list_cartesian_coord = np.zeros(list_coord.shape)
     list_cartesian_coord[:, 0] = x.flatten()
     list_cartesian_coord[:, 1] = y.flatten()
 
     # Plotting the flux density contour
-    self.view_contour_flux(Phi, x, y, N_point_theta, N_point_r, list_geometry)
+    self.view_contour_flux(Phi, x, y, N_point_theta, self.N_point_r, list_geometry)
 
     # computing B radial
     Bx, By = self.compute_B(Phi, list_elem, list_coord, la, type_coord_sys)
