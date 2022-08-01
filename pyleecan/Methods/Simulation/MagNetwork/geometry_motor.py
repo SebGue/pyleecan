@@ -7,7 +7,6 @@ import numpy as np
 from pyleecan.Functions.load import load
 from scipy.fft import ifftn
 import matplotlib.pyplot as plt
-from collections import defaultdict
 
 
 def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
@@ -28,7 +27,7 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
     -------
     cells_materials: ndarray
         The permeability of each cell of the motor geometry
-    permeabilty_materials : array
+    material_dict : dict
         The permeabilities of the materials constituting the motor
     N_point_theta : integer
         Updated number of discretization points in the theta-direction according to condition 1
@@ -42,6 +41,7 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
 
     rad_to_deg = 180 / np.pi
 
+    # Machine periodicity
     if Machine.comp_periodicity_spatial()[1] == True:
         periodicity = Machine.comp_periodicity_spatial()[0]
     else:
@@ -104,7 +104,7 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
     la = Machine.rotor.L1
 
     #######################################################################################
-    # Material properties
+    # Material properties definition
     #######################################################################################
     # PM remanance (T)
     Br = Machine.rotor.magnet.mat_type.mag.Brm20
@@ -130,33 +130,17 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
     # Relative permeabiltity of the PM
     mur_PM = Machine.rotor.magnet.mat_type.mag.mur_lin
 
-    # Generalize the materials list and their linear permeabilities for a specific number of windings
-    # list_materials = []
-    # permeabilty_materials = np.array([])
+    material_dict = {}
 
-    # for i in range(nb_stator_teeth_per_period * nb_layers):
-
-    #     list_materials.append("winding" + str(i + 1))
-    #     permeabilty_materials = np.append(permeabilty_materials, [mu_winding])
-
-    # list_materials += ["air", "stator", "PM", "rotor"]
-
-    # permeabilty_materials = np.append(
-    #     permeabilty_materials, [mu_air, mu_stator, mur_PM, mu_rotor]
-    # )
-    # Material dict
-
-    material_dict = defaultdict(int)
-
-    material_dict["air"] += mu_air
-    material_dict["stator"] += mu_stator
-    material_dict["rotor"] += mu_rotor
+    material_dict["air"] = mu_air
+    material_dict["stator"] = mu_stator
+    material_dict["rotor"] = mu_rotor
 
     for ii in range(nb_stator_teeth_per_period * nb_layers):
-        material_dict["winding" + str(ii + 1)] += mu_winding
+        material_dict["winding" + str(ii + 1)] = mu_winding
 
     for jj in range(nb_PM_per_period):
-        material_dict["PM" + str(jj + 1)] += mur_PM
+        material_dict["PM" + str(jj + 1)] = mur_PM
     #######################################################################################
 
     # x and y positions
@@ -227,10 +211,9 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
     # airgap_and_Pm_height = round(Machine.rotor.comp_radius_mec() / h_r)
 
     #######################################################################################
-    #######################################################################################
     # Update and re-calculation of N_element_theta and the dependent parameters
     # Condition 1
-
+    #######################################################################################
     if (nb_stator_teeth_per_period * (angle_slot + 2 * Half_tooth_width)) == (
         nb_PM_per_period * (PM_width + 2 * half_airgap_PM_width)
     ):
@@ -270,7 +253,6 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
         ):
             break
     #######################################################################################
-    #######################################################################################
 
     # Total number of elements
     N_total_element = N_element_r * N_element_theta_kk
@@ -292,7 +274,6 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
 
             for j in range(N_element_theta_kk):
                 num_element = N_element_theta_kk * i + j
-
                 # Assignment of the first half of the airgap elements
                 if j < half_airgap_PM_width:
                     cells_materials[num_element] = material_dict["air"]  # air material
@@ -314,6 +295,7 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
                                 + PM_idx * airgap_PM_width
                             )
                         ):
+                            # print(material_dict["PM" + str(PM_idx + 1)])
                             cells_materials[num_element] = material_dict[
                                 "PM" + str(PM_idx + 1)
                             ]  # PM material
@@ -333,7 +315,9 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
                                 + PM_idx * (PM_width + airgap_PM_width)
                             )
                         ):
-                            material_dict["air"]  # air material between the PMs
+                            cells_materials[num_element] = material_dict[
+                                "air"
+                            ]  # air material between the PMs
 
                 # Assignment of the last half of the airgap
                 else:
@@ -348,7 +332,6 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
         elif i < N_element_r - stator_iron_height:
             for j in range(N_element_theta_kk):
                 num_element = N_element_theta_kk * i + j
-
                 # Assignment of the elements in the first half tooth
                 if j < Half_tooth_width:
                     cells_materials[num_element] = material_dict["stator"]  # stator
@@ -415,12 +398,12 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
                 cells_materials[num_element] = material_dict["stator"]  # stator
 
     # Plotting of the geometry : Validation
-    ct = plt.pcolormesh(
-        cells_materials.reshape((N_point_r - 1, N_point_theta - 1)),
-        cmap="jet",
-        alpha=0.6,
-    )
-
-    plt.show()
+    # ct = plt.pcolormesh(
+    #     cells_materials.reshape((N_point_r - 1, N_point_theta - 1)),
+    #     cmap="jet",
+    #     alpha=0.6,
+    # )
+    # plt.colorbar()
+    # plt.show()
 
     return cells_materials, material_dict, N_point_theta
