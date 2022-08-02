@@ -44,7 +44,7 @@ def run_radial(self, axes_dict, Is_val=None, type_coord_sys=2):
     ###############################################################################
     Machine = self.parent.machine
 
-    # Active length (m)
+    # Active length of the electric motor (m)
     la = Machine.rotor.L1
 
     # Definition of N_point_theta initial value
@@ -69,7 +69,13 @@ def run_radial(self, axes_dict, Is_val=None, type_coord_sys=2):
 
     # Material properties of PM and vaccum
     Br = Machine.rotor.magnet.mat_type.mag.Brm20
-    mu0 = np.pi * 4e-7  # Permeability of vacuum (H/m)
+
+    # Material_dict from geometry_motor method
+    material_dict = self.geometry_motor(
+        N_point_theta, self.N_point_r, self.rotor_shift
+    )[1]
+
+    mu0 = material_dict["vacuum"]  # Permeability of vacuum (H/m)
 
     ###############################################################################
     # Definition of the r- and theta- axes
@@ -126,7 +132,7 @@ def run_radial(self, axes_dict, Is_val=None, type_coord_sys=2):
         r_dual,
         BC,
         self.geometry_motor,
-        mu0,
+        material_dict,
         la,
         Br,
         type_coord_sys,

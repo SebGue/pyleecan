@@ -166,6 +166,7 @@ def solver_linear_model(
         list_coord,
         reluc_list,
         Br,
+        material_dict,
         la,
         type_coord_sys,
         JA=JA,
