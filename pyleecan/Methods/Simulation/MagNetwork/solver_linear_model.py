@@ -36,7 +36,6 @@ def solver_linear_model(
     r,
     x_dual,
     y_dual,
-    rotor_shift,
     boundary_condition,
     geometry,
     mu0,
@@ -93,47 +92,50 @@ def solver_linear_model(
         Coordinates of the geometry
     """
 
+    ###############################################################################
+    # Initialization of the grid and the MagNetwork simulation parameters
+    ###############################################################################
+
+    # Starting the couting time
     t0 = time.perf_counter()
 
-    # initialize the cells of materials and their permeability
-    list_elem_materials = self.geometry_motor(N_point_theta, N_point_r, rotor_shift)[0]
-
-    permeability_materials = self.geometry_motor(N_point_theta, N_point_r, rotor_shift)[
-        1
-    ]
-
-    (list_coord, list_elem,) = self.init_mesh(
+    (
+        list_coord,
+        list_elem,
+        list_elem_permability,
+        list_boundary_condition,
+        Num_Unknowns,
+    ) = self.init_mesh(
         N_point_theta,
         N_point_r,
         theta,
         r,
+        boundary_condition,
     )
 
-    list_elem_permability = self.init_permeabilty_cell(
-        N_point_theta, N_point_r, permeability_materials, mu0, list_elem_materials
-    )
-
-    list_boundary_condition, Periodic_point = self.init_mesh_BC(
-        N_point_theta, N_point_r, boundary_condition
-    )
-
-    Num_Unknowns = self.numeroting_unknows(
-        list_elem, list_boundary_condition, Periodic_point
-    )
-
-    # Mesuring the performance time
+    # Ending the couting time
     t1 = time.perf_counter()
 
-    print("Assembly geometry:", np.round(t1 - t0, 5), "seconds")
+    # Measuring the performance time
+    print("Initialization of the problem:", np.round(t1 - t0, 5), "seconds")
+
+    ###############################################################################
+    # Saving the mesh
+    ###############################################################################
+
     self.save_mesh(
         list_elem_materials, Num_Unknowns, list_elem, theta, r, list_boundary_condition
     )
 
     t2 = time.perf_counter()
-    # Saving mesh time
+
+    # Saving the mesh time
     print("Save mesh:", np.round(t2 - t1, 5), "secondes")
 
-    # Assembly all matrice
+    ###############################################################################
+    # Assemblying all the matrices
+    ###############################################################################
+
     reluc_list = self.init_reluc(list_elem, list_coord, mu0, la, type_coord_sys)
     # print(reluc_list)
 
@@ -148,14 +150,16 @@ def solver_linear_model(
     t3 = time.perf_counter()
     print("Assembly matrix", np.round(t3 - t2, 5), "secondes")
 
-    # Assembly RHS containing the sources
+    ###############################################################################
+    # Assemblying the RHS containing the sources
+    ###############################################################################
+
     RHS = self.right_member_assembly(
-        list_elem_materials,
+        list_elem_permability,
         Num_Unknowns,
         list_elem,
         list_coord,
         reluc_list,
-        permeability_materials,
         Br,
         mu0,
         la,
@@ -170,7 +174,10 @@ def solver_linear_model(
     print("Assembly vector:", np.round(t4 - t3, 5), "secondes")
     print("Total :", np.round(t4 - t2, 5))
 
-    # Compute Solution
+    ###############################################################################
+    # Computing the solution Phi
+    ###############################################################################
+
     t3 = time.perf_counter()
     if Have_cholmod:
 
@@ -194,6 +201,7 @@ def solver_linear_model(
             np.linalg.norm(M_csr @ Phi - RHS, ord=2),
         )
 
+    # Adding the oundary conditions to the solution Phi
     Phi = self.add_BC_to_Phi(
         Phi,
         Num_Unknowns,
@@ -203,7 +211,6 @@ def solver_linear_model(
 
     return (
         Phi,
-        list_elem_materials,
         Num_Unknowns,
         list_elem,
         list_elem_permability,

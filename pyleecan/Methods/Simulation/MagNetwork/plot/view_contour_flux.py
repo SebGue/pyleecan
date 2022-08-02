@@ -14,12 +14,12 @@ def view_contour_flux(
 ):
 
     try:
-        # Plotting list_element_materials
+        # Plotting the list_element_materials
         plt.pcolormesh(
             theta,
             r,
             list_element_materials.reshape((N_point_r - 1, N_point_theta - 1)),
-            cmap="Paired",
+            cmap="tab20c",
             edgecolors=None,
             facecolors="none",
             alpha=0.6,

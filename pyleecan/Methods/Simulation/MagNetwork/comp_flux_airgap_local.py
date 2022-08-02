@@ -54,4 +54,4 @@ def comp_flux_airgap_local(
     # Getting the index of the line i from the position in the center of the mecanical airgap
     index_airgap = (int)((position - r.min()) * ((r.size - 1) / (r.max() - r.min())))
 
-    return Bx[index_airgap, :], By[index_airgap, :]
+    return -Bx[index_airgap, :], -By[index_airgap, :]

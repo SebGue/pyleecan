@@ -6,12 +6,11 @@ from scipy.sparse import coo_matrix
 
 def right_member_assembly(
     self,
-    list_elements_materials,
+    list_permeability_cell,  # cells materials
     Num_Unknowns,
     list_elem,
     list_coord,
     reluc_list,
-    list_permeability,
     Br,
     mu0,
     la,
@@ -20,37 +19,32 @@ def right_member_assembly(
     JB=None,
     JC=None,
 ):
-    """Vector assembler (RHS)
 
-    Parameters
-    ----------
-    list_elements_materials: nd-array (size: m of integers)
-        Material of each cell of the motor geometry
-    Num_Unknowns : nd-array (size: n of integers)
-        Unknowns in the linear system
-    list_elem : nd-array (size: m of integers)
-        Elements in the motor geometry
-    list_coord : nd-array (size: n * 2 (flat))
-        Coordinates of each point
-    Br : float
-        Remeanance flux density of the permanent magnet
-    mu0 : float
-        Permeability of the vaccum
+    #######################################################################################
+    # Number of PMs per period
+    #######################################################################################
+    # Get machine object
+    Machine = self.parent.machine
 
-    Returns
-    -------
-    RHS : nd-array, size: Num.unknowns.max()+1
-        Right member vector
+    if Machine.comp_periodicity_spatial()[1] == True:
+        periodicity = Machine.comp_periodicity_spatial()[0]
+    else:
+        periodicity = Machine.comp_periodicity_spatial()[0] / 2
 
-    """
+    # Number of PMs per period
+    nb_PM_per_period = round(Machine.rotor.get_pole_pair_number() / periodicity)
 
-    position_permeability_PM = len(list_permeability) - 3
-    mask_magnet = list_elements_materials == position_permeability_PM
-    mur_PM = list_permeability[position_permeability_PM]  # 4-1???????
+    # Relative permeabiltity of the PM
+    mur_PM = Machine.rotor.magnet.mat_type.mag.mur_lin
+    #######################################################################################
+
+    mask_magnet = list_permeability_cell == mur_PM
     N_unknowns = Num_Unknowns.max() + 1
 
-    # np.savetxt("cell_materials.csv", list_elements_materials)
-    # print("non-zero in mak magnet?", mask_magnet.sum())
+    #######################################################################################
+    # Modeling of the PM force according to the PM direction (y): Phi_PM = FMMPM
+
+    # Linear : Ref 1: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=9473194
     if type_coord_sys == 1:
         h_x = np.linalg.norm(
             list_coord[list_elem[:, 0]] - list_coord[list_elem[:, 1]], axis=1, ord=2
@@ -58,8 +52,9 @@ def right_member_assembly(
         h_y = np.linalg.norm(
             list_coord[list_elem[:, 1]] - list_coord[list_elem[:, 2]], axis=1, ord=2
         )
-        FMMPM = 0.5 * Br * la * h_y[mask_magnet] / mur_PM
+        FMMPM = 2 * Br * h_y[mask_magnet] * la / mur_PM
 
+    # Radial: Ref 2: https://www.researchgate.net/publication/269405270_Modeling_of_a_Radial_Flux_PM_Rotating_Machine_using_a_New_Hybrid_Analytical_Model
     elif type_coord_sys == 2:
         R1 = list_coord[list_elem[:, 0], 1]
         R2 = list_coord[list_elem[:, -1], 1]
@@ -68,12 +63,12 @@ def right_member_assembly(
             list_coord[list_elem[:, 1], 0] - list_coord[list_elem[:, 0], 0]
         )
 
-        FMMPM = 1.05 * Br * la * sigma_R[mask_magnet] * 2
+        FMMPM = 2 * Br * sigma_R[mask_magnet] * la / mur_PM
 
-        ##Initailyze returned vector -> RHS
+        # Initialize returned vector -> RHS
         RHS = np.zeros(N_unknowns, dtype=np.float64)
 
-        ####Permanant Magnet assembling
+        # Permanant Magnet assembling
         index_unknowns_1 = Num_Unknowns[list_elem[mask_magnet, 0]]
         index_unknowns_2 = Num_Unknowns[list_elem[mask_magnet, 1]]
         index_unknowns_3 = Num_Unknowns[list_elem[mask_magnet, 2]]
@@ -85,9 +80,15 @@ def right_member_assembly(
         RHS[index_unknowns_4] += FMMPM * reluc_list[mask_magnet, 3]
 
     ####Winding assembling
+
+    if Machine.stator.winding.conductor.cond_mat.mag != None:
+        mu_winding = Machine.stator.winding.conductor.cond_mat.mag.mur_lin
+    else:
+        mu_winding = 1
+
     if JA is None and JB is None and JC is None:
         # Phase 1
-        mask_winding = list_elements_materials == 1
+        mask_winding = list_permeability_cell == mu_winding
 
         if type_coord_sys == 1:
             S = h_x[mask_winding] * h_y[mask_winding] / 4
@@ -110,7 +111,8 @@ def right_member_assembly(
         RHS[index_unknowns_4] += JA * S
 
         # Phase 2
-        mask_winding = list_elements_materials == 2
+        mask_winding = list_permeability_cell == mu_winding + 1
+        # here to be changed by the winding number bob1, bob2..
 
         if type_coord_sys == 1:
             S = h_x[mask_winding] * h_y[mask_winding] / 4
@@ -133,7 +135,7 @@ def right_member_assembly(
         RHS[index_unknowns_4] += JB * S
 
         ###Phase 3
-        mask_winding = list_elements_materials == 3
+        mask_winding = list_permeability_cell == mu_winding + 2
         if type_coord_sys == 1:
             S = h_x[mask_winding] * h_y[mask_winding] / 4
         elif type_coord_sys == 2:
