@@ -133,6 +133,7 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
 
     material_dict = defaultdict(float)
 
+    material_dict["vacuum"] = mu0
     material_dict["air"] = mu_air
     material_dict["stator"] = mu_stator
     material_dict["rotor"] = mu_rotor

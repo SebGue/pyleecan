@@ -38,7 +38,7 @@ def solver_linear_model(
     y_dual,
     boundary_condition,
     geometry,
-    mu0,
+    material_dict,
     la,
     Br,
     type_coord_sys,
@@ -66,8 +66,8 @@ def solver_linear_model(
         Boundary conditions of the simulation
     geometry : method
         Initialize the geometry
-    mu0 : float
-        Permeability of the vaccum
+    material_dict : dict
+        The material dict containing the permeabilities of the motor elements
     la : integer
         Active length of the motor
     Br : float
@@ -123,6 +123,10 @@ def solver_linear_model(
     # Saving the mesh
     ###############################################################################
 
+    list_elem_materials = self.geometry_motor(
+        N_point_theta, self.N_point_r, self.rotor_shift
+    )[3]
+
     self.save_mesh(
         list_elem_materials, Num_Unknowns, list_elem, theta, r, list_boundary_condition
     )
@@ -136,6 +140,7 @@ def solver_linear_model(
     # Assemblying all the matrices
     ###############################################################################
 
+    mu0 = material_dict["vacuum"]
     reluc_list = self.init_reluc(list_elem, list_coord, mu0, la, type_coord_sys)
     # print(reluc_list)
 
@@ -161,7 +166,6 @@ def solver_linear_model(
         list_coord,
         reluc_list,
         Br,
-        mu0,
         la,
         type_coord_sys,
         JA=JA,

@@ -4,13 +4,15 @@ import numpy as np
 
 
 def init_permeabilty_cell(
-    self, N_point_theta, N_point_r, permeability_materials, mu0, list_element_materials
+    self, N_point_theta, N_point_r, permeability_materials, list_element_materials
 ):
     """
     Initialize the permeabilties in each cell.
 
     Parameters
     ----------
+    self: MagNetwork
+        a MagNetwork object
     N_point_theta : integer
         Discretization point in the theta direction
     N_point_r : integer
