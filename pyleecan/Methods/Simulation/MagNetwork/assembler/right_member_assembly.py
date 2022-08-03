@@ -52,11 +52,14 @@ def right_member_assembly(
     #######################################################################################
 
     # Masking the magnet : mask_magnet is true if the permeability is equal to mur_PM
-    mask_magnet = list_permeability_cell == mur_PM
+    # mask_magnet = list_permeability_cell == mur_PM[0]
+    mask_magnet = []
+    for ii in range(nb_PM_per_period):
+        mask_magnet = list_permeability_cell == mur_PM[ii]
 
     N_unknowns = Num_Unknowns.max() + 1
 
-    # Calculation of the FMMPM according to the coordinate ystem type
+    # Calculation of the FMMPM according to the coordinate system type
     # Linear : Ref 1: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=9473194
     if type_coord_sys == 1:
 
@@ -68,7 +71,8 @@ def right_member_assembly(
             list_coord[list_elem[:, 1]] - list_coord[list_elem[:, 2]], axis=1, ord=2
         )  # step according to y
 
-        FMMPM = 2 * Br * h_y[mask_magnet] * la / mur_PM
+        for jj in range(nb_PM_per_period):
+            FMMPM = 2 * Br * h_y[mask_magnet] * la / mur_PM[jj]
 
     # Radial: Ref 2: https://www.researchgate.net/publication/269405270_Modeling_of_a_Radial_Flux_PM_Rotating_Machine_using_a_New_Hybrid_Analytical_Model
     elif type_coord_sys == 2:
@@ -83,7 +87,15 @@ def right_member_assembly(
             list_coord[list_elem[:, 1], 0] - list_coord[list_elem[:, 0], 0]
         )  # step according to theta
 
-        FMMPM = 2 * Br * sigma_R[mask_magnet] * la / mur_PM[0]
+        for kk in range(nb_PM_per_period):
+            # Determine the direction of the magnet magnetization
+            if (kk % 2) == 0:
+                Magnetization = +1  # positive magnetization direction
+            else:
+                Magnetization = -1  # negative magnetization direction
+
+            # Determine the flux of the magnet
+            FMMPM = Magnetization * 2 * Br * sigma_R[mask_magnet] * la / mur_PM[kk]
 
         # Initialize returned vector -> RHS
         RHS = np.zeros(N_unknowns, dtype=np.float64)
