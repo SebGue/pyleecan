@@ -249,11 +249,11 @@ def test_MagNetwork_Kmesh_fineness():
 
 def test_MagNetwork_double_layer_2magnets():
     """Test MagNetwork simulation with of a 1/4 SPMSM equipped with
-    12 slots and 8 poles. Its windings are double layer."""
+    12 slots and 8 poles. Its windings are single layer."""
 
     # Case 2 : Load the machine and create the Simulation
     # file_path2 = "C:/Users/pc/Downloads/easy_test_MagNetwork2.json"
-    file_path2 = "C:/Users/pc/Downloads/easy_test_MagNetwork2_one_layer_new.json"
+    file_path2 = "C:/Users/pc/Downloads/validation_2pms.json"
     SPMSM_12s_8p_fourth = load(file_path2)
 
     simu = Simu1(name="test_magnetwork_case2", machine=SPMSM_12s_8p_fourth)
@@ -271,7 +271,7 @@ def test_MagNetwork_double_layer_2magnets():
         is_periodicity_t=False,
         type_model=1,
         type_coord_sys=2,
-        N_point_r=57,
+        N_point_r=105,
         Kmesh_fineness=2,
         rotor_shift=8,
     )
