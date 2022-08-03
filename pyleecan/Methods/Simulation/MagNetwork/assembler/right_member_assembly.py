@@ -13,6 +13,7 @@ def right_member_assembly(
     reluc_list,
     Br,
     material_dict,
+    mask_magnet,
     la,
     type_coord_sys,
     JA=None,
@@ -53,13 +54,13 @@ def right_member_assembly(
 
     # Masking the magnet : mask_magnet is true if the permeability is equal to mur_PM
     # mask_magnet = list_permeability_cell == mur_PM[0]
-    mask_magnet = []
-    for ii in range(nb_PM_per_period):
-        mask_magnet = list_permeability_cell == mur_PM[ii]
+    # mask_magnet_1p = []
+    # for ii in range(nb_PM_per_period):
+    #     mask_magnet_1p[str(ii)] = mask_magnet[ii]
 
     N_unknowns = Num_Unknowns.max() + 1
 
-    # Calculation of the FMMPM according to the coordinate system type
+    # Calculation of the phi_PM according to the coordinate system type
     # Linear : Ref 1: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=9473194
     if type_coord_sys == 1:
 
@@ -71,8 +72,7 @@ def right_member_assembly(
             list_coord[list_elem[:, 1]] - list_coord[list_elem[:, 2]], axis=1, ord=2
         )  # step according to y
 
-        for jj in range(nb_PM_per_period):
-            FMMPM = 2 * Br * h_y[mask_magnet] * la / mur_PM[jj]
+        phi_PM = 2 * Br * h_y[mask_magnet] * la / mur_PM[0]
 
     # Radial: Ref 2: https://www.researchgate.net/publication/269405270_Modeling_of_a_Radial_Flux_PM_Rotating_Machine_using_a_New_Hybrid_Analytical_Model
     elif type_coord_sys == 2:
@@ -88,14 +88,21 @@ def right_member_assembly(
         )  # step according to theta
 
         for kk in range(nb_PM_per_period):
-            # Determine the direction of the magnet magnetization
+            # Determination of the direction of the magnet magnetization
             if (kk % 2) == 0:
                 Magnetization = +1  # positive magnetization direction
             else:
                 Magnetization = -1  # negative magnetization direction
 
-            # Determine the flux of the magnet
-            FMMPM = Magnetization * 2 * Br * sigma_R[mask_magnet] * la / mur_PM[kk]
+            # Determine the flux of the one magnet
+            phi_PM = (
+                Magnetization
+                * 2
+                * Br
+                * sigma_R[mask_magnet["PM" + str(kk + 1)]]
+                * la
+                / mur_PM[kk]
+            )
 
         # Initialize returned vector -> RHS
         RHS = np.zeros(N_unknowns, dtype=np.float64)
@@ -106,10 +113,10 @@ def right_member_assembly(
         index_unknowns_3 = Num_Unknowns[list_elem[mask_magnet, 2]]
         index_unknowns_4 = Num_Unknowns[list_elem[mask_magnet, 3]]
 
-        RHS[index_unknowns_1] += FMMPM * reluc_list[mask_magnet, 3]
-        RHS[index_unknowns_2] -= FMMPM * reluc_list[mask_magnet, 1]
-        RHS[index_unknowns_3] -= FMMPM * reluc_list[mask_magnet, 1]
-        RHS[index_unknowns_4] += FMMPM * reluc_list[mask_magnet, 3]
+        RHS[index_unknowns_1] += phi_PM * reluc_list[mask_magnet, 3]
+        RHS[index_unknowns_2] -= phi_PM * reluc_list[mask_magnet, 1]
+        RHS[index_unknowns_3] -= phi_PM * reluc_list[mask_magnet, 1]
+        RHS[index_unknowns_4] += phi_PM * reluc_list[mask_magnet, 3]
 
     #######################################################################################
     # Calculating the contribution of the windings in the RHS

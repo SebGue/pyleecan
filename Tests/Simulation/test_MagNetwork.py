@@ -252,7 +252,8 @@ def test_MagNetwork_double_layer_2magnets():
     12 slots and 8 poles. Its windings are double layer."""
 
     # Case 2 : Load the machine and create the Simulation
-    file_path2 = "C:/Users/pc/Downloads/easy_test_MagNetwork2.json"
+    # file_path2 = "C:/Users/pc/Downloads/easy_test_MagNetwork2.json"
+    file_path2 = "C:/Users/pc/Downloads/easy_test_MagNetwork2_one_layer_new.json"
     SPMSM_12s_8p_fourth = load(file_path2)
 
     simu = Simu1(name="test_magnetwork_case2", machine=SPMSM_12s_8p_fourth)

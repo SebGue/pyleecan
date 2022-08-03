@@ -54,8 +54,8 @@ def run_radial(self, axes_dict, Is_val=None, type_coord_sys=2):
         periodicity = Machine.comp_periodicity_spatial()[0] / 2
 
     angle_tp = (np.pi / periodicity) * (180 / np.pi)
-
-    N_point_theta = self.Kmesh_fineness * round(0.5 * angle_tp) + 1
+    angle_elem = 2  # freeze element angular width in degrees to be reached
+    N_point_theta = self.Kmesh_fineness * round(angle_tp / angle_elem) + 1
 
     # Definition of N_point_r
     # N_point_r = 1 + Kmesh_fineness * round(
@@ -100,6 +100,13 @@ def run_radial(self, axes_dict, Is_val=None, type_coord_sys=2):
         "anti_periodic_condition",
         "homogeneous_Dirichlet_condition",
     ]
+
+    # BC = [
+    #     "periodic_condition",
+    #     "homogeneous_Dirichlet_condition",
+    #     "periodic_condition",
+    #     "homogeneous_Dirichlet_condition",
+    # ]
 
     ###############################################################################
     # Compute current densities: TODO

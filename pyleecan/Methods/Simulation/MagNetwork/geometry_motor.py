@@ -262,6 +262,11 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
     # Attribute an array of N_total_element size of zeros to cells_materials
     cells_materials = np.zeros(N_total_element, dtype=np.float64)
 
+    # Identify the position of the magnets in the geometry
+    mask_magnet = defaultdict(bool)
+    for nbr in range(nb_PM_per_period):
+        mask_magnet["PM" + str(nbr + 1)] = [False for i in range(N_total_element)]
+
     """Add the geoemtry_disctint list to be able to plot the different motor elements
      (even with them having the same permeabilities) in the view_contour_flux method"""
     geometry_disctint = np.zeros(N_total_element, dtype=np.uint16)
@@ -303,11 +308,11 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
                                 + PM_idx * airgap_PM_width
                             )
                         ):
-                            # print(material_dict["PM" + str(PM_idx + 1)])
                             cells_materials[num_element] = material_dict[
                                 "PM" + str(PM_idx + 1)
-                            ]  # PM material
+                            ]  # PM materials
                             geometry_disctint[num_element] = 4 + PM_idx
+                            mask_magnet["PM" + str(PM_idx + 1)][num_element] = True
                         # Assignment of the airgaps between PMs elements
 
                         if (
@@ -420,11 +425,10 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
 
     # Plotting of the geometry : Validation
     # ct = plt.pcolormesh(
-    #     cells_materials.reshape((N_point_r - 1, N_point_theta - 1)),
+    #     geometry_disctint.reshape((N_point_r - 1, N_point_theta - 1)),
     #     cmap="jet",
     #     alpha=0.6,
     # )
-    # plt.colorbar()
     # plt.show()
 
-    return cells_materials, material_dict, N_point_theta, geometry_disctint
+    return cells_materials, material_dict, N_point_theta, geometry_disctint, mask_magnet

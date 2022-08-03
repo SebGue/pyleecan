@@ -159,6 +159,10 @@ def solver_linear_model(
     # Assemblying the RHS containing the sources
     ###############################################################################
 
+    mask_magnet = self.geometry_motor(N_point_theta, self.N_point_r, self.rotor_shift)[
+        4
+    ]
+
     RHS = self.right_member_assembly(
         list_elem_permability,
         Num_Unknowns,
@@ -167,6 +171,7 @@ def solver_linear_model(
         reluc_list,
         Br,
         material_dict,
+        mask_magnet,
         la,
         type_coord_sys,
         JA=JA,
