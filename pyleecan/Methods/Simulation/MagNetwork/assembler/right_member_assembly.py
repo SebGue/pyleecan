@@ -73,8 +73,65 @@ def right_member_assembly(
             list_coord[list_elem[:, 1]] - list_coord[list_elem[:, 2]], axis=1, ord=2
         )  # step according to y
 
-        # TODO
-        phi_PM = 2 * Br * h_y[mask_magnet] * la / mur_PM[0]
+        # Initialize returned vector -> RHS
+        RHS = np.zeros(N_unknowns, dtype=np.float64)
+
+        # Permanant Magnet assembling
+        index_unknowns_1 = defaultdict(float)
+        index_unknowns_2 = defaultdict(float)
+        index_unknowns_3 = defaultdict(float)
+        index_unknowns_4 = defaultdict(float)
+        phi_PM = defaultdict(float)
+
+        for hh in range(nb_PM_per_period):
+
+            # Determination of the direction of the magnet magnetization
+            if (hh % 2) == 0:
+                Magnetization = +1  # positive magnetization direction
+            else:
+                Magnetization = -1  # negative magnetization direction
+
+            # Determination of the flux of the one magnet
+            phi_PM["PM" + str(hh + 1)] = (
+                Magnetization
+                * 2
+                * Br
+                * h_y[mask_magnet["PM" + str(hh + 1)]]
+                * la
+                / mur_PM[hh]
+            )
+
+            # Determination of the indexes of the unknowns
+            index_unknowns_1["PM" + str(hh + 1)] = Num_Unknowns[
+                list_elem[mask_magnet["PM" + str(hh + 1)], 0]
+            ]
+            index_unknowns_2["PM" + str(hh + 1)] = Num_Unknowns[
+                list_elem[mask_magnet["PM" + str(hh + 1)], 1]
+            ]
+            index_unknowns_3["PM" + str(hh + 1)] = Num_Unknowns[
+                list_elem[mask_magnet["PM" + str(hh + 1)], 2]
+            ]
+            index_unknowns_4["PM" + str(hh + 1)] = Num_Unknowns[
+                list_elem[mask_magnet["PM" + str(hh + 1)], 3]
+            ]
+
+            # Determination of the contribution of the PMs in the RHS vector
+            RHS[index_unknowns_1["PM" + str(hh + 1)]] += (
+                phi_PM["PM" + str(hh + 1)]
+                * reluc_list[mask_magnet["PM" + str(hh + 1)], 3]
+            )
+            RHS[index_unknowns_2["PM" + str(hh + 1)]] -= (
+                phi_PM["PM" + str(hh + 1)]
+                * reluc_list[mask_magnet["PM" + str(hh + 1)], 1]
+            )
+            RHS[index_unknowns_3["PM" + str(hh + 1)]] -= (
+                phi_PM["PM" + str(hh + 1)]
+                * reluc_list[mask_magnet["PM" + str(hh + 1)], 1]
+            )
+            RHS[index_unknowns_4["PM" + str(hh + 1)]] += (
+                phi_PM["PM" + str(hh + 1)]
+                * reluc_list[mask_magnet["PM" + str(hh + 1)], 3]
+            )
 
     # Radial: Ref 2: https://www.researchgate.net/publication/269405270_Modeling_of_a_Radial_Flux_PM_Rotating_Machine_using_a_New_Hybrid_Analytical_Model
     elif type_coord_sys == 2:
@@ -88,23 +145,6 @@ def right_member_assembly(
         sigma_theta = np.abs(
             list_coord[list_elem[:, 1], 0] - list_coord[list_elem[:, 0], 0]
         )  # step according to theta
-
-        # for kk in range(nb_PM_per_period):
-        #     # Determination of the direction of the magnet magnetization
-        #     if (kk % 2) == 0:
-        #         Magnetization = +1  # positive magnetization direction
-        #     else:
-        #         Magnetization = -1  # negative magnetization direction
-
-        #     # Determine the flux of the one magnet
-        #     phi_PM = (
-        #         Magnetization
-        #         * 2
-        #         * Br
-        #         * sigma_R[mask_magnet["PM" + str(kk + 1)]]
-        #         * la
-        #         / mur_PM[kk]
-        #     )
 
         # Initialize returned vector -> RHS
         RHS = np.zeros(N_unknowns, dtype=np.float64)
@@ -167,7 +207,7 @@ def right_member_assembly(
             )
 
     #######################################################################################
-    # Calculating the contribution of the windings in the RHS
+    # Calculating the contribution of the windings in the RHS #TODO
     #######################################################################################
 
     if JA is None and JB is None and JC is None:

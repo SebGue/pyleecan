@@ -271,7 +271,7 @@ def test_MagNetwork_double_layer_2magnets():
         is_periodicity_t=False,
         type_model=1,
         type_coord_sys=2,
-        N_point_r=105,
+        N_point_r=138,
         Kmesh_fineness=2,
         rotor_shift=8,
     )
@@ -549,8 +549,8 @@ def test_MagNetwork_benchmark():
 
 
 if __name__ == "__main__":
-    # test_MagNetwork_initial_validation()
+    test_MagNetwork_initial_validation()
     # test_MagNetwork_Kmesh_fineness()
-    test_MagNetwork_double_layer_2magnets()
+    # test_MagNetwork_double_layer_2magnets()
     # test_MagNetwork_fractional_periodicity()
     # test_MagNetwork_benchmark()
