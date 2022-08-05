@@ -4,7 +4,6 @@
 from tkinter import *
 from turtle import st
 import numpy as np
-from pyleecan.Functions.load import load
 from scipy.fft import ifftn
 import matplotlib.pyplot as plt
 from collections import defaultdict

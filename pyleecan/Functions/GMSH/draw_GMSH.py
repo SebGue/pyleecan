@@ -384,30 +384,30 @@ def draw_GMSH(
             pg = model.addPhysicalGroup(2, [s_data["tag"]])
             model.setPhysicalName(2, pg, s_data["label"])
 
-    ###################
-    # Adding Airbox
-    ###################
-    if is_airbox and (not is_lam_only_R) and (not is_lam_only_S):
-        ab_list = get_air_box(sym=sym, machine=machine)
-    else:
-        ab_list = []
+            ###################
+            # Adding Airbox
+            ###################
+            # if is_airbox and (not is_lam_only_R) and (not is_lam_only_S):
+            #     ab_list = get_air_box(sym=sym, machine=machine)
+            # else:
+            #     ab_list = []
 
-    # Default airbox mesh element size
-    for surf in ab_list:
-        nsurf += 1
-        gmsh_dict.update(
-            {
-                nsurf: {
-                    "tag": None,
-                    "label": short_label(surf.label),
-                }
-            }
-        )
+            # Default airbox mesh element size
+            # for surf in ab_list:
+            #     nsurf += 1
+            #     gmsh_dict.update(
+            #         {
+            #             nsurf: {
+            #                 "tag": None,
+            #                 "label": short_label(surf.label),
+            #             }
+            #         }
+            #     )
 
-        # comp. number of elements on the lines & override by user values in case
-        mesh_dict = surf.comp_mesh_dict(element_size=mesh_size_AB)
-        if user_mesh_dict and surf.label in user_mesh_dict:
-            mesh_dict.update(user_mesh_dict[surf.label])
+            # comp. number of elements on the lines & override by user values in case
+            mesh_dict = surf.comp_mesh_dict(element_size=mesh_size_AB)
+            if user_mesh_dict and surf.label in user_mesh_dict:
+                mesh_dict.update(user_mesh_dict[surf.label])
 
         # Draw the surface
         draw_surf_line(
