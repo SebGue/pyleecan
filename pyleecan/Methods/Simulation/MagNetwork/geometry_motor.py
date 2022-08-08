@@ -175,6 +175,7 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
 
     # Stator interior and exterior radius
     radius_stator_exterior = Machine.stator.Rext
+    radius_stator_interior = Machine.stator.Rint
 
     # Stator slots interior and exterior radius
     radius_stator_slot_exterior = (
@@ -345,48 +346,129 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
 
         # Stator elements
         elif i < N_element_r - stator_iron_height:
+
             # Case where the stator slot is not aligned with the stator tooth
-            # if i <= height_stator_slot_interior:
-            if i <= height_stator_slot_interior + rotor_height + airgap_and_Pm_height:
-                for j in range(N_element_theta_kk):
-                    num_element = N_element_theta_kk * i + j
-                    # Assignment of the elements in the first half tooth
-                    if j < Half_tooth_width:
-                        cells_materials[num_element] = material_dict["stator"]  # stator
-                        geometry_disctint[num_element] = 1
+            if radius_stator_slot_interior != radius_stator_interior:
+                if (
+                    i
+                    <= height_stator_slot_interior + rotor_height + airgap_and_Pm_height
+                ):
+                    for j in range(N_element_theta_kk):
+                        num_element = N_element_theta_kk * i + j
+                        # Assignment of the elements in the first half tooth
+                        if j < Half_tooth_width:
+                            cells_materials[num_element] = material_dict[
+                                "stator"
+                            ]  # stator
+                            geometry_disctint[num_element] = 1
 
-                    elif j <= (N_element_theta_kk - Half_tooth_width):
-                        for slot_idx in range(nb_stator_teeth_per_period):
-                            if (
-                                j
-                                >= (
-                                    Half_tooth_width
-                                    + slot_idx * (angle_slot + tooth_width)
-                                )
-                            ) and (
-                                j
-                                < (
-                                    Half_tooth_width
-                                    + (slot_idx + 1) * angle_slot
-                                    + slot_idx * tooth_width
-                                )
-                            ):
-                                cells_materials[num_element] = material_dict["air"]
-                                geometry_disctint[num_element] = 2
-                                break
+                        elif j <= (N_element_theta_kk - Half_tooth_width):
+                            for slot_idx in range(nb_stator_teeth_per_period):
+                                if (
+                                    j
+                                    >= (
+                                        Half_tooth_width
+                                        + slot_idx * (angle_slot + tooth_width)
+                                    )
+                                ) and (
+                                    j
+                                    < (
+                                        Half_tooth_width
+                                        + (slot_idx + 1) * angle_slot
+                                        + slot_idx * tooth_width
+                                    )
+                                ):
+                                    cells_materials[num_element] = material_dict["air"]
+                                    geometry_disctint[num_element] = 2
+                                    break
 
-                            # Assignment of tooth elements
-                            else:
-                                cells_materials[num_element] = material_dict[
-                                    "stator"
-                                ]  # stator
-                                geometry_disctint[num_element] = 1
+                                # Assignment of tooth elements
+                                else:
+                                    cells_materials[num_element] = material_dict[
+                                        "stator"
+                                    ]  # stator
+                                    geometry_disctint[num_element] = 1
 
-                    else:
-                        cells_materials[num_element] = material_dict["stator"]  # stator
-                        geometry_disctint[num_element] = 1
+                        else:
+                            cells_materials[num_element] = material_dict[
+                                "stator"
+                            ]  # stator
+                            geometry_disctint[num_element] = 1
 
-            # Assignment of the remaining stator elements
+                # Assignment of the remaining stator elements
+                else:
+                    for j in range(N_element_theta_kk):
+                        num_element = N_element_theta_kk * i + j
+                        # Assignment of the elements in the first half tooth
+                        if j < Half_tooth_width:
+                            cells_materials[num_element] = material_dict[
+                                "stator"
+                            ]  # stator
+                            geometry_disctint[num_element] = 1
+
+                        elif j <= (N_element_theta_kk - Half_tooth_width):
+                            for slot_idx in range(nb_stator_teeth_per_period):
+
+                                # Assignement of the winding elements
+                                if (
+                                    j
+                                    >= (
+                                        Half_tooth_width
+                                        + slot_idx * (angle_slot + tooth_width)
+                                    )
+                                ) and (
+                                    j
+                                    < (
+                                        Half_tooth_width
+                                        + (slot_idx + 1) * angle_slot
+                                        + slot_idx * tooth_width
+                                    )
+                                ):
+                                    # Searching for the layer of a slot index
+                                    for layer in range(nb_layers):
+                                        if (
+                                            j
+                                            >= (
+                                                Half_tooth_width
+                                                + slot_idx * (angle_slot + tooth_width)
+                                                + layer * (angle_slot / nb_layers)
+                                            )
+                                        ) and (
+                                            j
+                                            < (
+                                                Half_tooth_width
+                                                + (slot_idx + 1) * angle_slot
+                                                + slot_idx * tooth_width
+                                                + (layer + 1) * (angle_slot / nb_layers)
+                                            )
+                                        ):
+
+                                            cells_materials[
+                                                num_element
+                                            ] = material_dict[
+                                                "winding"
+                                                + str(slot_idx * nb_layers + layer + 1)
+                                            ]
+                                            geometry_disctint[num_element] = (
+                                                (4 + nb_PM_per_period)
+                                                + layer
+                                                + slot_idx * nb_layers
+                                            )
+                                    break
+
+                                # Assignment of tooth elements
+                                else:
+                                    cells_materials[num_element] = material_dict[
+                                        "stator"
+                                    ]  # stator
+                                    geometry_disctint[num_element] = 1
+
+                        # Assignment of the last half tooth element
+                        else:
+                            cells_materials[num_element] = material_dict[
+                                "stator"
+                            ]  # stator
+                            geometry_disctint[num_element] = 1
             else:
                 for j in range(N_element_theta_kk):
                     num_element = N_element_theta_kk * i + j
@@ -465,13 +547,13 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
     #######################################################################################
     # Plotting the geometry mesh for validation purposes
     #######################################################################################
-    # ct = plt.pcolormesh(
-    #     geometry_disctint.reshape((N_point_r - 1, N_point_theta - 1)),
-    #     cmap="jet",
-    #     alpha=0.6,
-    # )
-    # plt.xlabel("N_element_theta")
-    # plt.ylabel("N_element_r")
-    # plt.show()
+    ct = plt.pcolormesh(
+        geometry_disctint.reshape((N_point_r - 1, N_point_theta - 1)),
+        cmap="jet",
+        alpha=0.6,
+    )
+    plt.xlabel("N_element_theta")
+    plt.ylabel("N_element_r")
+    plt.show()
 
     return cells_materials, material_dict, N_point_theta, geometry_disctint, mask_magnet
