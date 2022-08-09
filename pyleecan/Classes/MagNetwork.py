@@ -490,7 +490,7 @@ class MagNetwork(Magnetics):
         dr_stator_yoke=0.001,
         dr_airgap=0.001,
         dr_rotor_yoke=0.001,
-        dr_stator_slot=0.001,
+        dr_stator_air=0.001,
         dr_stator_tooth=0.001,
         dr_magnet=0.001,
         is_remove_slotS=False,
@@ -544,8 +544,8 @@ class MagNetwork(Magnetics):
                 dr_airgap = init_dict["dr_airgap"]
             if "dr_rotor_yoke" in list(init_dict.keys()):
                 dr_rotor_yoke = init_dict["dr_rotor_yoke"]
-            if "dr_stator_slot" in list(init_dict.keys()):
-                dr_stator_slot = init_dict["dr_stator_slot"]
+            if "dr_stator_air" in list(init_dict.keys()):
+                dr_stator_air = init_dict["dr_stator_air"]
             if "dr_stator_tooth" in list(init_dict.keys()):
                 dr_stator_tooth = init_dict["dr_stator_tooth"]
             if "dr_magnet" in list(init_dict.keys()):
@@ -596,7 +596,7 @@ class MagNetwork(Magnetics):
         self.dr_stator_yoke = dr_stator_yoke
         self.dr_airgap = dr_airgap
         self.dr_rotor_yoke = dr_rotor_yoke
-        self.dr_stator_slot = dr_stator_slot
+        self.dr_stator_air = dr_stator_air
         self.dr_stator_tooth = dr_stator_tooth
         self.dr_magnet = dr_magnet
         # Call Magnetics init
@@ -637,7 +637,7 @@ class MagNetwork(Magnetics):
         MagNetwork_str += "dr_stator_yoke = " + str(self.dr_stator_yoke) + linesep
         MagNetwork_str += "dr_airgap = " + str(self.dr_airgap) + linesep
         MagNetwork_str += "dr_rotor_yoke = " + str(self.dr_rotor_yoke) + linesep
-        MagNetwork_str += "dr_stator_slot = " + str(self.dr_stator_slot) + linesep
+        MagNetwork_str += "dr_stator_air = " + str(self.dr_stator_air) + linesep
         MagNetwork_str += "dr_stator_tooth = " + str(self.dr_stator_tooth) + linesep
         MagNetwork_str += "dr_magnet = " + str(self.dr_magnet) + linesep
         return MagNetwork_str
@@ -665,7 +665,7 @@ class MagNetwork(Magnetics):
             return False
         if other.dr_rotor_yoke != self.dr_rotor_yoke:
             return False
-        if other.dr_stator_slot != self.dr_stator_slot:
+        if other.dr_stator_air != self.dr_stator_air:
             return False
         if other.dr_stator_tooth != self.dr_stator_tooth:
             return False
@@ -794,24 +794,24 @@ class MagNetwork(Magnetics):
             else:
                 diff_list.append(name + ".dr_rotor_yoke")
         if (
-            other._dr_stator_slot is not None
-            and self._dr_stator_slot is not None
-            and isnan(other._dr_stator_slot)
-            and isnan(self._dr_stator_slot)
+            other._dr_stator_air is not None
+            and self._dr_stator_air is not None
+            and isnan(other._dr_stator_air)
+            and isnan(self._dr_stator_air)
         ):
             pass
-        elif other._dr_stator_slot != self._dr_stator_slot:
+        elif other._dr_stator_air != self._dr_stator_air:
             if is_add_value:
                 val_str = (
                     " (self="
-                    + str(self._dr_stator_slot)
+                    + str(self._dr_stator_air)
                     + ", other="
-                    + str(other._dr_stator_slot)
+                    + str(other._dr_stator_air)
                     + ")"
                 )
-                diff_list.append(name + ".dr_stator_slot" + val_str)
+                diff_list.append(name + ".dr_stator_air" + val_str)
             else:
-                diff_list.append(name + ".dr_stator_slot")
+                diff_list.append(name + ".dr_stator_air")
         if (
             other._dr_stator_tooth is not None
             and self._dr_stator_tooth is not None
@@ -868,7 +868,7 @@ class MagNetwork(Magnetics):
         S += getsizeof(self.dr_stator_yoke)
         S += getsizeof(self.dr_airgap)
         S += getsizeof(self.dr_rotor_yoke)
-        S += getsizeof(self.dr_stator_slot)
+        S += getsizeof(self.dr_stator_air)
         S += getsizeof(self.dr_stator_tooth)
         S += getsizeof(self.dr_magnet)
         return S
@@ -897,7 +897,7 @@ class MagNetwork(Magnetics):
         MagNetwork_dict["dr_stator_yoke"] = self.dr_stator_yoke
         MagNetwork_dict["dr_airgap"] = self.dr_airgap
         MagNetwork_dict["dr_rotor_yoke"] = self.dr_rotor_yoke
-        MagNetwork_dict["dr_stator_slot"] = self.dr_stator_slot
+        MagNetwork_dict["dr_stator_air"] = self.dr_stator_air
         MagNetwork_dict["dr_stator_tooth"] = self.dr_stator_tooth
         MagNetwork_dict["dr_magnet"] = self.dr_magnet
         # The class name is added to the dict for deserialisation purpose
@@ -916,7 +916,7 @@ class MagNetwork(Magnetics):
         dr_stator_yoke_val = self.dr_stator_yoke
         dr_airgap_val = self.dr_airgap
         dr_rotor_yoke_val = self.dr_rotor_yoke
-        dr_stator_slot_val = self.dr_stator_slot
+        dr_stator_air_val = self.dr_stator_air
         dr_stator_tooth_val = self.dr_stator_tooth
         dr_magnet_val = self.dr_magnet
         is_remove_slotS_val = self.is_remove_slotS
@@ -950,7 +950,7 @@ class MagNetwork(Magnetics):
             dr_stator_yoke=dr_stator_yoke_val,
             dr_airgap=dr_airgap_val,
             dr_rotor_yoke=dr_rotor_yoke_val,
-            dr_stator_slot=dr_stator_slot_val,
+            dr_stator_air=dr_stator_air_val,
             dr_stator_tooth=dr_stator_tooth_val,
             dr_magnet=dr_magnet_val,
             is_remove_slotS=is_remove_slotS_val,
@@ -985,7 +985,7 @@ class MagNetwork(Magnetics):
         self.dr_stator_yoke = None
         self.dr_airgap = None
         self.dr_rotor_yoke = None
-        self.dr_stator_slot = None
+        self.dr_stator_air = None
         self.dr_stator_tooth = None
         self.dr_magnet = None
         # Set to None the properties inherited from Magnetics
@@ -1121,19 +1121,19 @@ class MagNetwork(Magnetics):
         """,
     )
 
-    def _get_dr_stator_slot(self):
-        """getter of dr_stator_slot"""
-        return self._dr_stator_slot
+    def _get_dr_stator_air(self):
+        """getter of dr_stator_air"""
+        return self._dr_stator_air
 
-    def _set_dr_stator_slot(self, value):
-        """setter of dr_stator_slot"""
-        check_var("dr_stator_slot", value, "float")
-        self._dr_stator_slot = value
+    def _set_dr_stator_air(self, value):
+        """setter of dr_stator_air"""
+        check_var("dr_stator_air", value, "float")
+        self._dr_stator_air = value
 
-    dr_stator_slot = property(
-        fget=_get_dr_stator_slot,
-        fset=_set_dr_stator_slot,
-        doc=u"""discretization of the stator slot according to the r-axis
+    dr_stator_air = property(
+        fget=_get_dr_stator_air,
+        fset=_set_dr_stator_air,
+        doc=u"""discretization of the geometry between the stator interior radius and the slot interior radius
 
         :Type: float
         """,

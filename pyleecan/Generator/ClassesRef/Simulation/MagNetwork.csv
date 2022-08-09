@@ -6,7 +6,7 @@ rotor_shift,-,number of cells to be shifted when changing the rotor position,1,i
 dr_stator_yoke,m,discretization of the stator yoke according to the r-axis,1,float,0.001,,,,,,plot.view_contour_flux2,,,
 dr_airgap,m,discretization of the airgap according to the r-axis,1,float,0.001,,,,,,post_processing,,,
 dr_rotor_yoke,m,discretization of the rotor yoke according to the r-axis,1,float,0.001,,,,,,run_cartesian,,,
-dr_stator_slot,m,discretization of the stator slot according to the r-axis,1,float,0.001,,,,,,run_non_linear,,,
+dr_stator_air,m,discretization of the geometry between the stator interior radius and the slot interior radius,1,float,0.001,,,,,,run_non_linear,,,
 dr_stator_tooth,m,discretization of the stator tooth according to the r-axis,1,float,0.001,,,,,,run_radial,,,
 dr_magnet,m,discretization of the magnet according to the r-axis,1,float,0.001,,,,,,solver_linear_model,,,
 ,,,,,,,,,,,solver_non_linear_model,,,

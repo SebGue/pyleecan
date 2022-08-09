@@ -171,8 +171,14 @@ def geometry_motor(self, N_point_theta):
     #######################################################################################
 
     """ Rotor geometry dimensions"""
+    # Rotor interior radius
+    radius_rotor_interior = Machine.rotor.Rint
+
     # Height of the rotor yoke
     height_rotor_yoke = Machine.rotor.comp_height_yoke()
+
+    # Rotor exterior radius
+    radius_rotor_exterior = radius_rotor_interior + height_rotor_yoke
 
     # Height of the magnet
     height_magnet = Machine.rotor.slot.comp_height_active()
@@ -199,21 +205,20 @@ def geometry_motor(self, N_point_theta):
     # Stator yoke
     height_stator_yoke = Machine.stator.comp_height_yoke()
 
-    # Height of the stator tooth
-    height_stator_tooth = (
-        radius_stator_exterior - radius_stator_interior
-    ) - height_stator_yoke
+    # Height of the air between the interior radius of the stator slot and the interior radius of the stator
+    # Null in case radius_stator_slot_interior = radius_stator_interior
+    height_stator_air = radius_stator_slot_interior - radius_stator_interior
 
     """ Geometry discretization according to the r-axis """
     """ Discritized stator """
     # Discretized stator yoke in the r-axis
     stator_yoke_elements_r = round(height_stator_yoke / self.dr_stator_yoke)
 
-    # stator_slot_elements is null in case "radius_stator_interior = radius_stator_slot_interior"
-    stator_slot_elements_r = round(height_stator_slot / self.dr_stator_slot)
+    # Stator = stator tooth region : Conform mesh
+    stator_slot_elements_r = round(height_stator_slot / self.dr_stator_tooth)
 
-    # Discretized stator tooth in the r-axis
-    stator_tooth_elements_r = round(height_stator_tooth / self.dr_stator_tooth)
+    # Stator air elements between the stator inner radius and the slot inner radius
+    stator_air_elements_r = round(height_stator_air / self.dr_stator_air)
 
     """ Discritized rotor """
     # Discretized rotor yoke in the r-axis
@@ -227,42 +232,52 @@ def geometry_motor(self, N_point_theta):
 
     """ Elements characteristics according to the r-axis of the geometry (in a dict):
     characteristics_elements_r = {nbr_elements_r, element_height}"""
-    characteristics_elements_r = {}
-    characteristics_elements_r["rotor_yoke"] = {
-        "nbr_elements_r": rotor_yoke_elements_r,
-        "element_height": (height_rotor_yoke / rotor_yoke_elements_r),
-    }
-    characteristics_elements_r["magnet"] = {
-        "nbr_elements_r": magnet_elements_r,
-        "element_height": (height_magnet / magnet_elements_r),
-    }
-    characteristics_elements_r["airgap"] = {
-        "nbr_elements_r": airgap_elements_r,
-        "element_height": (e / airgap_elements_r),
-    }
-    characteristics_elements_r["stator_tooth"] = {
-        "nbr_elements_r": stator_tooth_elements_r,
-        "element_height": (height_stator_tooth / stator_tooth_elements_r),
-    }
-    characteristics_elements_r["stator_slot"] = {
-        "nbr_elements_r": stator_slot_elements_r,
-        "element_height": (height_stator_slot / stator_slot_elements_r),
-    }
-    characteristics_elements_r["stator_yoke"] = {
-        "nbr_elements_r": stator_yoke_elements_r,
-        "element_height": (height_stator_yoke / stator_yoke_elements_r),
-    }
+    axes_r = {}
+    axes_r["rotor_yoke"] = np.linspace(
+        radius_rotor_interior, radius_rotor_exterior, (rotor_yoke_elements_r + 1)
+    )
+    axes_r["magnet"] = np.linspace(
+        radius_rotor_exterior,
+        (radius_rotor_exterior + height_magnet),
+        (magnet_elements_r + 1),
+    )
+    axes_r["airgap"] = np.linspace(
+        (radius_rotor_exterior + height_magnet),
+        (radius_rotor_exterior + height_magnet + e),
+        (airgap_elements_r + 1),
+    )
+
+    axes_r["stator_tooth"] = np.linspace(
+        radius_stator_slot_exterior,
+        (radius_stator_exterior - height_stator_yoke),
+        (stator_slot_elements_r + 1),
+    )
+
+    if radius_stator_interior != radius_stator_slot_interior:
+        axes_r["stator_air"] = np.linspace(
+            radius_stator_interior,
+            radius_stator_slot_interior,
+            (stator_air_elements_r + 1),
+        )
+    else:
+        axes_r["stator_air"] = np.array([0.0, 0.0, 0])
+
+    axes_r["stator_yoke"] = np.linspace(
+        radius_stator_slot_exterior,
+        radius_stator_exterior,
+        (stator_yoke_elements_r + 1),
+    )
 
     # Total number of elements of the geometry
     N_element_r_total = (
-        characteristics_elements_r["rotor_yoke"]["nbr_elements_r"]
-        + characteristics_elements_r["magnet"]["nbr_elements_r"]
-        + characteristics_elements_r["airgap"]["nbr_elements_r"]
-        + characteristics_elements_r["stator_tooth"]["nbr_elements_r"]
-        + characteristics_elements_r["stator_slot"]["nbr_elements_r"]
-        + characteristics_elements_r["stator_yoke"]["nbr_elements_r"]
+        rotor_yoke_elements_r
+        + magnet_elements_r
+        + airgap_elements_r
+        + stator_slot_elements_r
+        + stator_air_elements_r
+        + stator_yoke_elements_r
     )
-    N_point_r = N_element_r_total + 1
+    N_point_r = N_element_r_total + 6
 
     #######################################################################################
     # Update and re-calculation of N_element_theta and the dependent parameters
@@ -346,9 +361,7 @@ def geometry_motor(self, N_point_theta):
                 geometry_disctint[num_element] = 3
 
         # Assignment of PM and the airgap between PMs elements
-        elif i < (
-            rotor_yoke_elements_r + airgap_and_magnet_elements_r - airgap_elements_r
-        ):
+        elif i < (rotor_yoke_elements_r + magnet_elements_r):
 
             for j in range(N_element_theta_kk):
                 num_element = N_element_theta_kk * i + j
@@ -380,8 +393,8 @@ def geometry_motor(self, N_point_theta):
                             ]  # PM materials
                             geometry_disctint[num_element] = 4 + PM_idx
                             mask_magnet["PM" + str(PM_idx + 1)][num_element] = True
-                        # Assignment of the airgaps between PMs elements
 
+                        # Assignment of the airgaps between PMs elements
                         if (
                             j
                             >= (
@@ -421,7 +434,7 @@ def geometry_motor(self, N_point_theta):
             if radius_stator_slot_interior != radius_stator_interior:
                 if (
                     i
-                    <= stator_slot_elements_r
+                    <= stator_air_elements_r
                     + rotor_yoke_elements_r
                     + airgap_and_magnet_elements_r
                 ):
@@ -467,6 +480,7 @@ def geometry_motor(self, N_point_theta):
                                     ]  # stator
                                     geometry_disctint[num_element] = 1
 
+                        # Assignment f the last half of the stator tooth
                         else:
                             cells_materials[num_element] = material_dict[
                                 "stator"
@@ -655,14 +669,14 @@ def geometry_motor(self, N_point_theta):
     #######################################################################################
     # Plotting the geometry mesh for validation purposes
     #######################################################################################
-    ct = plt.pcolormesh(
-        geometry_disctint.reshape((N_point_r - 1, N_point_theta - 1)),
-        cmap="jet",
-        alpha=0.6,
-    )
-    plt.xlabel("N_element_theta")
-    plt.ylabel("N_element_r")
-    plt.show()
+    # ct = plt.pcolormesh(
+    #     geometry_disctint.reshape((N_point_r - 1, N_point_theta - 1)),
+    #     cmap="jet",
+    #     alpha=0.6,
+    # )
+    # plt.xlabel("N_element_theta")
+    # plt.ylabel("N_element_r")
+    # plt.show()
 
     return (
         cells_materials,
@@ -670,5 +684,6 @@ def geometry_motor(self, N_point_theta):
         N_point_theta,
         geometry_disctint,
         mask_magnet,
-        characteristics_elements_r,
+        N_point_r,
+        axes_r,
     )

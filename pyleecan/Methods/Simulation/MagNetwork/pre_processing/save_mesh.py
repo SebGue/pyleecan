@@ -44,7 +44,7 @@ def save_mesh(
         fmt="%u",
         header=str(permeabiltiy_materials.size) + " " + str(Num_Unknowns.size),
     )
-    ###TO DO: place list_coord in parameter
+    ###TODO: place list_coord in parameter
     list_coord = np.zeros((Num_Unknowns.size, 2))
     for i in range(theta.size):
         for j in range(r.size):
