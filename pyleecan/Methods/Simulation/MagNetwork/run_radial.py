@@ -5,12 +5,12 @@ import numpy as np
 import meshio
 import matplotlib.pyplot as plt
 from pyleecan.Functions.load import load
-
 from pyleecan.Classes.MeshMat import MeshMat
 from pyleecan.Classes.NodeMat import NodeMat
 from pyleecan.Classes.CellMat import CellMat
 from pyleecan.Classes.MeshSolution import MeshSolution
 from pyleecan.Classes.SolutionMat import SolutionMat
+from numpy import concatenate
 
 
 def run_radial(self, axes_dict, Is_val=None, type_coord_sys=2):
@@ -75,7 +75,29 @@ def run_radial(self, axes_dict, Is_val=None, type_coord_sys=2):
     # Definition of the r- and theta- axes
     ###############################################################################
     # Definition of the r-axis
-    r = np.linspace(Machine.rotor.Rint, Machine.stator.Rext, N_point_r)
+    # r = np.linspace(Machine.rotor.Rint, Machine.stator.Rext, N_point_r)
+    axes_r = self.geometry_motor(N_point_theta)[6]
+    if axes_r["stator_air"].any() == True:
+        r = np.concatenate(
+            (
+                axes_r["rotor_yoke"],
+                axes_r["magnet"],
+                axes_r["airgap"],
+                axes_r["stator_air"],
+                axes_r["stator_tooth"],
+                axes_r["stator_yoke"],
+            )
+        )
+    else:
+        r = np.concatenate(
+            (
+                axes_r["rotor_yoke"],
+                axes_r["magnet"],
+                axes_r["airgap"],
+                axes_r["stator_tooth"],
+                axes_r["stator_yoke"],
+            )
+        )
 
     # Definition of the theta-axis
     theta = axes_dict["theta_primal"].get_values(is_smallestperiod=True)

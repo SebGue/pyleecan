@@ -7132,10 +7132,10 @@
             },
             {
                 "as_dict": "",
-                "desc": "discretization of the stator slot according to the r-axis",
+                "desc": "discretization of the geometry between the stator interior radius and the slot interior radius",
                 "max": "",
                 "min": "",
-                "name": "dr_stator_slot",
+                "name": "dr_stator_air",
                 "type": "float",
                 "unit": "m",
                 "value": 0.001
