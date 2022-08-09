@@ -43,9 +43,7 @@ def init_mesh(
 
     list_elem = self.init_cell(N_point_theta, N_point_r)
 
-    list_elem_permability = self.geometry_motor(
-        N_point_theta, N_point_r, self.rotor_shift
-    )[0]
+    list_elem_permability = self.geometry_motor(N_point_theta)[0]
 
     list_boundary_condition, Periodic_point = self.init_mesh_BC(
         N_point_theta, N_point_r, boundary_condition

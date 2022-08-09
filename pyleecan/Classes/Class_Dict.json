@@ -7040,7 +7040,6 @@
             "solver_non_linear_model",
             "pre_processing.init_cell",
             "pre_processing.init_mesh_BC",
-            "pre_processing.init_permeabilty_cell",
             "pre_processing.init_point",
             "pre_processing.init_reluc",
             "pre_processing.numeroting_unknows",
@@ -7103,13 +7102,63 @@
             },
             {
                 "as_dict": "",
-                "desc": "number of discretization points in the r-direction",
+                "desc": "discretization of the stator yoke according to the r-axis",
                 "max": "",
                 "min": "",
-                "name": "N_point_r",
-                "type": "int",
-                "unit": "",
-                "value": 37
+                "name": "dr_stator_yoke",
+                "type": "float",
+                "unit": "m",
+                "value": 0.001
+            },
+            {
+                "as_dict": "",
+                "desc": "discretization of the airgap according to the r-axis",
+                "max": "",
+                "min": "",
+                "name": "dr_airgap",
+                "type": "float",
+                "unit": "m",
+                "value": 0.001
+            },
+            {
+                "as_dict": "",
+                "desc": "discretization of the rotor yoke according to the r-axis",
+                "max": "",
+                "min": "",
+                "name": "dr_rotor_yoke",
+                "type": "float",
+                "unit": "m",
+                "value": 0.001
+            },
+            {
+                "as_dict": "",
+                "desc": "discretization of the stator slot according to the r-axis",
+                "max": "",
+                "min": "",
+                "name": "dr_stator_slot",
+                "type": "float",
+                "unit": "m",
+                "value": 0.001
+            },
+            {
+                "as_dict": "",
+                "desc": "discretization of the stator tooth according to the r-axis",
+                "max": "",
+                "min": "",
+                "name": "dr_stator_tooth",
+                "type": "float",
+                "unit": "m",
+                "value": 0.001
+            },
+            {
+                "as_dict": "",
+                "desc": "discretization of the magnet according to the r-axis",
+                "max": "",
+                "min": "",
+                "name": "dr_magnet",
+                "type": "float",
+                "unit": "m",
+                "value": 0.001
             }
         ]
     },

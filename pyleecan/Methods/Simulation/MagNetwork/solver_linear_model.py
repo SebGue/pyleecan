@@ -123,9 +123,7 @@ def solver_linear_model(
     # Saving the mesh
     ###############################################################################
 
-    list_elem_materials = self.geometry_motor(
-        N_point_theta, self.N_point_r, self.rotor_shift
-    )[3]
+    list_elem_materials = self.geometry_motor(N_point_theta)[3]
 
     self.save_mesh(
         list_elem_materials, Num_Unknowns, list_elem, theta, r, list_boundary_condition
@@ -159,9 +157,7 @@ def solver_linear_model(
     # Assemblying the RHS containing the sources
     ###############################################################################
 
-    mask_magnet = self.geometry_motor(N_point_theta, self.N_point_r, self.rotor_shift)[
-        4
-    ]
+    mask_magnet = self.geometry_motor(N_point_theta)[4]
 
     RHS = self.right_member_assembly(
         list_elem_permability,

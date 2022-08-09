@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from collections import defaultdict
 
 
-def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
+def geometry_motor(self, N_point_theta):
     """Define the discretized geometry of the electric machine under study
 
     Parameters
@@ -32,8 +32,8 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
     N_point_theta : integer
         Updated number of discretization points in the theta-direction according to condition 1
         {condition 1 :
-        nb_stator_teeth_per_period * (angle_slot + 2 * half_angle_tooth)
-        = nb_PM_per_period * (PM_width + 2 * half_airgap_PM) }
+        nb_stator_teeth_per_period * (stator_slot_elements_theta + 2 * half_stator_tooth_opening)
+        = nb_PM_per_period * (magnet_elements_theta + 2 * half_airgap_PM) }
     """
 
     #######################################################################################
@@ -110,62 +110,69 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
     # Definition of the discretization along theta and r
     #######################################################################################
 
-    # Defining the x and y axes
+    # Defining the x and y axes of the motor geometry
     x = angle_tp
     y = Machine.stator.Rext - Machine.rotor.Rint
 
     # Number of elements in the x-axis direction
     N_element_theta = N_point_theta - 1
 
-    # Number of elements in the y-axis direction
-    N_element_r = N_point_r - 1
-
     # Definition of the discretization steps
     h_theta = x / (N_point_theta - 1)
-    h_r = y / (N_point_r - 1)
 
     #######################################################################################
-    # Definition of the angles of the motor elements
+    # Definition of the angles of the motor elements (theta)
     #######################################################################################
 
+    """ Rotor geometry angular dimensions in deg"""
     # Angular opening of the rotor magnet
     angle_magnet = Machine.rotor.slot.comp_angle_active_eq() * rad_to_deg
 
+    """ Stator geometry angular dimensions in deg"""
     # Angular opening of the stator slot
     angle_stator_slot = Machine.stator.slot.comp_angle_active_eq() * rad_to_deg
 
-    # Discretization of the motor elements according to theta
+    """ Geometry discretization according to the theta-axis """
+    """ Discritized stator """
     # Discretized slot angle according to the theta-direction
-    angle_slot = round(angle_stator_slot / h_theta)
+    stator_slot_elements_theta = round(angle_stator_slot / h_theta)
 
     # angle slot is multiple of number of layers
-    angle_slot = nb_layers * round(angle_slot / nb_layers)
+    stator_slot_elements_theta = nb_layers * round(
+        stator_slot_elements_theta / nb_layers
+    )
 
-    # Angle of a stator tooth
-    angle_tooth = (
-        N_element_theta - nb_stator_teeth_per_period * angle_slot
+    # Angular opening of the stator tooth
+    stator_tooth_opening = (
+        N_element_theta - nb_stator_teeth_per_period * stator_slot_elements_theta
     ) / nb_stator_teeth_per_period
 
     # Discretized 1/2 stator tooth angle according to the theta-direction
-    Half_tooth_width = round(angle_tooth / 2)
+    half_stator_tooth_elements_theta = round(stator_tooth_opening / 2)
 
     # Discretized stator tooth angle according to the theta-direction
-    tooth_width = round(angle_tooth)
+    stator_tooth_elements_theta = round(stator_tooth_opening)
 
-    # Discretized PM zngle according to the theta-direction
-    PM_width = round(angle_magnet / h_theta)
+    """ Discritized rotor """
+    # Discretized PM angle according to the theta-direction
+    magnet_elements_theta = round(angle_magnet / h_theta)
 
     # Discretized 1/2 air-gap between two adjacent PMs in the theta-direction
-    half_airgap_PM_width = round(
-        (N_element_theta - PM_width * nb_PM_per_period) / (2 * nb_PM_per_period)
+    half_airgap_magnet_elements_theta = round(
+        (N_element_theta - magnet_elements_theta * nb_PM_per_period)
+        / (2 * nb_PM_per_period)
     )
 
     # Discretized air-gap between two adjacent PMs in the theta-direction
-    airgap_PM_width = half_airgap_PM_width * 2
+    airgap_magnet_elements_theta = half_airgap_magnet_elements_theta * 2
 
     #######################################################################################
-    # Definition of the radius of the motor elements
+    # Definition of the radius of the motor elements (r)
     #######################################################################################
+
+    """ Rotor geometry dimensions"""
+    # Height of the rotor yoke
+    height_rotor_yoke = Machine.rotor.comp_height_yoke()
 
     # Height of the magnet
     height_magnet = Machine.rotor.slot.comp_height_active()
@@ -173,7 +180,8 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
     # Airgap thickness
     e = Machine.comp_width_airgap_mec()
 
-    # Stator interior and exterior radius
+    """ Stator geometry dimensions"""
+    # Stator exterior and interior radius
     radius_stator_exterior = Machine.stator.Rext
     radius_stator_interior = Machine.stator.Rint
 
@@ -181,40 +189,91 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
     radius_stator_slot_exterior = (
         radius_stator_exterior - Machine.stator.comp_height_yoke()
     )
-
     radius_stator_slot_interior = (
         radius_stator_slot_exterior - Machine.stator.slot.comp_height_active()
     )
 
-    # Rotor yoke height
-    height_rotor_yoke = Machine.rotor.comp_height_yoke()
+    # Height of the stator slot
+    height_stator_slot = radius_stator_slot_exterior - radius_stator_slot_interior
 
     # Stator yoke
     height_stator_yoke = Machine.stator.comp_height_yoke()
 
-    # Discretization of the motor elements according to the r-axis
+    # Height of the stator tooth
+    height_stator_tooth = (
+        radius_stator_exterior - radius_stator_interior
+    ) - height_stator_yoke
+
+    """ Geometry discretization according to the r-axis """
+    """ Discritized stator """
     # Discretized stator yoke in the r-axis
-    stator_iron_height = round(height_stator_yoke / h_r)
+    stator_yoke_elements_r = round(height_stator_yoke / self.dr_stator_yoke)
 
-    height_stator_slot_interior = round(
-        (radius_stator_slot_interior - radius_stator_interior) / h_r
+    # stator_slot_elements is null in case "radius_stator_interior = radius_stator_slot_interior"
+    stator_slot_elements_r = round(height_stator_slot / self.dr_stator_slot)
+
+    # Discretized stator tooth in the r-axis
+    stator_tooth_elements_r = round(height_stator_tooth / self.dr_stator_tooth)
+
+    """ Discritized rotor """
+    # Discretized rotor yoke in the r-axis
+    rotor_yoke_elements_r = round(height_rotor_yoke / self.dr_rotor_yoke)
+
+    # Number of elements in the airgap and magnet in the y-direction
+    airgap_elements_r = round(e / self.dr_airgap)
+    magnet_elements_r = round(height_magnet / self.dr_magnet)
+
+    airgap_and_magnet_elements_r = airgap_elements_r + magnet_elements_r
+
+    """ Elements characteristics according to the r-axis of the geometry (in a dict):
+    characteristics_elements_r = {nbr_elements_r, element_height}"""
+    characteristics_elements_r = {}
+    characteristics_elements_r["rotor_yoke"] = {
+        "nbr_elements_r": rotor_yoke_elements_r,
+        "element_height": (height_rotor_yoke / rotor_yoke_elements_r),
+    }
+    characteristics_elements_r["magnet"] = {
+        "nbr_elements_r": magnet_elements_r,
+        "element_height": (height_magnet / magnet_elements_r),
+    }
+    characteristics_elements_r["airgap"] = {
+        "nbr_elements_r": airgap_elements_r,
+        "element_height": (e / airgap_elements_r),
+    }
+    characteristics_elements_r["stator_tooth"] = {
+        "nbr_elements_r": stator_tooth_elements_r,
+        "element_height": (height_stator_tooth / stator_tooth_elements_r),
+    }
+    characteristics_elements_r["stator_slot"] = {
+        "nbr_elements_r": stator_slot_elements_r,
+        "element_height": (height_stator_slot / stator_slot_elements_r),
+    }
+    characteristics_elements_r["stator_yoke"] = {
+        "nbr_elements_r": stator_yoke_elements_r,
+        "element_height": (height_stator_yoke / stator_yoke_elements_r),
+    }
+
+    # Total number of elements of the geometry
+    N_element_r_total = (
+        characteristics_elements_r["rotor_yoke"]["nbr_elements_r"]
+        + characteristics_elements_r["magnet"]["nbr_elements_r"]
+        + characteristics_elements_r["airgap"]["nbr_elements_r"]
+        + characteristics_elements_r["stator_tooth"]["nbr_elements_r"]
+        + characteristics_elements_r["stator_slot"]["nbr_elements_r"]
+        + characteristics_elements_r["stator_yoke"]["nbr_elements_r"]
     )
-
-    # Number of elements in the air-gap in y direction
-    airgap_height = round(e / h_r)
-
-    # Number of elements in the moving armature iron in y direction
-    rotor_height = round(height_rotor_yoke / h_r)
-
-    # Number of elements in the magnetic air-gap (height_magnet + e) in y direction
-    airgap_and_Pm_height = round((height_magnet + e) / h_r)
+    N_point_r = N_element_r_total + 1
 
     #######################################################################################
     # Update and re-calculation of N_element_theta and the dependent parameters
-    # Condition 1
+    # Condition 1 (theta is unchangeable for all elements)
     #######################################################################################
-    if (nb_stator_teeth_per_period * (angle_slot + 2 * Half_tooth_width)) == (
-        nb_PM_per_period * (PM_width + 2 * half_airgap_PM_width)
+    if (
+        nb_stator_teeth_per_period
+        * (stator_slot_elements_theta + 2 * half_stator_tooth_elements_theta)
+    ) == (
+        nb_PM_per_period
+        * (magnet_elements_theta + 2 * half_airgap_magnet_elements_theta)
     ):
         N_element_theta_kk = N_element_theta
         N_point_theta = N_element_theta_kk + 1
@@ -226,29 +285,34 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
         N_element_theta_kk = N_element_theta * kk
         N_point_theta = N_element_theta_kk + 1
         h_theta = x / (N_point_theta - 1)
-        angle_slot = nb_layers * round(
+        stator_slot_elements_theta = nb_layers * round(
             (Machine.stator.slot.comp_angle_active_eq() * rad_to_deg / h_theta)
             / nb_layers
         )
 
-        angle_tooth = (
-            N_element_theta_kk - nb_stator_teeth_per_period * angle_slot
+        stator_tooth_opening = (
+            N_element_theta_kk - nb_stator_teeth_per_period * stator_slot_elements_theta
         ) / nb_stator_teeth_per_period
 
-        Half_tooth_width = round(angle_tooth / 2)
+        half_stator_tooth_elements_theta = round(stator_tooth_opening / 2)
 
-        tooth_width = round(angle_tooth)
+        stator_tooth_elements_theta = round(stator_tooth_opening)
 
-        PM_width = round(angle_magnet / h_theta)
+        magnet_elements_theta = round(angle_magnet / h_theta)
 
-        half_airgap_PM_width = round(
-            (N_element_theta_kk - PM_width * nb_PM_per_period) / (2 * nb_PM_per_period)
+        half_airgap_magnet_elements_theta = round(
+            (N_element_theta_kk - magnet_elements_theta * nb_PM_per_period)
+            / (2 * nb_PM_per_period)
         )
 
-        airgap_PM_width = half_airgap_PM_width * 2
+        airgap_magnet_elements_theta = half_airgap_magnet_elements_theta * 2
 
-        if (nb_stator_teeth_per_period * (angle_slot + 2 * Half_tooth_width)) == (
-            nb_PM_per_period * (PM_width + 2 * half_airgap_PM_width)
+        if (
+            nb_stator_teeth_per_period
+            * (stator_slot_elements_theta + 2 * half_stator_tooth_elements_theta)
+        ) == (
+            nb_PM_per_period
+            * (magnet_elements_theta + 2 * half_airgap_magnet_elements_theta)
         ):
             break
 
@@ -257,7 +321,7 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
     #######################################################################################
 
     # Total number of elements
-    N_total_element = N_element_r * N_element_theta_kk
+    N_total_element = N_element_r_total * N_element_theta_kk
 
     # Attribute an array of N_total_element size of zeros to cells_materials
     cells_materials = np.zeros(N_total_element, dtype=np.float64)
@@ -272,40 +336,43 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
     geometry_disctint = np.zeros(N_total_element, dtype=np.uint16)
 
     # Assignment of geometry elements
-    for i in range(N_element_r):
+    for i in range(N_element_r_total):
 
         # Assigning rotor elements
-        if i < rotor_height:
+        if i < rotor_yoke_elements_r:
             for j in range(N_element_theta_kk):
                 num_element = N_element_theta_kk * i + j
                 cells_materials[num_element] = material_dict["rotor"]  # rotor material
                 geometry_disctint[num_element] = 3
 
         # Assignment of PM and the airgap between PMs elements
-        elif i < (rotor_height + airgap_and_Pm_height - airgap_height):
+        elif i < (
+            rotor_yoke_elements_r + airgap_and_magnet_elements_r - airgap_elements_r
+        ):
 
             for j in range(N_element_theta_kk):
                 num_element = N_element_theta_kk * i + j
                 # Assignment of the first half of the airgap elements
-                if j < half_airgap_PM_width:
+                if j < half_airgap_magnet_elements_theta:
                     cells_materials[num_element] = material_dict["air"]  # air material
                     geometry_disctint[num_element] = 2
 
-                elif j < (N_element_theta_kk - half_airgap_PM_width):
+                elif j < (N_element_theta_kk - half_airgap_magnet_elements_theta):
                     for PM_idx in range(nb_PM_per_period):
                         # Assignment of PM elements
                         if (
                             j
                             >= (
-                                half_airgap_PM_width
-                                + PM_idx * (PM_width + airgap_PM_width)
+                                half_airgap_magnet_elements_theta
+                                + PM_idx
+                                * (magnet_elements_theta + airgap_magnet_elements_theta)
                             )
                         ) and (
                             j
                             < (
-                                half_airgap_PM_width
-                                + (PM_idx + 1) * PM_width
-                                + PM_idx * airgap_PM_width
+                                half_airgap_magnet_elements_theta
+                                + (PM_idx + 1) * magnet_elements_theta
+                                + PM_idx * airgap_magnet_elements_theta
                             )
                         ):
                             cells_materials[num_element] = material_dict[
@@ -318,15 +385,16 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
                         if (
                             j
                             >= (
-                                half_airgap_PM_width
-                                + PM_idx * PM_width
-                                + (PM_idx - 1) * airgap_PM_width
+                                half_airgap_magnet_elements_theta
+                                + PM_idx * magnet_elements_theta
+                                + (PM_idx - 1) * airgap_magnet_elements_theta
                             )
                         ) and (
                             j
                             < (
-                                half_airgap_PM_width
-                                + PM_idx * (PM_width + airgap_PM_width)
+                                half_airgap_magnet_elements_theta
+                                + PM_idx
+                                * (magnet_elements_theta + airgap_magnet_elements_theta)
                             )
                         ):
                             cells_materials[num_element] = material_dict[
@@ -340,44 +408,52 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
                     geometry_disctint[num_element] = 2
 
         # Assignment of the airgap between the PMs and the stator
-        elif i < (rotor_height + airgap_and_Pm_height):
+        elif i < (rotor_yoke_elements_r + airgap_and_magnet_elements_r):
             for j in range(N_element_theta_kk):
                 num_element = N_element_theta_kk * i + j
                 cells_materials[num_element] = material_dict["air"]  # air
                 geometry_disctint[num_element] = 2
 
         # Stator elements
-        elif i < N_element_r - stator_iron_height:
+        elif i < N_element_r_total - stator_yoke_elements_r:
 
             # Case where the stator slot is not aligned with the stator tooth
             if radius_stator_slot_interior != radius_stator_interior:
                 if (
                     i
-                    <= height_stator_slot_interior + rotor_height + airgap_and_Pm_height
+                    <= stator_slot_elements_r
+                    + rotor_yoke_elements_r
+                    + airgap_and_magnet_elements_r
                 ):
                     for j in range(N_element_theta_kk):
                         num_element = N_element_theta_kk * i + j
                         # Assignment of the elements in the first half tooth
-                        if j < Half_tooth_width:
+                        if j < half_stator_tooth_elements_theta:
                             cells_materials[num_element] = material_dict[
                                 "stator"
                             ]  # stator
                             geometry_disctint[num_element] = 1
 
-                        elif j <= (N_element_theta_kk - Half_tooth_width):
+                        elif j <= (
+                            N_element_theta_kk - half_stator_tooth_elements_theta
+                        ):
                             for slot_idx in range(nb_stator_teeth_per_period):
                                 if (
                                     j
                                     >= (
-                                        Half_tooth_width
-                                        + slot_idx * (angle_slot + tooth_width)
+                                        half_stator_tooth_elements_theta
+                                        + slot_idx
+                                        * (
+                                            stator_slot_elements_theta
+                                            + stator_tooth_elements_theta
+                                        )
                                     )
                                 ) and (
                                     j
                                     < (
-                                        Half_tooth_width
-                                        + (slot_idx + 1) * angle_slot
-                                        + slot_idx * tooth_width
+                                        half_stator_tooth_elements_theta
+                                        + (slot_idx + 1) * stator_slot_elements_theta
+                                        + slot_idx * stator_tooth_elements_theta
                                     )
                                 ):
                                     cells_materials[num_element] = material_dict["air"]
@@ -402,28 +478,34 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
                     for j in range(N_element_theta_kk):
                         num_element = N_element_theta_kk * i + j
                         # Assignment of the elements in the first half tooth
-                        if j < Half_tooth_width:
+                        if j < half_stator_tooth_elements_theta:
                             cells_materials[num_element] = material_dict[
                                 "stator"
                             ]  # stator
                             geometry_disctint[num_element] = 1
 
-                        elif j <= (N_element_theta_kk - Half_tooth_width):
+                        elif j <= (
+                            N_element_theta_kk - half_stator_tooth_elements_theta
+                        ):
                             for slot_idx in range(nb_stator_teeth_per_period):
 
                                 # Assignement of the winding elements
                                 if (
                                     j
                                     >= (
-                                        Half_tooth_width
-                                        + slot_idx * (angle_slot + tooth_width)
+                                        half_stator_tooth_elements_theta
+                                        + slot_idx
+                                        * (
+                                            stator_slot_elements_theta
+                                            + stator_tooth_elements_theta
+                                        )
                                     )
                                 ) and (
                                     j
                                     < (
-                                        Half_tooth_width
-                                        + (slot_idx + 1) * angle_slot
-                                        + slot_idx * tooth_width
+                                        half_stator_tooth_elements_theta
+                                        + (slot_idx + 1) * stator_slot_elements_theta
+                                        + slot_idx * stator_tooth_elements_theta
                                     )
                                 ):
                                     # Searching for the layer of a slot index
@@ -431,17 +513,30 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
                                         if (
                                             j
                                             >= (
-                                                Half_tooth_width
-                                                + slot_idx * (angle_slot + tooth_width)
-                                                + layer * (angle_slot / nb_layers)
+                                                half_stator_tooth_elements_theta
+                                                + slot_idx
+                                                * (
+                                                    stator_slot_elements_theta
+                                                    + stator_tooth_elements_theta
+                                                )
+                                                + layer
+                                                * (
+                                                    stator_slot_elements_theta
+                                                    / nb_layers
+                                                )
                                             )
                                         ) and (
                                             j
                                             < (
-                                                Half_tooth_width
-                                                + (slot_idx + 1) * angle_slot
-                                                + slot_idx * tooth_width
-                                                + (layer + 1) * (angle_slot / nb_layers)
+                                                half_stator_tooth_elements_theta
+                                                + (slot_idx + 1)
+                                                * stator_slot_elements_theta
+                                                + slot_idx * stator_tooth_elements_theta
+                                                + (layer + 1)
+                                                * (
+                                                    stator_slot_elements_theta
+                                                    / nb_layers
+                                                )
                                             )
                                         ):
 
@@ -475,26 +570,30 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
                 for j in range(N_element_theta_kk):
                     num_element = N_element_theta_kk * i + j
                     # Assignment of the elements in the first half tooth
-                    if j < Half_tooth_width:
+                    if j < half_stator_tooth_elements_theta:
                         cells_materials[num_element] = material_dict["stator"]  # stator
                         geometry_disctint[num_element] = 1
 
-                    elif j <= (N_element_theta_kk - Half_tooth_width):
+                    elif j <= (N_element_theta_kk - half_stator_tooth_elements_theta):
                         for slot_idx in range(nb_stator_teeth_per_period):
 
                             # Assignement of the winding elements
                             if (
                                 j
                                 >= (
-                                    Half_tooth_width
-                                    + slot_idx * (angle_slot + tooth_width)
+                                    half_stator_tooth_elements_theta
+                                    + slot_idx
+                                    * (
+                                        stator_slot_elements_theta
+                                        + stator_tooth_elements_theta
+                                    )
                                 )
                             ) and (
                                 j
                                 < (
-                                    Half_tooth_width
-                                    + (slot_idx + 1) * angle_slot
-                                    + slot_idx * tooth_width
+                                    half_stator_tooth_elements_theta
+                                    + (slot_idx + 1) * stator_slot_elements_theta
+                                    + slot_idx * stator_tooth_elements_theta
                                 )
                             ):
                                 # Searching for the layer of a slot index
@@ -502,17 +601,24 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
                                     if (
                                         j
                                         >= (
-                                            Half_tooth_width
-                                            + slot_idx * (angle_slot + tooth_width)
-                                            + layer * (angle_slot / nb_layers)
+                                            half_stator_tooth_elements_theta
+                                            + slot_idx
+                                            * (
+                                                stator_slot_elements_theta
+                                                + stator_tooth_elements_theta
+                                            )
+                                            + layer
+                                            * (stator_slot_elements_theta / nb_layers)
                                         )
                                     ) and (
                                         j
                                         < (
-                                            Half_tooth_width
-                                            + (slot_idx + 1) * angle_slot
-                                            + slot_idx * tooth_width
-                                            + (layer + 1) * (angle_slot / nb_layers)
+                                            half_stator_tooth_elements_theta
+                                            + (slot_idx + 1)
+                                            * stator_slot_elements_theta
+                                            + slot_idx * stator_tooth_elements_theta
+                                            + (layer + 1)
+                                            * (stator_slot_elements_theta / nb_layers)
                                         )
                                     ):
 
@@ -558,4 +664,11 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
     plt.ylabel("N_element_r")
     plt.show()
 
-    return cells_materials, material_dict, N_point_theta, geometry_disctint, mask_magnet
+    return (
+        cells_materials,
+        material_dict,
+        N_point_theta,
+        geometry_disctint,
+        mask_magnet,
+        characteristics_elements_r,
+    )
