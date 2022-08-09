@@ -196,7 +196,9 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
     # Discretized stator yoke in the r-axis
     stator_iron_height = round(height_stator_yoke / self.dr_stator_yoke)
 
-    height_stator_slot_interior = round(radius_stator_slot_interior * 1000 / 2)
+    stator_slot_interior_height = round(
+        (radius_stator_slot_interior - radius_stator_interior) / self.dr_stator_slot
+    )
 
     # Number of elements in the air-gap in y direction
     airgap_height = round(e / self.dr_airgap)
@@ -353,7 +355,7 @@ def geometry_motor(self, N_point_theta, N_point_r, rotor_shift):
             if radius_stator_slot_interior != radius_stator_interior:
                 if (
                     i
-                    <= height_stator_slot_interior + rotor_height + airgap_and_Pm_height
+                    <= stator_slot_interior_height + rotor_height + airgap_and_Pm_height
                 ):
                     for j in range(N_element_theta_kk):
                         num_element = N_element_theta_kk * i + j
