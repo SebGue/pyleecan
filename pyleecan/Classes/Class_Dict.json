@@ -7102,63 +7102,63 @@
             },
             {
                 "as_dict": "",
-                "desc": "discretization of the stator yoke according to the r-axis",
+                "desc": "number of discretized elements of the stator yoke according to the r-axis",
                 "max": "",
                 "min": "",
-                "name": "dr_stator_yoke",
-                "type": "float",
-                "unit": "m",
-                "value": 0.001
+                "name": "stator_yoke_elements_r",
+                "type": "int",
+                "unit": "-",
+                "value": 2
             },
             {
                 "as_dict": "",
-                "desc": "discretization of the airgap according to the r-axis",
+                "desc": "number of discretized elements of the airgap according to the r-axis",
                 "max": "",
                 "min": "",
-                "name": "dr_airgap",
-                "type": "float",
-                "unit": "m",
-                "value": 0.001
+                "name": "airgap_elements_r",
+                "type": "int",
+                "unit": "-",
+                "value": 2
             },
             {
                 "as_dict": "",
-                "desc": "discretization of the rotor yoke according to the r-axis",
+                "desc": "number of discretized elements of the rotor yoke according to the r-axis",
                 "max": "",
                 "min": "",
-                "name": "dr_rotor_yoke",
-                "type": "float",
-                "unit": "m",
-                "value": 0.001
+                "name": "rotor_yoke_elements_r",
+                "type": "int",
+                "unit": "-",
+                "value": 2
             },
             {
                 "as_dict": "",
-                "desc": "discretization of the geometry between the stator interior radius and the slot interior radius",
+                "desc": "number of discretized elements of the geometry between the stator interior radius and the slot interior radius",
                 "max": "",
                 "min": "",
-                "name": "dr_stator_air",
-                "type": "float",
-                "unit": "m",
-                "value": 0.001
+                "name": "stator_isthmus_elements_r",
+                "type": "int",
+                "unit": "-",
+                "value": 2
             },
             {
                 "as_dict": "",
-                "desc": "discretization of the stator tooth according to the r-axis",
+                "desc": "number of discretized elements of the stator tooth according to the r-axis",
                 "max": "",
                 "min": "",
-                "name": "dr_stator_tooth",
-                "type": "float",
-                "unit": "m",
-                "value": 0.001
+                "name": "stator_tooth_elements_r",
+                "type": "int",
+                "unit": "-",
+                "value": 2
             },
             {
                 "as_dict": "",
-                "desc": "discretization of the magnet according to the r-axis",
+                "desc": "number of discretized elements of the magnet according to the r-axis",
                 "max": "",
                 "min": "",
-                "name": "dr_magnet",
-                "type": "float",
-                "unit": "m",
-                "value": 0.001
+                "name": "magnet_elements_r",
+                "type": "int",
+                "unit": "-",
+                "value": 2
             }
         ]
     },

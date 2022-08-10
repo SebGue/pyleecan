@@ -74,7 +74,7 @@ def run_radial(self, axes_dict, Is_val=None, type_coord_sys=2):
     ###############################################################################
     # Definition of the r-axis
     axes_r = self.geometry_motor(N_point_theta)[6]
-    if not len(axes_r["stator_air"]):  # stator_air = 0
+    if not len(axes_r["stator_isthmus"]):  # stator_isthmus = []
         r = np.concatenate(
             (
                 axes_r["rotor_yoke"],
@@ -90,7 +90,7 @@ def run_radial(self, axes_dict, Is_val=None, type_coord_sys=2):
                 axes_r["rotor_yoke"],
                 axes_r["magnet"],
                 axes_r["airgap"],
-                axes_r["stator_air"],
+                axes_r["stator_isthmus"],
                 axes_r["stator_tooth"],
                 axes_r["stator_yoke"],
             )
@@ -199,6 +199,7 @@ def run_radial(self, axes_dict, Is_val=None, type_coord_sys=2):
     print("mesh saved", list_coord.shape, list_elem.shape)
 
     # Compute 2D curve of the airgap flux density
+    index_airgap = self.geometry_motor(N_point_theta)[7]
     Bx_airgap, By_airgap = self.comp_flux_airgap_local(
         # r,
         # theta,
@@ -208,7 +209,8 @@ def run_radial(self, axes_dict, Is_val=None, type_coord_sys=2):
         list_elem,
         list_coord,
         la,
-        Machine.comp_Rgap_mec(),
+        # Machine.comp_Rgap_mec(),
+        index_airgap,
         type_coord_sys,
     )
 

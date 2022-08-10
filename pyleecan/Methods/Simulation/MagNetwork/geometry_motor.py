@@ -207,28 +207,28 @@ def geometry_motor(self, N_point_theta):
 
     # Height of the air between the interior radius of the stator slot and the interior radius of the stator
     # Null in case radius_stator_slot_interior = radius_stator_interior
-    height_stator_air = radius_stator_slot_interior - radius_stator_interior
+    height_stator_isthmus = radius_stator_slot_interior - radius_stator_interior
 
     """ Geometry discretization according to the r-axis """
     """ Discritized stator """
     # Discretized stator yoke in the r-axis
-    stator_yoke_elements_r = round(height_stator_yoke / self.dr_stator_yoke)
+    # dr_stator_yoke = round(height_stator_yoke / self.stator_yoke_elements_r)
 
     # Stator = stator tooth region : Conform mesh
-    stator_slot_elements_r = round(height_stator_slot / self.dr_stator_tooth)
+    # dr_stator_tooth = round(height_stator_slot / self.stator_tooth_elements_r)
 
     # Stator air elements between the stator inner radius and the slot inner radius
-    stator_air_elements_r = round(height_stator_air / self.dr_stator_air)
+    # dr_stator_isthmus = round(height_stator_isthmus / self.stator_isthmus_elements_r)
 
     """ Discritized rotor """
     # Discretized rotor yoke in the r-axis
-    rotor_yoke_elements_r = round(height_rotor_yoke / self.dr_rotor_yoke)
+    # dr_rotor_yoke = round(height_rotor_yoke / self.rotor_yoke_elements_r)
 
     # Number of elements in the airgap and magnet in the y-direction
-    airgap_elements_r = round(e / self.dr_airgap)
-    magnet_elements_r = round(height_magnet / self.dr_magnet)
+    # dr_airgap = round(e / self.airgap_elements_r)
+    # dr_magnet = round(height_magnet / self.magnet_elements_r)
 
-    airgap_and_magnet_elements_r = airgap_elements_r + magnet_elements_r
+    airgap_and_magnet_elements_r = self.airgap_elements_r + self.magnet_elements_r
 
     """ Elements characteristics according to the r-axis of the geometry (in a dict):
     characteristics_elements_r = {nbr_elements_r, element_height}"""
@@ -236,7 +236,7 @@ def geometry_motor(self, N_point_theta):
     axes_r["rotor_yoke"] = np.linspace(
         radius_rotor_interior,
         radius_rotor_exterior,
-        (rotor_yoke_elements_r + 1),
+        (self.rotor_yoke_elements_r + 1),
     )
     # Delete the last point of the rotor yoke axis to avoid duplication
     axes_r["rotor_yoke"] = np.delete(axes_r["rotor_yoke"], -1)
@@ -244,51 +244,67 @@ def geometry_motor(self, N_point_theta):
     axes_r["magnet"] = np.linspace(
         radius_rotor_exterior,
         (radius_rotor_exterior + height_magnet),
-        (magnet_elements_r + 1),
+        (self.magnet_elements_r + 1),
     )
     axes_r["magnet"] = np.delete(axes_r["magnet"], -1)
 
     axes_r["airgap"] = np.linspace(
         (radius_rotor_exterior + height_magnet),
         (radius_rotor_exterior + height_magnet + e),
-        (airgap_elements_r + 1),
+        (self.airgap_elements_r + 1),
     )
     axes_r["airgap"] = np.delete(axes_r["airgap"], -1)
 
     axes_r["stator_tooth"] = np.linspace(
         radius_stator_slot_interior,
         radius_stator_slot_exterior,
-        (stator_slot_elements_r + 1),
+        (self.stator_tooth_elements_r + 1),
     )
     axes_r["stator_tooth"] = np.delete(axes_r["stator_tooth"], -1)
 
     if radius_stator_interior != radius_stator_slot_interior:
-        axes_r["stator_air"] = np.linspace(
+        axes_r["stator_isthmus"] = np.linspace(
             radius_stator_interior,
             radius_stator_slot_interior,
-            (stator_air_elements_r + 1),
+            (self.stator_isthmus_elements_r + 1),
         )
-        axes_r["stator_air"] = np.delete(axes_r["stator_air"], -1)
+        axes_r["stator_isthmus"] = np.delete(axes_r["stator_air"], -1)
     else:
-        axes_r["stator_air"] = []
+        axes_r["stator_isthmus"] = []
 
     axes_r["stator_yoke"] = np.linspace(
         radius_stator_slot_exterior,
         radius_stator_exterior,
-        (stator_yoke_elements_r + 1),
+        (self.stator_yoke_elements_r + 1),
     )
 
     # Total number of elements of the geometry
-    N_element_r_total = (
-        rotor_yoke_elements_r
-        + magnet_elements_r
-        + airgap_elements_r
-        + stator_slot_elements_r
-        + stator_air_elements_r
-        + stator_yoke_elements_r
-    )
+    if radius_stator_interior != radius_stator_slot_interior:
+        N_element_r_total = (
+            self.rotor_yoke_elements_r
+            + self.magnet_elements_r
+            + self.airgap_elements_r
+            + self.stator_tooth_elements_r
+            + self.stator_isthmus_elements_r
+            + self.stator_yoke_elements_r
+        )
+    else:
+        N_element_r_total = (
+            self.rotor_yoke_elements_r
+            + self.magnet_elements_r
+            + self.airgap_elements_r
+            + self.stator_tooth_elements_r
+            + self.stator_yoke_elements_r
+        )
     # Total number of elements in the geometry
     N_point_r = N_element_r_total + 1
+
+    # Position in the middle of the airgap
+    index_middle_airgap = (
+        self.rotor_yoke_elements_r
+        + self.magnet_elements_r
+        + self.airgap_elements_r // 2
+    )
 
     #######################################################################################
     # Update and re-calculation of N_element_theta and the dependent parameters
@@ -365,14 +381,14 @@ def geometry_motor(self, N_point_theta):
     for i in range(N_element_r_total):
 
         # Assigning rotor elements
-        if i < rotor_yoke_elements_r:
+        if i < self.rotor_yoke_elements_r:
             for j in range(N_element_theta_kk):
                 num_element = N_element_theta_kk * i + j
                 cells_materials[num_element] = material_dict["rotor"]  # rotor material
                 geometry_disctint[num_element] = 3
 
         # Assignment of PM and the airgap between PMs elements
-        elif i < (rotor_yoke_elements_r + magnet_elements_r):
+        elif i < (self.rotor_yoke_elements_r + self.magnet_elements_r):
 
             for j in range(N_element_theta_kk):
                 num_element = N_element_theta_kk * i + j
@@ -432,21 +448,21 @@ def geometry_motor(self, N_point_theta):
                     geometry_disctint[num_element] = 2
 
         # Assignment of the airgap between the PMs and the stator
-        elif i < (rotor_yoke_elements_r + airgap_and_magnet_elements_r):
+        elif i < (self.rotor_yoke_elements_r + airgap_and_magnet_elements_r):
             for j in range(N_element_theta_kk):
                 num_element = N_element_theta_kk * i + j
                 cells_materials[num_element] = material_dict["air"]  # air
                 geometry_disctint[num_element] = 2
 
         # Stator elements
-        elif i < N_element_r_total - stator_yoke_elements_r:
+        elif i < N_element_r_total - self.stator_yoke_elements_r:
 
             # Case where the stator slot is not aligned with the stator tooth
             if radius_stator_slot_interior != radius_stator_interior:
                 if (
                     i
-                    <= stator_air_elements_r
-                    + rotor_yoke_elements_r
+                    <= self.stator_air_elements_r
+                    + self.rotor_yoke_elements_r
                     + airgap_and_magnet_elements_r
                 ):
                     for j in range(N_element_theta_kk):
@@ -697,4 +713,5 @@ def geometry_motor(self, N_point_theta):
         mask_magnet,
         N_point_r,
         axes_r,
+        index_middle_airgap,
     )
