@@ -55,9 +55,9 @@ def init_reluc(self, list_elem, list_coord, mu0, la, type_coord_sys):
         # Ref : https://www.researchgate.net/publication/321237892_Reluctance_network_-_Lumped_mechanical_thermal_models_for_the_modeling_of_concentrated_flux_synchronous_machine
         theta = np.abs(list_coord[list_elem[:, 0], 0] - list_coord[list_elem[:, 1], 0])
         R1 = list_coord[list_elem[:, 0], 1]
-        R2 = R1 + (list_coord[list_elem[:, 2], 1] - list_coord[list_elem[:, 0], 1]) / 2
-        R3 = list_coord[list_elem[:, 3], 1]
 
+        R3 = list_coord[list_elem[:, 3], 1]
+        R2 = (R1 + R3) / 2
         Reluc_list[:, 0] = np.log(R2 / R1) / (mu0 * theta * la)
         Reluc_list[:, 1] = 0.5 * theta / (mu0 * la * np.log(R3 / R1))
         Reluc_list[:, 2] = np.log(R3 / R2) / (mu0 * theta * la)
