@@ -17,6 +17,7 @@ def right_member_assembly(
     mask_magnet,
     la,
     type_coord_sys,
+    N_point_theta,
     JA=None,
     JB=None,
     JC=None,
@@ -48,6 +49,17 @@ def right_member_assembly(
     mur_windings = []
     for j in range(nb_stator_teeth_per_period):
         mur_windings.append(material_dict["winding" + str(j + 1)])
+
+    #######################################################################################
+    # Information regarding the magnet
+    #######################################################################################
+    # Magnet dimensions
+    magnet_height = Machine.rotor.slot.comp_height_active()
+    magnet_angle_deg = Machine.rotor.slot.comp_angle_active_eq() * (180 / np.pi)
+
+    # Number of elements (TO BE used directly)
+    # N_elements_magnet_theta = N_point_theta
+    # N_elements_magnet_r = self.magnet_elements_r
 
     #######################################################################################
     # Modeling the PM regions and calculating the FEMM (PM), PM_Magnetization_Direction = y

@@ -169,6 +169,7 @@ def solver_linear_model(
         mask_magnet,
         la,
         type_coord_sys,
+        N_point_theta,
         JA=JA,
         JB=JB,
         JC=JC,
