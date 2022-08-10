@@ -69,15 +69,12 @@ def run_radial(self, axes_dict, Is_val=None, type_coord_sys=2):
     # Material_dict from geometry_motor method
     material_dict = self.geometry_motor(N_point_theta)[1]
 
-    mu0 = material_dict["vacuum"]  # Permeability of vacuum (H/m)
-
     ###############################################################################
     # Definition of the r- and theta- axes
     ###############################################################################
     # Definition of the r-axis
-    # r = np.linspace(Machine.rotor.Rint, Machine.stator.Rext, N_point_r)
     axes_r = self.geometry_motor(N_point_theta)[6]
-    if axes_r["stator_air"].any() == True:
+    if not axes_r["stator_air"]:
         r = np.concatenate(
             (
                 axes_r["rotor_yoke"],

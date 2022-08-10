@@ -234,24 +234,33 @@ def geometry_motor(self, N_point_theta):
     characteristics_elements_r = {nbr_elements_r, element_height}"""
     axes_r = {}
     axes_r["rotor_yoke"] = np.linspace(
-        radius_rotor_interior, radius_rotor_exterior, (rotor_yoke_elements_r + 1)
+        radius_rotor_interior,
+        radius_rotor_exterior,
+        (rotor_yoke_elements_r + 1),
     )
+    # Delete the last point of the rotor yoke axis
+    axes_r["rotor_yoke"] = np.delete(axes_r["rotor_yoke"], -1)
+
     axes_r["magnet"] = np.linspace(
         radius_rotor_exterior,
         (radius_rotor_exterior + height_magnet),
         (magnet_elements_r + 1),
     )
+    axes_r["magnet"] = np.delete(axes_r["magnet"], -1)
+
     axes_r["airgap"] = np.linspace(
         (radius_rotor_exterior + height_magnet),
         (radius_rotor_exterior + height_magnet + e),
         (airgap_elements_r + 1),
     )
+    axes_r["airgap"] = np.delete(axes_r["airgap"], -1)
 
     axes_r["stator_tooth"] = np.linspace(
+        radius_stator_slot_interior,
         radius_stator_slot_exterior,
-        (radius_stator_exterior - height_stator_yoke),
         (stator_slot_elements_r + 1),
     )
+    axes_r["stator_tooth"] = np.delete(axes_r["stator_tooth"], -1)
 
     if radius_stator_interior != radius_stator_slot_interior:
         axes_r["stator_air"] = np.linspace(
@@ -259,8 +268,9 @@ def geometry_motor(self, N_point_theta):
             radius_stator_slot_interior,
             (stator_air_elements_r + 1),
         )
+        axes_r["stator_air"] = np.delete(axes_r["stator_air"], -1)
     else:
-        axes_r["stator_air"] = np.array([0.0, 0.0, 0])
+        axes_r["stator_air"] = []
 
     axes_r["stator_yoke"] = np.linspace(
         radius_stator_slot_exterior,
@@ -277,7 +287,8 @@ def geometry_motor(self, N_point_theta):
         + stator_air_elements_r
         + stator_yoke_elements_r
     )
-    N_point_r = N_element_r_total + 6
+    # Total number of elements in the geometry
+    N_point_r = N_element_r_total + 1
 
     #######################################################################################
     # Update and re-calculation of N_element_theta and the dependent parameters
