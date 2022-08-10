@@ -24,8 +24,8 @@ def init_point(self, N_point_theta, N_point_r, theta, r):
         list of point coordinates
 
     """
-    # if N_point_theta != theta.size:
-    #     raise NameError("Wrong number of points in theta direction.")
+    if N_point_theta != theta.size:
+        raise NameError("Wrong number of points in theta direction, N_point_theta= "+str(N_point_theta)+" and theta.size= "+str(theta.size)+" must be equal")
     if N_point_r != r.size:
         raise NameError("Wrong number of points in radial direction.")
 
