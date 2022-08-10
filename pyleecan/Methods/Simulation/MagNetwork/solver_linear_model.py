@@ -140,7 +140,6 @@ def solver_linear_model(
 
     mu0 = material_dict["vacuum"]
     reluc_list = self.init_reluc(list_elem, list_coord, mu0, la, type_coord_sys)
-    # print(reluc_list)
 
     M_csr = self.assembly(
         reluc_list,

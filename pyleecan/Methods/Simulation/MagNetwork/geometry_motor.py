@@ -238,7 +238,7 @@ def geometry_motor(self, N_point_theta):
         radius_rotor_exterior,
         (rotor_yoke_elements_r + 1),
     )
-    # Delete the last point of the rotor yoke axis
+    # Delete the last point of the rotor yoke axis to avoid duplication
     axes_r["rotor_yoke"] = np.delete(axes_r["rotor_yoke"], -1)
 
     axes_r["magnet"] = np.linspace(
@@ -698,4 +698,3 @@ def geometry_motor(self, N_point_theta):
         N_point_r,
         axes_r,
     )
-

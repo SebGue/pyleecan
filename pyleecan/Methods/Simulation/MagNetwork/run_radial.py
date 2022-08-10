@@ -74,13 +74,12 @@ def run_radial(self, axes_dict, Is_val=None, type_coord_sys=2):
     ###############################################################################
     # Definition of the r-axis
     axes_r = self.geometry_motor(N_point_theta)[6]
-    if not axes_r["stator_air"]:
+    if not len(axes_r["stator_air"]):  # stator_air = 0
         r = np.concatenate(
             (
                 axes_r["rotor_yoke"],
                 axes_r["magnet"],
                 axes_r["airgap"],
-                axes_r["stator_air"],
                 axes_r["stator_tooth"],
                 axes_r["stator_yoke"],
             )
@@ -91,6 +90,7 @@ def run_radial(self, axes_dict, Is_val=None, type_coord_sys=2):
                 axes_r["rotor_yoke"],
                 axes_r["magnet"],
                 axes_r["airgap"],
+                axes_r["stator_air"],
                 axes_r["stator_tooth"],
                 axes_r["stator_yoke"],
             )
@@ -213,4 +213,3 @@ def run_radial(self, axes_dict, Is_val=None, type_coord_sys=2):
     )
 
     return Bx, By, Bx_airgap, By_airgap
-
