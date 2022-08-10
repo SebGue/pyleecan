@@ -60,18 +60,19 @@ def compute_B(self, Phi, list_elem, list_coord, la, type_coord_sys):
         r2 = list_coord[list_elem[:, 3], 1]
         h_r = np.abs(r2 - r1)
 
-        # Compute B
-        Btheta_down = (Phi[list_elem[:, 1]] - Phi[list_elem[:, 0]]) / (
-            h_theta * r1 * la
-        )
-        Btheta_upper = (Phi[list_elem[:, 2]] - Phi[list_elem[:, 3]]) / (
-            h_theta * r2 * la
-        )
+        # Compute B by linear regression
+        # Use normal equation to obtain this formula
+        Phi_down = Phi[list_elem[:, 0]] - Phi[list_elem[:, 1]]
+        S_down= h_theta*r1*la
+        Phi_upper = Phi[list_elem[:, 3]] - Phi[list_elem[:, 2]]
+        S_upper= h_theta*r2*la
 
-        Br_left = (Phi[list_elem[:, 0]] - Phi[list_elem[:, 3]]) / (h_r * la)
-        Br_right = (Phi[list_elem[:, 1]] - Phi[list_elem[:, 2]]) / (h_r * la)
+        Phi_left = (Phi[list_elem[:, 3]] - Phi[list_elem[:, 0]]) 
+        S_left=(h_r * la)
+        Phi_right = (Phi[list_elem[:, 2]] - Phi[list_elem[:, 1]])
 
-        Btheta = (Btheta_down + Btheta_upper) / 2
-        Br = (Br_left + Br_right) / 2
+
+        Btheta = (S_upper*Phi_upper + S_down*Phi_down) / (S_upper**2+S_down**2)
+        Br = (Phi_left + Phi_right) / (2*S_left)
 
         return Btheta, Br
