@@ -698,3 +698,4 @@ def geometry_motor(self, N_point_theta):
         N_point_r,
         axes_r,
     )
+

@@ -559,8 +559,8 @@ def test_MagNetwork_benchmark():
 
 
 if __name__ == "__main__":
-    test_MagNetwork_initial_validation()
+    # test_MagNetwork_initial_validation()
     # test_MagNetwork_Kmesh_fineness()
-    # test_MagNetwork_double_layer_2magnets()
+    test_MagNetwork_double_layer_2magnets()
     # test_MagNetwork_fractional_periodicity()
     # test_MagNetwork_benchmark()

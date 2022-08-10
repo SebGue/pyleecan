@@ -213,3 +213,4 @@ def run_radial(self, axes_dict, Is_val=None, type_coord_sys=2):
     )
 
     return Bx, By, Bx_airgap, By_airgap
+
