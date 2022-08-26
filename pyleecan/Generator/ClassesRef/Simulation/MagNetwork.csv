@@ -26,3 +26,5 @@ magnet_elements_r,-,number of discretized elements of the magnet according to th
 ,,,,,,,,,,,comp_flux_airgap_local,,,
 ,,,,,,,,,,,cartesianmeshclass_pyleecan,,,
 ,,,,,,,,,,,comp_axes,,,
+,,,,,,,,,,,post_processing.add_to_mesh_cell_math,,,
+,,,,,,,,,,,post_processing.save_mesh_and_data_xdmf,,,
