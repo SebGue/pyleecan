@@ -268,7 +268,7 @@ def geometry_motor(self, N_point_theta):
             radius_stator_slot_interior,
             (self.stator_isthmus_elements_r + 1),
         )
-        axes_r["stator_isthmus"] = np.delete(axes_r["stator_air"], -1)
+        axes_r["stator_isthmus"] = np.delete(axes_r["stator_isthmus"], -1)
     else:
         axes_r["stator_isthmus"] = []
 
@@ -461,7 +461,7 @@ def geometry_motor(self, N_point_theta):
             if radius_stator_slot_interior != radius_stator_interior:
                 if (
                     i
-                    <= self.stator_air_elements_r
+                    <= self.stator_isthmus_elements_r
                     + self.rotor_yoke_elements_r
                     + airgap_and_magnet_elements_r
                 ):

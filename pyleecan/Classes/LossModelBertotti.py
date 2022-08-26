@@ -23,16 +23,12 @@ except ImportError as error:
     comp_loss = error
 
 try:
-    from ..Methods.Simulation.LossModelBertotti.comp_coeff_Bertotti import (
-        comp_coeff_Bertotti,
-    )
+    from ..Methods.Simulation.LossModelBertotti.comp_coeff_Bertotti import comp_coeff_Bertotti
 except ImportError as error:
     comp_coeff_Bertotti = error
 
 try:
-    from ..Methods.Simulation.LossModelBertotti.comp_loss_density import (
-        comp_loss_density,
-    )
+    from ..Methods.Simulation.LossModelBertotti.comp_loss_density import comp_loss_density
 except ImportError as error:
     comp_loss_density = error
 
@@ -89,21 +85,7 @@ class LossModelBertotti(LossModel):
     # get_logger method is available in all object
     get_logger = get_logger
 
-    def __init__(
-        self,
-        k_hy=None,
-        k_ed=None,
-        k_ex=None,
-        alpha_hy=None,
-        alpha_ed=None,
-        alpha_ex=None,
-        group="core",
-        get_meshsolution=False,
-        N0=-1,
-        name="",
-        init_dict=None,
-        init_str=None,
-    ):
+    def __init__(self, k_hy=None, k_ed=None, k_ex=None, alpha_hy=None, alpha_ed=None, alpha_ex=None, group="core", get_meshsolution=False, N0=-1, name="", init_dict = None, init_str = None):
         """Constructor of the class. Can be use in three ways :
         - __init__ (arg1 = 1, arg3 = 5) every parameters have name and default values
             for pyleecan type, -1 will call the default constructor
@@ -167,12 +149,8 @@ class LossModelBertotti(LossModel):
         LossModelBertotti_str += "alpha_ed = " + str(self.alpha_ed) + linesep
         LossModelBertotti_str += "alpha_ex = " + str(self.alpha_ex) + linesep
         LossModelBertotti_str += 'group = "' + str(self.group) + '"' + linesep
-        LossModelBertotti_str += (
-            "get_meshsolution = " + str(self.get_meshsolution) + linesep
-        )
-        LossModelBertotti_str += (
-            "N0 = " + linesep + str(self.N0).replace(linesep, linesep + "\t") + linesep
-        )
+        LossModelBertotti_str += "get_meshsolution = " + str(self.get_meshsolution) + linesep
+        LossModelBertotti_str += "N0 = " + linesep + str(self.N0).replace(linesep, linesep + "\t") + linesep
         return LossModelBertotti_str
 
     def __eq__(self, other):
@@ -204,151 +182,85 @@ class LossModelBertotti(LossModel):
             return False
         return True
 
-    def compare(self, other, name="self", ignore_list=None, is_add_value=False):
+    def compare(self, other, name='self', ignore_list=None, is_add_value=False):
         """Compare two objects and return list of differences"""
 
         if ignore_list is None:
             ignore_list = list()
         if type(other) != type(self):
-            return ["type(" + name + ")"]
+            return ['type('+name+')']
         diff_list = list()
 
         # Check the properties inherited from LossModel
-        diff_list.extend(
-            super(LossModelBertotti, self).compare(
-                other, name=name, ignore_list=ignore_list, is_add_value=is_add_value
-            )
-        )
-        if (
-            other._k_hy is not None
-            and self._k_hy is not None
-            and isnan(other._k_hy)
-            and isnan(self._k_hy)
-        ):
+        diff_list.extend(super(LossModelBertotti, self).compare(other,name=name, ignore_list=ignore_list, is_add_value=is_add_value))
+        if other._k_hy is not None and self._k_hy is not None and isnan(other._k_hy) and isnan(self._k_hy):
             pass
         elif other._k_hy != self._k_hy:
             if is_add_value:
-                val_str = (
-                    " (self=" + str(self._k_hy) + ", other=" + str(other._k_hy) + ")"
-                )
-                diff_list.append(name + ".k_hy" + val_str)
+                val_str = ' (self='+str(self._k_hy)+', other='+str(other._k_hy)+')'
+                diff_list.append(name+'.k_hy'+val_str)
             else:
-                diff_list.append(name + ".k_hy")
-        if (
-            other._k_ed is not None
-            and self._k_ed is not None
-            and isnan(other._k_ed)
-            and isnan(self._k_ed)
-        ):
+                diff_list.append(name+'.k_hy')
+        if other._k_ed is not None and self._k_ed is not None and isnan(other._k_ed) and isnan(self._k_ed):
             pass
         elif other._k_ed != self._k_ed:
             if is_add_value:
-                val_str = (
-                    " (self=" + str(self._k_ed) + ", other=" + str(other._k_ed) + ")"
-                )
-                diff_list.append(name + ".k_ed" + val_str)
+                val_str = ' (self='+str(self._k_ed)+', other='+str(other._k_ed)+')'
+                diff_list.append(name+'.k_ed'+val_str)
             else:
-                diff_list.append(name + ".k_ed")
-        if (
-            other._k_ex is not None
-            and self._k_ex is not None
-            and isnan(other._k_ex)
-            and isnan(self._k_ex)
-        ):
+                diff_list.append(name+'.k_ed')
+        if other._k_ex is not None and self._k_ex is not None and isnan(other._k_ex) and isnan(self._k_ex):
             pass
         elif other._k_ex != self._k_ex:
             if is_add_value:
-                val_str = (
-                    " (self=" + str(self._k_ex) + ", other=" + str(other._k_ex) + ")"
-                )
-                diff_list.append(name + ".k_ex" + val_str)
+                val_str = ' (self='+str(self._k_ex)+', other='+str(other._k_ex)+')'
+                diff_list.append(name+'.k_ex'+val_str)
             else:
-                diff_list.append(name + ".k_ex")
-        if (
-            other._alpha_hy is not None
-            and self._alpha_hy is not None
-            and isnan(other._alpha_hy)
-            and isnan(self._alpha_hy)
-        ):
+                diff_list.append(name+'.k_ex')
+        if other._alpha_hy is not None and self._alpha_hy is not None and isnan(other._alpha_hy) and isnan(self._alpha_hy):
             pass
         elif other._alpha_hy != self._alpha_hy:
             if is_add_value:
-                val_str = (
-                    " (self="
-                    + str(self._alpha_hy)
-                    + ", other="
-                    + str(other._alpha_hy)
-                    + ")"
-                )
-                diff_list.append(name + ".alpha_hy" + val_str)
+                val_str = ' (self='+str(self._alpha_hy)+', other='+str(other._alpha_hy)+')'
+                diff_list.append(name+'.alpha_hy'+val_str)
             else:
-                diff_list.append(name + ".alpha_hy")
-        if (
-            other._alpha_ed is not None
-            and self._alpha_ed is not None
-            and isnan(other._alpha_ed)
-            and isnan(self._alpha_ed)
-        ):
+                diff_list.append(name+'.alpha_hy')
+        if other._alpha_ed is not None and self._alpha_ed is not None and isnan(other._alpha_ed) and isnan(self._alpha_ed):
             pass
         elif other._alpha_ed != self._alpha_ed:
             if is_add_value:
-                val_str = (
-                    " (self="
-                    + str(self._alpha_ed)
-                    + ", other="
-                    + str(other._alpha_ed)
-                    + ")"
-                )
-                diff_list.append(name + ".alpha_ed" + val_str)
+                val_str = ' (self='+str(self._alpha_ed)+', other='+str(other._alpha_ed)+')'
+                diff_list.append(name+'.alpha_ed'+val_str)
             else:
-                diff_list.append(name + ".alpha_ed")
-        if (
-            other._alpha_ex is not None
-            and self._alpha_ex is not None
-            and isnan(other._alpha_ex)
-            and isnan(self._alpha_ex)
-        ):
+                diff_list.append(name+'.alpha_ed')
+        if other._alpha_ex is not None and self._alpha_ex is not None and isnan(other._alpha_ex) and isnan(self._alpha_ex):
             pass
         elif other._alpha_ex != self._alpha_ex:
             if is_add_value:
-                val_str = (
-                    " (self="
-                    + str(self._alpha_ex)
-                    + ", other="
-                    + str(other._alpha_ex)
-                    + ")"
-                )
-                diff_list.append(name + ".alpha_ex" + val_str)
+                val_str = ' (self='+str(self._alpha_ex)+', other='+str(other._alpha_ex)+')'
+                diff_list.append(name+'.alpha_ex'+val_str)
             else:
-                diff_list.append(name + ".alpha_ex")
+                diff_list.append(name+'.alpha_ex')
         if other._group != self._group:
             if is_add_value:
-                val_str = (
-                    " (self=" + str(self._group) + ", other=" + str(other._group) + ")"
-                )
-                diff_list.append(name + ".group" + val_str)
+                val_str = ' (self='+str(self._group)+', other='+str(other._group)+')'
+                diff_list.append(name+'.group'+val_str)
             else:
-                diff_list.append(name + ".group")
+                diff_list.append(name+'.group')
         if other._get_meshsolution != self._get_meshsolution:
             if is_add_value:
-                val_str = (
-                    " (self="
-                    + str(self._get_meshsolution)
-                    + ", other="
-                    + str(other._get_meshsolution)
-                    + ")"
-                )
-                diff_list.append(name + ".get_meshsolution" + val_str)
+                val_str = ' (self='+str(self._get_meshsolution)+', other='+str(other._get_meshsolution)+')'
+                diff_list.append(name+'.get_meshsolution'+val_str)
             else:
-                diff_list.append(name + ".get_meshsolution")
+                diff_list.append(name+'.get_meshsolution')
         if other._N0 != self._N0:
             if is_add_value:
-                val_str = " (self=" + str(self._N0) + ", other=" + str(other._N0) + ")"
-                diff_list.append(name + ".N0" + val_str)
+                val_str = ' (self='+str(self._N0)+', other='+str(other._N0)+')'
+                diff_list.append(name+'.N0'+val_str)
             else:
-                diff_list.append(name + ".N0")
+                diff_list.append(name+'.N0')
         # Filter ignore differences
-        diff_list = list(filter(lambda x: x not in ignore_list, diff_list))
+        diff_list = list(filter(lambda x : x not in ignore_list, diff_list))
         return diff_list
 
     def __sizeof__(self):
@@ -378,16 +290,12 @@ class LossModelBertotti(LossModel):
             How to handle ndarray (0: tolist, 1: copy, 2: nothing)
         keep_function : bool
             True to keep the function object, else return str
-        Optional keyword input parameter is for internal use only
+        Optional keyword input parameter is for internal use only 
         and may prevent json serializability.
         """
 
         # Get the properties inherited from LossModel
-        LossModelBertotti_dict = super(LossModelBertotti, self).as_dict(
-            type_handle_ndarray=type_handle_ndarray,
-            keep_function=keep_function,
-            **kwargs
-        )
+        LossModelBertotti_dict = super(LossModelBertotti, self).as_dict(type_handle_ndarray=type_handle_ndarray, keep_function=keep_function, **kwargs)
         LossModelBertotti_dict["k_hy"] = self.k_hy
         LossModelBertotti_dict["k_ed"] = self.k_ed
         LossModelBertotti_dict["k_ex"] = self.k_ex
@@ -396,11 +304,14 @@ class LossModelBertotti(LossModel):
         LossModelBertotti_dict["alpha_ex"] = self.alpha_ex
         LossModelBertotti_dict["group"] = self.group
         LossModelBertotti_dict["get_meshsolution"] = self.get_meshsolution
-        LossModelBertotti_dict["N0"] = self.N0.copy() if self.N0 is not None else None
+        LossModelBertotti_dict["N0"] = (
+            self.N0.copy() if self.N0 is not None else None
+        )
         # The class name is added to the dict for deserialisation purpose
         # Overwrite the mother class name
         LossModelBertotti_dict["__class__"] = "LossModelBertotti"
         return LossModelBertotti_dict
+
 
     def copy(self):
         """Creates a deepcopy of the object"""
@@ -420,18 +331,7 @@ class LossModelBertotti(LossModel):
             N0_val = self.N0.copy()
         name_val = self.name
         # Creates new object of the same type with the copied properties
-        obj_copy = type(self)(
-            k_hy=k_hy_val,
-            k_ed=k_ed_val,
-            k_ex=k_ex_val,
-            alpha_hy=alpha_hy_val,
-            alpha_ed=alpha_ed_val,
-            alpha_ex=alpha_ex_val,
-            group=group_val,
-            get_meshsolution=get_meshsolution_val,
-            N0=N0_val,
-            name=name_val,
-        )
+        obj_copy = type(self)(k_hy=k_hy_val,k_ed=k_ed_val,k_ex=k_ex_val,alpha_hy=alpha_hy_val,alpha_ed=alpha_ed_val,alpha_ex=alpha_ex_val,group=group_val,get_meshsolution=get_meshsolution_val,N0=N0_val,name=name_val)
         return obj_copy
 
     def _set_None(self):

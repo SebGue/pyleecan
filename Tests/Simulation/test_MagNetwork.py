@@ -23,7 +23,7 @@ def test_MagNetwork_initial_validation():
     Ref: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=9473194"""
 
     # Case 0 : Load the machine and create the Simulation
-    file_path0 = "C:/Users/pc/Downloads/SPMSM_val.json"
+    file_path0 = "C:/Users/LAP02/Desktop/validation_2pms.json"
     SPMSM_12s_4p_initial = load(file_path0)
 
     simu = Simu1(name="test_magnetwork_case0", machine=SPMSM_12s_4p_initial)

@@ -68,26 +68,7 @@ class VarLoad(VarSimu):
     # get_logger method is available in all object
     get_logger = get_logger
 
-    def __init__(
-        self,
-        OP_matrix=None,
-        type_OP_matrix=0,
-        is_output_power=True,
-        name="",
-        desc="",
-        datakeeper_list=-1,
-        is_keep_all_output=False,
-        stop_if_error=False,
-        var_simu=None,
-        nb_simu=0,
-        is_reuse_femm_file=True,
-        postproc_list=-1,
-        pre_keeper_postproc_list=None,
-        post_keeper_postproc_list=None,
-        is_reuse_LUT=True,
-        init_dict=None,
-        init_str=None,
-    ):
+    def __init__(self, OP_matrix=None, type_OP_matrix=0, is_output_power=True, name="", desc="", datakeeper_list=-1, is_keep_all_output=False, stop_if_error=False, var_simu=None, nb_simu=0, is_reuse_femm_file=True, postproc_list=-1, pre_keeper_postproc_list=None, post_keeper_postproc_list=None, is_reuse_LUT=True, init_dict = None, init_str = None):
         """Constructor of the class. Can be use in three ways :
         - __init__ (arg1 = 1, arg3 = 5) every parameters have name and default values
             for pyleecan type, -1 will call the default constructor
@@ -138,20 +119,7 @@ class VarLoad(VarSimu):
         self.type_OP_matrix = type_OP_matrix
         self.is_output_power = is_output_power
         # Call VarSimu init
-        super(VarLoad, self).__init__(
-            name=name,
-            desc=desc,
-            datakeeper_list=datakeeper_list,
-            is_keep_all_output=is_keep_all_output,
-            stop_if_error=stop_if_error,
-            var_simu=var_simu,
-            nb_simu=nb_simu,
-            is_reuse_femm_file=is_reuse_femm_file,
-            postproc_list=postproc_list,
-            pre_keeper_postproc_list=pre_keeper_postproc_list,
-            post_keeper_postproc_list=post_keeper_postproc_list,
-            is_reuse_LUT=is_reuse_LUT,
-        )
+        super(VarLoad, self).__init__(name=name, desc=desc, datakeeper_list=datakeeper_list, is_keep_all_output=is_keep_all_output, stop_if_error=stop_if_error, var_simu=var_simu, nb_simu=nb_simu, is_reuse_femm_file=is_reuse_femm_file, postproc_list=postproc_list, pre_keeper_postproc_list=pre_keeper_postproc_list, post_keeper_postproc_list=post_keeper_postproc_list, is_reuse_LUT=is_reuse_LUT)
         # The class is frozen (in VarSimu init), for now it's impossible to
         # add new properties
 
@@ -161,13 +129,7 @@ class VarLoad(VarSimu):
         VarLoad_str = ""
         # Get the properties inherited from VarSimu
         VarLoad_str += super(VarLoad, self).__str__()
-        VarLoad_str += (
-            "OP_matrix = "
-            + linesep
-            + str(self.OP_matrix).replace(linesep, linesep + "\t")
-            + linesep
-            + linesep
-        )
+        VarLoad_str += "OP_matrix = " + linesep + str(self.OP_matrix).replace(linesep, linesep + "\t") + linesep + linesep
         VarLoad_str += "type_OP_matrix = " + str(self.type_OP_matrix) + linesep
         VarLoad_str += "is_output_power = " + str(self.is_output_power) + linesep
         return VarLoad_str
@@ -189,49 +151,33 @@ class VarLoad(VarSimu):
             return False
         return True
 
-    def compare(self, other, name="self", ignore_list=None, is_add_value=False):
+    def compare(self, other, name='self', ignore_list=None, is_add_value=False):
         """Compare two objects and return list of differences"""
 
         if ignore_list is None:
             ignore_list = list()
         if type(other) != type(self):
-            return ["type(" + name + ")"]
+            return ['type('+name+')']
         diff_list = list()
 
         # Check the properties inherited from VarSimu
-        diff_list.extend(
-            super(VarLoad, self).compare(
-                other, name=name, ignore_list=ignore_list, is_add_value=is_add_value
-            )
-        )
+        diff_list.extend(super(VarLoad, self).compare(other,name=name, ignore_list=ignore_list, is_add_value=is_add_value))
         if not array_equal(other.OP_matrix, self.OP_matrix):
-            diff_list.append(name + ".OP_matrix")
+            diff_list.append(name+'.OP_matrix')
         if other._type_OP_matrix != self._type_OP_matrix:
             if is_add_value:
-                val_str = (
-                    " (self="
-                    + str(self._type_OP_matrix)
-                    + ", other="
-                    + str(other._type_OP_matrix)
-                    + ")"
-                )
-                diff_list.append(name + ".type_OP_matrix" + val_str)
+                val_str = ' (self='+str(self._type_OP_matrix)+', other='+str(other._type_OP_matrix)+')'
+                diff_list.append(name+'.type_OP_matrix'+val_str)
             else:
-                diff_list.append(name + ".type_OP_matrix")
+                diff_list.append(name+'.type_OP_matrix')
         if other._is_output_power != self._is_output_power:
             if is_add_value:
-                val_str = (
-                    " (self="
-                    + str(self._is_output_power)
-                    + ", other="
-                    + str(other._is_output_power)
-                    + ")"
-                )
-                diff_list.append(name + ".is_output_power" + val_str)
+                val_str = ' (self='+str(self._is_output_power)+', other='+str(other._is_output_power)+')'
+                diff_list.append(name+'.is_output_power'+val_str)
             else:
-                diff_list.append(name + ".is_output_power")
+                diff_list.append(name+'.is_output_power')
         # Filter ignore differences
-        diff_list = list(filter(lambda x: x not in ignore_list, diff_list))
+        diff_list = list(filter(lambda x : x not in ignore_list, diff_list))
         return diff_list
 
     def __sizeof__(self):
@@ -253,35 +199,30 @@ class VarLoad(VarSimu):
             How to handle ndarray (0: tolist, 1: copy, 2: nothing)
         keep_function : bool
             True to keep the function object, else return str
-        Optional keyword input parameter is for internal use only
+        Optional keyword input parameter is for internal use only 
         and may prevent json serializability.
         """
 
         # Get the properties inherited from VarSimu
-        VarLoad_dict = super(VarLoad, self).as_dict(
-            type_handle_ndarray=type_handle_ndarray,
-            keep_function=keep_function,
-            **kwargs
-        )
+        VarLoad_dict = super(VarLoad, self).as_dict(type_handle_ndarray=type_handle_ndarray, keep_function=keep_function, **kwargs)
         if self.OP_matrix is None:
             VarLoad_dict["OP_matrix"] = None
         else:
-            if type_handle_ndarray == 0:
+            if type_handle_ndarray==0:
                 VarLoad_dict["OP_matrix"] = self.OP_matrix.tolist()
-            elif type_handle_ndarray == 1:
+            elif type_handle_ndarray==1:
                 VarLoad_dict["OP_matrix"] = self.OP_matrix.copy()
-            elif type_handle_ndarray == 2:
+            elif type_handle_ndarray==2:
                 VarLoad_dict["OP_matrix"] = self.OP_matrix
             else:
-                raise Exception(
-                    "Unknown type_handle_ndarray: " + str(type_handle_ndarray)
-                )
+                raise Exception ('Unknown type_handle_ndarray: '+str(type_handle_ndarray))
         VarLoad_dict["type_OP_matrix"] = self.type_OP_matrix
         VarLoad_dict["is_output_power"] = self.is_output_power
         # The class name is added to the dict for deserialisation purpose
         # Overwrite the mother class name
         VarLoad_dict["__class__"] = "VarLoad"
         return VarLoad_dict
+
 
     def copy(self):
         """Creates a deepcopy of the object"""
@@ -329,23 +270,7 @@ class VarLoad(VarSimu):
                 post_keeper_postproc_list_val.append(obj.copy())
         is_reuse_LUT_val = self.is_reuse_LUT
         # Creates new object of the same type with the copied properties
-        obj_copy = type(self)(
-            OP_matrix=OP_matrix_val,
-            type_OP_matrix=type_OP_matrix_val,
-            is_output_power=is_output_power_val,
-            name=name_val,
-            desc=desc_val,
-            datakeeper_list=datakeeper_list_val,
-            is_keep_all_output=is_keep_all_output_val,
-            stop_if_error=stop_if_error_val,
-            var_simu=var_simu_val,
-            nb_simu=nb_simu_val,
-            is_reuse_femm_file=is_reuse_femm_file_val,
-            postproc_list=postproc_list_val,
-            pre_keeper_postproc_list=pre_keeper_postproc_list_val,
-            post_keeper_postproc_list=post_keeper_postproc_list_val,
-            is_reuse_LUT=is_reuse_LUT_val,
-        )
+        obj_copy = type(self)(OP_matrix=OP_matrix_val,type_OP_matrix=type_OP_matrix_val,is_output_power=is_output_power_val,name=name_val,desc=desc_val,datakeeper_list=datakeeper_list_val,is_keep_all_output=is_keep_all_output_val,stop_if_error=stop_if_error_val,var_simu=var_simu_val,nb_simu=nb_simu_val,is_reuse_femm_file=is_reuse_femm_file_val,postproc_list=postproc_list_val,pre_keeper_postproc_list=pre_keeper_postproc_list_val,post_keeper_postproc_list=post_keeper_postproc_list_val,is_reuse_LUT=is_reuse_LUT_val)
         return obj_copy
 
     def _set_None(self):

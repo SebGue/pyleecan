@@ -9,11 +9,14 @@ from pyleecan.Classes.MagFEMM import MagFEMM
 from os.path import join
 from Tests import save_validation_path as save_path
 
+from pyleecan.Functions.load import load
+from pyleecan.definitions import DATA_DIR
+
 #######################################################################################
 #######################################################################################
 # simple tests for geometry discretization
 #######################################################################################
-file_path = "C:/Users/pc/Downloads/easy_test_MagNetwork.json"
+
 # file_path = "C:/Users/pc/Downloads/easy_test_MagNetwork2.json"
 # file_path = "C:/Users/pc/Downloads/easy_test_MagNetwork3.json"
 
@@ -30,7 +33,7 @@ file_path = "C:/Users/pc/Downloads/easy_test_MagNetwork.json"
 #######################################################################################
 
 # Loading the machine from the file path
-SPMSM_val = load(file_path)
+SPMSM_val = load(join(DATA_DIR, "Machine", "SPMSM_val.json"))
 
 # Creating the simulation object of the MagNetwork
 simu = Simu1(name="test_magnetwork", machine=SPMSM_val)

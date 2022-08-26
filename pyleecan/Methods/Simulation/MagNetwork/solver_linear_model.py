@@ -214,7 +214,7 @@ def solver_linear_model(
         list_elem,
         list_boundary_condition,
     )
-
+    
     return (
         Phi,
         Num_Unknowns,

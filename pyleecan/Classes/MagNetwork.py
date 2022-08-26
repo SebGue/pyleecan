@@ -23,9 +23,7 @@ except ImportError as error:
     geometry_motor = error
 
 try:
-    from ..Methods.Simulation.MagNetwork.geometry_linear_motor_separetion import (
-        geometry_linear_motor_separetion,
-    )
+    from ..Methods.Simulation.MagNetwork.geometry_linear_motor_separetion import geometry_linear_motor_separetion
 except ImportError as error:
     geometry_linear_motor_separetion = error
 
@@ -40,9 +38,7 @@ except ImportError as error:
     view_contour_flux = error
 
 try:
-    from ..Methods.Simulation.MagNetwork.plot.view_contour_flux2 import (
-        view_contour_flux2,
-    )
+    from ..Methods.Simulation.MagNetwork.plot.view_contour_flux2 import view_contour_flux2
 except ImportError as error:
     view_contour_flux2 = error
 
@@ -72,9 +68,7 @@ except ImportError as error:
     solver_linear_model = error
 
 try:
-    from ..Methods.Simulation.MagNetwork.solver_non_linear_model import (
-        solver_non_linear_model,
-    )
+    from ..Methods.Simulation.MagNetwork.solver_non_linear_model import solver_non_linear_model
 except ImportError as error:
     solver_non_linear_model = error
 
@@ -99,9 +93,7 @@ except ImportError as error:
     init_reluc = error
 
 try:
-    from ..Methods.Simulation.MagNetwork.pre_processing.numeroting_unknows import (
-        numeroting_unknows,
-    )
+    from ..Methods.Simulation.MagNetwork.pre_processing.numeroting_unknows import numeroting_unknows
 except ImportError as error:
     numeroting_unknows = error
 
@@ -121,23 +113,17 @@ except ImportError as error:
     assembly = error
 
 try:
-    from ..Methods.Simulation.MagNetwork.assembler.assembly_one_area import (
-        assembly_one_area,
-    )
+    from ..Methods.Simulation.MagNetwork.assembler.assembly_one_area import assembly_one_area
 except ImportError as error:
     assembly_one_area = error
 
 try:
-    from ..Methods.Simulation.MagNetwork.assembler.right_member_assembly import (
-        right_member_assembly,
-    )
+    from ..Methods.Simulation.MagNetwork.assembler.right_member_assembly import right_member_assembly
 except ImportError as error:
     right_member_assembly = error
 
 try:
-    from ..Methods.Simulation.MagNetwork.post_processing.add_BC_to_Phi import (
-        add_BC_to_Phi,
-    )
+    from ..Methods.Simulation.MagNetwork.post_processing.add_BC_to_Phi import add_BC_to_Phi
 except ImportError as error:
     add_BC_to_Phi = error
 
@@ -152,16 +138,12 @@ except ImportError as error:
     comp_flux_airgap = error
 
 try:
-    from ..Methods.Simulation.MagNetwork.comp_flux_airgap_local import (
-        comp_flux_airgap_local,
-    )
+    from ..Methods.Simulation.MagNetwork.comp_flux_airgap_local import comp_flux_airgap_local
 except ImportError as error:
     comp_flux_airgap_local = error
 
 try:
-    from ..Methods.Simulation.MagNetwork.cartesianmeshclass_pyleecan import (
-        cartesianmeshclass_pyleecan,
-    )
+    from ..Methods.Simulation.MagNetwork.cartesianmeshclass_pyleecan import cartesianmeshclass_pyleecan
 except ImportError as error:
     cartesianmeshclass_pyleecan = error
 
@@ -169,6 +151,16 @@ try:
     from ..Methods.Simulation.MagNetwork.comp_axes import comp_axes
 except ImportError as error:
     comp_axes = error
+
+try:
+    from ..Methods.Simulation.MagNetwork.post_processing.add_to_mesh_cell_math import add_to_mesh_cell_math
+except ImportError as error:
+    add_to_mesh_cell_math = error
+
+try:
+    from ..Methods.Simulation.MagNetwork.post_processing.save_mesh_and_data_xdmf import save_mesh_and_data_xdmf
+except ImportError as error:
+    save_mesh_and_data_xdmf = error
 
 
 from numpy import isnan
@@ -476,45 +468,36 @@ class MagNetwork(Magnetics):
         )
     else:
         comp_axes = comp_axes
+    # cf Methods.Simulation.MagNetwork.post_processing.add_to_mesh_cell_math
+    if isinstance(add_to_mesh_cell_math, ImportError):
+        add_to_mesh_cell_math = property(
+            fget=lambda x: raise_(
+                ImportError(
+                    "Can't use MagNetwork method add_to_mesh_cell_math: "
+                    + str(add_to_mesh_cell_math)
+                )
+            )
+        )
+    else:
+        add_to_mesh_cell_math = add_to_mesh_cell_math
+    # cf Methods.Simulation.MagNetwork.post_processing.save_mesh_and_data_xdmf
+    if isinstance(save_mesh_and_data_xdmf, ImportError):
+        save_mesh_and_data_xdmf = property(
+            fget=lambda x: raise_(
+                ImportError(
+                    "Can't use MagNetwork method save_mesh_and_data_xdmf: "
+                    + str(save_mesh_and_data_xdmf)
+                )
+            )
+        )
+    else:
+        save_mesh_and_data_xdmf = save_mesh_and_data_xdmf
     # generic save method is available in all object
     save = save
     # get_logger method is available in all object
     get_logger = get_logger
 
-    def __init__(
-        self,
-        type_model=1,
-        type_coord_sys=2,
-        Kmesh_fineness=1,
-        rotor_shift=8,
-        stator_yoke_elements_r=2,
-        airgap_elements_r=2,
-        rotor_yoke_elements_r=2,
-        stator_isthmus_elements_r=2,
-        stator_tooth_elements_r=2,
-        magnet_elements_r=2,
-        is_remove_slotS=False,
-        is_remove_slotR=False,
-        is_remove_ventS=False,
-        is_remove_ventR=False,
-        is_mmfs=True,
-        is_mmfr=True,
-        type_BH_stator=0,
-        type_BH_rotor=0,
-        is_periodicity_t=False,
-        is_periodicity_a=False,
-        angle_stator_shift=0,
-        angle_rotor_shift=0,
-        logger_name="Pyleecan.Magnetics",
-        Slice_enforced=None,
-        Nslices_enforced=None,
-        type_distribution_enforced=None,
-        is_current_harm=True,
-        T_mag=20,
-        is_periodicity_rotor=False,
-        init_dict=None,
-        init_str=None,
-    ):
+    def __init__(self, type_model=1, type_coord_sys=2, Kmesh_fineness=1, rotor_shift=8, stator_yoke_elements_r=2, airgap_elements_r=2, rotor_yoke_elements_r=2, stator_isthmus_elements_r=2, stator_tooth_elements_r=2, magnet_elements_r=2, is_remove_slotS=False, is_remove_slotR=False, is_remove_ventS=False, is_remove_ventR=False, is_mmfs=True, is_mmfr=True, type_BH_stator=0, type_BH_rotor=0, is_periodicity_t=False, is_periodicity_a=False, angle_stator_shift=0, angle_rotor_shift=0, logger_name="Pyleecan.Magnetics", Slice_enforced=None, Nslices_enforced=None, type_distribution_enforced=None, is_current_harm=True, T_mag=20, is_periodicity_rotor=False, init_dict = None, init_str = None):
         """Constructor of the class. Can be use in three ways :
         - __init__ (arg1 = 1, arg3 = 5) every parameters have name and default values
             for pyleecan type, -1 will call the default constructor
@@ -600,27 +583,7 @@ class MagNetwork(Magnetics):
         self.stator_tooth_elements_r = stator_tooth_elements_r
         self.magnet_elements_r = magnet_elements_r
         # Call Magnetics init
-        super(MagNetwork, self).__init__(
-            is_remove_slotS=is_remove_slotS,
-            is_remove_slotR=is_remove_slotR,
-            is_remove_ventS=is_remove_ventS,
-            is_remove_ventR=is_remove_ventR,
-            is_mmfs=is_mmfs,
-            is_mmfr=is_mmfr,
-            type_BH_stator=type_BH_stator,
-            type_BH_rotor=type_BH_rotor,
-            is_periodicity_t=is_periodicity_t,
-            is_periodicity_a=is_periodicity_a,
-            angle_stator_shift=angle_stator_shift,
-            angle_rotor_shift=angle_rotor_shift,
-            logger_name=logger_name,
-            Slice_enforced=Slice_enforced,
-            Nslices_enforced=Nslices_enforced,
-            type_distribution_enforced=type_distribution_enforced,
-            is_current_harm=is_current_harm,
-            T_mag=T_mag,
-            is_periodicity_rotor=is_periodicity_rotor,
-        )
+        super(MagNetwork, self).__init__(is_remove_slotS=is_remove_slotS, is_remove_slotR=is_remove_slotR, is_remove_ventS=is_remove_ventS, is_remove_ventR=is_remove_ventR, is_mmfs=is_mmfs, is_mmfr=is_mmfr, type_BH_stator=type_BH_stator, type_BH_rotor=type_BH_rotor, is_periodicity_t=is_periodicity_t, is_periodicity_a=is_periodicity_a, angle_stator_shift=angle_stator_shift, angle_rotor_shift=angle_rotor_shift, logger_name=logger_name, Slice_enforced=Slice_enforced, Nslices_enforced=Nslices_enforced, type_distribution_enforced=type_distribution_enforced, is_current_harm=is_current_harm, T_mag=T_mag, is_periodicity_rotor=is_periodicity_rotor)
         # The class is frozen (in Magnetics init), for now it's impossible to
         # add new properties
 
@@ -634,21 +597,11 @@ class MagNetwork(Magnetics):
         MagNetwork_str += "type_coord_sys = " + str(self.type_coord_sys) + linesep
         MagNetwork_str += "Kmesh_fineness = " + str(self.Kmesh_fineness) + linesep
         MagNetwork_str += "rotor_shift = " + str(self.rotor_shift) + linesep
-        MagNetwork_str += (
-            "stator_yoke_elements_r = " + str(self.stator_yoke_elements_r) + linesep
-        )
+        MagNetwork_str += "stator_yoke_elements_r = " + str(self.stator_yoke_elements_r) + linesep
         MagNetwork_str += "airgap_elements_r = " + str(self.airgap_elements_r) + linesep
-        MagNetwork_str += (
-            "rotor_yoke_elements_r = " + str(self.rotor_yoke_elements_r) + linesep
-        )
-        MagNetwork_str += (
-            "stator_isthmus_elements_r = "
-            + str(self.stator_isthmus_elements_r)
-            + linesep
-        )
-        MagNetwork_str += (
-            "stator_tooth_elements_r = " + str(self.stator_tooth_elements_r) + linesep
-        )
+        MagNetwork_str += "rotor_yoke_elements_r = " + str(self.rotor_yoke_elements_r) + linesep
+        MagNetwork_str += "stator_isthmus_elements_r = " + str(self.stator_isthmus_elements_r) + linesep
+        MagNetwork_str += "stator_tooth_elements_r = " + str(self.stator_tooth_elements_r) + linesep
         MagNetwork_str += "magnet_elements_r = " + str(self.magnet_elements_r) + linesep
         return MagNetwork_str
 
@@ -683,143 +636,79 @@ class MagNetwork(Magnetics):
             return False
         return True
 
-    def compare(self, other, name="self", ignore_list=None, is_add_value=False):
+    def compare(self, other, name='self', ignore_list=None, is_add_value=False):
         """Compare two objects and return list of differences"""
 
         if ignore_list is None:
             ignore_list = list()
         if type(other) != type(self):
-            return ["type(" + name + ")"]
+            return ['type('+name+')']
         diff_list = list()
 
         # Check the properties inherited from Magnetics
-        diff_list.extend(
-            super(MagNetwork, self).compare(
-                other, name=name, ignore_list=ignore_list, is_add_value=is_add_value
-            )
-        )
+        diff_list.extend(super(MagNetwork, self).compare(other,name=name, ignore_list=ignore_list, is_add_value=is_add_value))
         if other._type_model != self._type_model:
             if is_add_value:
-                val_str = (
-                    " (self="
-                    + str(self._type_model)
-                    + ", other="
-                    + str(other._type_model)
-                    + ")"
-                )
-                diff_list.append(name + ".type_model" + val_str)
+                val_str = ' (self='+str(self._type_model)+', other='+str(other._type_model)+')'
+                diff_list.append(name+'.type_model'+val_str)
             else:
-                diff_list.append(name + ".type_model")
+                diff_list.append(name+'.type_model')
         if other._type_coord_sys != self._type_coord_sys:
             if is_add_value:
-                val_str = (
-                    " (self="
-                    + str(self._type_coord_sys)
-                    + ", other="
-                    + str(other._type_coord_sys)
-                    + ")"
-                )
-                diff_list.append(name + ".type_coord_sys" + val_str)
+                val_str = ' (self='+str(self._type_coord_sys)+', other='+str(other._type_coord_sys)+')'
+                diff_list.append(name+'.type_coord_sys'+val_str)
             else:
-                diff_list.append(name + ".type_coord_sys")
+                diff_list.append(name+'.type_coord_sys')
         if other._Kmesh_fineness != self._Kmesh_fineness:
             if is_add_value:
-                val_str = (
-                    " (self="
-                    + str(self._Kmesh_fineness)
-                    + ", other="
-                    + str(other._Kmesh_fineness)
-                    + ")"
-                )
-                diff_list.append(name + ".Kmesh_fineness" + val_str)
+                val_str = ' (self='+str(self._Kmesh_fineness)+', other='+str(other._Kmesh_fineness)+')'
+                diff_list.append(name+'.Kmesh_fineness'+val_str)
             else:
-                diff_list.append(name + ".Kmesh_fineness")
+                diff_list.append(name+'.Kmesh_fineness')
         if other._rotor_shift != self._rotor_shift:
             if is_add_value:
-                val_str = (
-                    " (self="
-                    + str(self._rotor_shift)
-                    + ", other="
-                    + str(other._rotor_shift)
-                    + ")"
-                )
-                diff_list.append(name + ".rotor_shift" + val_str)
+                val_str = ' (self='+str(self._rotor_shift)+', other='+str(other._rotor_shift)+')'
+                diff_list.append(name+'.rotor_shift'+val_str)
             else:
-                diff_list.append(name + ".rotor_shift")
+                diff_list.append(name+'.rotor_shift')
         if other._stator_yoke_elements_r != self._stator_yoke_elements_r:
             if is_add_value:
-                val_str = (
-                    " (self="
-                    + str(self._stator_yoke_elements_r)
-                    + ", other="
-                    + str(other._stator_yoke_elements_r)
-                    + ")"
-                )
-                diff_list.append(name + ".stator_yoke_elements_r" + val_str)
+                val_str = ' (self='+str(self._stator_yoke_elements_r)+', other='+str(other._stator_yoke_elements_r)+')'
+                diff_list.append(name+'.stator_yoke_elements_r'+val_str)
             else:
-                diff_list.append(name + ".stator_yoke_elements_r")
+                diff_list.append(name+'.stator_yoke_elements_r')
         if other._airgap_elements_r != self._airgap_elements_r:
             if is_add_value:
-                val_str = (
-                    " (self="
-                    + str(self._airgap_elements_r)
-                    + ", other="
-                    + str(other._airgap_elements_r)
-                    + ")"
-                )
-                diff_list.append(name + ".airgap_elements_r" + val_str)
+                val_str = ' (self='+str(self._airgap_elements_r)+', other='+str(other._airgap_elements_r)+')'
+                diff_list.append(name+'.airgap_elements_r'+val_str)
             else:
-                diff_list.append(name + ".airgap_elements_r")
+                diff_list.append(name+'.airgap_elements_r')
         if other._rotor_yoke_elements_r != self._rotor_yoke_elements_r:
             if is_add_value:
-                val_str = (
-                    " (self="
-                    + str(self._rotor_yoke_elements_r)
-                    + ", other="
-                    + str(other._rotor_yoke_elements_r)
-                    + ")"
-                )
-                diff_list.append(name + ".rotor_yoke_elements_r" + val_str)
+                val_str = ' (self='+str(self._rotor_yoke_elements_r)+', other='+str(other._rotor_yoke_elements_r)+')'
+                diff_list.append(name+'.rotor_yoke_elements_r'+val_str)
             else:
-                diff_list.append(name + ".rotor_yoke_elements_r")
+                diff_list.append(name+'.rotor_yoke_elements_r')
         if other._stator_isthmus_elements_r != self._stator_isthmus_elements_r:
             if is_add_value:
-                val_str = (
-                    " (self="
-                    + str(self._stator_isthmus_elements_r)
-                    + ", other="
-                    + str(other._stator_isthmus_elements_r)
-                    + ")"
-                )
-                diff_list.append(name + ".stator_isthmus_elements_r" + val_str)
+                val_str = ' (self='+str(self._stator_isthmus_elements_r)+', other='+str(other._stator_isthmus_elements_r)+')'
+                diff_list.append(name+'.stator_isthmus_elements_r'+val_str)
             else:
-                diff_list.append(name + ".stator_isthmus_elements_r")
+                diff_list.append(name+'.stator_isthmus_elements_r')
         if other._stator_tooth_elements_r != self._stator_tooth_elements_r:
             if is_add_value:
-                val_str = (
-                    " (self="
-                    + str(self._stator_tooth_elements_r)
-                    + ", other="
-                    + str(other._stator_tooth_elements_r)
-                    + ")"
-                )
-                diff_list.append(name + ".stator_tooth_elements_r" + val_str)
+                val_str = ' (self='+str(self._stator_tooth_elements_r)+', other='+str(other._stator_tooth_elements_r)+')'
+                diff_list.append(name+'.stator_tooth_elements_r'+val_str)
             else:
-                diff_list.append(name + ".stator_tooth_elements_r")
+                diff_list.append(name+'.stator_tooth_elements_r')
         if other._magnet_elements_r != self._magnet_elements_r:
             if is_add_value:
-                val_str = (
-                    " (self="
-                    + str(self._magnet_elements_r)
-                    + ", other="
-                    + str(other._magnet_elements_r)
-                    + ")"
-                )
-                diff_list.append(name + ".magnet_elements_r" + val_str)
+                val_str = ' (self='+str(self._magnet_elements_r)+', other='+str(other._magnet_elements_r)+')'
+                diff_list.append(name+'.magnet_elements_r'+val_str)
             else:
-                diff_list.append(name + ".magnet_elements_r")
+                diff_list.append(name+'.magnet_elements_r')
         # Filter ignore differences
-        diff_list = list(filter(lambda x: x not in ignore_list, diff_list))
+        diff_list = list(filter(lambda x : x not in ignore_list, diff_list))
         return diff_list
 
     def __sizeof__(self):
@@ -848,16 +737,12 @@ class MagNetwork(Magnetics):
             How to handle ndarray (0: tolist, 1: copy, 2: nothing)
         keep_function : bool
             True to keep the function object, else return str
-        Optional keyword input parameter is for internal use only
+        Optional keyword input parameter is for internal use only 
         and may prevent json serializability.
         """
 
         # Get the properties inherited from Magnetics
-        MagNetwork_dict = super(MagNetwork, self).as_dict(
-            type_handle_ndarray=type_handle_ndarray,
-            keep_function=keep_function,
-            **kwargs
-        )
+        MagNetwork_dict = super(MagNetwork, self).as_dict(type_handle_ndarray=type_handle_ndarray, keep_function=keep_function, **kwargs)
         MagNetwork_dict["type_model"] = self.type_model
         MagNetwork_dict["type_coord_sys"] = self.type_coord_sys
         MagNetwork_dict["Kmesh_fineness"] = self.Kmesh_fineness
@@ -872,6 +757,7 @@ class MagNetwork(Magnetics):
         # Overwrite the mother class name
         MagNetwork_dict["__class__"] = "MagNetwork"
         return MagNetwork_dict
+
 
     def copy(self):
         """Creates a deepcopy of the object"""
@@ -910,37 +796,7 @@ class MagNetwork(Magnetics):
         T_mag_val = self.T_mag
         is_periodicity_rotor_val = self.is_periodicity_rotor
         # Creates new object of the same type with the copied properties
-        obj_copy = type(self)(
-            type_model=type_model_val,
-            type_coord_sys=type_coord_sys_val,
-            Kmesh_fineness=Kmesh_fineness_val,
-            rotor_shift=rotor_shift_val,
-            stator_yoke_elements_r=stator_yoke_elements_r_val,
-            airgap_elements_r=airgap_elements_r_val,
-            rotor_yoke_elements_r=rotor_yoke_elements_r_val,
-            stator_isthmus_elements_r=stator_isthmus_elements_r_val,
-            stator_tooth_elements_r=stator_tooth_elements_r_val,
-            magnet_elements_r=magnet_elements_r_val,
-            is_remove_slotS=is_remove_slotS_val,
-            is_remove_slotR=is_remove_slotR_val,
-            is_remove_ventS=is_remove_ventS_val,
-            is_remove_ventR=is_remove_ventR_val,
-            is_mmfs=is_mmfs_val,
-            is_mmfr=is_mmfr_val,
-            type_BH_stator=type_BH_stator_val,
-            type_BH_rotor=type_BH_rotor_val,
-            is_periodicity_t=is_periodicity_t_val,
-            is_periodicity_a=is_periodicity_a_val,
-            angle_stator_shift=angle_stator_shift_val,
-            angle_rotor_shift=angle_rotor_shift_val,
-            logger_name=logger_name_val,
-            Slice_enforced=Slice_enforced_val,
-            Nslices_enforced=Nslices_enforced_val,
-            type_distribution_enforced=type_distribution_enforced_val,
-            is_current_harm=is_current_harm_val,
-            T_mag=T_mag_val,
-            is_periodicity_rotor=is_periodicity_rotor_val,
-        )
+        obj_copy = type(self)(type_model=type_model_val,type_coord_sys=type_coord_sys_val,Kmesh_fineness=Kmesh_fineness_val,rotor_shift=rotor_shift_val,stator_yoke_elements_r=stator_yoke_elements_r_val,airgap_elements_r=airgap_elements_r_val,rotor_yoke_elements_r=rotor_yoke_elements_r_val,stator_isthmus_elements_r=stator_isthmus_elements_r_val,stator_tooth_elements_r=stator_tooth_elements_r_val,magnet_elements_r=magnet_elements_r_val,is_remove_slotS=is_remove_slotS_val,is_remove_slotR=is_remove_slotR_val,is_remove_ventS=is_remove_ventS_val,is_remove_ventR=is_remove_ventR_val,is_mmfs=is_mmfs_val,is_mmfr=is_mmfr_val,type_BH_stator=type_BH_stator_val,type_BH_rotor=type_BH_rotor_val,is_periodicity_t=is_periodicity_t_val,is_periodicity_a=is_periodicity_a_val,angle_stator_shift=angle_stator_shift_val,angle_rotor_shift=angle_rotor_shift_val,logger_name=logger_name_val,Slice_enforced=Slice_enforced_val,Nslices_enforced=Nslices_enforced_val,type_distribution_enforced=type_distribution_enforced_val,is_current_harm=is_current_harm_val,T_mag=T_mag_val,is_periodicity_rotor=is_periodicity_rotor_val)
         return obj_copy
 
     def _set_None(self):

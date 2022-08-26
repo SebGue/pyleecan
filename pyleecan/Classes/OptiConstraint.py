@@ -34,15 +34,7 @@ class OptiConstraint(FrozenClass):
     # get_logger method is available in all object
     get_logger = get_logger
 
-    def __init__(
-        self,
-        name="",
-        type_const="<=",
-        value=0,
-        get_variable=None,
-        init_dict=None,
-        init_str=None,
-    ):
+    def __init__(self, name="", type_const="<=", value=0, get_variable=None, init_dict = None, init_str = None):
         """Constructor of the class. Can be use in three ways :
         - __init__ (arg1 = 1, arg3 = 5) every parameters have name and default values
             for pyleecan type, -1 will call the default constructor
@@ -83,18 +75,14 @@ class OptiConstraint(FrozenClass):
         if self.parent is None:
             OptiConstraint_str += "parent = None " + linesep
         else:
-            OptiConstraint_str += (
-                "parent = " + str(type(self.parent)) + " object" + linesep
-            )
+            OptiConstraint_str += "parent = " + str(type(self.parent)) + " object" + linesep
         OptiConstraint_str += 'name = "' + str(self.name) + '"' + linesep
         OptiConstraint_str += 'type_const = "' + str(self.type_const) + '"' + linesep
         OptiConstraint_str += "value = " + str(self.value) + linesep
         if self._get_variable_str is not None:
             OptiConstraint_str += "get_variable = " + self._get_variable_str + linesep
         elif self._get_variable_func is not None:
-            OptiConstraint_str += (
-                "get_variable = " + str(self._get_variable_func) + linesep
-            )
+            OptiConstraint_str += "get_variable = " + str(self._get_variable_func) + linesep
         else:
             OptiConstraint_str += "get_variable = None" + linesep + linesep
         return OptiConstraint_str
@@ -114,53 +102,38 @@ class OptiConstraint(FrozenClass):
             return False
         return True
 
-    def compare(self, other, name="self", ignore_list=None, is_add_value=False):
+    def compare(self, other, name='self', ignore_list=None, is_add_value=False):
         """Compare two objects and return list of differences"""
 
         if ignore_list is None:
             ignore_list = list()
         if type(other) != type(self):
-            return ["type(" + name + ")"]
+            return ['type('+name+')']
         diff_list = list()
         if other._name != self._name:
             if is_add_value:
-                val_str = (
-                    " (self=" + str(self._name) + ", other=" + str(other._name) + ")"
-                )
-                diff_list.append(name + ".name" + val_str)
+                val_str = ' (self='+str(self._name)+', other='+str(other._name)+')'
+                diff_list.append(name+'.name'+val_str)
             else:
-                diff_list.append(name + ".name")
+                diff_list.append(name+'.name')
         if other._type_const != self._type_const:
             if is_add_value:
-                val_str = (
-                    " (self="
-                    + str(self._type_const)
-                    + ", other="
-                    + str(other._type_const)
-                    + ")"
-                )
-                diff_list.append(name + ".type_const" + val_str)
+                val_str = ' (self='+str(self._type_const)+', other='+str(other._type_const)+')'
+                diff_list.append(name+'.type_const'+val_str)
             else:
-                diff_list.append(name + ".type_const")
-        if (
-            other._value is not None
-            and self._value is not None
-            and isnan(other._value)
-            and isnan(self._value)
-        ):
+                diff_list.append(name+'.type_const')
+        if other._value is not None and self._value is not None and isnan(other._value) and isnan(self._value):
             pass
         elif other._value != self._value:
             if is_add_value:
-                val_str = (
-                    " (self=" + str(self._value) + ", other=" + str(other._value) + ")"
-                )
-                diff_list.append(name + ".value" + val_str)
+                val_str = ' (self='+str(self._value)+', other='+str(other._value)+')'
+                diff_list.append(name+'.value'+val_str)
             else:
-                diff_list.append(name + ".value")
+                diff_list.append(name+'.value')
         if other._get_variable_str != self._get_variable_str:
-            diff_list.append(name + ".get_variable")
+            diff_list.append(name+'.get_variable')
         # Filter ignore differences
-        diff_list = list(filter(lambda x: x not in ignore_list, diff_list))
+        diff_list = list(filter(lambda x : x not in ignore_list, diff_list))
         return diff_list
 
     def __sizeof__(self):
@@ -180,7 +153,7 @@ class OptiConstraint(FrozenClass):
             How to handle ndarray (0: tolist, 1: copy, 2: nothing)
         keep_function : bool
             True to keep the function object, else return str
-        Optional keyword input parameter is for internal use only
+        Optional keyword input parameter is for internal use only 
         and may prevent json serializability.
         """
 
@@ -196,13 +169,12 @@ class OptiConstraint(FrozenClass):
             OptiConstraint_dict["get_variable"] = None
             if self.get_variable is not None:
                 self.get_logger().warning(
-                    "OptiConstraint.as_dict(): "
-                    + f"Function {self.get_variable.__name__} is not serializable "
-                    + "and will be converted to None."
+                    "OptiConstraint.as_dict(): " +f"Function {self.get_variable.__name__} is not serializable " + "and will be converted to None."
                 )
         # The class name is added to the dict for deserialisation purpose
         OptiConstraint_dict["__class__"] = "OptiConstraint"
         return OptiConstraint_dict
+
 
     def copy(self):
         """Creates a deepcopy of the object"""
@@ -216,12 +188,7 @@ class OptiConstraint(FrozenClass):
         else:
             get_variable_val = self._get_variable_func
         # Creates new object of the same type with the copied properties
-        obj_copy = type(self)(
-            name=name_val,
-            type_const=type_const_val,
-            value=value_val,
-            get_variable=get_variable_val,
-        )
+        obj_copy = type(self)(name=name_val,type_const=type_const_val,value=value_val,get_variable=get_variable_val)
         return obj_copy
 
     def _set_None(self):
@@ -244,7 +211,7 @@ class OptiConstraint(FrozenClass):
     name = property(
         fget=_get_name,
         fset=_set_name,
-        doc="""name of the design variable
+        doc=u"""name of the design variable
 
         :Type: str
         """,
@@ -262,7 +229,7 @@ class OptiConstraint(FrozenClass):
     type_const = property(
         fget=_get_type_const,
         fset=_set_type_const,
-        doc="""Type of comparison ( "==", "<=", ">=", "<",">")
+        doc=u"""Type of comparison ( "==", "<=", ">=", "<",">")
 
         :Type: str
         """,
@@ -280,7 +247,7 @@ class OptiConstraint(FrozenClass):
     value = property(
         fget=_get_value,
         fset=_set_value,
-        doc="""Value to compare
+        doc=u"""Value to compare
 
         :Type: float
         """,
@@ -315,7 +282,7 @@ class OptiConstraint(FrozenClass):
     get_variable = property(
         fget=_get_get_variable,
         fset=_set_get_variable,
-        doc="""Function to get the variable to compare
+        doc=u"""Function to get the variable to compare
 
         :Type: function
         """,
