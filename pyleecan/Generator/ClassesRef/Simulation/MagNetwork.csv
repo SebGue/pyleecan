@@ -27,3 +27,5 @@ N_point_r,,number of discretization points in the r-direction,1,int,37,,,,,,plot
 ,,,,,,,,,,,comp_flux_airgap_local,,,
 ,,,,,,,,,,,cartesianmeshclass_pyleecan,,,
 ,,,,,,,,,,,comp_axes,,,
+,,,,,,,,,,,post_processing.add_to_mesh_cell_math,,,
+,,,,,,,,,,,post_processing.save_mesh_and_data_xdmf,,,
