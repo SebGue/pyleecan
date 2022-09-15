@@ -169,13 +169,7 @@ def draw_GMSH(
                 mesh_dict.update(user_mesh_dict[surf.label])
             # Draw the surface
             draw_surf_line(
-                surf,
-                mesh_dict,
-                boundary_prop,
-                factory,
-                gmsh_dict,
-                nsurf,
-                mesh_size_R,
+                surf, mesh_dict, boundary_prop, factory, gmsh_dict, nsurf, mesh_size_R
             )
 
         lam_and_holes = list()
@@ -285,13 +279,7 @@ def draw_GMSH(
 
             # Draw the surface
             draw_surf_line(
-                surf,
-                mesh_dict,
-                boundary_prop,
-                factory,
-                gmsh_dict,
-                nsurf,
-                mesh_size_S,
+                surf, mesh_dict, boundary_prop, factory, gmsh_dict, nsurf, mesh_size_S
             )
 
         for s_data in gmsh_dict.values():
@@ -346,13 +334,7 @@ def draw_GMSH(
 
         # Draw the surface
         draw_surf_line(
-            surf,
-            mesh_dict,
-            boundary_prop,
-            factory,
-            gmsh_dict,
-            nsurf,
-            mesh_size_SB,
+            surf, mesh_dict, boundary_prop, factory, gmsh_dict, nsurf, mesh_size_SB
         )
 
     for s_data in gmsh_dict.values():
@@ -411,13 +393,7 @@ def draw_GMSH(
 
         # Draw the surface
         draw_surf_line(
-            surf,
-            mesh_dict,
-            boundary_prop,
-            factory,
-            gmsh_dict,
-            nsurf,
-            mesh_size_AB,
+            surf, mesh_dict, boundary_prop, factory, gmsh_dict, nsurf, mesh_size_AB
         )
 
     for s_id, s_data in gmsh_dict.items():
@@ -443,9 +419,7 @@ def draw_GMSH(
         bc_id = []
         for s_data in gmsh_dict.values():
             for lvalues in s_data.values():
-                if type(lvalues) is not dict:
-                    continue
-                if lvalues["bc_name"] == propname:
+                if isinstance(lvalues, dict) and lvalues["bc_name"] == propname:
                     bc_id.extend([abs(lvalues["tag"])])
         if bc_id:
             pg = model.addPhysicalGroup(1, bc_id)
