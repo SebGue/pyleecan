@@ -4,7 +4,6 @@ import cmath
 
 from ...Classes.Arc import Arc
 from ...Classes.Arc1 import Arc1
-from ...Classes.Arc2 import Arc2
 from ...Classes.Circle import Circle
 from ...Classes.Segment import Segment
 from ...Classes.SurfLine import SurfLine

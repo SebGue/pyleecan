@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from .get_boundary_condition import get_boundary_condition
 from numpy import pi
 from ...Classes.Arc import Arc

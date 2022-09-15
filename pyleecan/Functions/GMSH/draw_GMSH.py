@@ -1,5 +1,4 @@
-from ...Classes.Arc import Arc
-from ...Classes.Arc2 import Arc2
+# -*- coding: utf-8 -*-
 from ...Classes.MachineSIPMSM import MachineSIPMSM
 
 from ...Functions.labels import (
@@ -18,11 +17,8 @@ from ...Functions.labels import (
 from ...Functions.GMSH import InputError
 from ...Functions.GMSH.get_sliding_band import get_sliding_band
 from ...Functions.GMSH.get_air_box import get_air_box
-from ...Functions.GMSH.get_boundary_condition import get_boundary_condition
 from ...Functions.GMSH.draw_surf_line import draw_surf_line
-import sys
 import gmsh
-import cmath
 
 from os import replace
 from os.path import splitext
