@@ -16,10 +16,8 @@ def get_boundary_condition(line, boundary_prop):
         boundary name
     """
 
-    if (
-        line.prop_dict
-        and BOUNDARY_PROP_LAB in line.prop_dict
-        and line.prop_dict[BOUNDARY_PROP_LAB] in boundary_prop
-    ):
-        return boundary_prop[line.prop_dict[BOUNDARY_PROP_LAB]]
+    if line.prop_dict and BOUNDARY_PROP_LAB in line.prop_dict:
+        for bnd in boundary_prop.keys():
+            if line.prop_dict[BOUNDARY_PROP_LAB].startswith(bnd):
+                return boundary_prop[bnd]
     return ""
