@@ -6,8 +6,11 @@ from ....Functions.get_path_binary import get_path_binary
 from ....Functions.labels import (
     AIRBOX_R_LAB,
     AIRBOX_SR_LAB,
+    HOLE_LAB,
+    MAG_LAB,
     SHAFTSR_LAB,
     SHAFTSL_LAB,
+    TOP_LAB,
     YSR_LAB,
     YSL_LAB,
     ROTOR_LAB,
@@ -29,6 +32,7 @@ from ....Functions.labels import (
     LAM_LAB,
     BORE_LAB,
 )
+from ....Functions.labels import TOP_LAB, BOT_LAB, LEFT_LAB, RIGHT_LAB
 
 R_LAB = ROTOR_LAB + "-0_"
 S_LAB = STATOR_LAB + "-0_"
@@ -103,6 +107,15 @@ StructElmer_BP_dict[SBS_TR_LAB] = "MASTER_STATOR_BOUNDARY"
 StructElmer_BP_dict[SBS_TL_LAB] = "SLAVE_STATOR_BOUNDARY"
 StructElmer_BP_dict[SBR_T_LAB] = "SB_STATOR_BOUNDARY"
 
+# Magnets and Holes
+RMT = ROTOR_LAB + "_" + MAG_LAB + "_" + TOP_LAB
+RMB = ROTOR_LAB + "_" + MAG_LAB + "_" + BOT_LAB
+RML = ROTOR_LAB + "_" + MAG_LAB + "_" + LEFT_LAB
+RMR = ROTOR_LAB + "_" + MAG_LAB + "_" + RIGHT_LAB
+for part in [MAG_LAB, HOLE_LAB]:
+    for pos in [TOP_LAB, BOT_LAB, LEFT_LAB, RIGHT_LAB]:
+        label = ROTOR_LAB + "_" + part + "_" + pos
+        StructElmer_BP_dict[label] = label
 
 # List of all StructElmer Boundary conditions
 StructElmer_BP_list = list(set(StructElmer_BP_dict.values()))

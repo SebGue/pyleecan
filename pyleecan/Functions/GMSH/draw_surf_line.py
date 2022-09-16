@@ -8,13 +8,7 @@ tol = 1e-6
 
 
 def draw_surf_line(
-    surf,
-    mesh_dict,
-    boundary_prop,
-    factory,
-    gmsh_dict,
-    nsurf,
-    mesh_size,
+    surf, mesh_dict, boundary_prop, factory, gmsh_dict, nsurf, mesh_size
 ):
     """Draw the lines of a surface and handles the Arc>180deg
 
@@ -38,46 +32,32 @@ def draw_surf_line(
     for ii, line in enumerate(surf.get_lines()):
         n_elem = mesh_dict[str(ii)]
         n_elem = n_elem if n_elem is not None else 0
-        bc_name = get_boundary_condition(line, boundary_prop)
+        line_kwargs = dict(
+            geo=factory,
+            d=gmsh_dict,
+            idx=nsurf,
+            mesh_size=mesh_size,
+            n_elements=n_elem,
+            bc=get_boundary_condition(line, boundary_prop),
+        )
         # Gmsh built-in engine does not allow arcs larger than 180deg
         # so arcs are split into two
         if isinstance(line, Arc) and abs(line.get_angle() * 180.0 / pi) >= 180.0:
             rot_dir = 1 if line.is_trigo_direction == True else -1
-            arc1 = Arc2(
-                begin=line.get_begin(),
-                center=line.get_center(),
+            arc_kwargs = dict(
                 angle=rot_dir * pi / 2.0,
+                center=line.get_center(),
                 prop_dict=line.prop_dict,
             )
-            arc2 = Arc2(
-                begin=arc1.get_end(),
-                center=line.get_center(),
-                angle=rot_dir * pi / 2.0,
-                prop_dict=line.prop_dict,
-            )
+            arc1 = Arc2(begin=line.get_begin(), **arc_kwargs)
+            arc2 = Arc2(begin=arc1.get_end(), **arc_kwargs)
             for arc in [arc1, arc2]:
-                _add_agline_to_dict(
-                    geo=factory,
-                    line=arc,
-                    d=gmsh_dict,
-                    idx=nsurf,
-                    mesh_size=mesh_size,
-                    n_elements=n_elem,
-                    bc=bc_name,
-                )
+                _add_agline_to_dict(line=arc, **line_kwargs)
         elif isinstance(line, Arc) and (abs(line.get_angle() * 180.0 / pi) <= tol):
             # Don't draw anything, this is a circle and usually is repeated ?
             pass
         else:
-            _add_agline_to_dict(
-                geo=factory,
-                line=line,
-                d=gmsh_dict,
-                idx=nsurf,
-                mesh_size=mesh_size,
-                n_elements=n_elem,
-                bc=bc_name,
-            )
+            _add_agline_to_dict(line=line, **line_kwargs)
 
 
 def _add_agline_to_dict(geo, line, d={}, idx=0, mesh_size=1e-2, n_elements=0, bc=None):

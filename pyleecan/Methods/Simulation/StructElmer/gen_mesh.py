@@ -1,6 +1,16 @@
 # -*- coding: utf-8 -*-
 from os.path import join
 
+from pyleecan.Functions.labels import (
+    BOT_LAB,
+    HOLE_LAB,
+    LEFT_LAB,
+    MAG_LAB,
+    RIGHT_LAB,
+    ROTOR_LAB,
+    TOP_LAB,
+)
+
 from ....Functions.GMSH.draw_GMSH import draw_GMSH
 from ....Methods.Simulation.StructElmer import (
     _execute,
@@ -35,10 +45,19 @@ def gen_mesh(self, output):
     # draw initial gmsh model
     file_gmsh_geo = join(save_dir, "GMSH_Machine_Model.geo")
 
+    # adapt boundary dict for actual number of magnets
+    bound_prop_dict = dict(StructElmer_BP_dict)
+    for part in [MAG_LAB, HOLE_LAB]:
+        for pos in [TOP_LAB, BOT_LAB, LEFT_LAB, RIGHT_LAB]:
+            key = ROTOR_LAB + "_" + part + "_" + pos
+            val = StructElmer_BP_dict[key]
+            for ii in range(2):
+                bound_prop_dict[key + "_" + str(ii)] = val + "_" + str(ii)
+
     draw_GMSH(
         output=output,
         sym=sym_r,  # TODO is it possible to have to use draw_GMSH with sym_r > sym ?
-        boundary_prop=StructElmer_BP_dict,
+        boundary_prop=bound_prop_dict,
         is_lam_only_S=False,
         is_lam_only_R=False,
         is_sliding_band=False,

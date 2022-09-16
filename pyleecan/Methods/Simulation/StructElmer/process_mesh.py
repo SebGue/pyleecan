@@ -5,6 +5,7 @@ import sys
 from os import replace
 from os.path import splitext
 from ....Functions.labels import (
+    MAG_LAB,
     SHAFT_LAB,
     decode_label,
     HOLEM_LAB_S,
@@ -15,81 +16,6 @@ from ....Functions.labels import (
     WIND_LAB_S,
     SHAFT_LAB,
 )
-
-
-def _remove_entities(gmsh, labels):
-    """
-    Remove model entities that have one of the given labels in their physical
-    groups names.
-
-    Parameters
-    ----------
-
-    gmsh :
-        gmsh object
-
-    labels : list
-        list of labels
-
-    """
-    # TODO add test that entities are not in surf or part of other 'keeper'entities
-    # get all group names
-    grps = gmsh.model.getPhysicalGroups(-1)
-    grp_names = [gmsh.model.getPhysicalName(*grp) for grp in grps]
-
-    # get entities that will be removed
-    pt_list = []
-    line_list = []
-    surf_list = []
-    for grp, name in zip(grps, grp_names):
-        if any([label in name.lower() for label in labels]):
-            dim = grp[0]
-            entities = gmsh.model.getEntitiesForPhysicalGroup(dim, grp[1])
-            if dim == 0:
-                pt_list.extend(entities.tolist())
-            elif dim == 1:
-                line_list.extend(entities.tolist())
-            elif dim == 2:
-                surf_list.extend(entities.tolist())
-
-    # get lines of surfaces
-    for surf in surf_list:
-        lines = gmsh.model.getBoundary([(2, surf)])  # TODO check if holes are included
-        for line in lines:
-            line_list.append(line[1])
-
-    # get points of lines
-    for line in line_list:
-        pts = gmsh.model.getBoundary([(1, line)])
-        for pt in pts:
-            pt_list.append(pt[1])
-
-    # get unique list of entities to remove
-    line_list = list(set(line_list))
-    pt_list = list(set(pt_list))
-
-    # delete unused entities
-    for surf in surf_list:
-        # gmsh.model.removeEntities((2, surf), recursive=False)
-        gmsh.model.geo.remove([(2, surf)], recursive=False)
-
-    for line in line_list:
-        # gmsh.model.removeEntities((1, line), recursive=False)
-        gmsh.model.geo.remove([(1, line)], recursive=False)
-
-    for pt in pt_list:
-        # gmsh.model.removeEntities((0, pt), recursive=False)
-        gmsh.model.geo.remove([(0, pt)], recursive=False)
-
-    # synchronize to apply changes to model
-    gmsh.model.geo.synchronize()
-
-
-def _get_names_physical(gmsh, dimtag):
-    grp_tags = gmsh.model.getPhysicalGroupsForEntity(*dimtag)
-    names = [gmsh.model.getPhysicalName(1, tag) for tag in grp_tags]
-
-    return names
 
 
 def process_mesh(
@@ -149,10 +75,7 @@ def process_mesh(
             if any([HOLEV_LAB_S in decode_label(name)["surf_type"] for name in names]):
                 hole_lines.append(line)
 
-    if is_get_lam and not is_get_magnet:
-        ext = "Master"
-    else:
-        ext = "Slave"
+    ext = "Master" if is_get_lam and not is_get_magnet else "Slave"
 
     # setup dict to store physical groups, key: group name, value: list of tags
     groups_dict = {}
@@ -162,27 +85,20 @@ def process_mesh(
         lines = gmsh.model.getBoundary([(2, magnet)])
         # store new group names in 'groups_dict' to set it later
         for line in lines:
-            names = _get_names_physical(
-                gmsh,
-                dimtag=[
-                    1,
-                    abs(line[1]),
-                ],
-            )
+            names = _get_names_physical(gmsh, dimtag=[1, abs(line[1])])
             if not names:
                 print(f"Warning: Found magnet line without label - line {line[1]}")
 
             if is_get_magnet or (is_get_lam and line[1] in lam_lines):
                 for name in names:
                     label_dict = decode_label(name)
-                    if HOLEM_LAB_S in label_dict["surf_type"]:
-                        if (
-                            line[1] in lam_lines
-                        ):  # only lines with direct contact for now
-                            # replace number and add 'Slave'
+                    if MAG_LAB in label_dict["surf_type"]:
+                        if line[1] in lam_lines:
+                            # only lines with direct contact for now
+                            # replace number and add 'Master' or 'Slave' extension
                             s = name.split("_")
                             s.append(ext)  # add extension
-                            s[2] = str(id)  # renumber
+                            s[-2] = str(id)  # renumber
                             key = "_".join(s)  # new name
                             if key not in groups_dict.keys():
                                 groups_dict[key] = []
@@ -356,3 +272,78 @@ def process_mesh(
     gmsh.finalize()
 
     return gmsh, grps, grp_names
+
+
+def _remove_entities(gmsh, labels):
+    """
+    Remove model entities that have one of the given labels in their physical
+    groups names.
+
+    Parameters
+    ----------
+
+    gmsh :
+        gmsh object
+
+    labels : list
+        list of labels
+
+    """
+    # TODO add test that entities are not in surf or part of other 'keeper'entities
+    # get all group names
+    grps = gmsh.model.getPhysicalGroups(-1)
+    grp_names = [gmsh.model.getPhysicalName(*grp) for grp in grps]
+
+    # get entities that will be removed
+    pt_list = []
+    line_list = []
+    surf_list = []
+    for grp, name in zip(grps, grp_names):
+        if any([label in name.lower() for label in labels]):
+            dim = grp[0]
+            entities = gmsh.model.getEntitiesForPhysicalGroup(dim, grp[1])
+            if dim == 0:
+                pt_list.extend(entities.tolist())
+            elif dim == 1:
+                line_list.extend(entities.tolist())
+            elif dim == 2:
+                surf_list.extend(entities.tolist())
+
+    # get lines of surfaces
+    for surf in surf_list:
+        lines = gmsh.model.getBoundary([(2, surf)])  # TODO check if holes are included
+        for line in lines:
+            line_list.append(line[1])
+
+    # get points of lines
+    for line in line_list:
+        pts = gmsh.model.getBoundary([(1, line)])
+        for pt in pts:
+            pt_list.append(pt[1])
+
+    # get unique list of entities to remove
+    line_list = list(set(line_list))
+    pt_list = list(set(pt_list))
+
+    # delete unused entities
+    for surf in surf_list:
+        # gmsh.model.removeEntities((2, surf), recursive=False)
+        gmsh.model.geo.remove([(2, surf)], recursive=False)
+
+    for line in line_list:
+        # gmsh.model.removeEntities((1, line), recursive=False)
+        gmsh.model.geo.remove([(1, line)], recursive=False)
+
+    for pt in pt_list:
+        # gmsh.model.removeEntities((0, pt), recursive=False)
+        gmsh.model.geo.remove([(0, pt)], recursive=False)
+
+    # synchronize to apply changes to model
+    gmsh.model.geo.synchronize()
+
+
+def _get_names_physical(gmsh, dimtag):
+    grp_tags = gmsh.model.getPhysicalGroupsForEntity(*dimtag)
+    names = [gmsh.model.getPhysicalName(1, tag) for tag in grp_tags]
+
+    return names

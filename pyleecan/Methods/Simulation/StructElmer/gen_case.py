@@ -3,6 +3,8 @@
 from os.path import join, split
 from numpy import pi
 
+from pyleecan.Functions.labels import LEFT_LAB, MAG_LAB, RIGHT_LAB, ROTOR_LAB, TOP_LAB
+
 from ....Classes.Section import Section
 from ....Classes.SolverInputFile import SolverInputFile
 from ....Methods.Elmer.Section import File, Variable, MATC
@@ -213,10 +215,10 @@ def gen_case(self, output, mesh_names):
 
     # pair master and slave of Magnet_x_Top, Magnet_0_Right and Magnet_1_Left
     paired_bnds = [
-        "Rotor_Magnet_0_Top",
-        "Rotor_Magnet_1_Top",
-        "Rotor_Magnet_0_Right",
-        "Rotor_Magnet_1_Left",
+        "_".join([ROTOR_LAB, MAG_LAB, TOP_LAB, "0"]),
+        "_".join([ROTOR_LAB, MAG_LAB, TOP_LAB, "1"]),
+        "_".join([ROTOR_LAB, MAG_LAB, RIGHT_LAB, "0"]),
+        "_".join([ROTOR_LAB, MAG_LAB, LEFT_LAB, "1"]),
     ]
 
     for name in paired_bnds:
