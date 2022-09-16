@@ -1,7 +1,7 @@
+# -*- coding: utf-8 -*-F
 from os import replace
 from numpy import pi
 from ...Classes.Arc import Arc
-import sys
 import gmsh
 from os.path import splitext
 
