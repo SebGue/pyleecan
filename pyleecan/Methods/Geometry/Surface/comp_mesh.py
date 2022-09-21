@@ -1,4 +1,5 @@
 from math import ceil
+from ....Functions.labels import decode_label, BOUNDARY_PROP_LAB
 
 
 def comp_mesh(self, element_size, user_mesh_dict=None):
@@ -22,14 +23,19 @@ def comp_mesh(self, element_size, user_mesh_dict=None):
         Dictionary containing the number of element of each line of the surface
     """
     mesh_dict = {}
-    if user_mesh_dict and self.label in user_mesh_dict:
-        mesh_dict.update(user_mesh_dict[self.label])
+    label = decode_label(self.label)["lam_type"]
+    if user_mesh_dict and label in user_mesh_dict:
+        mesh_dict.update(user_mesh_dict[label])
 
     mesh_list = []
     lines = self.get_lines()
     for line in lines:
         length = line.comp_length()
         number_of_element = ceil(length / element_size)
+        if line.prop_dict and BOUNDARY_PROP_LAB in line.prop_dict:
+            if line.prop_dict[BOUNDARY_PROP_LAB] in mesh_dict:
+                number_of_element = mesh_dict[line.prop_dict[BOUNDARY_PROP_LAB]]
+
         mesh_list.append(number_of_element)
 
     return mesh_list

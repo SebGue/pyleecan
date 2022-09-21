@@ -24,24 +24,26 @@ n1 = 6
 n2 = 40
 
 mesh_dict_1 = {
-    "Rotor_Magnet_Top_0": n2,
-    "Rotor_Magnet_Bottom_0": n2,
-    "Rotor_Magnet_Left_0": n1,
-    "Rotor_Magnet_Right_0": n1,
-    "Rotor_Magnet_Top_1": n2,
-    "Rotor_Magnet_Bottom_1": n2,
-    "Rotor_Magnet_Left_1": n1,
-    "Rotor_Magnet_Right_1": n1,
-    "Rotor_Hole_Top_0": 0,
-    "Rotor_Hole_Left_0": n1,
-    "Rotor_Hole_Right_0": n1,
-    "Rotor_Hole_Top_1": 0,
-    "Rotor_Hole_Left_1": n1,
-    "Rotor_Hole_Right_1": n1,
-    "Tangential_Bridge": 40,
-    "Radial_Bridge": 40,
-    "ROTOR_BORE_CURVE": 100,
-    "Lamination_Rotor_Bore_Radius_Ext": 100,
+    "Rotor": {
+        "Rotor_Magnet_Top_0": n2,
+        "Rotor_Magnet_Bottom_0": n2,
+        "Rotor_Magnet_Left_0": n1,
+        "Rotor_Magnet_Right_0": n1,
+        "Rotor_Magnet_Top_1": n2,
+        "Rotor_Magnet_Bottom_1": n2,
+        "Rotor_Magnet_Left_1": n1,
+        "Rotor_Magnet_Right_1": n1,
+        "Rotor_Hole_Top_0": 0,
+        "Rotor_Hole_Left_0": n1,
+        "Rotor_Hole_Right_0": n1,
+        "Rotor_Hole_Top_1": 0,
+        "Rotor_Hole_Left_1": n1,
+        "Rotor_Hole_Right_1": n1,
+        "Rotor_Tangential_Bridge": 40,
+        "Rotor_Radial_Bridge": 40,
+        "ROTOR_BORE_CURVE": 100,
+        "Lamination_Rotor_Bore_Radius_Ext": 100,
+    }
 }
 
 
