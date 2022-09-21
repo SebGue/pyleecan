@@ -79,12 +79,11 @@ def draw_GMSH(
 
     # get machine
     machine = output.simu.machine
-    mesh_dict = {}
     tol = 1e-6
 
     # Default stator mesh element size
     mesh_size_S = machine.stator.Rext / 100.0  # Stator
-    mesh_size_R = machine.rotor.Rext / 25.0  # Rotor
+    mesh_size_R = machine.rotor.Rext / 100.0  # Rotor
     mesh_size_SB = 2.0 * pi * machine.rotor.Rext / 360.0  # Sliding Band
     mesh_size_AB = machine.stator.Rext / 50.0  # AirBox
 
@@ -160,12 +159,12 @@ def draw_GMSH(
                 gmsh_dict[nsurf]["with_holes"] = False
 
             # comp. number of elements on the lines & override by user values in case
-            mesh_dict = surf.comp_mesh_dict(element_size=mesh_size_R)
-            if user_mesh_dict and surf.label in user_mesh_dict:
-                mesh_dict.update(user_mesh_dict[surf.label])
+            mesh_list = surf.comp_mesh(
+                element_size=mesh_size_R, user_mesh_dict=user_mesh_dict
+            )
             # Draw the surface
             draw_surf_line(
-                surf, mesh_dict, boundary_prop, factory, gmsh_dict, nsurf, mesh_size_R
+                surf, mesh_list, boundary_prop, factory, gmsh_dict, nsurf, mesh_size_R
             )
 
         lam_and_holes = list()
@@ -269,13 +268,13 @@ def draw_GMSH(
                 gmsh_dict[nsurf]["with_holes"] = False
 
             # comp. number of elements on the lines & override by user values in case
-            mesh_dict = surf.comp_mesh_dict(element_size=mesh_size_S)
-            if user_mesh_dict and surf.label in user_mesh_dict:
-                mesh_dict.update(user_mesh_dict[surf.label])
+            mesh_list = surf.comp_mesh(
+                element_size=mesh_size_S, user_mesh_dict=user_mesh_dict
+            )
 
             # Draw the surface
             draw_surf_line(
-                surf, mesh_dict, boundary_prop, factory, gmsh_dict, nsurf, mesh_size_S
+                surf, mesh_list, boundary_prop, factory, gmsh_dict, nsurf, mesh_size_S
             )
 
         for s_data in gmsh_dict.values():
@@ -324,13 +323,13 @@ def draw_GMSH(
             }
         )
         # comp. number of elements on the lines & override by user values in case
-        mesh_dict = surf.comp_mesh_dict(element_size=mesh_size_SB)
-        if user_mesh_dict and surf.label in user_mesh_dict:
-            mesh_dict.update(user_mesh_dict[surf.label])
+        mesh_list = surf.comp_mesh(
+            element_size=mesh_size_SB, user_mesh_dict=user_mesh_dict
+        )
 
         # Draw the surface
         draw_surf_line(
-            surf, mesh_dict, boundary_prop, factory, gmsh_dict, nsurf, mesh_size_SB
+            surf, mesh_list, boundary_prop, factory, gmsh_dict, nsurf, mesh_size_SB
         )
 
     for s_data in gmsh_dict.values():
@@ -383,13 +382,13 @@ def draw_GMSH(
         )
 
         # comp. number of elements on the lines & override by user values in case
-        mesh_dict = surf.comp_mesh_dict(element_size=mesh_size_AB)
-        if user_mesh_dict and surf.label in user_mesh_dict:
-            mesh_dict.update(user_mesh_dict[surf.label])
+        mesh_list = surf.comp_mesh(
+            element_size=mesh_size_AB, user_mesh_dict=user_mesh_dict
+        )
 
         # Draw the surface
         draw_surf_line(
-            surf, mesh_dict, boundary_prop, factory, gmsh_dict, nsurf, mesh_size_AB
+            surf, mesh_list, boundary_prop, factory, gmsh_dict, nsurf, mesh_size_AB
         )
 
     for s_id, s_data in gmsh_dict.items():

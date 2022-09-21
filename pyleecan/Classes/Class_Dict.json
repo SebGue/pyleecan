@@ -15379,7 +15379,7 @@
         "desc": "SurfLine define by list of lines that delimit it",
         "is_internal": false,
         "methods": [
-            "comp_mesh_dict",
+            "comp_mesh",
             "draw_FEMM",
             "plot",
             "split_line",

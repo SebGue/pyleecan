@@ -20,23 +20,24 @@ from pyleecan.Functions.load import load
 machine_1 = load(join(DATA_DIR, "Machine", "Toyota_Prius.json"))
 save_path = join(save_path, "StructElmer")
 # mesh settings, original line label names have to be used (not the translated)
-n1 = 3
-n2 = 20
+n1 = 6
+n2 = 40
 
 mesh_dict_1 = {
-    "Magnet_0_Top": n2,
-    "Magnet_0_Bottom": n2,
-    "Magnet_0_Left": n1,
-    "Magnet_0_Right": n1,
-    "Magnet_1_Top": n2,
-    "Magnet_1_Bottom": n2,
-    "Magnet_1_Left": n1,
-    "Magnet_1_Right": n1,
-    "Hole_0_Top": 0,
-    "Hole_0_Left": n1,
-    "Hole_0_Right": n1,
-    "Hole_1_Top": 0,
-    "Hole_1_Left": n1,
+    "Rotor_Magnet_Top_0": n2,
+    "Rotor_Magnet_Bottom_0": n2,
+    "Rotor_Magnet_Left_0": n1,
+    "Rotor_Magnet_Right_0": n1,
+    "Rotor_Magnet_Top_1": n2,
+    "Rotor_Magnet_Bottom_1": n2,
+    "Rotor_Magnet_Left_1": n1,
+    "Rotor_Magnet_Right_1": n1,
+    "Rotor_Hole_Top_0": 0,
+    "Rotor_Hole_Left_0": n1,
+    "Rotor_Hole_Right_0": n1,
+    "Rotor_Hole_Top_1": 0,
+    "Rotor_Hole_Left_1": n1,
+    "Rotor_Hole_Right_1": n1,
     "Tangential_Bridge": 40,
     "Radial_Bridge": 40,
     "ROTOR_BORE_CURVE": 100,
@@ -145,12 +146,12 @@ if __name__ == "__main__":
     obj = Test_StructElmer()
     # test Toyota_Prius (HoleM50-Rotor) with minor modification
     out = obj.test_StructElmer_HoleM50()
-    out = obj.test_StructElmer_HoleM50_no_magnets()
+    # out = obj.test_StructElmer_HoleM50_no_magnets()
 
     # test centrifugal force on a disc
     out = obj.test_StructElmer_disk()
 
     # # plot some results
-    # out.struct.meshsolution.plot_deflection(label="disp", factor=20)
-    # out.struct.meshsolution.plot_contour(label="disp")
-    # out.struct.meshsolution.plot_mesh()
+    out.struct.meshsolution.plot_deflection(label="disp", factor=20)
+    out.struct.meshsolution.plot_contour(label="disp")
+    out.struct.meshsolution.plot_mesh()

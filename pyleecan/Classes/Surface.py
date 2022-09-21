@@ -18,9 +18,9 @@ from ._frozen import FrozenClass
 # Import all class method
 # Try/catch to remove unnecessary dependencies in unused method
 try:
-    from ..Methods.Geometry.Surface.comp_mesh_dict import comp_mesh_dict
+    from ..Methods.Geometry.Surface.comp_mesh import comp_mesh
 except ImportError as error:
-    comp_mesh_dict = error
+    comp_mesh = error
 
 try:
     from ..Methods.Geometry.Surface.draw_FEMM import draw_FEMM
@@ -53,17 +53,15 @@ class Surface(FrozenClass):
     VERSION = 1
 
     # Check ImportError to remove unnecessary dependencies in unused method
-    # cf Methods.Geometry.Surface.comp_mesh_dict
-    if isinstance(comp_mesh_dict, ImportError):
-        comp_mesh_dict = property(
+    # cf Methods.Geometry.Surface.comp_mesh
+    if isinstance(comp_mesh, ImportError):
+        comp_mesh = property(
             fget=lambda x: raise_(
-                ImportError(
-                    "Can't use Surface method comp_mesh_dict: " + str(comp_mesh_dict)
-                )
+                ImportError("Can't use Surface method comp_mesh: " + str(comp_mesh))
             )
         )
     else:
-        comp_mesh_dict = comp_mesh_dict
+        comp_mesh = comp_mesh
     # cf Methods.Geometry.Surface.draw_FEMM
     if isinstance(draw_FEMM, ImportError):
         draw_FEMM = property(

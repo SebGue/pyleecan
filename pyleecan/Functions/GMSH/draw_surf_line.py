@@ -9,7 +9,7 @@ tol = 1e-6
 
 
 def draw_surf_line(
-    surf, mesh_dict, boundary_prop, factory, gmsh_dict, nsurf, mesh_size
+    surf, mesh_list, boundary_prop, factory, gmsh_dict, nsurf, mesh_size
 ):
     """Draw the lines of a surface and handles the Arc>180deg
 
@@ -31,7 +31,7 @@ def draw_surf_line(
         Default mesh element size
     """
     for ii, line in enumerate(surf.get_lines()):
-        n_elem = mesh_dict[str(ii)]
+        n_elem = mesh_list[ii]
         n_elem = n_elem if n_elem is not None else 0
         line_kwargs = dict(
             geo=factory,
