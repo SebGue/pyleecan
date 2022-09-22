@@ -6,6 +6,9 @@ from ....Classes.Arc1 import Arc1
 from ....Classes.Segment import Segment
 from ....Classes.SurfLine import SurfLine
 from ....Functions.labels import HOLEV_LAB, HOLEM_LAB
+from ....Functions.labels import HOLE_LAB, HOLEM_LAB, MAG_LAB, ROTOR_LAB
+from ....Functions.labels import RIGHT_LAB, LEFT_LAB, TOP_LAB, BOT_LAB
+from ....Functions.labels import BOUNDARY_PROP_LAB as BND
 
 
 def build_geometry(self, alpha=0, delta=0, is_simplified=False):
@@ -35,6 +38,9 @@ def build_geometry(self, alpha=0, delta=0, is_simplified=False):
     R_id, surf_type = self.get_R_id()
     vent_label = lam_label + "_" + surf_type + "_R" + str(R_id) + "-"
     mag_label = lam_label + "_" + HOLEM_LAB + "_R" + str(R_id) + "-"
+
+    MAG = ROTOR_LAB + "_" + MAG_LAB
+    HOLE = ROTOR_LAB + "_" + HOLE_LAB
 
     # Get all the points
     point_dict = self._comp_point_coordinate()
@@ -80,10 +86,18 @@ def build_geometry(self, alpha=0, delta=0, is_simplified=False):
         curve_list.append(Segment(Z5, Z9))
         curve_list.append(Segment(Z2, Z10))
     else:
-        curve_list.append(Segment(Z3, Z4))
-        curve_list.append(Segment(Z4, Z9))
-        curve_list.append(Segment(Z9, Z10))
-        curve_list.append(Segment(Z10, Z3))
+        curve_list.append(
+            Segment(Z3, Z4, prop_dict={BND: "_".join([MAG, BOT_LAB, "0"])})
+        )
+        curve_list.append(
+            Segment(Z4, Z9, prop_dict={BND: "_".join([MAG, LEFT_LAB, "0"])})
+        )
+        curve_list.append(
+            Segment(Z9, Z10, prop_dict={BND: "_".join([MAG, TOP_LAB, "0"])})
+        )
+        curve_list.append(
+            Segment(Z10, Z3, prop_dict={BND: "_".join([MAG, RIGHT_LAB, "0"])})
+        )
     point_ref = (Z3 + Z4 + Z9 + Z10) / 4
 
     S2 = SurfLine(line_list=curve_list, label=mag_label + "T0-S0", point_ref=point_ref)
@@ -118,10 +132,18 @@ def build_geometry(self, alpha=0, delta=0, is_simplified=False):
         curve_list.append(Segment(Z5s, Z9s))
         curve_list.append(Segment(Z2s, Z10s))
     else:
-        curve_list.append(Segment(Z3s, Z4s))
-        curve_list.append(Segment(Z4s, Z9s))
-        curve_list.append(Segment(Z9s, Z10s))
-        curve_list.append(Segment(Z10s, Z3s))
+        curve_list.append(
+            Segment(Z3s, Z4s, prop_dict={BND: "_".join([MAG, BOT_LAB, "1"])})
+        )
+        curve_list.append(
+            Segment(Z4s, Z9s, prop_dict={BND: "_".join([MAG, RIGHT_LAB, "1"])})
+        )
+        curve_list.append(
+            Segment(Z9s, Z10s, prop_dict={BND: "_".join([MAG, TOP_LAB, "1"])})
+        )
+        curve_list.append(
+            Segment(Z10s, Z3s, prop_dict={BND: "_".join([MAG, LEFT_LAB, "1"])})
+        )
     point_ref = (Z3s + Z4s + Z9s + Z10s) / 4
     S5 = SurfLine(line_list=curve_list, label=mag_label + "T1-S0", point_ref=point_ref)
 
