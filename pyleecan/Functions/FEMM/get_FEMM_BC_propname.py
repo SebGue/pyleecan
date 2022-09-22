@@ -23,4 +23,4 @@ def get_FEMM_BC_propname(femm, line_label, BC_dict):
 
     if line_label not in BC_dict:
         create_FEMM_boundary_conditions(femm, line_label, BC_dict)
-    return BC_dict[line_label]
+    return BC_dict.get(line_label, None)
