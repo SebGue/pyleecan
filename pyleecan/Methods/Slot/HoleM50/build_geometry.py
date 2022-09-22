@@ -96,10 +96,10 @@ def build_geometry(self, alpha=0, delta=0, is_simplified=False):
     L_7s_6 = Segment(Z7s, Z6, prop_dict=None)
     L_7s_8s = Segment(Z7s, Z8s, prop_dict={BND_LAB: "Rotor_Radial_Bridge"})
 
-    L_8_8b = Segment(Z8, Z8b, prop_dict=None)
+    L_8_8b = Segment(Z8, Z8b, prop_dict={BND_LAB: "_".join([RHOLE, TOP_LAB, "0"])})
     L_8_9 = Segment(Z8, Z9, prop_dict=None)
     L_8s_8bs = Segment(Z8s, Z8bs, prop_dict={BND_LAB: "_".join([RHOLE, TOP_LAB, "1"])})
-    L_8s_8b = Segment(Z8s, Z8b, prop_dict={BND_LAB: "_".join([RHOLE, TOP_LAB, "0"])})
+    L_8s_8b = Segment(Z8s, Z8b, prop_dict=None)
     L_8s_9 = Segment(Z8s, Z9, prop_dict=None)
     L_8s_9s = Segment(Z8s, Z9s, prop_dict=None)
 
@@ -110,7 +110,7 @@ def build_geometry(self, alpha=0, delta=0, is_simplified=False):
     L_8b_8c = Segment(Z8b, Z8c, prop_dict={BND_LAB: "_".join([RMAG, TOP_LAB, "0"])})
     L_8b_8s = Segment(Z8b, Z8s, prop_dict=None)
     L_8bs_8 = Segment(Z8bs, Z8, prop_dict=None)
-    L_8bs_8s = Segment(Z8bs, Z8s, prop_dict={BND_LAB: "_".join([RHOLE, TOP_LAB, "1"])})
+    L_8bs_8s = Segment(Z8bs, Z8s, prop_dict={BND_LAB: "_".join([RHOLE, TOP_LAB])})
     L_8bs_8cs = Segment(Z8bs, Z8cs, prop_dict={BND_LAB: "_".join([RMAG, TOP_LAB, "1"])})
 
     L_8c_3 = Segment(Z8c, Z3, prop_dict=None)
