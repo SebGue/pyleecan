@@ -24,7 +24,6 @@ from pyleecan.Methods import ParentMissingError
 
 """unittest for Machine with Hole 50 plot"""
 
-
 @pytest.mark.dev
 class Test_Hole_50_plot(object):
     @pytest.fixture
@@ -191,6 +190,7 @@ class Test_Hole_50_plot(object):
 
     def test_plot_line_labels(self, machine):
         """Test if the line labels are assigned to the respective lines."""
+        machine.rotor.hole[0].H4 = 1 * 1e-3
         machine.rotor.plot(is_show_fig=False)
         fig = plt.gcf()
 
@@ -211,6 +211,7 @@ class Test_Hole_50_plot(object):
 
     def test_plot_point_labels(self, machine):
         """Test if the line labels are assigned to the respective lines."""
+        machine.rotor.hole[0].H4 = 1 * 1e-3
         machine.rotor.hole[0].plot_schematics(
             is_add_point_label=True,
             is_add_schematics=False,
