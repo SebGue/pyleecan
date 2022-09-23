@@ -218,6 +218,8 @@ def gen_case(self, output, mesh_names):
         "_".join([ROTOR_LAB, MAG_LAB, TOP_LAB, "0"]),
         "_".join([ROTOR_LAB, MAG_LAB, TOP_LAB, "1"]),
         "_".join([ROTOR_LAB, MAG_LAB, RIGHT_LAB, "0"]),
+        "_".join([ROTOR_LAB, MAG_LAB, RIGHT_LAB, "1"]),
+        "_".join([ROTOR_LAB, MAG_LAB, LEFT_LAB, "0"]),
         "_".join([ROTOR_LAB, MAG_LAB, LEFT_LAB, "1"]),
     ]
 
