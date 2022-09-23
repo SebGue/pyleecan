@@ -8,6 +8,7 @@ from pyleecan.definitions import DATA_DIR
 
 from pyleecan.Classes.LamSlotMag import LamSlotMag
 from pyleecan.Classes.SlotM11 import SlotM11
+from pyleecan.Classes.HoleM52R import HoleM52R
 from pyleecan.Classes.MachineSIPMSM import MachineSIPMSM
 from pyleecan.Classes.Simu1 import Simu1
 from pyleecan.Classes.StructElmer import StructElmer
@@ -25,7 +26,7 @@ n2 = 40
 
 mesh_dict_1 = {
     "Rotor": {
-        "Rotor_Magnet_Top_0": n2,
+        "Rotor_Magnet_Top_0": 2 * n2,
         "Rotor_Magnet_Bottom_0": n2,
         "Rotor_Magnet_Left_0": n1,
         "Rotor_Magnet_Right_0": n1,
@@ -33,7 +34,7 @@ mesh_dict_1 = {
         "Rotor_Magnet_Bottom_1": n2,
         "Rotor_Magnet_Left_1": n1,
         "Rotor_Magnet_Right_1": n1,
-        "Rotor_Hole_Top_0": 0,
+        "Rotor_Hole_Top_0": n2,
         "Rotor_Hole_Left_0": n1,
         "Rotor_Hole_Right_0": n1,
         "Rotor_Hole_Top_1": 0,
@@ -75,6 +76,40 @@ class Test_StructElmer(object):
 
         # set rotor speed and run simulation
         simu.input = InputVoltage(OP=OPdq(N0=10000))  # rpm
+        simu.run()
+
+        return output
+
+    def test_StructElmer_HoleM52R(self):
+        """Test StructElmer simulation with 1 magnet on HoleM52R rotor"""
+
+        # copy the machine
+        machine = machine_1.copy()
+
+        # some modifications to geometry
+        hole = HoleM52R()
+        machine.rotor.hole[0] = hole
+
+        hole.Zh = 8
+        hole.W0 = 20 * 1e-3
+        hole.W1 = 2 * 1e-3
+        hole.R0 = 1 * 1e-3
+        hole.H0 = 1 * 1e-3
+        hole.H1 = 5 * 1e-3
+        hole.H2 = 1 * 1e-3
+
+        # setup the simulation
+        simu = Simu1(name="test_StructElmer_HoleM52R", machine=machine)
+        output = Output(simu=simu)
+        output.path_result = join(save_path, "Hole52R")
+        makedirs(output.path_result)
+
+        simu.struct = StructElmer()
+        simu.struct.FEA_dict_enforced = mesh_dict_1
+        simu.struct.is_get_mesh = True
+
+        # set rotor speed and run simulation
+        simu.input = InputVoltage(OP=OPdq(N0=20000))  # rpm
         simu.run()
 
         return output
@@ -150,10 +185,12 @@ if __name__ == "__main__":
     out = obj.test_StructElmer_HoleM50()
     # out = obj.test_StructElmer_HoleM50_no_magnets()
 
+    out = obj.test_StructElmer_HoleM52R()
+
     # test centrifugal force on a disc
-    out = obj.test_StructElmer_disk()
+    # out = obj.test_StructElmer_disk()
 
     # # plot some results
-    out.struct.meshsolution.plot_deflection(label="disp", factor=20)
-    out.struct.meshsolution.plot_contour(label="disp")
-    out.struct.meshsolution.plot_mesh()
+    # out.struct.meshsolution.plot_deflection(label="disp", factor=20)
+    # out.struct.meshsolution.plot_contour(label="disp")
+    # out.struct.meshsolution.plot_mesh()
