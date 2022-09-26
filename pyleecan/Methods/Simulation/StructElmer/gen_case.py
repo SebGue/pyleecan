@@ -227,7 +227,7 @@ def gen_case(self, output, mesh_names):
         # TODO check with 3 mag. holes and only 1 or 2 mag. set
         for mag_name, mag_dir in mag_dict.items():
             mag_dir = (mag_dir + pi / 2) % pi - pi / 2
-            ii = mag_name.split("_")[-1]
+            ii = int(mag_name.split("_")[-1])
 
             # TODO regard actual magnet position too
             mag_bnds.append(["_".join([RM_LAB, TOP_LAB, str(ii)]), False])
