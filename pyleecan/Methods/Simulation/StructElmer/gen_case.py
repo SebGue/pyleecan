@@ -21,6 +21,10 @@ ID_MAG = 2
 
 def gen_case(self, output, mesh_names):
     """Setup the Elmer Case file (.sif file)"""
+    # readability
+    machine = self.parent.machine
+    sym_r, is_antipert_r = machine.comp_periodicity_spatial()
+    sym_r = sym_r * (1 + is_antipert_r)
 
     # get the save path
     save_dir = self.get_path_save_fea(output)
@@ -213,28 +217,41 @@ def gen_case(self, output, mesh_names):
     boundaries = []
     i = 0
 
-    # pair master and slave of Magnet_x_Top, Magnet_0_Right and Magnet_1_Left
-    paired_bnds = [
-        "_".join([ROTOR_LAB, MAG_LAB, TOP_LAB, "0"]),
-        "_".join([ROTOR_LAB, MAG_LAB, TOP_LAB, "1"]),
-        "_".join([ROTOR_LAB, MAG_LAB, RIGHT_LAB, "0"]),
-        "_".join([ROTOR_LAB, MAG_LAB, RIGHT_LAB, "1"]),
-        "_".join([ROTOR_LAB, MAG_LAB, LEFT_LAB, "0"]),
-        "_".join([ROTOR_LAB, MAG_LAB, LEFT_LAB, "1"]),
-    ]
+    # get number of magnet for paired master/slave boundaries
+    mag_bnds = []
+    nbr_mags = machine.rotor.get_magnet_number() / sym_r
+    RM_LAB = "_".join([ROTOR_LAB, MAG_LAB])
 
-    for name in paired_bnds:
-        master = name + "_Master"
-        slave = name + "_Slave"
+    for hole in machine.rotor.hole:
+        mag_dict = hole.comp_magnetization_dict()
+        # TODO check with 3 mag. holes and only 1 or 2 mag. set
+        for mag_name, mag_dir in mag_dict.items():
+            mag_dir = (mag_dir + pi / 2) % pi - pi / 2
+            ii = mag_name.split("_")[-1]
+
+            # TODO regard actual magnet position too
+            mag_bnds.append(["_".join([RM_LAB, TOP_LAB, str(ii)]), False])
+            if mag_dir < 0:
+                mag_bnds.append(["_".join([RM_LAB, LEFT_LAB, str(ii)]), False])
+            if mag_dir > 0:
+                mag_bnds.append(["_".join([RM_LAB, RIGHT_LAB, str(ii)]), False])
+
+            if mag_dir == 0 and (ii + 1) == nbr_mags // 2 + nbr_mags % 2:
+                # fix middle magnet against tangential displacement
+                mag_bnds[-1][1] = True
+
+    for mag_bnd in mag_bnds:
+        master = mag_bnd[0] + "_Master"
+        slave = mag_bnd[0] + "_Slave"
         if master in names and slave in names:
             # "slave"
             i += 1
             bnd = Section(section="Boundary Condition", id=i)
-            bnd["Name"] = slave
+            bnd["Name"] = master
             bnd["Normal-Tangential Displacement"] = True
             bnd["Periodic BC"] = i + 1  # next bnd will be the corresponding master
             bnd["Periodic BC Displacement 1"] = True  # normal disp is fixed between M&S
-            bnd["Periodic BC Displacement 2"] = False  # tangential disp is independent
+            bnd["Periodic BC Displacement 2"] = mag_bnd[1]  # tangential disp.
             bnd["Periodic BC Pressure"] = False  # pressure can be independent
             bnd["Top_0"] = True  # for save values
             boundaries.append(bnd)
@@ -242,7 +259,7 @@ def gen_case(self, output, mesh_names):
             # "master"
             i += 1
             bnd = Section(section="Boundary Condition", id=i)
-            bnd["Name"] = master
+            bnd["Name"] = slave
             bnd["Normal-Tangential Displacement"] = True
             boundaries.append(bnd)
 
@@ -312,3 +329,26 @@ def gen_case(self, output, mesh_names):
     # save the sif file
     with open(sif_file, "wt") as f:
         sif.write(f)
+
+
+def _get_master_slave_bnd(i, master, slave, d=[True, False], p=False):
+    bnds = []
+
+    bnd = Section(section="Boundary Condition", id=i)
+    bnd["Name"] = master
+    bnd["Normal-Tangential Displacement"] = True
+    bnd["Periodic BC"] = i + 1  # next bnd will be the corresponding master
+    bnd["Periodic BC Displacement 1"] = d[0]  # normal disp.
+    bnd["Periodic BC Displacement 2"] = d[1]  # tangential disp.
+    bnd["Periodic BC Pressure"] = p  # pressure can be independent
+    # bnd["Top_0"] = True  # for save values
+    bnds.append(bnd)
+
+    # "master"
+    i += 1
+    bnd = Section(section="Boundary Condition", id=i + 1)
+    bnd["Name"] = slave
+    bnd["Normal-Tangential Displacement"] = True
+    bnds.append(bnd)
+
+    return bnds
