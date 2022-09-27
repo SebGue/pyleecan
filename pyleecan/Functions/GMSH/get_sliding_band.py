@@ -277,8 +277,7 @@ def get_sliding_band(sym, machine):
         ext_airgap_arc = Arc1(
             begin=Z8,
             end=Z9,
-            radius=Rgap_mec_int + 3 * W_sb,
-            prop_dict={BOUNDARY_PROP_LAB: SBR_T_LAB},  # Top Radius SB
+            radius=Rgap_mec_int + 3 * W_sb,  # Top Radius SB surface
             is_trigo_direction=True,
         )
         airgap_lines.append(ext_airgap_arc)
@@ -289,17 +288,15 @@ def get_sliding_band(sym, machine):
             begin=Z6,
             end=Z7,
             radius=Rgap_mec_int + 2 * W_sb,
-            # label="ext_sb_arc",
+            prop_dict={BOUNDARY_PROP_LAB: SBR_T_LAB},
             is_trigo_direction=True,
         )
         ext_sb_arc.reverse()
         airgap_lines.append(ext_sb_arc)
-        surf_list.append(
-            SurfLine(
-                line_list=airgap_lines,
-                point_ref=(Z8 - W_sb / 2) * exp(1j * pi / sym),
-                label=NO_LAM_LAB + "_" + SLID_LAB + TOP_LAB,
-            )
+        ext_sb_surf = SurfLine(
+            line_list=airgap_lines,
+            point_ref=(Z8 - W_sb / 2) * exp(1j * pi / sym),
+            label=NO_LAM_LAB + "_" + SLID_LAB + TOP_LAB,
         )
 
         # External AirGap
@@ -323,12 +320,13 @@ def get_sliding_band(sym, machine):
         ext_airgap_arc_copy.reverse()
         airgap_lines.append(ext_airgap_arc_copy)
         airgap_lines.extend(stator_airgap_ext_lines)
-        surf_list.append(
-            SurfLine(
-                line_list=airgap_lines,
-                point_ref=(Z8 + W_sb / 2) * exp(1j * pi / sym),
-                label=lab_ext + "_" + AIRGAP_LAB + TOP_LAB,
-            )
+        ext_ag_surf = SurfLine(
+            line_list=airgap_lines,
+            point_ref=(Z8 + W_sb / 2) * exp(1j * pi / sym),
+            label=lab_ext + "_" + AIRGAP_LAB + TOP_LAB,
         )
+
+        # reversed append to apply mesh settings correctly
+        surf_list.extend([ext_ag_surf, ext_sb_surf])  
 
     return surf_list

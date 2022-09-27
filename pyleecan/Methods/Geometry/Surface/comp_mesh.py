@@ -1,5 +1,5 @@
 from math import ceil
-from ....Functions.labels import decode_label, BOUNDARY_PROP_LAB
+from ....Functions.labels import decode_label, BOUNDARY_PROP_LAB, RADIUS_PROP_LAB
 
 
 def comp_mesh(self, element_size, user_mesh_dict=None):
@@ -35,6 +35,9 @@ def comp_mesh(self, element_size, user_mesh_dict=None):
         if line.prop_dict and BOUNDARY_PROP_LAB in line.prop_dict:
             if line.prop_dict[BOUNDARY_PROP_LAB] in mesh_dict:
                 number_of_element = mesh_dict[line.prop_dict[BOUNDARY_PROP_LAB]]
+        elif line.prop_dict and RADIUS_PROP_LAB in line.prop_dict:
+            if line.prop_dict[RADIUS_PROP_LAB] in mesh_dict:
+                number_of_element = mesh_dict[line.prop_dict[RADIUS_PROP_LAB]]
 
         mesh_list.append(number_of_element)
 

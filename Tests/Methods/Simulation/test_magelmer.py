@@ -9,6 +9,7 @@ from pyleecan.Classes.SlotM10 import SlotM10
 from pyleecan.Classes.Simu1 import Simu1
 from pyleecan.Classes.OPdq import OPdq
 from pyleecan.Classes.Output import Output
+from pyleecan.Functions.labels import SBR_B_LAB, SBR_T_LAB, AR_T_LAB, AR_B_LAB
 from pyleecan.Functions.load import load
 from pyleecan.Functions.Plot import dict_2D
 from pyleecan.definitions import DATA_DIR
@@ -20,23 +21,29 @@ if not isdir(save_path):
 
 
 mesh_dict = {
-    "Lamination_Rotor_Bore_Radius_Ext": 180,
-    "surface_line_0": 5,
-    "surface_line_1": 10,
-    "surface_line_2": 5,
-    "surface_line_3": 5,
-    "surface_line_4": 10,
-    "surface_line_5": 5,
-    "Lamination_Stator_Bore_Radius_Int": 10,
-    "Lamination_Stator_Yoke_Side_Right": 30,
-    "Lamination_Stator_Yoke_Side_Left": 30,
-    "int_airgap_arc": 120,
-    "int_sb_arc": 120,
-    "ext_airgap_arc": 120,
-    "ext_sb_arc": 120,
-    "airbox_line_1": 10,
-    "airbox_line_2": 10,
-    "airbox_arc": 20,
+    "Rotor": {
+        "Bore": 180,
+        "Yoke": 10,
+        "surface_line_0": 5,
+        "surface_line_1": 10,
+        "surface_line_2": 5,
+        "surface_line_3": 5,
+        "surface_line_4": 10,
+        "surface_line_5": 5,
+        AR_B_LAB: 120,  # "int_airgap_arc": 120,
+    },
+    "Stator": {
+        "Stator-0_YokeSide-Left-0": 30,
+        "Stator-0_YokeSide-Right-0": 30,
+        AR_T_LAB: 120,  # "ext_airgap_arc": 120,
+    },
+    "None": {
+        "ABSide-Right": 10,
+        "ABSide-Left": 10,
+        "ABRadius": 20,
+        SBR_B_LAB: 120,  # "int_sb_arc": 120,
+        SBR_T_LAB: 120,  # "ext_sb_arc": 120,
+    },
 }
 
 
