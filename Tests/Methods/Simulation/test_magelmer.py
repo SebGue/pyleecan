@@ -24,12 +24,6 @@ mesh_dict = {
     "Rotor": {
         "Bore": 180,
         "Yoke": 10,
-        "surface_line_0": 5,
-        "surface_line_1": 10,
-        "surface_line_2": 5,
-        "surface_line_3": 5,
-        "surface_line_4": 10,
-        "surface_line_5": 5,
         AR_B_LAB: 120,  # "int_airgap_arc": 120,
     },
     "Stator": {
