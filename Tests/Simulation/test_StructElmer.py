@@ -15,6 +15,8 @@ from pyleecan.Classes.StructElmer import StructElmer
 from pyleecan.Classes.InputVoltage import InputVoltage
 from pyleecan.Classes.Output import Output
 from pyleecan.Functions.load import load
+from pyleecan.Functions.MeshSolution.get_indices_limited import get_indices_limited
+from pyleecan.Functions.MeshSolution.get_area import get_area
 
 
 # get the machine
@@ -26,7 +28,7 @@ n2 = 40
 
 mesh_dict_1 = {
     "Rotor": {
-        "Rotor_Magnet_Top_0": 2 * n2,
+        "Rotor_Magnet_Top_0": n2,
         "Rotor_Magnet_Bottom_0": n2,
         "Rotor_Magnet_Left_0": n1,
         "Rotor_Magnet_Right_0": n1,
@@ -182,7 +184,7 @@ if __name__ == "__main__":
     # create test object
     obj = Test_StructElmer()
     # test Toyota_Prius (HoleM50-Rotor) with minor modification
-    out = obj.test_StructElmer_HoleM50()
+    # out = obj.test_StructElmer_HoleM50()
     # out = obj.test_StructElmer_HoleM50_no_magnets()
 
     out = obj.test_StructElmer_HoleM52R()
@@ -190,7 +192,23 @@ if __name__ == "__main__":
     # test centrifugal force on a disc
     # out = obj.test_StructElmer_disk()
 
+    # get_indices_limited(out.struct.meshsolution,label="vonmises")
+    field = out.struct.meshsolution.get_field(
+        label="vonmises",
+        index=None,
+        indices=None,
+        is_rthetaz=False,
+        is_pol2cart=False,
+        is_radial=False,
+        is_normal=False,
+        is_rms=False,
+        is_center=False,
+        is_surf=False,
+        is_squeeze=True,
+    )
+
     # # plot some results
     # out.struct.meshsolution.plot_deflection(label="disp", factor=20)
-    # out.struct.meshsolution.plot_contour(label="disp")
-    # out.struct.meshsolution.plot_mesh()
+    out.struct.meshsolution.plot_contour(label="disp")
+    out.struct.meshsolution.plot_contour(label="vonmises")
+    out.struct.meshsolution.plot_mesh()

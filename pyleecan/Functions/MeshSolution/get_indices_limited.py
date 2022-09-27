@@ -34,7 +34,10 @@ def get_indices_limited(
         surface area of the specified groups and indices
 
     """
-    grp = meshsolution.get_group(group_names=group_names)
+    if group_names is not None:
+        grp = meshsolution.get_group(group_names=group_names)
+    else:
+        grp = meshsolution
     msh = grp.get_mesh()
 
     indices = msh.cell["triangle"].indice
