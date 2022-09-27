@@ -83,7 +83,7 @@ def draw_GMSH(
 
     # Default stator mesh element size
     mesh_size_S = machine.stator.Rext / 100.0  # Stator
-    mesh_size_R = machine.rotor.Rext / 100.0  # Rotor
+    mesh_size_R = machine.rotor.Rext / 25.0  # Rotor
     mesh_size_SB = 2.0 * pi * machine.rotor.Rext / 360.0  # Sliding Band
     mesh_size_AB = machine.stator.Rext / 50.0  # AirBox
 
