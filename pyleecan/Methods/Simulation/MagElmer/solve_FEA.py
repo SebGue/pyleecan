@@ -731,7 +731,7 @@ def solve_FEA(self, output, sym, angle, time, angle_rotor, Is, Ir):
                 fo.write("\tBody Force = {0}\n".format(bf))
             if btg is not None:
                 fo.write("\tTorque Groups = Integer {0}\n".format(btg))
-            if k == "SB_INT":
+            if k == NO_LAM_LAB + "_" + SLID_LAB + BOT_LAB:
                 fo.write(
                     "\tR Inner = Real {0}\n" "\tR Outer = Real {1}\n".format(ror, sir)
                 )
