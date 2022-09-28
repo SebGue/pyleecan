@@ -804,7 +804,7 @@ def solve_FEA(self, output, sym, angle, time, angle_rotor, Is, Ir):
             '\tProcedure = "ResultOutputSolve" "ResultOutputSolver"\n'
             '\tOutput File Name = "{0}"\n'
             "\tVtu Format = True\n"
-            "\tBinary Output = True\n"
+            "\tBinary Output = False\n"
             "\tSingle Precision = True\n"
             "\tSave Geometry Ids = True\n"
             "\tShow Variables = True\n"
