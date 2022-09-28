@@ -125,7 +125,7 @@ def test_spm_Elmer():
     PMSM_A.rotor.slot = SlotM10(Wmag=15e-3, Hmag=3e-3, H0=0.0, W0=15e-3, Zs=8)
     # PMSM_A.rotor.slot = SlotMFlat(H0=0.0, W0=15e-3, Zs=8)
     # PMSM_A.rotor.slot.magnet = [MagnetType10(Wmag=15e-3, Hmag=3e-3)]
-    mesh_dict["Lamination_Rotor_Bore_Radius_Ext"] = 20
+    mesh_dict["Rotor"]["Bore"] = 20
 
     # Create the Simulation
     simu = Simu1(name="test_spm_Elmer", machine=PMSM_A)
