@@ -10,7 +10,19 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def Plot_B(self, Bx, By, x, y, x_dual, y_dual, list_geometry,type_coord_sys,list_coord,pos_aigap=None):
+def Plot_B(
+    self,
+    Bx,
+    By,
+    x,
+    y,
+    x_dual,
+    y_dual,
+    list_geometry,
+    type_coord_sys,
+    list_coord,
+    pos_aigap=None,
+):
     """
 
     Parameters
@@ -42,7 +54,7 @@ def Plot_B(self, Bx, By, x, y, x_dual, y_dual, list_geometry,type_coord_sys,list
     # Getting the norm of the magnetix flux density B
 
     norm = np.sqrt(Bx ** 2 + By ** 2)
-    if type_coord_sys==1:
+    if type_coord_sys == 1:
         k = 1
         skip = (slice(None, None, k), slice(None, None, k))
 
@@ -53,7 +65,7 @@ def Plot_B(self, Bx, By, x, y, x_dual, y_dual, list_geometry,type_coord_sys,list
         plt.pcolormesh(
             X[skip],
             Y[skip],
-            list_geometry.reshape((y.size-1,x.size-1))[skip],
+            list_geometry.reshape((y.size - 1, x.size - 1))[skip],
             cmap="Paired",
             edgecolors=None,
             facecolors="none",
@@ -78,21 +90,15 @@ def Plot_B(self, Bx, By, x, y, x_dual, y_dual, list_geometry,type_coord_sys,list
             width=0.01,
         )
     else:
-        X = (list_coord[:, 1] * np.cos(list_coord[:, 0])).reshape(
-        y.size, x.size
-        )
-        Y = (list_coord[:, 1] * np.sin(list_coord[:, 0])).reshape(
-            y.size, x.size
-        )
+        X = (list_coord[:, 1] * np.cos(list_coord[:, 0])).reshape(y.size, x.size)
+        Y = (list_coord[:, 1] * np.sin(list_coord[:, 0])).reshape(y.size, x.size)
 
-        X, Y = X.reshape((y.size, x.size)),Y.reshape((y.size, x.size))
-
+        X, Y = X.reshape((y.size, x.size)), Y.reshape((y.size, x.size))
 
         plt.pcolormesh(
             X,
             Y,
-            norm.reshape(y_dual.size,x_dual.size),
-
+            norm.reshape(y_dual.size, x_dual.size),
         )
 
         # Defining the colorbar
@@ -101,7 +107,7 @@ def Plot_B(self, Bx, By, x, y, x_dual, y_dual, list_geometry,type_coord_sys,list
         plt.pcolormesh(
             X,
             Y,
-            list_geometry.reshape((y.size-1, x.size-1)),
+            list_geometry.reshape((y.size - 1, x.size - 1)),
             cmap="Paired",
             edgecolors=None,
             facecolors="none",
@@ -112,13 +118,12 @@ def Plot_B(self, Bx, By, x, y, x_dual, y_dual, list_geometry,type_coord_sys,list
         # X, Y = np.meshgrid(x_dual,y_dual)
         # X,Y= Y*np.cos(X),Y*np.sin(X)
         # plt.contour(X,Y,norm.reshape(y_dual.size,x_dual.size))
-        if pos_aigap!=None:
-            plt.plot(y_dual[pos_aigap]*np.cos(x_dual),y_dual[pos_aigap]*np.sin(x_dual),linewidth=2)
-
-
-
-
-    
+        if pos_aigap != None:
+            plt.plot(
+                y_dual[pos_aigap] * np.cos(x_dual),
+                y_dual[pos_aigap] * np.sin(x_dual),
+                linewidth=2,
+            )
 
     # Defining the graph title
     cbar.ax.set_title("B (Tesla)")

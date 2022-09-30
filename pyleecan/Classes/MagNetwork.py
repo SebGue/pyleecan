@@ -177,6 +177,20 @@ try:
 except ImportError as error:
     comp_axes = error
 
+try:
+    from ..Methods.Simulation.MagNetwork.post_processing.add_to_mesh_cell_math import (
+        add_to_mesh_cell_math,
+    )
+except ImportError as error:
+    add_to_mesh_cell_math = error
+
+try:
+    from ..Methods.Simulation.MagNetwork.post_processing.save_mesh_and_data_xdmf import (
+        save_mesh_and_data_xdmf,
+    )
+except ImportError as error:
+    save_mesh_and_data_xdmf = error
+
 
 from numpy import isnan
 from ._check import InitUnKnowClassError
@@ -495,6 +509,30 @@ class MagNetwork(Magnetics):
         )
     else:
         comp_axes = comp_axes
+    # cf Methods.Simulation.MagNetwork.post_processing.add_to_mesh_cell_math
+    if isinstance(add_to_mesh_cell_math, ImportError):
+        add_to_mesh_cell_math = property(
+            fget=lambda x: raise_(
+                ImportError(
+                    "Can't use MagNetwork method add_to_mesh_cell_math: "
+                    + str(add_to_mesh_cell_math)
+                )
+            )
+        )
+    else:
+        add_to_mesh_cell_math = add_to_mesh_cell_math
+    # cf Methods.Simulation.MagNetwork.post_processing.save_mesh_and_data_xdmf
+    if isinstance(save_mesh_and_data_xdmf, ImportError):
+        save_mesh_and_data_xdmf = property(
+            fget=lambda x: raise_(
+                ImportError(
+                    "Can't use MagNetwork method save_mesh_and_data_xdmf: "
+                    + str(save_mesh_and_data_xdmf)
+                )
+            )
+        )
+    else:
+        save_mesh_and_data_xdmf = save_mesh_and_data_xdmf
     # generic save method is available in all object
     save = save
     # get_logger method is available in all object
