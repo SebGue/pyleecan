@@ -106,8 +106,7 @@ class OutLoss(FrozenClass):
         get_loss_overall = property(
             fget=lambda x: raise_(
                 ImportError(
-                    "Can't use OutLoss method get_loss_overall: "
-                    + str(get_loss_overall)
+                    "Can't use OutLoss method get_loss_overall: " + str(get_loss_overall)
                 )
             )
         )
@@ -127,22 +126,7 @@ class OutLoss(FrozenClass):
     # get_logger method is available in all object
     get_logger = get_logger
 
-    def __init__(
-        self,
-        loss_list=None,
-        meshsol_list=None,
-        loss_index=-1,
-        logger_name="Pyleecan.Loss",
-        axes_dict=None,
-        Pstator=None,
-        Protor=None,
-        Pmagnet=None,
-        Pprox=None,
-        Pjoule=None,
-        coeff_dict=-1,
-        init_dict=None,
-        init_str=None,
-    ):
+    def __init__(self, loss_list=None, meshsol_list=None, loss_index=-1, logger_name="Pyleecan.Loss", axes_dict=None, Pstator=None, Protor=None, Pmagnet=None, Pprox=None, Pjoule=None, coeff_dict=-1, init_dict = None, init_str = None):
         """Constructor of the class. Can be use in three ways :
         - __init__ (arg1 = 1, arg3 = 5) every parameters have name and default values
             for pyleecan type, -1 will call the default constructor
@@ -205,18 +189,15 @@ class OutLoss(FrozenClass):
             OutLoss_str += "parent = None " + linesep
         else:
             OutLoss_str += "parent = " + str(type(self.parent)) + " object" + linesep
-        OutLoss_str += "loss_list = " + str(self.loss_list) + linesep + linesep
+        OutLoss_str += "loss_list = "+ str(self.loss_list) + linesep + linesep
         if len(self.meshsol_list) == 0:
             OutLoss_str += "meshsol_list = []" + linesep
         for ii in range(len(self.meshsol_list)):
-            tmp = (
-                self.meshsol_list[ii].__str__().replace(linesep, linesep + "\t")
-                + linesep
-            )
-            OutLoss_str += "meshsol_list[" + str(ii) + "] =" + tmp + linesep + linesep
+            tmp = self.meshsol_list[ii].__str__().replace(linesep, linesep + "\t") + linesep
+            OutLoss_str += "meshsol_list["+str(ii)+"] ="+ tmp + linesep + linesep
         OutLoss_str += "loss_index = " + str(self.loss_index) + linesep
         OutLoss_str += 'logger_name = "' + str(self.logger_name) + '"' + linesep
-        OutLoss_str += "axes_dict = " + str(self.axes_dict) + linesep + linesep
+        OutLoss_str += "axes_dict = "+ str(self.axes_dict) + linesep + linesep
         OutLoss_str += "Pstator = " + str(self.Pstator) + linesep
         OutLoss_str += "Protor = " + str(self.Protor) + linesep
         OutLoss_str += "Pmagnet = " + str(self.Pmagnet) + linesep
@@ -254,197 +235,101 @@ class OutLoss(FrozenClass):
             return False
         return True
 
-    def compare(self, other, name="self", ignore_list=None, is_add_value=False):
+    def compare(self, other, name='self', ignore_list=None, is_add_value=False):
         """Compare two objects and return list of differences"""
 
         if ignore_list is None:
             ignore_list = list()
         if type(other) != type(self):
-            return ["type(" + name + ")"]
+            return ['type('+name+')']
         diff_list = list()
-        if (other.loss_list is None and self.loss_list is not None) or (
-            other.loss_list is not None and self.loss_list is None
-        ):
-            diff_list.append(name + ".loss_list None mismatch")
+        if (other.loss_list is None and self.loss_list is not None) or (other.loss_list is not None and self.loss_list is None):
+            diff_list.append(name+'.loss_list None mismatch')
         elif self.loss_list is None:
             pass
         elif len(other.loss_list) != len(self.loss_list):
-            diff_list.append("len(" + name + ".loss_list)")
+            diff_list.append('len('+name+'.loss_list)')
         else:
             for ii in range(len(other.loss_list)):
-                diff_list.extend(
-                    self.loss_list[ii].compare(
-                        other.loss_list[ii],
-                        name=name + ".loss_list[" + str(ii) + "]",
-                        ignore_list=ignore_list,
-                        is_add_value=is_add_value,
-                    )
-                )
-        if (other.meshsol_list is None and self.meshsol_list is not None) or (
-            other.meshsol_list is not None and self.meshsol_list is None
-        ):
-            diff_list.append(name + ".meshsol_list None mismatch")
+                diff_list.extend(self.loss_list[ii].compare(other.loss_list[ii],name=name+'.loss_list['+str(ii)+']',ignore_list=ignore_list,is_add_value=is_add_value))
+        if (other.meshsol_list is None and self.meshsol_list is not None) or (other.meshsol_list is not None and self.meshsol_list is None):
+            diff_list.append(name+'.meshsol_list None mismatch')
         elif self.meshsol_list is None:
             pass
         elif len(other.meshsol_list) != len(self.meshsol_list):
-            diff_list.append("len(" + name + ".meshsol_list)")
+            diff_list.append('len('+name+'.meshsol_list)')
         else:
             for ii in range(len(other.meshsol_list)):
-                diff_list.extend(
-                    self.meshsol_list[ii].compare(
-                        other.meshsol_list[ii],
-                        name=name + ".meshsol_list[" + str(ii) + "]",
-                        ignore_list=ignore_list,
-                        is_add_value=is_add_value,
-                    )
-                )
+                diff_list.extend(self.meshsol_list[ii].compare(other.meshsol_list[ii],name=name+'.meshsol_list['+str(ii)+']',ignore_list=ignore_list,is_add_value=is_add_value))
         if other._loss_index != self._loss_index:
             if is_add_value:
-                val_str = (
-                    " (self="
-                    + str(self._loss_index)
-                    + ", other="
-                    + str(other._loss_index)
-                    + ")"
-                )
-                diff_list.append(name + ".loss_index" + val_str)
+                val_str = ' (self='+str(self._loss_index)+', other='+str(other._loss_index)+')'
+                diff_list.append(name+'.loss_index'+val_str)
             else:
-                diff_list.append(name + ".loss_index")
+                diff_list.append(name+'.loss_index')
         if other._logger_name != self._logger_name:
             if is_add_value:
-                val_str = (
-                    " (self="
-                    + str(self._logger_name)
-                    + ", other="
-                    + str(other._logger_name)
-                    + ")"
-                )
-                diff_list.append(name + ".logger_name" + val_str)
+                val_str = ' (self='+str(self._logger_name)+', other='+str(other._logger_name)+')'
+                diff_list.append(name+'.logger_name'+val_str)
             else:
-                diff_list.append(name + ".logger_name")
-        if (other.axes_dict is None and self.axes_dict is not None) or (
-            other.axes_dict is not None and self.axes_dict is None
-        ):
-            diff_list.append(name + ".axes_dict None mismatch")
+                diff_list.append(name+'.logger_name')
+        if (other.axes_dict is None and self.axes_dict is not None) or (other.axes_dict is not None and self.axes_dict is None):
+            diff_list.append(name+'.axes_dict None mismatch')
         elif self.axes_dict is None:
             pass
         elif len(other.axes_dict) != len(self.axes_dict):
-            diff_list.append("len(" + name + "axes_dict)")
+            diff_list.append('len('+name+'axes_dict)')
         else:
             for key in self.axes_dict:
-                diff_list.extend(
-                    self.axes_dict[key].compare(
-                        other.axes_dict[key],
-                        name=name + ".axes_dict[" + str(key) + "]",
-                        ignore_list=ignore_list,
-                        is_add_value=is_add_value,
-                    )
-                )
-        if (
-            other._Pstator is not None
-            and self._Pstator is not None
-            and isnan(other._Pstator)
-            and isnan(self._Pstator)
-        ):
+                diff_list.extend(self.axes_dict[key].compare(other.axes_dict[key],name=name+'.axes_dict['+str(key)+']',ignore_list=ignore_list,is_add_value=is_add_value))
+        if other._Pstator is not None and self._Pstator is not None and isnan(other._Pstator) and isnan(self._Pstator):
             pass
         elif other._Pstator != self._Pstator:
             if is_add_value:
-                val_str = (
-                    " (self="
-                    + str(self._Pstator)
-                    + ", other="
-                    + str(other._Pstator)
-                    + ")"
-                )
-                diff_list.append(name + ".Pstator" + val_str)
+                val_str = ' (self='+str(self._Pstator)+', other='+str(other._Pstator)+')'
+                diff_list.append(name+'.Pstator'+val_str)
             else:
-                diff_list.append(name + ".Pstator")
-        if (
-            other._Protor is not None
-            and self._Protor is not None
-            and isnan(other._Protor)
-            and isnan(self._Protor)
-        ):
+                diff_list.append(name+'.Pstator')
+        if other._Protor is not None and self._Protor is not None and isnan(other._Protor) and isnan(self._Protor):
             pass
         elif other._Protor != self._Protor:
             if is_add_value:
-                val_str = (
-                    " (self="
-                    + str(self._Protor)
-                    + ", other="
-                    + str(other._Protor)
-                    + ")"
-                )
-                diff_list.append(name + ".Protor" + val_str)
+                val_str = ' (self='+str(self._Protor)+', other='+str(other._Protor)+')'
+                diff_list.append(name+'.Protor'+val_str)
             else:
-                diff_list.append(name + ".Protor")
-        if (
-            other._Pmagnet is not None
-            and self._Pmagnet is not None
-            and isnan(other._Pmagnet)
-            and isnan(self._Pmagnet)
-        ):
+                diff_list.append(name+'.Protor')
+        if other._Pmagnet is not None and self._Pmagnet is not None and isnan(other._Pmagnet) and isnan(self._Pmagnet):
             pass
         elif other._Pmagnet != self._Pmagnet:
             if is_add_value:
-                val_str = (
-                    " (self="
-                    + str(self._Pmagnet)
-                    + ", other="
-                    + str(other._Pmagnet)
-                    + ")"
-                )
-                diff_list.append(name + ".Pmagnet" + val_str)
+                val_str = ' (self='+str(self._Pmagnet)+', other='+str(other._Pmagnet)+')'
+                diff_list.append(name+'.Pmagnet'+val_str)
             else:
-                diff_list.append(name + ".Pmagnet")
-        if (
-            other._Pprox is not None
-            and self._Pprox is not None
-            and isnan(other._Pprox)
-            and isnan(self._Pprox)
-        ):
+                diff_list.append(name+'.Pmagnet')
+        if other._Pprox is not None and self._Pprox is not None and isnan(other._Pprox) and isnan(self._Pprox):
             pass
         elif other._Pprox != self._Pprox:
             if is_add_value:
-                val_str = (
-                    " (self=" + str(self._Pprox) + ", other=" + str(other._Pprox) + ")"
-                )
-                diff_list.append(name + ".Pprox" + val_str)
+                val_str = ' (self='+str(self._Pprox)+', other='+str(other._Pprox)+')'
+                diff_list.append(name+'.Pprox'+val_str)
             else:
-                diff_list.append(name + ".Pprox")
-        if (
-            other._Pjoule is not None
-            and self._Pjoule is not None
-            and isnan(other._Pjoule)
-            and isnan(self._Pjoule)
-        ):
+                diff_list.append(name+'.Pprox')
+        if other._Pjoule is not None and self._Pjoule is not None and isnan(other._Pjoule) and isnan(self._Pjoule):
             pass
         elif other._Pjoule != self._Pjoule:
             if is_add_value:
-                val_str = (
-                    " (self="
-                    + str(self._Pjoule)
-                    + ", other="
-                    + str(other._Pjoule)
-                    + ")"
-                )
-                diff_list.append(name + ".Pjoule" + val_str)
+                val_str = ' (self='+str(self._Pjoule)+', other='+str(other._Pjoule)+')'
+                diff_list.append(name+'.Pjoule'+val_str)
             else:
-                diff_list.append(name + ".Pjoule")
+                diff_list.append(name+'.Pjoule')
         if other._coeff_dict != self._coeff_dict:
             if is_add_value:
-                val_str = (
-                    " (self="
-                    + str(self._coeff_dict)
-                    + ", other="
-                    + str(other._coeff_dict)
-                    + ")"
-                )
-                diff_list.append(name + ".coeff_dict" + val_str)
+                val_str = ' (self='+str(self._coeff_dict)+', other='+str(other._coeff_dict)+')'
+                diff_list.append(name+'.coeff_dict'+val_str)
             else:
-                diff_list.append(name + ".coeff_dict")
+                diff_list.append(name+'.coeff_dict')
         # Filter ignore differences
-        diff_list = list(filter(lambda x: x not in ignore_list, diff_list))
+        diff_list = list(filter(lambda x : x not in ignore_list, diff_list))
         return diff_list
 
     def __sizeof__(self):
@@ -481,41 +366,29 @@ class OutLoss(FrozenClass):
             How to handle ndarray (0: tolist, 1: copy, 2: nothing)
         keep_function : bool
             True to keep the function object, else return str
-        Optional keyword input parameter is for internal use only
+        Optional keyword input parameter is for internal use only 
         and may prevent json serializability.
         """
 
         OutLoss_dict = dict()
         if self.loss_list is None:
-            OutLoss_dict["loss_list"] = None
+            OutLoss_dict['loss_list'] = None
         else:
-            OutLoss_dict["loss_list"] = list()
+            OutLoss_dict['loss_list'] = list()
             for obj in self.loss_list:
                 if obj is not None:
-                    OutLoss_dict["loss_list"].append(
-                        obj.as_dict(
-                            type_handle_ndarray=type_handle_ndarray,
-                            keep_function=keep_function,
-                            **kwargs
-                        )
-                    )
+                    OutLoss_dict['loss_list'].append(obj.as_dict(type_handle_ndarray=type_handle_ndarray, keep_function=keep_function, **kwargs))
                 else:
-                    OutLoss_dict["loss_list"].append(None)
+                    OutLoss_dict['loss_list'].append(None)
         if self.meshsol_list is None:
-            OutLoss_dict["meshsol_list"] = None
+            OutLoss_dict['meshsol_list'] = None
         else:
-            OutLoss_dict["meshsol_list"] = list()
+            OutLoss_dict['meshsol_list'] = list()
             for obj in self.meshsol_list:
                 if obj is not None:
-                    OutLoss_dict["meshsol_list"].append(
-                        obj.as_dict(
-                            type_handle_ndarray=type_handle_ndarray,
-                            keep_function=keep_function,
-                            **kwargs
-                        )
-                    )
+                    OutLoss_dict['meshsol_list'].append(obj.as_dict(type_handle_ndarray=type_handle_ndarray, keep_function=keep_function, **kwargs))
                 else:
-                    OutLoss_dict["meshsol_list"].append(None)
+                    OutLoss_dict['meshsol_list'].append(None)
         OutLoss_dict["loss_index"] = (
             self.loss_index.copy() if self.loss_index is not None else None
         )
@@ -526,11 +399,7 @@ class OutLoss(FrozenClass):
             OutLoss_dict["axes_dict"] = dict()
             for key, obj in self.axes_dict.items():
                 if obj is not None:
-                    OutLoss_dict["axes_dict"][key] = obj.as_dict(
-                        type_handle_ndarray=type_handle_ndarray,
-                        keep_function=keep_function,
-                        **kwargs
-                    )
+                    OutLoss_dict["axes_dict"][key] = obj.as_dict(type_handle_ndarray=type_handle_ndarray, keep_function=keep_function, **kwargs)
                 else:
                     OutLoss_dict["axes_dict"][key] = None
         OutLoss_dict["Pstator"] = self.Pstator
@@ -544,6 +413,7 @@ class OutLoss(FrozenClass):
         # The class name is added to the dict for deserialisation purpose
         OutLoss_dict["__class__"] = "OutLoss"
         return OutLoss_dict
+
 
     def copy(self):
         """Creates a deepcopy of the object"""
@@ -582,19 +452,7 @@ class OutLoss(FrozenClass):
         else:
             coeff_dict_val = self.coeff_dict.copy()
         # Creates new object of the same type with the copied properties
-        obj_copy = type(self)(
-            loss_list=loss_list_val,
-            meshsol_list=meshsol_list_val,
-            loss_index=loss_index_val,
-            logger_name=logger_name_val,
-            axes_dict=axes_dict_val,
-            Pstator=Pstator_val,
-            Protor=Protor_val,
-            Pmagnet=Pmagnet_val,
-            Pprox=Pprox_val,
-            Pjoule=Pjoule_val,
-            coeff_dict=coeff_dict_val,
-        )
+        obj_copy = type(self)(loss_list=loss_list_val,meshsol_list=meshsol_list_val,loss_index=loss_index_val,logger_name=logger_name_val,axes_dict=axes_dict_val,Pstator=Pstator_val,Protor=Protor_val,Pmagnet=Pmagnet_val,Pprox=Pprox_val,Pjoule=Pjoule_val,coeff_dict=coeff_dict_val)
         return obj_copy
 
     def _set_None(self):
@@ -628,15 +486,11 @@ class OutLoss(FrozenClass):
                     try:
                         obj = load_init_dict(obj)[1]
                     except Exception as e:
-                        self.get_logger().error(
-                            "Error while loading " + obj + ", setting None instead"
-                        )
+                        self.get_logger().error('Error while loading '+obj+', setting None instead')
                         obj = None
                         value[ii] = None
                 if type(obj) is dict:
-                    class_obj = import_class(
-                        "SciDataTool.Classes", obj.get("__class__"), "loss_list"
-                    )
+                    class_obj = import_class('SciDataTool.Classes', obj.get('__class__'), 'loss_list')
                     value[ii] = class_obj(init_dict=obj)
                 if value[ii] is not None:
                     value[ii].parent = self
@@ -670,15 +524,11 @@ class OutLoss(FrozenClass):
                     try:
                         obj = load_init_dict(obj)[1]
                     except Exception as e:
-                        self.get_logger().error(
-                            "Error while loading " + obj + ", setting None instead"
-                        )
+                        self.get_logger().error('Error while loading '+obj+', setting None instead')
                         obj = None
                         value[ii] = None
                 if type(obj) is dict:
-                    class_obj = import_class(
-                        "pyleecan.Classes", obj.get("__class__"), "meshsol_list"
-                    )
+                    class_obj = import_class('pyleecan.Classes', obj.get('__class__'), 'meshsol_list')
                     value[ii] = class_obj(init_dict=obj)
                 if value[ii] is not None:
                     value[ii].parent = self
@@ -750,15 +600,11 @@ class OutLoss(FrozenClass):
                     try:
                         obj = load_init_dict(obj)[1]
                     except Exception as e:
-                        self.get_logger().error(
-                            "Error while loading " + obj + ", setting None instead"
-                        )
+                        self.get_logger().error('Error while loading '+obj+', setting None instead')
                         obj = None
                         value[key] = None
                 if type(obj) is dict:
-                    class_obj = import_class(
-                        "SciDataTool.Classes", obj.get("__class__"), "axes_dict"
-                    )
+                    class_obj = import_class('SciDataTool.Classes', obj.get('__class__'), 'axes_dict')
                     value[key] = class_obj(init_dict=obj)
         if type(value) is int and value == -1:
             value = dict()

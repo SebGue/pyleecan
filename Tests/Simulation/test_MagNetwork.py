@@ -23,7 +23,7 @@ def test_MagNetwork_initial_validation():
     Ref: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=9473194"""
 
     # Case 0 : Load the machine and create the Simulation
-    file_path0 = "C:/Users/pc/Downloads/SPMSM_val.json"
+    file_path0 = "C:/Users/LAP02/Desktop/validation_2pms.json"
     SPMSM_12s_4p_initial = load(file_path0)
 
     simu = Simu1(name="test_magnetwork_case0", machine=SPMSM_12s_4p_initial)
@@ -41,7 +41,12 @@ def test_MagNetwork_initial_validation():
         is_periodicity_t=False,
         type_model=1,
         type_coord_sys=2,
-        N_point_r=137,
+        stator_yoke_elements_r=2,
+        airgap_elements_r=2,
+        rotor_yoke_elements_r=2,
+        stator_isthmus_elements_r=1,
+        stator_tooth_elements_r=11,
+        magnet_elements_r=22,  ###
         Kmesh_fineness=2,
         rotor_shift=8,
     )
@@ -271,7 +276,12 @@ def test_MagNetwork_double_layer_2magnets():
         is_periodicity_t=False,
         type_model=1,
         type_coord_sys=2,
-        N_point_r=138,
+        stator_yoke_elements_r=2,
+        airgap_elements_r=2,
+        rotor_yoke_elements_r=2,
+        stator_isthmus_elements_r=1,
+        stator_tooth_elements_r=11,
+        magnet_elements_r=10,
         Kmesh_fineness=2,
         rotor_shift=8,
     )
@@ -549,8 +559,8 @@ def test_MagNetwork_benchmark():
 
 
 if __name__ == "__main__":
-    # test_MagNetwork_initial_validation()
+    test_MagNetwork_initial_validation()
     # test_MagNetwork_Kmesh_fineness()
-    test_MagNetwork_double_layer_2magnets()
+    # test_MagNetwork_double_layer_2magnets()
     # test_MagNetwork_fractional_periodicity()
     # test_MagNetwork_benchmark()

@@ -6,7 +6,6 @@ import numpy as np
 def compute_B(self, Phi, list_elem, list_coord, la, type_coord_sys):
     """
     Compute the magnetic field from the flux Phi and the mesh.
-
     Parameters
     ----------
     Phi : nd-array, size: n (float)
@@ -17,14 +16,12 @@ def compute_B(self, Phi, list_elem, list_coord, la, type_coord_sys):
         coordinate of each point.
     la : float
         depth of the model.
-
     Returns
     -------
     Bx : nd-array, size: m (flat)
         x component of B
     By : nd-array, size: m (float)
         y component of B
-
     """
     if type_coord_sys == 1:
         h_x = np.linalg.norm(

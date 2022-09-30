@@ -7063,7 +7063,6 @@
             "solver_non_linear_model",
             "pre_processing.init_cell",
             "pre_processing.init_mesh_BC",
-            "pre_processing.init_permeabilty_cell",
             "pre_processing.init_point",
             "pre_processing.init_reluc",
             "pre_processing.numeroting_unknows",
@@ -7128,13 +7127,63 @@
             },
             {
                 "as_dict": "",
-                "desc": "number of discretization points in the r-direction",
+                "desc": "number of discretized elements of the stator yoke according to the r-axis",
                 "max": "",
                 "min": "",
-                "name": "N_point_r",
+                "name": "stator_yoke_elements_r",
                 "type": "int",
-                "unit": "",
-                "value": 37
+                "unit": "-",
+                "value": 2
+            },
+            {
+                "as_dict": "",
+                "desc": "number of discretized elements of the airgap according to the r-axis",
+                "max": "",
+                "min": "",
+                "name": "airgap_elements_r",
+                "type": "int",
+                "unit": "-",
+                "value": 2
+            },
+            {
+                "as_dict": "",
+                "desc": "number of discretized elements of the rotor yoke according to the r-axis",
+                "max": "",
+                "min": "",
+                "name": "rotor_yoke_elements_r",
+                "type": "int",
+                "unit": "-",
+                "value": 2
+            },
+            {
+                "as_dict": "",
+                "desc": "number of discretized elements of the geometry between the stator interior radius and the slot interior radius",
+                "max": "",
+                "min": "",
+                "name": "stator_isthmus_elements_r",
+                "type": "int",
+                "unit": "-",
+                "value": 2
+            },
+            {
+                "as_dict": "",
+                "desc": "number of discretized elements of the stator tooth according to the r-axis",
+                "max": "",
+                "min": "",
+                "name": "stator_tooth_elements_r",
+                "type": "int",
+                "unit": "-",
+                "value": 2
+            },
+            {
+                "as_dict": "",
+                "desc": "number of discretized elements of the magnet according to the r-axis",
+                "max": "",
+                "min": "",
+                "name": "magnet_elements_r",
+                "type": "int",
+                "unit": "-",
+                "value": 2
             }
         ]
     },

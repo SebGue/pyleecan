@@ -123,9 +123,7 @@ def solver_linear_model(
     # Saving the mesh
     ###############################################################################
 
-    list_elem_materials = self.geometry_motor(
-        N_point_theta, self.N_point_r, self.rotor_shift
-    )[3]
+    list_elem_materials = self.geometry_motor(N_point_theta)[3]
 
     self.save_mesh(
         list_elem_materials, Num_Unknowns, list_elem, theta, r, list_boundary_condition
@@ -142,7 +140,6 @@ def solver_linear_model(
 
     mu0 = material_dict["vacuum"]
     reluc_list = self.init_reluc(list_elem, list_coord, mu0, la, type_coord_sys)
-    # print(reluc_list)
 
     M_csr = self.assembly(
         reluc_list,
@@ -159,9 +156,7 @@ def solver_linear_model(
     # Assemblying the RHS containing the sources
     ###############################################################################
 
-    mask_magnet = self.geometry_motor(N_point_theta, self.N_point_r, self.rotor_shift)[
-        4
-    ]
+    mask_magnet = self.geometry_motor(N_point_theta)[4]
 
     RHS = self.right_member_assembly(
         list_elem_permability,
@@ -174,6 +169,7 @@ def solver_linear_model(
         mask_magnet,
         la,
         type_coord_sys,
+        N_point_theta,
         JA=JA,
         JB=JB,
         JC=JC,
@@ -218,7 +214,7 @@ def solver_linear_model(
         list_elem,
         list_boundary_condition,
     )
-
+    
     return (
         Phi,
         Num_Unknowns,

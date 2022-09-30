@@ -5,12 +5,12 @@ import numpy as np
 import meshio
 import matplotlib.pyplot as plt
 from pyleecan.Functions.load import load
-
 from pyleecan.Classes.MeshMat import MeshMat
 from pyleecan.Classes.NodeMat import NodeMat
 from pyleecan.Classes.CellMat import CellMat
 from pyleecan.Classes.MeshSolution import MeshSolution
 from pyleecan.Classes.SolutionMat import SolutionMat
+from numpy import concatenate
 
 
 def run_radial(self, axes_dict, Is_val=None, type_coord_sys=2):
@@ -57,31 +57,44 @@ def run_radial(self, axes_dict, Is_val=None, type_coord_sys=2):
     angle_elem = 2  # freeze element angular width in degrees to be reached
     N_point_theta = self.Kmesh_fineness * round(angle_tp / angle_elem) + 1
 
-    # Definition of N_point_r
-    # N_point_r = 1 + Kmesh_fineness * round(
-    #     (Machine.stator.Rext - Machine.rotor.Rint) * 1000
-    # )
+    # Definition of the discretization according to the r-axis
+    N_point_r = self.geometry_motor(N_point_theta)[5]
 
     # Update of N_point_theta verifying condition 1
-    N_point_theta = self.geometry_motor(
-        N_point_theta, self.N_point_r, self.rotor_shift
-    )[2]
+    N_point_theta = self.geometry_motor(N_point_theta)[2]
 
     # Material properties of PM and vaccum
     Br = Machine.rotor.magnet.mat_type.mag.Brm20
 
     # Material_dict from geometry_motor method
-    material_dict = self.geometry_motor(
-        N_point_theta, self.N_point_r, self.rotor_shift
-    )[1]
-
-    mu0 = material_dict["vacuum"]  # Permeability of vacuum (H/m)
+    material_dict = self.geometry_motor(N_point_theta)[1]
 
     ###############################################################################
     # Definition of the r- and theta- axes
     ###############################################################################
     # Definition of the r-axis
-    r = np.linspace(Machine.rotor.Rint, Machine.stator.Rext, self.N_point_r)
+    axes_r = self.geometry_motor(N_point_theta)[6]
+    if not len(axes_r["stator_isthmus"]):  # stator_isthmus = []
+        r = np.concatenate(
+            (
+                axes_r["rotor_yoke"],
+                axes_r["magnet"],
+                axes_r["airgap"],
+                axes_r["stator_tooth"],
+                axes_r["stator_yoke"],
+            )
+        )
+    else:
+        r = np.concatenate(
+            (
+                axes_r["rotor_yoke"],
+                axes_r["magnet"],
+                axes_r["airgap"],
+                axes_r["stator_isthmus"],
+                axes_r["stator_tooth"],
+                axes_r["stator_yoke"],
+            )
+        )
 
     # Definition of the theta-axis
     theta = axes_dict["theta_primal"].get_values(is_smallestperiod=True)
@@ -132,7 +145,7 @@ def run_radial(self, axes_dict, Is_val=None, type_coord_sys=2):
         list_coord,
     ) = self.solver_linear_model(
         N_point_theta,
-        self.N_point_r,
+        N_point_r,
         theta,
         r,
         theta_dual,
@@ -153,12 +166,8 @@ def run_radial(self, axes_dict, Is_val=None, type_coord_sys=2):
     ###############################################################################
 
     # Transfomration of radial coordinates to cartesian to plot the flux density contour
-    x = (list_coord[:, 1] * np.cos(list_coord[:, 0])).reshape(
-        self.N_point_r, N_point_theta
-    )
-    y = (list_coord[:, 1] * np.sin(list_coord[:, 0])).reshape(
-        self.N_point_r, N_point_theta
-    )
+    x = (list_coord[:, 1] * np.cos(list_coord[:, 0])).reshape(N_point_r, N_point_theta)
+    y = (list_coord[:, 1] * np.sin(list_coord[:, 0])).reshape(N_point_r, N_point_theta)
 
     list_cartesian_coord = np.zeros(list_coord.shape)
     list_cartesian_coord[:, 0] = x.flatten()
@@ -169,29 +178,17 @@ def run_radial(self, axes_dict, Is_val=None, type_coord_sys=2):
     ###############################################################################
 
     # Getting the geometry elements from the geometry_motor method
-    list_geometry = self.geometry_motor(
-        N_point_theta, self.N_point_r, self.rotor_shift
-    )[3]
-    self.view_contour_flux(Phi, x, y, N_point_theta, self.N_point_r, list_geometry)
+    list_geometry = self.geometry_motor(N_point_theta)[3]
+    self.view_contour_flux(Phi, x, y, N_point_theta, N_point_r, list_geometry)
 
     ###############################################################################
     # computing the flux density B
     ###############################################################################
     Bx, By = self.compute_B(Phi, list_elem, list_coord, la, type_coord_sys)
 
-    B = np.stack((Bx, By), axis=-1)
-
-    temp = np.zeros((list_elem.shape[0], 3))
-    temp[:, 0] = Bx.flatten()
-    temp[:, 1] = By.flatten()
-    B = temp
-
-    temp = np.zeros((list_coord.shape[0], 3))
-    temp[:, 0:2] = list_coord
-
-    print("mesh saved", list_coord.shape, list_elem.shape)
 
     # Compute 2D curve of the airgap flux density
+    index_airgap = self.geometry_motor(N_point_theta)[7]
     Bx_airgap, By_airgap = self.comp_flux_airgap_local(
         # r,
         # theta,
@@ -201,8 +198,12 @@ def run_radial(self, axes_dict, Is_val=None, type_coord_sys=2):
         list_elem,
         list_coord,
         la,
-        Machine.comp_Rgap_mec(),
+        # Machine.comp_Rgap_mec(),
+        index_airgap,
         type_coord_sys,
     )
-
+    self.add_to_mesh_cell_math(Phi,Bx,By,list_elem,list_coord,type_coord_sys,material_dict)
+    self.save_mesh_and_data_xdmf("test",Phi,Bx,By,list_elem,list_coord,type_coord_sys,material_dict)
+    
+    
     return Bx, By, Bx_airgap, By_airgap

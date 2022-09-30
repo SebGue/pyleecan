@@ -89,13 +89,6 @@ except ImportError as error:
     init_mesh_BC = error
 
 try:
-    from ..Methods.Simulation.MagNetwork.pre_processing.init_permeabilty_cell import (
-        init_permeabilty_cell,
-    )
-except ImportError as error:
-    init_permeabilty_cell = error
-
-try:
     from ..Methods.Simulation.MagNetwork.pre_processing.init_point import init_point
 except ImportError as error:
     init_point = error
@@ -347,18 +340,6 @@ class MagNetwork(Magnetics):
         )
     else:
         init_mesh_BC = init_mesh_BC
-    # cf Methods.Simulation.MagNetwork.pre_processing.init_permeabilty_cell
-    if isinstance(init_permeabilty_cell, ImportError):
-        init_permeabilty_cell = property(
-            fget=lambda x: raise_(
-                ImportError(
-                    "Can't use MagNetwork method init_permeabilty_cell: "
-                    + str(init_permeabilty_cell)
-                )
-            )
-        )
-    else:
-        init_permeabilty_cell = init_permeabilty_cell
     # cf Methods.Simulation.MagNetwork.pre_processing.init_point
     if isinstance(init_point, ImportError):
         init_point = property(
@@ -544,7 +525,12 @@ class MagNetwork(Magnetics):
         type_coord_sys=2,
         Kmesh_fineness=1,
         rotor_shift=8,
-        N_point_r=37,
+        stator_yoke_elements_r=2,
+        airgap_elements_r=2,
+        rotor_yoke_elements_r=2,
+        stator_isthmus_elements_r=2,
+        stator_tooth_elements_r=2,
+        magnet_elements_r=2,
         is_remove_slotS=False,
         is_remove_slotR=False,
         is_remove_ventS=False,
@@ -590,8 +576,18 @@ class MagNetwork(Magnetics):
                 Kmesh_fineness = init_dict["Kmesh_fineness"]
             if "rotor_shift" in list(init_dict.keys()):
                 rotor_shift = init_dict["rotor_shift"]
-            if "N_point_r" in list(init_dict.keys()):
-                N_point_r = init_dict["N_point_r"]
+            if "stator_yoke_elements_r" in list(init_dict.keys()):
+                stator_yoke_elements_r = init_dict["stator_yoke_elements_r"]
+            if "airgap_elements_r" in list(init_dict.keys()):
+                airgap_elements_r = init_dict["airgap_elements_r"]
+            if "rotor_yoke_elements_r" in list(init_dict.keys()):
+                rotor_yoke_elements_r = init_dict["rotor_yoke_elements_r"]
+            if "stator_isthmus_elements_r" in list(init_dict.keys()):
+                stator_isthmus_elements_r = init_dict["stator_isthmus_elements_r"]
+            if "stator_tooth_elements_r" in list(init_dict.keys()):
+                stator_tooth_elements_r = init_dict["stator_tooth_elements_r"]
+            if "magnet_elements_r" in list(init_dict.keys()):
+                magnet_elements_r = init_dict["magnet_elements_r"]
             if "is_remove_slotS" in list(init_dict.keys()):
                 is_remove_slotS = init_dict["is_remove_slotS"]
             if "is_remove_slotR" in list(init_dict.keys()):
@@ -635,7 +631,12 @@ class MagNetwork(Magnetics):
         self.type_coord_sys = type_coord_sys
         self.Kmesh_fineness = Kmesh_fineness
         self.rotor_shift = rotor_shift
-        self.N_point_r = N_point_r
+        self.stator_yoke_elements_r = stator_yoke_elements_r
+        self.airgap_elements_r = airgap_elements_r
+        self.rotor_yoke_elements_r = rotor_yoke_elements_r
+        self.stator_isthmus_elements_r = stator_isthmus_elements_r
+        self.stator_tooth_elements_r = stator_tooth_elements_r
+        self.magnet_elements_r = magnet_elements_r
         # Call Magnetics init
         super(MagNetwork, self).__init__(
             is_remove_slotS=is_remove_slotS,
@@ -671,7 +672,22 @@ class MagNetwork(Magnetics):
         MagNetwork_str += "type_coord_sys = " + str(self.type_coord_sys) + linesep
         MagNetwork_str += "Kmesh_fineness = " + str(self.Kmesh_fineness) + linesep
         MagNetwork_str += "rotor_shift = " + str(self.rotor_shift) + linesep
-        MagNetwork_str += "N_point_r = " + str(self.N_point_r) + linesep
+        MagNetwork_str += (
+            "stator_yoke_elements_r = " + str(self.stator_yoke_elements_r) + linesep
+        )
+        MagNetwork_str += "airgap_elements_r = " + str(self.airgap_elements_r) + linesep
+        MagNetwork_str += (
+            "rotor_yoke_elements_r = " + str(self.rotor_yoke_elements_r) + linesep
+        )
+        MagNetwork_str += (
+            "stator_isthmus_elements_r = "
+            + str(self.stator_isthmus_elements_r)
+            + linesep
+        )
+        MagNetwork_str += (
+            "stator_tooth_elements_r = " + str(self.stator_tooth_elements_r) + linesep
+        )
+        MagNetwork_str += "magnet_elements_r = " + str(self.magnet_elements_r) + linesep
         return MagNetwork_str
 
     def __eq__(self, other):
@@ -691,7 +707,17 @@ class MagNetwork(Magnetics):
             return False
         if other.rotor_shift != self.rotor_shift:
             return False
-        if other.N_point_r != self.N_point_r:
+        if other.stator_yoke_elements_r != self.stator_yoke_elements_r:
+            return False
+        if other.airgap_elements_r != self.airgap_elements_r:
+            return False
+        if other.rotor_yoke_elements_r != self.rotor_yoke_elements_r:
+            return False
+        if other.stator_isthmus_elements_r != self.stator_isthmus_elements_r:
+            return False
+        if other.stator_tooth_elements_r != self.stator_tooth_elements_r:
+            return False
+        if other.magnet_elements_r != self.magnet_elements_r:
             return False
         return True
 
@@ -758,18 +784,78 @@ class MagNetwork(Magnetics):
                 diff_list.append(name + ".rotor_shift" + val_str)
             else:
                 diff_list.append(name + ".rotor_shift")
-        if other._N_point_r != self._N_point_r:
+        if other._stator_yoke_elements_r != self._stator_yoke_elements_r:
             if is_add_value:
                 val_str = (
                     " (self="
-                    + str(self._N_point_r)
+                    + str(self._stator_yoke_elements_r)
                     + ", other="
-                    + str(other._N_point_r)
+                    + str(other._stator_yoke_elements_r)
                     + ")"
                 )
-                diff_list.append(name + ".N_point_r" + val_str)
+                diff_list.append(name + ".stator_yoke_elements_r" + val_str)
             else:
-                diff_list.append(name + ".N_point_r")
+                diff_list.append(name + ".stator_yoke_elements_r")
+        if other._airgap_elements_r != self._airgap_elements_r:
+            if is_add_value:
+                val_str = (
+                    " (self="
+                    + str(self._airgap_elements_r)
+                    + ", other="
+                    + str(other._airgap_elements_r)
+                    + ")"
+                )
+                diff_list.append(name + ".airgap_elements_r" + val_str)
+            else:
+                diff_list.append(name + ".airgap_elements_r")
+        if other._rotor_yoke_elements_r != self._rotor_yoke_elements_r:
+            if is_add_value:
+                val_str = (
+                    " (self="
+                    + str(self._rotor_yoke_elements_r)
+                    + ", other="
+                    + str(other._rotor_yoke_elements_r)
+                    + ")"
+                )
+                diff_list.append(name + ".rotor_yoke_elements_r" + val_str)
+            else:
+                diff_list.append(name + ".rotor_yoke_elements_r")
+        if other._stator_isthmus_elements_r != self._stator_isthmus_elements_r:
+            if is_add_value:
+                val_str = (
+                    " (self="
+                    + str(self._stator_isthmus_elements_r)
+                    + ", other="
+                    + str(other._stator_isthmus_elements_r)
+                    + ")"
+                )
+                diff_list.append(name + ".stator_isthmus_elements_r" + val_str)
+            else:
+                diff_list.append(name + ".stator_isthmus_elements_r")
+        if other._stator_tooth_elements_r != self._stator_tooth_elements_r:
+            if is_add_value:
+                val_str = (
+                    " (self="
+                    + str(self._stator_tooth_elements_r)
+                    + ", other="
+                    + str(other._stator_tooth_elements_r)
+                    + ")"
+                )
+                diff_list.append(name + ".stator_tooth_elements_r" + val_str)
+            else:
+                diff_list.append(name + ".stator_tooth_elements_r")
+        if other._magnet_elements_r != self._magnet_elements_r:
+            if is_add_value:
+                val_str = (
+                    " (self="
+                    + str(self._magnet_elements_r)
+                    + ", other="
+                    + str(other._magnet_elements_r)
+                    + ")"
+                )
+                diff_list.append(name + ".magnet_elements_r" + val_str)
+            else:
+                diff_list.append(name + ".magnet_elements_r")
         # Filter ignore differences
         diff_list = list(filter(lambda x: x not in ignore_list, diff_list))
         return diff_list
@@ -785,7 +871,12 @@ class MagNetwork(Magnetics):
         S += getsizeof(self.type_coord_sys)
         S += getsizeof(self.Kmesh_fineness)
         S += getsizeof(self.rotor_shift)
-        S += getsizeof(self.N_point_r)
+        S += getsizeof(self.stator_yoke_elements_r)
+        S += getsizeof(self.airgap_elements_r)
+        S += getsizeof(self.rotor_yoke_elements_r)
+        S += getsizeof(self.stator_isthmus_elements_r)
+        S += getsizeof(self.stator_tooth_elements_r)
+        S += getsizeof(self.magnet_elements_r)
         return S
 
     def as_dict(self, type_handle_ndarray=0, keep_function=False, **kwargs):
@@ -809,7 +900,12 @@ class MagNetwork(Magnetics):
         MagNetwork_dict["type_coord_sys"] = self.type_coord_sys
         MagNetwork_dict["Kmesh_fineness"] = self.Kmesh_fineness
         MagNetwork_dict["rotor_shift"] = self.rotor_shift
-        MagNetwork_dict["N_point_r"] = self.N_point_r
+        MagNetwork_dict["stator_yoke_elements_r"] = self.stator_yoke_elements_r
+        MagNetwork_dict["airgap_elements_r"] = self.airgap_elements_r
+        MagNetwork_dict["rotor_yoke_elements_r"] = self.rotor_yoke_elements_r
+        MagNetwork_dict["stator_isthmus_elements_r"] = self.stator_isthmus_elements_r
+        MagNetwork_dict["stator_tooth_elements_r"] = self.stator_tooth_elements_r
+        MagNetwork_dict["magnet_elements_r"] = self.magnet_elements_r
         # The class name is added to the dict for deserialisation purpose
         # Overwrite the mother class name
         MagNetwork_dict["__class__"] = "MagNetwork"
@@ -823,7 +919,12 @@ class MagNetwork(Magnetics):
         type_coord_sys_val = self.type_coord_sys
         Kmesh_fineness_val = self.Kmesh_fineness
         rotor_shift_val = self.rotor_shift
-        N_point_r_val = self.N_point_r
+        stator_yoke_elements_r_val = self.stator_yoke_elements_r
+        airgap_elements_r_val = self.airgap_elements_r
+        rotor_yoke_elements_r_val = self.rotor_yoke_elements_r
+        stator_isthmus_elements_r_val = self.stator_isthmus_elements_r
+        stator_tooth_elements_r_val = self.stator_tooth_elements_r
+        magnet_elements_r_val = self.magnet_elements_r
         is_remove_slotS_val = self.is_remove_slotS
         is_remove_slotR_val = self.is_remove_slotR
         is_remove_ventS_val = self.is_remove_ventS
@@ -852,7 +953,12 @@ class MagNetwork(Magnetics):
             type_coord_sys=type_coord_sys_val,
             Kmesh_fineness=Kmesh_fineness_val,
             rotor_shift=rotor_shift_val,
-            N_point_r=N_point_r_val,
+            stator_yoke_elements_r=stator_yoke_elements_r_val,
+            airgap_elements_r=airgap_elements_r_val,
+            rotor_yoke_elements_r=rotor_yoke_elements_r_val,
+            stator_isthmus_elements_r=stator_isthmus_elements_r_val,
+            stator_tooth_elements_r=stator_tooth_elements_r_val,
+            magnet_elements_r=magnet_elements_r_val,
             is_remove_slotS=is_remove_slotS_val,
             is_remove_slotR=is_remove_slotR_val,
             is_remove_ventS=is_remove_ventS_val,
@@ -882,7 +988,12 @@ class MagNetwork(Magnetics):
         self.type_coord_sys = None
         self.Kmesh_fineness = None
         self.rotor_shift = None
-        self.N_point_r = None
+        self.stator_yoke_elements_r = None
+        self.airgap_elements_r = None
+        self.rotor_yoke_elements_r = None
+        self.stator_isthmus_elements_r = None
+        self.stator_tooth_elements_r = None
+        self.magnet_elements_r = None
         # Set to None the properties inherited from Magnetics
         super(MagNetwork, self)._set_None()
 
@@ -962,19 +1073,109 @@ class MagNetwork(Magnetics):
         """,
     )
 
-    def _get_N_point_r(self):
-        """getter of N_point_r"""
-        return self._N_point_r
+    def _get_stator_yoke_elements_r(self):
+        """getter of stator_yoke_elements_r"""
+        return self._stator_yoke_elements_r
 
-    def _set_N_point_r(self, value):
-        """setter of N_point_r"""
-        check_var("N_point_r", value, "int")
-        self._N_point_r = value
+    def _set_stator_yoke_elements_r(self, value):
+        """setter of stator_yoke_elements_r"""
+        check_var("stator_yoke_elements_r", value, "int")
+        self._stator_yoke_elements_r = value
 
-    N_point_r = property(
-        fget=_get_N_point_r,
-        fset=_set_N_point_r,
-        doc=u"""number of discretization points in the r-direction
+    stator_yoke_elements_r = property(
+        fget=_get_stator_yoke_elements_r,
+        fset=_set_stator_yoke_elements_r,
+        doc=u"""number of discretized elements of the stator yoke according to the r-axis
+
+        :Type: int
+        """,
+    )
+
+    def _get_airgap_elements_r(self):
+        """getter of airgap_elements_r"""
+        return self._airgap_elements_r
+
+    def _set_airgap_elements_r(self, value):
+        """setter of airgap_elements_r"""
+        check_var("airgap_elements_r", value, "int")
+        self._airgap_elements_r = value
+
+    airgap_elements_r = property(
+        fget=_get_airgap_elements_r,
+        fset=_set_airgap_elements_r,
+        doc=u"""number of discretized elements of the airgap according to the r-axis
+
+        :Type: int
+        """,
+    )
+
+    def _get_rotor_yoke_elements_r(self):
+        """getter of rotor_yoke_elements_r"""
+        return self._rotor_yoke_elements_r
+
+    def _set_rotor_yoke_elements_r(self, value):
+        """setter of rotor_yoke_elements_r"""
+        check_var("rotor_yoke_elements_r", value, "int")
+        self._rotor_yoke_elements_r = value
+
+    rotor_yoke_elements_r = property(
+        fget=_get_rotor_yoke_elements_r,
+        fset=_set_rotor_yoke_elements_r,
+        doc=u"""number of discretized elements of the rotor yoke according to the r-axis
+
+        :Type: int
+        """,
+    )
+
+    def _get_stator_isthmus_elements_r(self):
+        """getter of stator_isthmus_elements_r"""
+        return self._stator_isthmus_elements_r
+
+    def _set_stator_isthmus_elements_r(self, value):
+        """setter of stator_isthmus_elements_r"""
+        check_var("stator_isthmus_elements_r", value, "int")
+        self._stator_isthmus_elements_r = value
+
+    stator_isthmus_elements_r = property(
+        fget=_get_stator_isthmus_elements_r,
+        fset=_set_stator_isthmus_elements_r,
+        doc=u"""number of discretized elements of the geometry between the stator interior radius and the slot interior radius
+
+        :Type: int
+        """,
+    )
+
+    def _get_stator_tooth_elements_r(self):
+        """getter of stator_tooth_elements_r"""
+        return self._stator_tooth_elements_r
+
+    def _set_stator_tooth_elements_r(self, value):
+        """setter of stator_tooth_elements_r"""
+        check_var("stator_tooth_elements_r", value, "int")
+        self._stator_tooth_elements_r = value
+
+    stator_tooth_elements_r = property(
+        fget=_get_stator_tooth_elements_r,
+        fset=_set_stator_tooth_elements_r,
+        doc=u"""number of discretized elements of the stator tooth according to the r-axis
+
+        :Type: int
+        """,
+    )
+
+    def _get_magnet_elements_r(self):
+        """getter of magnet_elements_r"""
+        return self._magnet_elements_r
+
+    def _set_magnet_elements_r(self, value):
+        """setter of magnet_elements_r"""
+        check_var("magnet_elements_r", value, "int")
+        self._magnet_elements_r = value
+
+    magnet_elements_r = property(
+        fget=_get_magnet_elements_r,
+        fset=_set_magnet_elements_r,
+        doc=u"""number of discretized elements of the magnet according to the r-axis
 
         :Type: int
         """,

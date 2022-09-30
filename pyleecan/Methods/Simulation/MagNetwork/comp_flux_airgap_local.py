@@ -5,7 +5,7 @@ import numpy as np
 
 
 def comp_flux_airgap_local(
-    self, r, theta, Phi, list_elem, list_coord, la, Rgap, type_coord_sys
+    self, r, theta, Phi, list_elem, list_coord, la, index_airgap, type_coord_sys
 ):
     """
     Computes the flux density in the airgap
@@ -49,11 +49,9 @@ def comp_flux_airgap_local(
     By = By.reshape((r.size, theta.size))
 
     # Looking for the position in the center of the mecanical airgap
-    position = Rgap
+    # position = Rgap
 
     # Getting the index of the line i from the position in the center of the mecanical airgap
-    index_airgap = (int)(
-        (position - r.min()) * ((r.size - 1) / (r.max() - r.min()))
-    ) + 1
+    # index_airgap = (int)((position - r.min()) * ((r.size - 1) / (r.max() - r.min())))
 
     return Bx[index_airgap, :], By[index_airgap, :]
