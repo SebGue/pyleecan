@@ -1,0 +1,115 @@
+from matplotlib.patches import Patch
+
+from ....Functions.init_fig import init_fig
+from ....definitions import config_dict
+
+ROTOR_COLOR = config_dict["PLOT"]["COLOR_DICT"]["ROTOR_COLOR"]
+STATOR_COLOR = config_dict["PLOT"]["COLOR_DICT"]["STATOR_COLOR"]
+
+
+def plot(
+    self,
+    fig=None,
+    ax=None,
+    is_lam_only=False,
+    sym=1,
+    alpha=0,
+    delta=0,
+    is_edge_only=False,
+    edgecolor=None,
+    is_add_arrow=False,
+    is_display=True,
+    is_show_fig=True,
+):
+    """Plot the Lamination with empty Slots in a matplotlib fig
+
+    Parameters
+    ----------
+    self : LamSlot
+        A LamSlot object
+    fig : Matplotlib.figure.Figure
+        existing figure to use if None create a new one
+    ax : Matplotlib.axes.Axes object
+        Axis on which to plot the data
+    is_lam_only: bool
+        True to plot only the lamination (No effect for LamSlot)
+    sym : int
+        Symmetry factor (1= full machine, 2= half of the machine...)
+    alpha : float
+        Angle for rotation [rad]
+    delta : complex
+        Complex value for translation
+    is_edge_only: bool
+        To plot transparent Patches
+    edgecolor:
+        Color of the edges if is_edge_only=True
+    is_display : bool
+        False to return the patches
+    is_show_fig : bool
+        To call show at the end of the method
+
+    Returns
+    -------
+    patches : list
+        List of Patches
+
+    or
+
+    fig : Matplotlib.figure.Figure
+        Figure containing the plot
+    ax : Matplotlib.axes.Axes object
+        Axis containing the plot
+    """
+
+    if self.is_stator:
+        lam_color = STATOR_COLOR
+    else:
+        lam_color = ROTOR_COLOR
+
+    (fig, ax, patch_leg, label_leg) = init_fig(fig=fig, ax=ax, shape="rectangle")
+
+    surf_list = self.build_geometry(sym=sym, alpha=alpha, delta=delta)
+    patches = list()
+    for surf in surf_list:
+        if "Lamination" in surf.label:
+            patches.extend(
+                surf.get_patches(
+                    color=lam_color, is_edge_only=is_edge_only, edgecolor=edgecolor
+                )
+            )
+        else:
+            patches.extend(
+                surf.get_patches(is_edge_only=is_edge_only, edgecolor=edgecolor)
+            )
+    # Display the result
+    if is_display:
+        ax.set_xlabel("(m)")
+        ax.set_ylabel("(m)")
+        for patch in patches:
+            ax.add_patch(patch)
+
+        # Axis Setup
+        ax.axis("equal")
+
+        # The Lamination is centered in the figure
+        Lim = self.Rext * 1.5
+        ax.set_xlim(-Lim, Lim)
+        ax.set_ylim(-Lim, Lim)
+
+        # Add the legend
+        if not is_edge_only:
+            if self.is_stator and "Stator" not in label_leg:
+                patch_leg.append(Patch(color=STATOR_COLOR))
+                label_leg.append("Stator")
+                ax.set_title("Stator with empty slot")
+            elif not self.is_stator and "Rotor" not in label_leg:
+                patch_leg.append(Patch(color=ROTOR_COLOR))
+                label_leg.append("Rotor")
+                ax.set_title("Rotor with empty slot")
+
+            ax.legend(patch_leg, label_leg)
+        if is_show_fig:
+            fig.show()
+        return fig, ax
+    else:
+        return patches

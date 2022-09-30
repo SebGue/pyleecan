@@ -7039,6 +7039,105 @@
             }
         ]
     },
+    "MagNetwork": {
+        "constants": [
+            {
+                "name": "VERSION",
+                "value": "1"
+            }
+        ],
+        "daughters": [],
+        "desc": "Abstract class to solve the electric machines using the reluctance network",
+        "is_internal": false,
+        "methods": [
+            "geometry_motor",
+            "geometry_linear_motor_separetion",
+            "plot.Plot_B",
+            "plot.view_contour_flux",
+            "plot.view_contour_flux2",
+            "post_processing",
+            "run_cartesian",
+            "run_non_linear",
+            "run_radial",
+            "solver_linear_model",
+            "solver_non_linear_model",
+            "pre_processing.init_cell",
+            "pre_processing.init_mesh_BC",
+            "pre_processing.init_permeabilty_cell",
+            "pre_processing.init_point",
+            "pre_processing.init_reluc",
+            "pre_processing.numeroting_unknows",
+            "pre_processing.save_mesh",
+            "pre_processing.init_mesh",
+            "assembler.assembly",
+            "assembler.assembly_one_area",
+            "assembler.right_member_assembly",
+            "post_processing.add_BC_to_Phi",
+            "post_processing.compute_B",
+            "comp_flux_airgap",
+            "comp_flux_airgap_local",
+            "cartesianmeshclass_pyleecan",
+            "comp_axes",
+            "post_processing.add_to_mesh_cell_math",
+            "post_processing.save_mesh_and_data_xdmf"
+        ],
+        "mother": "Magnetics",
+        "name": "MagNetwork",
+        "package": "Simulation",
+        "path": "pyleecan/Generator/ClassesRef/Simulation/MagNetwork.csv",
+        "properties": [
+            {
+                "as_dict": "",
+                "desc": "Type of the model to be solved: linear (1) or non-linear (1)",
+                "max": "2",
+                "min": "1",
+                "name": "type_model",
+                "type": "int",
+                "unit": "-",
+                "value": 1
+            },
+            {
+                "as_dict": "",
+                "desc": "Type of the coordinate system: cartesian (1) or radial (2)",
+                "max": "2",
+                "min": "1",
+                "name": "type_coord_sys",
+                "type": "int",
+                "unit": "-",
+                "value": 2
+            },
+            {
+                "as_dict": "",
+                "desc": "Mesh density",
+                "max": "",
+                "min": "",
+                "name": "Kmesh_fineness",
+                "type": "int",
+                "unit": "-",
+                "value": 1
+            },
+            {
+                "as_dict": "",
+                "desc": "number of cells to be shifted when changing the rotor position",
+                "max": "",
+                "min": "",
+                "name": "rotor_shift",
+                "type": "int",
+                "unit": "-",
+                "value": 8
+            },
+            {
+                "as_dict": "",
+                "desc": "number of discretization points in the r-direction",
+                "max": "",
+                "min": "",
+                "name": "N_point_r",
+                "type": "int",
+                "unit": "",
+                "value": 37
+            }
+        ]
+    },
     "Magnet": {
         "constants": [
             {
@@ -7106,7 +7205,8 @@
         ],
         "daughters": [
             "MagElmer",
-            "MagFEMM"
+            "MagFEMM",
+            "MagNetwork"
         ],
         "desc": "Magnetic module abstract object",
         "is_internal": false,

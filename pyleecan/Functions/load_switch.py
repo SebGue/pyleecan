@@ -113,6 +113,7 @@ load_switch = {
     "MachineWRSM": MachineWRSM,
     "MagElmer": MagElmer,
     "MagFEMM": MagFEMM,
+    "MagNetwork": MagNetwork,
     "Magnet": Magnet,
     "Magnetics": Magnetics,
     "MatEconomical": MatEconomical,

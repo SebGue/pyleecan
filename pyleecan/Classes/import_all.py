@@ -111,6 +111,7 @@ from ..Classes.MachineUD import MachineUD
 from ..Classes.MachineWRSM import MachineWRSM
 from ..Classes.MagElmer import MagElmer
 from ..Classes.MagFEMM import MagFEMM
+from ..Classes.MagNetwork import MagNetwork
 from ..Classes.Magnet import Magnet
 from ..Classes.Magnetics import Magnetics
 from ..Classes.MatEconomical import MatEconomical
