@@ -33,17 +33,23 @@ except ImportError as error:
     comp_loss = error
 
 try:
-    from ..Methods.Simulation.LossFEMM.comp_loss_density_core import comp_loss_density_core
+    from ..Methods.Simulation.LossFEMM.comp_loss_density_core import (
+        comp_loss_density_core,
+    )
 except ImportError as error:
     comp_loss_density_core = error
 
 try:
-    from ..Methods.Simulation.LossFEMM.comp_loss_density_joule import comp_loss_density_joule
+    from ..Methods.Simulation.LossFEMM.comp_loss_density_joule import (
+        comp_loss_density_joule,
+    )
 except ImportError as error:
     comp_loss_density_joule = error
 
 try:
-    from ..Methods.Simulation.LossFEMM.comp_loss_density_magnet import comp_loss_density_magnet
+    from ..Methods.Simulation.LossFEMM.comp_loss_density_magnet import (
+        comp_loss_density_magnet,
+    )
 except ImportError as error:
     comp_loss_density_magnet = error
 
@@ -126,7 +132,20 @@ class LossFEMM(Loss):
     # get_logger method is available in all object
     get_logger = get_logger
 
-    def __init__(self, is_get_meshsolution=False, Tsta=20, Trot=20, type_skin_effect=1, Cp=None, model_index=-1, model_list=-1, logger_name="Pyleecan.Loss", model_dict=None, init_dict = None, init_str = None):
+    def __init__(
+        self,
+        is_get_meshsolution=False,
+        Tsta=20,
+        Trot=20,
+        type_skin_effect=1,
+        Cp=None,
+        model_index=-1,
+        model_list=-1,
+        logger_name="Pyleecan.Loss",
+        model_dict=None,
+        init_dict=None,
+        init_str=None,
+    ):
         """Constructor of the class. Can be use in three ways :
         - __init__ (arg1 = 1, arg3 = 5) every parameters have name and default values
             for pyleecan type, -1 will call the default constructor
@@ -167,7 +186,12 @@ class LossFEMM(Loss):
         self.type_skin_effect = type_skin_effect
         self.Cp = Cp
         # Call Loss init
-        super(LossFEMM, self).__init__(model_index=model_index, model_list=model_list, logger_name=logger_name, model_dict=model_dict)
+        super(LossFEMM, self).__init__(
+            model_index=model_index,
+            model_list=model_list,
+            logger_name=logger_name,
+            model_dict=model_dict,
+        )
         # The class is frozen (in Loss init), for now it's impossible to
         # add new properties
 
@@ -177,7 +201,9 @@ class LossFEMM(Loss):
         LossFEMM_str = ""
         # Get the properties inherited from Loss
         LossFEMM_str += super(LossFEMM, self).__str__()
-        LossFEMM_str += "is_get_meshsolution = " + str(self.is_get_meshsolution) + linesep
+        LossFEMM_str += (
+            "is_get_meshsolution = " + str(self.is_get_meshsolution) + linesep
+        )
         LossFEMM_str += "Tsta = " + str(self.Tsta) + linesep
         LossFEMM_str += "Trot = " + str(self.Trot) + linesep
         LossFEMM_str += "type_skin_effect = " + str(self.type_skin_effect) + linesep
@@ -205,55 +231,90 @@ class LossFEMM(Loss):
             return False
         return True
 
-    def compare(self, other, name='self', ignore_list=None, is_add_value=False):
+    def compare(self, other, name="self", ignore_list=None, is_add_value=False):
         """Compare two objects and return list of differences"""
 
         if ignore_list is None:
             ignore_list = list()
         if type(other) != type(self):
-            return ['type('+name+')']
+            return ["type(" + name + ")"]
         diff_list = list()
 
         # Check the properties inherited from Loss
-        diff_list.extend(super(LossFEMM, self).compare(other,name=name, ignore_list=ignore_list, is_add_value=is_add_value))
+        diff_list.extend(
+            super(LossFEMM, self).compare(
+                other, name=name, ignore_list=ignore_list, is_add_value=is_add_value
+            )
+        )
         if other._is_get_meshsolution != self._is_get_meshsolution:
             if is_add_value:
-                val_str = ' (self='+str(self._is_get_meshsolution)+', other='+str(other._is_get_meshsolution)+')'
-                diff_list.append(name+'.is_get_meshsolution'+val_str)
+                val_str = (
+                    " (self="
+                    + str(self._is_get_meshsolution)
+                    + ", other="
+                    + str(other._is_get_meshsolution)
+                    + ")"
+                )
+                diff_list.append(name + ".is_get_meshsolution" + val_str)
             else:
-                diff_list.append(name+'.is_get_meshsolution')
-        if other._Tsta is not None and self._Tsta is not None and isnan(other._Tsta) and isnan(self._Tsta):
+                diff_list.append(name + ".is_get_meshsolution")
+        if (
+            other._Tsta is not None
+            and self._Tsta is not None
+            and isnan(other._Tsta)
+            and isnan(self._Tsta)
+        ):
             pass
         elif other._Tsta != self._Tsta:
             if is_add_value:
-                val_str = ' (self='+str(self._Tsta)+', other='+str(other._Tsta)+')'
-                diff_list.append(name+'.Tsta'+val_str)
+                val_str = (
+                    " (self=" + str(self._Tsta) + ", other=" + str(other._Tsta) + ")"
+                )
+                diff_list.append(name + ".Tsta" + val_str)
             else:
-                diff_list.append(name+'.Tsta')
-        if other._Trot is not None and self._Trot is not None and isnan(other._Trot) and isnan(self._Trot):
+                diff_list.append(name + ".Tsta")
+        if (
+            other._Trot is not None
+            and self._Trot is not None
+            and isnan(other._Trot)
+            and isnan(self._Trot)
+        ):
             pass
         elif other._Trot != self._Trot:
             if is_add_value:
-                val_str = ' (self='+str(self._Trot)+', other='+str(other._Trot)+')'
-                diff_list.append(name+'.Trot'+val_str)
+                val_str = (
+                    " (self=" + str(self._Trot) + ", other=" + str(other._Trot) + ")"
+                )
+                diff_list.append(name + ".Trot" + val_str)
             else:
-                diff_list.append(name+'.Trot')
+                diff_list.append(name + ".Trot")
         if other._type_skin_effect != self._type_skin_effect:
             if is_add_value:
-                val_str = ' (self='+str(self._type_skin_effect)+', other='+str(other._type_skin_effect)+')'
-                diff_list.append(name+'.type_skin_effect'+val_str)
+                val_str = (
+                    " (self="
+                    + str(self._type_skin_effect)
+                    + ", other="
+                    + str(other._type_skin_effect)
+                    + ")"
+                )
+                diff_list.append(name + ".type_skin_effect" + val_str)
             else:
-                diff_list.append(name+'.type_skin_effect')
-        if other._Cp is not None and self._Cp is not None and isnan(other._Cp) and isnan(self._Cp):
+                diff_list.append(name + ".type_skin_effect")
+        if (
+            other._Cp is not None
+            and self._Cp is not None
+            and isnan(other._Cp)
+            and isnan(self._Cp)
+        ):
             pass
         elif other._Cp != self._Cp:
             if is_add_value:
-                val_str = ' (self='+str(self._Cp)+', other='+str(other._Cp)+')'
-                diff_list.append(name+'.Cp'+val_str)
+                val_str = " (self=" + str(self._Cp) + ", other=" + str(other._Cp) + ")"
+                diff_list.append(name + ".Cp" + val_str)
             else:
-                diff_list.append(name+'.Cp')
+                diff_list.append(name + ".Cp")
         # Filter ignore differences
-        diff_list = list(filter(lambda x : x not in ignore_list, diff_list))
+        diff_list = list(filter(lambda x: x not in ignore_list, diff_list))
         return diff_list
 
     def __sizeof__(self):
@@ -277,12 +338,16 @@ class LossFEMM(Loss):
             How to handle ndarray (0: tolist, 1: copy, 2: nothing)
         keep_function : bool
             True to keep the function object, else return str
-        Optional keyword input parameter is for internal use only 
+        Optional keyword input parameter is for internal use only
         and may prevent json serializability.
         """
 
         # Get the properties inherited from Loss
-        LossFEMM_dict = super(LossFEMM, self).as_dict(type_handle_ndarray=type_handle_ndarray, keep_function=keep_function, **kwargs)
+        LossFEMM_dict = super(LossFEMM, self).as_dict(
+            type_handle_ndarray=type_handle_ndarray,
+            keep_function=keep_function,
+            **kwargs
+        )
         LossFEMM_dict["is_get_meshsolution"] = self.is_get_meshsolution
         LossFEMM_dict["Tsta"] = self.Tsta
         LossFEMM_dict["Trot"] = self.Trot
@@ -292,7 +357,6 @@ class LossFEMM(Loss):
         # Overwrite the mother class name
         LossFEMM_dict["__class__"] = "LossFEMM"
         return LossFEMM_dict
-
 
     def copy(self):
         """Creates a deepcopy of the object"""
@@ -321,7 +385,17 @@ class LossFEMM(Loss):
             for key, obj in self.model_dict.items():
                 model_dict_val[key] = obj.copy()
         # Creates new object of the same type with the copied properties
-        obj_copy = type(self)(is_get_meshsolution=is_get_meshsolution_val,Tsta=Tsta_val,Trot=Trot_val,type_skin_effect=type_skin_effect_val,Cp=Cp_val,model_index=model_index_val,model_list=model_list_val,logger_name=logger_name_val,model_dict=model_dict_val)
+        obj_copy = type(self)(
+            is_get_meshsolution=is_get_meshsolution_val,
+            Tsta=Tsta_val,
+            Trot=Trot_val,
+            type_skin_effect=type_skin_effect_val,
+            Cp=Cp_val,
+            model_index=model_index_val,
+            model_list=model_list_val,
+            logger_name=logger_name_val,
+            model_dict=model_dict_val,
+        )
         return obj_copy
 
     def _set_None(self):

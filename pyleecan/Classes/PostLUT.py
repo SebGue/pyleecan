@@ -46,7 +46,7 @@ class PostLUT(PostMethod):
     # get_logger method is available in all object
     get_logger = get_logger
 
-    def __init__(self, is_save_LUT=True, init_dict = None, init_str = None):
+    def __init__(self, is_save_LUT=True, init_dict=None, init_str=None):
         """Constructor of the class. Can be use in three ways :
         - __init__ (arg1 = 1, arg3 = 5) every parameters have name and default values
             for pyleecan type, -1 will call the default constructor
@@ -93,25 +93,35 @@ class PostLUT(PostMethod):
             return False
         return True
 
-    def compare(self, other, name='self', ignore_list=None, is_add_value=False):
+    def compare(self, other, name="self", ignore_list=None, is_add_value=False):
         """Compare two objects and return list of differences"""
 
         if ignore_list is None:
             ignore_list = list()
         if type(other) != type(self):
-            return ['type('+name+')']
+            return ["type(" + name + ")"]
         diff_list = list()
 
         # Check the properties inherited from PostMethod
-        diff_list.extend(super(PostLUT, self).compare(other,name=name, ignore_list=ignore_list, is_add_value=is_add_value))
+        diff_list.extend(
+            super(PostLUT, self).compare(
+                other, name=name, ignore_list=ignore_list, is_add_value=is_add_value
+            )
+        )
         if other._is_save_LUT != self._is_save_LUT:
             if is_add_value:
-                val_str = ' (self='+str(self._is_save_LUT)+', other='+str(other._is_save_LUT)+')'
-                diff_list.append(name+'.is_save_LUT'+val_str)
+                val_str = (
+                    " (self="
+                    + str(self._is_save_LUT)
+                    + ", other="
+                    + str(other._is_save_LUT)
+                    + ")"
+                )
+                diff_list.append(name + ".is_save_LUT" + val_str)
             else:
-                diff_list.append(name+'.is_save_LUT')
+                diff_list.append(name + ".is_save_LUT")
         # Filter ignore differences
-        diff_list = list(filter(lambda x : x not in ignore_list, diff_list))
+        diff_list = list(filter(lambda x: x not in ignore_list, diff_list))
         return diff_list
 
     def __sizeof__(self):
@@ -131,18 +141,21 @@ class PostLUT(PostMethod):
             How to handle ndarray (0: tolist, 1: copy, 2: nothing)
         keep_function : bool
             True to keep the function object, else return str
-        Optional keyword input parameter is for internal use only 
+        Optional keyword input parameter is for internal use only
         and may prevent json serializability.
         """
 
         # Get the properties inherited from PostMethod
-        PostLUT_dict = super(PostLUT, self).as_dict(type_handle_ndarray=type_handle_ndarray, keep_function=keep_function, **kwargs)
+        PostLUT_dict = super(PostLUT, self).as_dict(
+            type_handle_ndarray=type_handle_ndarray,
+            keep_function=keep_function,
+            **kwargs
+        )
         PostLUT_dict["is_save_LUT"] = self.is_save_LUT
         # The class name is added to the dict for deserialisation purpose
         # Overwrite the mother class name
         PostLUT_dict["__class__"] = "PostLUT"
         return PostLUT_dict
-
 
     def copy(self):
         """Creates a deepcopy of the object"""

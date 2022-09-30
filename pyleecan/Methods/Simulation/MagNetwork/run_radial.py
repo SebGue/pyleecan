@@ -186,7 +186,6 @@ def run_radial(self, axes_dict, Is_val=None, type_coord_sys=2):
     ###############################################################################
     Bx, By = self.compute_B(Phi, list_elem, list_coord, la, type_coord_sys)
 
-
     # Compute 2D curve of the airgap flux density
     index_airgap = self.geometry_motor(N_point_theta)[7]
     Bx_airgap, By_airgap = self.comp_flux_airgap_local(
@@ -202,8 +201,11 @@ def run_radial(self, axes_dict, Is_val=None, type_coord_sys=2):
         index_airgap,
         type_coord_sys,
     )
-    self.add_to_mesh_cell_math(Phi,Bx,By,list_elem,list_coord,type_coord_sys,material_dict)
-    self.save_mesh_and_data_xdmf("test",Phi,Bx,By,list_elem,list_coord,type_coord_sys,material_dict)
-    
-    
+    self.add_to_mesh_cell_math(
+        Phi, Bx, By, list_elem, list_coord, type_coord_sys, material_dict
+    )
+    self.save_mesh_and_data_xdmf(
+        "test", Phi, Bx, By, list_elem, list_coord, type_coord_sys, material_dict
+    )
+
     return Bx, By, Bx_airgap, By_airgap

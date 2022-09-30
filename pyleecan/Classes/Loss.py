@@ -46,9 +46,7 @@ class Loss(FrozenClass):
     # cf Methods.Simulation.Loss.run
     if isinstance(run, ImportError):
         run = property(
-            fget=lambda x: raise_(
-                ImportError("Can't use Loss method run: " + str(run))
-            )
+            fget=lambda x: raise_(ImportError("Can't use Loss method run: " + str(run)))
         )
     else:
         run = run
@@ -75,7 +73,15 @@ class Loss(FrozenClass):
     # get_logger method is available in all object
     get_logger = get_logger
 
-    def __init__(self, model_index=-1, model_list=-1, logger_name="Pyleecan.Loss", model_dict=None, init_dict = None, init_str = None):
+    def __init__(
+        self,
+        model_index=-1,
+        model_list=-1,
+        logger_name="Pyleecan.Loss",
+        model_dict=None,
+        init_dict=None,
+        init_str=None,
+    ):
         """Constructor of the class. Can be use in three ways :
         - __init__ (arg1 = 1, arg3 = 5) every parameters have name and default values
             for pyleecan type, -1 will call the default constructor
@@ -121,14 +127,19 @@ class Loss(FrozenClass):
         if len(self.model_list) == 0:
             Loss_str += "model_list = []" + linesep
         for ii in range(len(self.model_list)):
-            tmp = self.model_list[ii].__str__().replace(linesep, linesep + "\t") + linesep
-            Loss_str += "model_list["+str(ii)+"] ="+ tmp + linesep + linesep
+            tmp = (
+                self.model_list[ii].__str__().replace(linesep, linesep + "\t") + linesep
+            )
+            Loss_str += "model_list[" + str(ii) + "] =" + tmp + linesep + linesep
         Loss_str += 'logger_name = "' + str(self.logger_name) + '"' + linesep
         if len(self.model_dict) == 0:
-            Loss_str += "model_dict = dict()"+linesep
+            Loss_str += "model_dict = dict()" + linesep
         for key, obj in self.model_dict.items():
-            tmp = self.model_dict[key].__str__().replace(linesep, linesep + "\t") + linesep 
-            Loss_str += "model_dict["+key+"] ="+ tmp + linesep + linesep
+            tmp = (
+                self.model_dict[key].__str__().replace(linesep, linesep + "\t")
+                + linesep
+            )
+            Loss_str += "model_dict[" + key + "] =" + tmp + linesep + linesep
         return Loss_str
 
     def __eq__(self, other):
@@ -146,46 +157,76 @@ class Loss(FrozenClass):
             return False
         return True
 
-    def compare(self, other, name='self', ignore_list=None, is_add_value=False):
+    def compare(self, other, name="self", ignore_list=None, is_add_value=False):
         """Compare two objects and return list of differences"""
 
         if ignore_list is None:
             ignore_list = list()
         if type(other) != type(self):
-            return ['type('+name+')']
+            return ["type(" + name + ")"]
         diff_list = list()
         if other._model_index != self._model_index:
             if is_add_value:
-                val_str = ' (self='+str(self._model_index)+', other='+str(other._model_index)+')'
-                diff_list.append(name+'.model_index'+val_str)
+                val_str = (
+                    " (self="
+                    + str(self._model_index)
+                    + ", other="
+                    + str(other._model_index)
+                    + ")"
+                )
+                diff_list.append(name + ".model_index" + val_str)
             else:
-                diff_list.append(name+'.model_index')
-        if (other.model_list is None and self.model_list is not None) or (other.model_list is not None and self.model_list is None):
-            diff_list.append(name+'.model_list None mismatch')
+                diff_list.append(name + ".model_index")
+        if (other.model_list is None and self.model_list is not None) or (
+            other.model_list is not None and self.model_list is None
+        ):
+            diff_list.append(name + ".model_list None mismatch")
         elif self.model_list is None:
             pass
         elif len(other.model_list) != len(self.model_list):
-            diff_list.append('len('+name+'.model_list)')
+            diff_list.append("len(" + name + ".model_list)")
         else:
             for ii in range(len(other.model_list)):
-                diff_list.extend(self.model_list[ii].compare(other.model_list[ii],name=name+'.model_list['+str(ii)+']',ignore_list=ignore_list,is_add_value=is_add_value))
+                diff_list.extend(
+                    self.model_list[ii].compare(
+                        other.model_list[ii],
+                        name=name + ".model_list[" + str(ii) + "]",
+                        ignore_list=ignore_list,
+                        is_add_value=is_add_value,
+                    )
+                )
         if other._logger_name != self._logger_name:
             if is_add_value:
-                val_str = ' (self='+str(self._logger_name)+', other='+str(other._logger_name)+')'
-                diff_list.append(name+'.logger_name'+val_str)
+                val_str = (
+                    " (self="
+                    + str(self._logger_name)
+                    + ", other="
+                    + str(other._logger_name)
+                    + ")"
+                )
+                diff_list.append(name + ".logger_name" + val_str)
             else:
-                diff_list.append(name+'.logger_name')
-        if (other.model_dict is None and self.model_dict is not None) or (other.model_dict is not None and self.model_dict is None):
-            diff_list.append(name+'.model_dict None mismatch')
+                diff_list.append(name + ".logger_name")
+        if (other.model_dict is None and self.model_dict is not None) or (
+            other.model_dict is not None and self.model_dict is None
+        ):
+            diff_list.append(name + ".model_dict None mismatch")
         elif self.model_dict is None:
             pass
         elif len(other.model_dict) != len(self.model_dict):
-            diff_list.append('len('+name+'model_dict)')
+            diff_list.append("len(" + name + "model_dict)")
         else:
             for key in self.model_dict:
-                diff_list.extend(self.model_dict[key].compare(other.model_dict[key],name=name+'.model_dict['+str(key)+']',ignore_list=ignore_list,is_add_value=is_add_value))
+                diff_list.extend(
+                    self.model_dict[key].compare(
+                        other.model_dict[key],
+                        name=name + ".model_dict[" + str(key) + "]",
+                        ignore_list=ignore_list,
+                        is_add_value=is_add_value,
+                    )
+                )
         # Filter ignore differences
-        diff_list = list(filter(lambda x : x not in ignore_list, diff_list))
+        diff_list = list(filter(lambda x: x not in ignore_list, diff_list))
         return diff_list
 
     def __sizeof__(self):
@@ -211,7 +252,7 @@ class Loss(FrozenClass):
             How to handle ndarray (0: tolist, 1: copy, 2: nothing)
         keep_function : bool
             True to keep the function object, else return str
-        Optional keyword input parameter is for internal use only 
+        Optional keyword input parameter is for internal use only
         and may prevent json serializability.
         """
 
@@ -220,14 +261,20 @@ class Loss(FrozenClass):
             self.model_index.copy() if self.model_index is not None else None
         )
         if self.model_list is None:
-            Loss_dict['model_list'] = None
+            Loss_dict["model_list"] = None
         else:
-            Loss_dict['model_list'] = list()
+            Loss_dict["model_list"] = list()
             for obj in self.model_list:
                 if obj is not None:
-                    Loss_dict['model_list'].append(obj.as_dict(type_handle_ndarray=type_handle_ndarray, keep_function=keep_function, **kwargs))
+                    Loss_dict["model_list"].append(
+                        obj.as_dict(
+                            type_handle_ndarray=type_handle_ndarray,
+                            keep_function=keep_function,
+                            **kwargs
+                        )
+                    )
                 else:
-                    Loss_dict['model_list'].append(None)
+                    Loss_dict["model_list"].append(None)
         Loss_dict["logger_name"] = self.logger_name
         if self.model_dict is None:
             Loss_dict["model_dict"] = None
@@ -235,13 +282,16 @@ class Loss(FrozenClass):
             Loss_dict["model_dict"] = dict()
             for key, obj in self.model_dict.items():
                 if obj is not None:
-                    Loss_dict["model_dict"][key] = obj.as_dict(type_handle_ndarray=type_handle_ndarray, keep_function=keep_function, **kwargs)
+                    Loss_dict["model_dict"][key] = obj.as_dict(
+                        type_handle_ndarray=type_handle_ndarray,
+                        keep_function=keep_function,
+                        **kwargs
+                    )
                 else:
                     Loss_dict["model_dict"][key] = None
         # The class name is added to the dict for deserialisation purpose
         Loss_dict["__class__"] = "Loss"
         return Loss_dict
-
 
     def copy(self):
         """Creates a deepcopy of the object"""
@@ -265,7 +315,12 @@ class Loss(FrozenClass):
             for key, obj in self.model_dict.items():
                 model_dict_val[key] = obj.copy()
         # Creates new object of the same type with the copied properties
-        obj_copy = type(self)(model_index=model_index_val,model_list=model_list_val,logger_name=logger_name_val,model_dict=model_dict_val)
+        obj_copy = type(self)(
+            model_index=model_index_val,
+            model_list=model_list_val,
+            logger_name=logger_name_val,
+            model_dict=model_dict_val,
+        )
         return obj_copy
 
     def _set_None(self):
@@ -312,11 +367,15 @@ class Loss(FrozenClass):
                     try:
                         obj = load_init_dict(obj)[1]
                     except Exception as e:
-                        self.get_logger().error('Error while loading '+obj+', setting None instead')
+                        self.get_logger().error(
+                            "Error while loading " + obj + ", setting None instead"
+                        )
                         obj = None
                         value[ii] = None
                 if type(obj) is dict:
-                    class_obj = import_class('pyleecan.Classes', obj.get('__class__'), 'model_list')
+                    class_obj = import_class(
+                        "pyleecan.Classes", obj.get("__class__"), "model_list"
+                    )
                     value[ii] = class_obj(init_dict=obj)
                 if value[ii] is not None:
                     value[ii].parent = self
@@ -368,11 +427,15 @@ class Loss(FrozenClass):
                     try:
                         obj = load_init_dict(obj)[1]
                     except Exception as e:
-                        self.get_logger().error('Error while loading '+obj+', setting None instead')
+                        self.get_logger().error(
+                            "Error while loading " + obj + ", setting None instead"
+                        )
                         obj = None
                         value[key] = None
                 if type(obj) is dict:
-                    class_obj = import_class('pyleecan.Classes', obj.get('__class__'), 'model_dict')
+                    class_obj = import_class(
+                        "pyleecan.Classes", obj.get("__class__"), "model_dict"
+                    )
                     value[key] = class_obj(init_dict=obj)
         if type(value) is int and value == -1:
             value = dict()
