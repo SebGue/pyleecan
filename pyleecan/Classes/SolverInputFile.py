@@ -22,6 +22,11 @@ try:
 except ImportError as error:
     write = error
 
+try:
+    from ..Methods.Elmer.SolverInputFile.save import save
+except ImportError as error:
+    save = error
+
 
 from numpy import isnan
 from ._check import InitUnKnowClassError
@@ -32,6 +37,7 @@ class SolverInputFile(Elmer):
 
     VERSION = 1
 
+    # Check ImportError to remove unnecessary dependencies in unused method
     # cf Methods.Elmer.SolverInputFile.write
     if isinstance(write, ImportError):
         write = property(
@@ -41,8 +47,16 @@ class SolverInputFile(Elmer):
         )
     else:
         write = write
+    # cf Methods.Elmer.SolverInputFile.save
+    if isinstance(save, ImportError):
+        save = property(
+            fget=lambda x: raise_(
+                ImportError("Can't use SolverInputFile method save: " + str(save))
+            )
+        )
+    else:
+        save = save
     # generic save method is available in all object
-    save = save
     # get_logger method is available in all object
     get_logger = get_logger
 

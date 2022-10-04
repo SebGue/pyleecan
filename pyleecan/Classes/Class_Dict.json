@@ -15320,7 +15320,8 @@
         "desc": "Class to setup the Elmer Solver Input File",
         "is_internal": false,
         "methods": [
-            "write"
+            "write",
+            "save"
         ],
         "mother": "Elmer",
         "name": "SolverInputFile",

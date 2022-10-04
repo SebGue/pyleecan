@@ -325,10 +325,7 @@ def gen_case(self, output, mesh_names):
 
     # create SolverInputFile obj.
     sif = SolverInputFile(sections=sect_list)
-
-    # save the sif file
-    with open(sif_file, "wt") as f:
-        sif.write(f)
+    sif.save(sif_file)
 
 
 def _get_master_slave_bnd(i, master, slave, d=[True, False], p=False):
