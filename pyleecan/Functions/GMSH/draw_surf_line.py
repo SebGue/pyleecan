@@ -3,6 +3,7 @@ from .get_boundary_condition import get_boundary_condition
 from numpy import pi
 from ...Classes.Arc import Arc
 from ...Classes.Arc2 import Arc2
+from ...Classes.Segment import Segment
 import cmath
 
 tol = 1e-6
@@ -53,21 +54,26 @@ def draw_surf_line(
             arc1 = Arc2(begin=line.get_begin(), **arc_kwargs)
             arc2 = Arc2(begin=arc1.get_end(), **arc_kwargs)
             for arc in [arc1, arc2]:
-                _add_agline_to_dict(line=arc, **line_kwargs)
+                _add_line_to_dict(line=arc, **line_kwargs)
         elif isinstance(line, Arc) and (abs(line.get_angle() * 180.0 / pi) <= tol):
             # Don't draw anything, this is a circle and usually is repeated ?
             pass
+        elif isinstance(line, (Segment, Arc)):
+            _add_line_to_dict(line=line, **line_kwargs)
         else:
-            _add_agline_to_dict(line=line, **line_kwargs)
+            surf.get_logger().warning(
+                "Functions.GMSH.draw_GMSH(): "
+                + f"Skipping unknown geometry of type '{type(line).__name__}'."
+            )
 
 
-def _add_agline_to_dict(geo, line, d={}, idx=0, mesh_size=1e-2, n_elements=0, bc=None):
-    """Draw a new Air Gap line and add it to GMSH dictionary if it does not exist
+def _add_line_to_dict(geo, line, d={}, idx=0, mesh_size=1e-2, n_elements=0, bc=None):
+    """Draw a new line and add it to GMSH dictionary if it does not exist.
 
     Parameters
     ----------
     geo : Model
-        GMSH Model objet
+        GMSH Model object
     line : Object
         Line Object
     d : Dictionary
@@ -84,7 +90,7 @@ def _add_agline_to_dict(geo, line, d={}, idx=0, mesh_size=1e-2, n_elements=0, bc
     None
     """
 
-    # TO-DO: Allow repeated points for the rotor and stator sliding bands
+    # TODO: Allow repeated points for the rotor and stator sliding bands
     dlines = list()
     ltag = None
     btag, bx, by = _find_point_tag(d, line.get_begin())
