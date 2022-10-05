@@ -1,3 +1,6 @@
+from PySide2 import QtWidgets, QtGui, QtCore
+from matplotlib.backends.backend_qt5agg import FigureCanvas  # for proper plots
+
 from os.path import join
 from os import makedirs
 from numpy import pi
@@ -9,6 +12,7 @@ from pyleecan.definitions import DATA_DIR
 from pyleecan.Classes.LamSlotMag import LamSlotMag
 from pyleecan.Classes.SlotM11 import SlotM11
 from pyleecan.Classes.HoleM52R import HoleM52R
+from pyleecan.Classes.BoreSinePole import BoreSinePole
 from pyleecan.Classes.MachineSIPMSM import MachineSIPMSM
 from pyleecan.Classes.Simu1 import Simu1
 from pyleecan.Classes.StructElmer import StructElmer
@@ -17,7 +21,6 @@ from pyleecan.Classes.Output import Output
 from pyleecan.Functions.load import load
 from pyleecan.Functions.MeshSolution.get_indices_limited import get_indices_limited
 from pyleecan.Functions.MeshSolution.get_area import get_area
-
 
 # get the machine
 machine_1 = load(join(DATA_DIR, "Machine", "Toyota_Prius.json"))
@@ -84,22 +87,31 @@ class Test_StructElmer(object):
 
     def test_StructElmer_HoleM52R(self):
         """Test StructElmer simulation with 1 magnet on HoleM52R rotor"""
+        mm = 1e-3
 
         # copy the machine
         machine = machine_1.copy()
+        machine.name = "Prius stator - HoleM52R rotor"
 
         # some modifications to geometry
         hole = HoleM52R()
+        bore = BoreSinePole()
         machine.rotor.hole[0] = hole
+        machine.rotor.bore = bore
 
         hole.Zh = 8
-        hole.W0 = 20 * 1e-3
-        hole.W1 = 2 * 1e-3
-        hole.R0 = 1 * 1e-3
-        hole.H0 = 1 * 1e-3
-        hole.H1 = 5 * 1e-3
-        hole.H2 = 1 * 1e-3
+        hole.W0 = 40 * mm
+        hole.W1 = 2 * mm
+        hole.R0 = 1 * mm
+        hole.H0 = 2 * mm
+        hole.H1 = 5 * mm
+        hole.H2 = 1 * mm
 
+        bore.W0 = 46 * mm
+        bore.delta_d = 0.75 * mm
+        bore.delta_q = 8.00 * mm
+
+        machine.plot()
         # setup the simulation
         simu = Simu1(name="test_StructElmer_HoleM52R", machine=machine)
         output = Output(simu=simu)
