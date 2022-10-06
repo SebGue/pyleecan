@@ -8,6 +8,7 @@ from pyleecan.Functions.labels import LEFT_LAB, MAG_LAB, RIGHT_LAB, ROTOR_LAB, T
 from ....Classes.Section import Section
 from ....Classes.SolverInputFile import SolverInputFile
 from ....Methods.Elmer.Section import File, Variable, MATC
+from ....Classes.LamHole import LamHole
 
 
 # constants
@@ -222,23 +223,24 @@ def gen_case(self, output, mesh_names):
     nbr_mags = machine.rotor.get_magnet_number() / sym_r
     RM_LAB = "_".join([ROTOR_LAB, MAG_LAB])
 
-    for hole in machine.rotor.hole:
-        mag_dict = hole.comp_magnetization_dict()
-        # TODO check with 3 mag. holes and only 1 or 2 mag. set
-        for mag_name, mag_dir in mag_dict.items():
-            mag_dir = (mag_dir + pi / 2) % pi - pi / 2
-            ii = int(mag_name.split("_")[-1])
+    if isinstance(machine.rotor, LamHole):
+        for hole in machine.rotor.hole:
+            mag_dict = hole.comp_magnetization_dict()
+            # TODO check with 3 mag. holes and only 1 or 2 mag. set
+            for mag_name, mag_dir in mag_dict.items():
+                mag_dir = (mag_dir + pi / 2) % pi - pi / 2
+                ii = int(mag_name.split("_")[-1])
 
-            # TODO regard actual magnet position too
-            mag_bnds.append(["_".join([RM_LAB, TOP_LAB, str(ii)]), False])
-            if mag_dir < 0:
-                mag_bnds.append(["_".join([RM_LAB, LEFT_LAB, str(ii)]), False])
-            if mag_dir > 0:
-                mag_bnds.append(["_".join([RM_LAB, RIGHT_LAB, str(ii)]), False])
+                # TODO regard actual magnet position too
+                mag_bnds.append(["_".join([RM_LAB, TOP_LAB, str(ii)]), False])
+                if mag_dir < 0:
+                    mag_bnds.append(["_".join([RM_LAB, LEFT_LAB, str(ii)]), False])
+                if mag_dir > 0:
+                    mag_bnds.append(["_".join([RM_LAB, RIGHT_LAB, str(ii)]), False])
 
-            if mag_dir == 0 and (ii + 1) == nbr_mags // 2 + nbr_mags % 2:
-                # fix middle magnet against tangential displacement
-                mag_bnds[-1][1] = True
+                if mag_dir == 0 and (ii + 1) == nbr_mags // 2 + nbr_mags % 2:
+                    # fix middle magnet against tangential displacement
+                    mag_bnds[-1][1] = True
 
     for mag_bnd in mag_bnds:
         master = mag_bnd[0] + "_Master"
