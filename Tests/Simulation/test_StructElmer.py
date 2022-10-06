@@ -111,7 +111,6 @@ class Test_StructElmer(object):
         bore.delta_d = 0.75 * mm
         bore.delta_q = 8.00 * mm
 
-        machine.plot()
         # setup the simulation
         simu = Simu1(name="test_StructElmer_HoleM52R", machine=machine)
         output = Output(simu=simu)
@@ -123,7 +122,7 @@ class Test_StructElmer(object):
         simu.struct.is_get_mesh = True
 
         # set rotor speed and run simulation
-        simu.input = InputVoltage(OP=OPdq(N0=20000))  # rpm
+        simu.input = InputVoltage(OP=OPdq(N0=6000))  # rpm
         simu.run()
 
         return output
@@ -196,31 +195,16 @@ if __name__ == "__main__":
     # create test object
     obj = Test_StructElmer()
     # test Toyota_Prius (HoleM50-Rotor) with minor modification
-    # out = obj.test_StructElmer_HoleM50()
-    # out = obj.test_StructElmer_HoleM50_no_magnets()
+    out = obj.test_StructElmer_HoleM50()
+    out = obj.test_StructElmer_HoleM50_no_magnets()
 
     out = obj.test_StructElmer_HoleM52R()
 
     # test centrifugal force on a disc
-    # out = obj.test_StructElmer_disk()
-
-    # get_indices_limited(out.struct.meshsolution,label="vonmises")
-    field = out.struct.meshsolution.get_field(
-        label="vonmises",
-        index=None,
-        indices=None,
-        is_rthetaz=False,
-        is_pol2cart=False,
-        is_radial=False,
-        is_normal=False,
-        is_rms=False,
-        is_center=False,
-        is_surf=False,
-        is_squeeze=True,
-    )
+    out = obj.test_StructElmer_disk()
 
     # # plot some results
     # out.struct.meshsolution.plot_deflection(label="disp", factor=20)
     out.struct.meshsolution.plot_contour(label="disp")
-    out.struct.meshsolution.plot_contour(label="vonmises")
+    out.struct.meshsolution.plot_contour(label="vonmises", clim=[0, 200*1e6])
     out.struct.meshsolution.plot_mesh()
