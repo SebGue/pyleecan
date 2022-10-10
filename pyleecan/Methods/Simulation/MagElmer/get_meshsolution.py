@@ -1,11 +1,7 @@
-from ....Classes.MeshSolution import MeshSolution
-from ....Classes.MeshVTK import MeshVTK
-from ....Classes.SolutionData import SolutionData
-from ....Classes.SolutionVector import SolutionVector
-from meshio import read
-from SciDataTool import Data1D, VectorField, DataTime, Norm_ref
-from numpy import arange, append as np_append
+# -*- coding: utf-8 -*-
 from os.path import join
+
+from ....Classes.ElmerResultsVTU import ElmerResultsVTU
 
 
 def get_meshsolution(self, output):
@@ -23,54 +19,19 @@ def get_meshsolution(self, output):
     meshsol: MeshSolution
         a MeshSolution object with Elmer outputs at every time step
     """
-    project_name = self.get_path_save_fea(output)
-    elmermesh_folder = project_name
-    meshsol = MeshSolution(label="Elmer MagnetoDynamics")
+    # logger
+    logger = self.get_logger()
+
+    # if meshsoltion is not requested set meshsolution to None
     if not self.is_get_mesh or not self.is_save_FEA:
-        self.get_logger().info("MagElmer: MeshSolution is not stored by request.")
+        logger.info("StructElmer: MeshSolution is not stored by request.")
+        output.struct.meshsolution = None
         return False
 
-    meshvtk = MeshVTK(path=elmermesh_folder, name="step_t0002", format="vtu")
-    meshsol.mesh = [meshvtk]
+    # setup Elmer result helper class
+    ElmerVtu = ElmerResultsVTU()
 
-    result_filename = join(elmermesh_folder, "step_t0002.vtu")
-    meshsolvtu = read(result_filename)
-    # pt_data = meshsolvtu.point_data
-    cell_data = meshsolvtu.cell_data
-
-    # indices = arange(meshsolvtu.points.shape[0])
-    indices = arange(
-        meshsolvtu.cells[0].data.shape[0] + meshsolvtu.cells[1].data.shape[0]
-    )
-
-    Indices = Data1D(name="indice", values=indices, is_components=True)
-    # store_dict = {
-    #     "magnetic vector potential": {
-    #         "name": "Magnetic Vector Potential A",
-    #         "unit": "Wb",
-    #         "symbol": "A",
-    #         "norm": 1,
-    #     },
-    #     "magnetic flux density": {
-    #         "name": "Magnetic Flux Density B",
-    #         "unit": "T",
-    #         "symbol": "B",
-    #         "norm": 1,
-    #     },
-    #     "magnetic field strength": {
-    #         "name": "Magnetic Field H",
-    #         "unit": "A/m",
-    #         "symbol": "H",
-    #         "norm": 1,
-    #     },
-    #     "current density": {
-    #         "name": "Current Density J",
-    #         "unit": "A/mm2",
-    #         "symbol": "J",
-    #         "norm": 1,
-    #     }
-    # }
-    store_dict = {
+    ElmerVtu.store_dict = {
         "magnetic flux density e": {
             "name": "Magnetic Flux Density B",
             "unit": "T",
@@ -96,67 +57,37 @@ def get_meshsolution(self, output):
             "norm": 1,
         },
     }
-    comp_ext = ["x", "y", "z"]
-    sol_list = []
-    # for key, value in pt_data.items():
-    for key, value in cell_data.items():
-        if key in store_dict.keys():
-            # siz = value.shape[1]
-            siz = value[0].shape[1]
-            if siz > 3:
-                print("Some Message")
-                siz = 3
-            components = []
-            comp_name = []
-            values = np_append(value[0], value[1], axis=0)
-            for i in range(siz):
-                if siz == 1:
-                    ext = ""
-                else:
-                    ext = comp_ext[i]
 
-                data = DataTime(
-                    name=store_dict[key]["name"] + ext,
-                    unit=store_dict[key]["unit"],
-                    symbol=store_dict[key]["symbol"] + ext,
-                    axes=[Indices],
-                    # values=value[:, i],
-                    values=values[:, i],
-                    normalizations={"ref": Norm_ref(ref=store_dict[key]["norm"])},
-                )
+    # ElmerVtu.store_dict = {
+    #     "magnetic vector potential": {
+    #         "name": "Magnetic Vector Potential A",
+    #         "unit": "Wb",
+    #         "symbol": "A",
+    #         "norm": 1,
+    #     },
+    #     "magnetic flux density": {
+    #         "name": "Magnetic Flux Density B",
+    #         "unit": "T",
+    #         "symbol": "B",
+    #         "norm": 1,
+    #     },
+    #     "magnetic field strength": {
+    #         "name": "Magnetic Field H",
+    #         "unit": "A/m",
+    #         "symbol": "H",
+    #         "norm": 1,
+    #     },
+    #     "current density": {
+    #         "name": "Current Density J",
+    #         "unit": "A/mm2",
+    #         "symbol": "J",
+    #         "norm": 1,
+    #     }
+    # }
 
-                components.append(data)
-                comp_name.append("comp_" + ext)
+    ElmerVtu.label = "Elmer MagnetoDynamics"
+    ElmerVtu.file_path = join(self.get_path_save_fea(output), "step_t0002.vtu")
 
-            if siz == 1:
-                field = components[0]
-                sol_list.append(
-                    SolutionData(
-                        field=field,
-                        # type_cell="point",
-                        type_cell="triangle",
-                        label=store_dict[key]["symbol"],
-                    )
-                )
-            else:
-                comps = {}
-                for i in range(siz):
-                    comps[comp_name[i]] = components[i]
-                field = VectorField(
-                    name=store_dict[key]["name"],
-                    symbol=store_dict[key]["symbol"],
-                    components=comps,
-                )
-                sol_list.append(
-                    SolutionVector(
-                        field=field,
-                        # type_cell="point",
-                        type_cell="triangle",
-                        label=store_dict[key]["symbol"],
-                    )
-                )
-
-    meshsol.solution = sol_list
-    output.mag.meshsolution = meshsol
+    output.mag.meshsolution = ElmerVtu.build_meshsolution(is_point_data=False)
 
     return True

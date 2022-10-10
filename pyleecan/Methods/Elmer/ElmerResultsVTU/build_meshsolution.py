@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from numpy import arange
+from operator import is_
+from numpy import arange, append as np_append
 from meshio import read
 from os.path import join, split, splitext
 
@@ -16,7 +17,7 @@ from ....Methods.Elmer.ElmerResultsVTU import ElmerResultsVTUError
 # TODO add groups, see get_meshsolution of MagFEMM
 
 
-def build_meshsolution(self):
+def build_meshsolution(self, is_point_data=True):
     """Get the mesh and solution data from an Elmer VTU results file
 
     Parameters
@@ -24,10 +25,13 @@ def build_meshsolution(self):
     self : ElmerResultsVTU
         a ElmerResultsVTU object
 
+    is_point_data : bool
+        True if the MeshSolution should be created from point data, else cell data
+
     Returns
     -------
-    success: bool
-        Information if meshsolution could be created
+    meshsol: MeshSolution
+        MeshSolution created from the corresponding VTU file
 
     """
     # create meshsolution
@@ -45,10 +49,15 @@ def build_meshsolution(self):
 
     # get the solution data on the mesh
     meshsolvtu = read(self.file_path)
-    pt_data = meshsolvtu.point_data  # point_data is of type dict
+    data = meshsolvtu.point_data if is_point_data else meshsolvtu.cell_data
 
     # setup axes
-    indices = arange(meshsolvtu.points.shape[0])
+    if is_point_data:
+        indices = arange(meshsolvtu.points.shape[0])
+    else:
+        indices = arange(
+            meshsolvtu.cells[0].data.shape[0] + meshsolvtu.cells[1].data.shape[0]
+        )
     Indices = Data1D(name="indice", values=indices, is_components=True)
 
     # store only data from store dict if available
@@ -56,10 +65,10 @@ def build_meshsolution(self):
 
     sol_list = []  # list of solutions
 
-    for key, value in pt_data.items():
+    for key, value in data.items():
         # check if value should be stored
         if key in self.store_dict.keys():
-            siz = value.shape[1]
+            siz = value.shape[1] if is_point_data else value[0].shape[1]
             # only regard max. 3 components
             if siz > 3:
                 self.get_logger().warning(
@@ -71,6 +80,8 @@ def build_meshsolution(self):
 
             components = []
             comp_name = []
+            if not is_point_data:
+                value = np_append(value[0], value[1], axis=0)
 
             # loop though components
             for i in range(siz):
