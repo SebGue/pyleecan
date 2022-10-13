@@ -327,6 +327,6 @@ def get_sliding_band(sym, machine):
         )
 
         # reversed append to apply mesh settings correctly
-        surf_list.extend([ext_ag_surf, ext_sb_surf])  
+        surf_list.extend([ext_ag_surf, ext_sb_surf])
 
     return surf_list
