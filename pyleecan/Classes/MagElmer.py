@@ -47,6 +47,11 @@ try:
 except ImportError as error:
     gen_elmer_mesh = error
 
+try:
+    from ..Methods.Simulation.MagElmer.gen_elmer_sif import gen_elmer_sif
+except ImportError as error:
+    gen_elmer_sif = error
+
 
 from numpy import isnan
 from ._check import InitUnKnowClassError
@@ -125,6 +130,17 @@ class MagElmer(Magnetics):
         )
     else:
         gen_elmer_mesh = gen_elmer_mesh
+    # cf Methods.Simulation.MagElmer.gen_elmer_sif
+    if isinstance(gen_elmer_sif, ImportError):
+        gen_elmer_sif = property(
+            fget=lambda x: raise_(
+                ImportError(
+                    "Can't use MagElmer method gen_elmer_sif: " + str(gen_elmer_sif)
+                )
+            )
+        )
+    else:
+        gen_elmer_sif = gen_elmer_sif
     # generic save method is available in all object
     save = save
     # get_logger method is available in all object
