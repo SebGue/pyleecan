@@ -80,7 +80,7 @@ def comp_flux_airgap(self, output, axes_dict, Is_val=None, Ir_val=None):
 
     # generate the elmer solver input file
     elmer_sif_file = self.gen_elmer_sif(
-        output, sym, angle, time, angle_rotor, Is_val, Ir_val
+        output, sym, time, angle_rotor, Is_val, Ir_val
     )
 
     # Solve for all time step and store all the results in output

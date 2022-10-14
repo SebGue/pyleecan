@@ -139,7 +139,7 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
     elmer_sif_file = join(project_name, "pyleecan_elmer.sif")
     pp = machine.stator.winding.p
     wind_mat = machine.stator.winding.get_connection_mat(machine.stator.slot.Zs)
-    surf_wind = machine.stator.slot.comp_surface_active()
+    surf_wind = machine.stator.slot.comp_surface_active()  # TODO use actual surf.
     ror = machine.rotor.comp_radius_mec()
     sir = machine.stator.comp_radius_mec()
 
@@ -156,12 +156,15 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
     surf_list = machine.build_geometry(sym=sym)
     pm_index = 6
     Mangle = list()
-    Ncond_Aplus = 1
-    Ncond_Aminus = 1
-    Ncond_Bplus = 1
-    Ncond_Bminus = 1
-    Ncond_Cplus = 1
-    Ncond_Cminus = 1
+    
+    # create Body Force LUT for required current densities TODO: only stator for now
+    qs = machine.stator.winding.qs
+    bf_id = 2
+    bf_LUT = dict()
+    for ii in range(qs):
+        bf_LUT[ii] = dict()
+
+    # evaluate surfaces
     for surf in surf_list:
         label = short_label(surf.label)
         label_dict = decode_label(label)
@@ -231,31 +234,15 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
             # Get the phase value in the correct slot zone
             q_id = get_phase_id(wind_mat, Nrad_id, Ntan_id, Zs_id)
             Ncond = wind_mat[Nrad_id, Ntan_id, Zs_id, q_id]
-            s = sign(Ncond)
             if bodies.get(label, None) is not None:
                 bodies[label]["mat"] = 5
                 bodies[label]["eq"] = 1
-                # TODO: each winding surface of a phase can have its own Ncond
-                if q_id == 0 and s == 1:
-                    bodies[label]["bf"] = 2
-                    Ncond_Aplus = abs(Ncond)
-                elif q_id == 0 and s == -1:
-                    bodies[label]["bf"] = 3
-                    Ncond_Aminus = abs(Ncond)
-                elif q_id == 1 and s == 1:
-                    bodies[label]["bf"] = 4
-                    Ncond_Bplus = abs(Ncond)
-                elif q_id == 1 and s == -1:
-                    bodies[label]["bf"] = 5
-                    Ncond_Bminus = abs(Ncond)
-                elif q_id == 2 and s == 1:
-                    bodies[label]["bf"] = 6
-                    Ncond_Cplus = abs(Ncond)
-                elif q_id == 2 and s == -1:
-                    bodies[label]["bf"] = 7
-                    Ncond_Cminus = abs(Ncond)
+                if Ncond not in bf_LUT[q_id]:
+                    bf_LUT[q_id][Ncond] = bf_id
+                    bodies[label]["bf"] = bf_id
+                    bf_id += 1
                 else:
-                    pass
+                    bodies[label]["bf"] = bf_LUT[q_id][Ncond]
         elif (
             LAM_LAB_S in label_dict["surf_type"]
             and ROTOR_LAB_S in label_dict["lam_label"]
@@ -309,7 +296,6 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
     rotor_init_pos = machine.comp_angle_rotor_initial() + angle_shift
     Ncond = 1  # Fixed for Now
     Cp = 1  # Fixed for Now
-    qs = len(machine.stator.get_name_phase())
 
     # generate sif file
     with open(elmer_sif_file, "wt") as fo:
@@ -417,7 +403,7 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
         winding_temp = 20.0  # Fixed for Now
         conductivity = machine.stator.winding.conductor.cond_mat.elec.get_conductivity(
             T_op=winding_temp, T_ref=20
-        )
+        ) * 0  # TODO no conductivity to avoid AC effects in conductors
 
         fo.write(
             "\nMaterial 5\n"
@@ -513,95 +499,23 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
             )
         fo.write("\tEnd\n" "End\n")
 
-        fo.write(
-            "Body Force 2\n"
-            '\tName = "J_A_PLUS"\n'
-            "\tCurrent Density = Variable time\n"
-            "\t\tReal\n"
-            "\t\t0.0\t\t0.0\n"
-        )
-        for tt in range(1, timelen + 1):
-            fo.write(
-                "\t\t{:.2e}\t\t{:.3f}\n".format(
-                    time[tt], Ncond_Aplus * Is[0, tt - 1] / surf_wind
+        # current density Body Forces
+        for q_id, Ncond_dict in bf_LUT.items():
+            for Ncond, ii in Ncond_dict.items():
+                fo.write(
+                    f"Body Force {ii}\n"
+                    f'\tName = "Phase_{q_id}_BF_{ii}"\n'
+                    "\tCurrent Density = Variable time\n"
+                    "\t\tReal\n"
+                    "\t\t0.0\t\t0.0\n"
                 )
-            )
-        fo.write("\tEnd\n" "End\n")
-
-        fo.write(
-            "Body Force 3\n"
-            '\tName = "J_A_MINUS"\n'
-            "\tCurrent Density = Variable time\n"
-            "\t\tReal\n"
-            "\t\t0.0\t\t0.0\n"
-        )
-        for tt in range(1, timelen + 1):
-            fo.write(
-                "\t\t{:.2e}\t\t{:.3f}\n".format(
-                    time[tt], -Ncond_Aminus * Is[0, tt - 1] / surf_wind
-                )
-            )
-        fo.write("\tEnd\n" "End\n")
-
-        fo.write(
-            "Body Force 4\n"
-            '\tName = "J_B_PLUS"\n'
-            "\tCurrent Density = Variable time\n"
-            "\t\tReal\n"
-            "\t\t0.0\t\t0.0\n"
-        )
-        for tt in range(1, timelen + 1):
-            fo.write(
-                "\t\t{:.2e}\t\t{:.3f}\n".format(
-                    time[tt], Ncond_Bplus * Is[1, tt - 1] / surf_wind
-                )
-            )
-        fo.write("\tEnd\n" "End\n")
-
-        fo.write(
-            "Body Force 5\n"
-            '\tName = "J_B_MINUS"\n'
-            "\tCurrent Density = Variable time\n"
-            "\t\tReal\n"
-            "\t\t0.0\t\t0.0\n"
-        )
-        for tt in range(1, timelen + 1):
-            fo.write(
-                "\t\t{:.2e}\t\t{:.3f}\n".format(
-                    time[tt], -Ncond_Bminus * Is[1, tt - 1] / surf_wind
-                )
-            )
-        fo.write("\tEnd\n" "End\n")
-
-        fo.write(
-            "Body Force 6\n"
-            '\tName = "J_C_PLUS"\n'
-            "\tCurrent Density = Variable time\n"
-            "\t\tReal\n"
-            "\t\t0.0\t\t0.0\n"
-        )
-        for tt in range(1, timelen + 1):
-            fo.write(
-                "\t\t{:.2e}\t\t{:.3f}\n".format(
-                    time[tt], Ncond_Cplus * Is[2, tt - 1] / surf_wind
-                )
-            )
-        fo.write("\tEnd\n" "End\n")
-
-        fo.write(
-            "Body Force 7\n"
-            '\tName = "J_C_MINUS"\n'
-            "\tCurrent Density = Variable time\n"
-            "\t\tReal\n"
-            "\t\t0.0\t\t0.0\n"
-        )
-        for tt in range(1, timelen + 1):
-            fo.write(
-                "\t\t{:.2e}\t\t{:.3f}\n".format(
-                    time[tt], -Ncond_Cminus * Is[2, tt - 1] / surf_wind
-                )
-            )
-        fo.write("\tEnd\n" "End\n")
+                for tt in range(1, timelen + 1):
+                    fo.write(
+                        "\t\t{:.2e}\t\t{:.3f}\n".format(
+                            time[tt], Ncond * Is[q_id, tt - 1] / surf_wind
+                        )
+                    )
+                fo.write("\tEnd\n" "End\n")
 
         # Bodies Section
         fo.write("\n!--- BODIES ---\n")
