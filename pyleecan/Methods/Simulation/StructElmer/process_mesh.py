@@ -246,13 +246,6 @@ def process_mesh(
 
     # gmsh.option.setNumber("Mesh.RecombinationAlgorithm", 1)
 
-    gmsh.model.mesh.generate(2)
-    # gmsh.model.mesh.recombine()
-    gmsh.model.mesh.refine()
-    # gmsh.model.mesh.refine()
-    # gmsh.model.mesh.recombine()
-    # gmsh.model.mesh.refine()
-
     # save mesh or geo file depending on file extension
     filename, file_extension = splitext(file_out)
 
@@ -261,6 +254,8 @@ def process_mesh(
         replace(filename + ".geo_unrolled", filename + file_extension)
     else:
         gmsh.model.mesh.generate(2)
+        gmsh.model.mesh.refine()
+        gmsh.model.mesh.setOrder(2)
         gmsh.write(file_out)
 
     # gmsh.fltk.run()      # Uncomment to launch Gmsh GUI
