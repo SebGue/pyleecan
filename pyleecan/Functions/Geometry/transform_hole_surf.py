@@ -48,6 +48,9 @@ def transform_hole_surf(
 
     assert Zh % sym == 0
 
+    if len(hole_surf_list) == 0:
+        return []
+
     # Default BC
     lam_label = decode_label(hole_surf_list[0].label)["lam_label"]
     if BC_prop_right is None:

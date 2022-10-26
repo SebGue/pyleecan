@@ -2663,7 +2663,8 @@
             "has_magnet",
             "plot",
             "set_magnet_by_id",
-            "get_R_id"
+            "get_R_id",
+            "build_geometry"
         ],
         "mother": "",
         "name": "Hole",

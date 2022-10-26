@@ -13,3 +13,4 @@ Alpha0,rad,Shift angle of the holes around circumference,0,float,0,0,6.29,,,,com
 ,,,,,,,,,,,plot,,,
 ,,,,,,,,,,,set_magnet_by_id,,,
 ,,,,,,,,,,,get_R_id,,,
+,,,,,,,,,,,build_geometry,,,

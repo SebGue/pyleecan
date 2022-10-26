@@ -87,6 +87,11 @@ try:
 except ImportError as error:
     get_R_id = error
 
+try:
+    from ..Methods.Slot.Hole.build_geometry import build_geometry
+except ImportError as error:
+    build_geometry = error
+
 
 from numpy import isnan
 from ._check import InitUnKnowClassError
@@ -237,6 +242,17 @@ class Hole(FrozenClass):
         )
     else:
         get_R_id = get_R_id
+    # cf Methods.Slot.Hole.build_geometry
+    if isinstance(build_geometry, ImportError):
+        build_geometry = property(
+            fget=lambda x: raise_(
+                ImportError(
+                    "Can't use Hole method build_geometry: " + str(build_geometry)
+                )
+            )
+        )
+    else:
+        build_geometry = build_geometry
     # generic save method is available in all object
     save = save
     # get_logger method is available in all object
