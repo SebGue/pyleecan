@@ -22,4 +22,8 @@ def get_boundary_condition(line, boundary_prop):
         for bnd in boundary_prop.keys():
             if line.prop_dict[BOUNDARY_PROP_LAB].startswith(bnd):
                 return boundary_prop[bnd]
+    elif line.prop_dict and "LamRadius" in line.prop_dict:
+        # TODO include bore label in gmsh model; this is a quick fix only
+        if line.prop_dict["LamRadius"] == "Bore" and "Rotor" in line.parent.label:
+            return "ROTOR_BORE_CURVE"
     return ""
