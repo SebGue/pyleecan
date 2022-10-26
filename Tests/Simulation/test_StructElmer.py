@@ -5,22 +5,23 @@ from os.path import join
 from os import makedirs
 from numpy import pi
 import pytest
-from Tests import save_validation_path as save_path, TEST_DATA_DIR
+from Tests import save_validation_path as save_path
 from pyleecan.Classes.OPdq import OPdq
 from pyleecan.definitions import DATA_DIR
 
-from pyleecan.Classes.LamSlotMag import LamSlotMag
-from pyleecan.Classes.SlotM11 import SlotM11
+from pyleecan.Classes.LamHole import LamHole
+from pyleecan.Classes.Hole import Hole
 from pyleecan.Classes.HoleM52R import HoleM52R
 from pyleecan.Classes.BoreSinePole import BoreSinePole
-from pyleecan.Classes.MachineSIPMSM import MachineSIPMSM
+from pyleecan.Classes.MachineIPMSM import MachineIPMSM
 from pyleecan.Classes.Simu1 import Simu1
 from pyleecan.Classes.StructElmer import StructElmer
 from pyleecan.Classes.InputVoltage import InputVoltage
 from pyleecan.Classes.Output import Output
 from pyleecan.Functions.load import load
-from pyleecan.Functions.MeshSolution.get_indices_limited import get_indices_limited
-from pyleecan.Functions.MeshSolution.get_area import get_area
+
+# from pyleecan.Functions.MeshSolution.get_indices_limited import get_indices_limited
+# from pyleecan.Functions.MeshSolution.get_area import get_area
 
 # get the machine
 machine_1 = load(join(DATA_DIR, "Machine", "Toyota_Prius.json"))
@@ -160,17 +161,19 @@ class Test_StructElmer(object):
         # TODO compare to analytical values
 
         # setup new machine and copy stator props of ref. machine
-        machine = MachineSIPMSM()
+        machine = MachineIPMSM()
         machine.stator = machine_1.stator.copy()
-        machine.rotor = LamSlotMag()
+        machine.stator.winding.p = 2
+        machine.rotor = LamHole()
 
-        machine.rotor.Rint = machine_1.rotor.Rint
-        machine.rotor.Rext = machine_1.rotor.Rext
+        machine.rotor.Rint = 70 * 1e-3
+        machine.rotor.Rext = 80 * 1e-3
         machine.rotor.mat_type = machine_1.rotor.mat_type.copy()
 
-        machine.rotor.slot = SlotM11(H0=0, W0=pi / 16)
-        machine.rotor.slot.Zs = 8
         machine.rotor.is_stator = False
+
+        hole = Hole(Zh=2 * machine.stator.winding.p)
+        machine.rotor.hole.append(hole)
 
         # setup the simulation
         simu = Simu1(name="test_StructElmer_disk", machine=machine)
@@ -198,7 +201,7 @@ if __name__ == "__main__":
     out = obj.test_StructElmer_HoleM50()
     out = obj.test_StructElmer_HoleM50_no_magnets()
 
-    out = obj.test_StructElmer_HoleM52R()
+    # out = obj.test_StructElmer_HoleM52R()
 
     # test centrifugal force on a disc
     out = obj.test_StructElmer_disk()
@@ -206,5 +209,5 @@ if __name__ == "__main__":
     # # plot some results
     # out.struct.meshsolution.plot_deflection(label="disp", factor=20)
     out.struct.meshsolution.plot_contour(label="disp")
-    out.struct.meshsolution.plot_contour(label="vonmises", clim=[0, 200*1e6])
+    out.struct.meshsolution.plot_contour(label="vonmises", clim=[0, 200 * 1e6])
     out.struct.meshsolution.plot_mesh()
