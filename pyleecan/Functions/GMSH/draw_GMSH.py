@@ -25,6 +25,9 @@ from os.path import splitext
 
 from numpy import pi
 
+# TODO: rework boundary_prop -> pair of prop_key, prop_value to avoid using
+#       'stiff' BOUNDARY_PROP_LAB in get_boundary_condition
+
 
 def draw_GMSH(
     output,
