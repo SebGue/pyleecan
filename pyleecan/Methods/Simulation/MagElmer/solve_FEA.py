@@ -61,7 +61,7 @@ def solve_FEA(self, output, sym, angle, time, elmer_sif_file):
 
     elmermesh_folder = self.get_path_save_fea(output)
     time = np.append(time, time[1] + time[-1])
-    
+
     # setup Elmer solver
     # ElmerSolver v8.4 must be installed and in the PATH
 
@@ -121,7 +121,7 @@ def solve_FEA(self, output, sym, angle, time, elmer_sif_file):
     Br = zeros((Nt, Na))
     Bt = zeros((Nt, Na))
     Bz = zeros((Nt, Na))
-    Tem = tq * sym * L1
+    Tem = tq * sym  # torque per meter
 
     # Phi_wind_stator = zeros((Nt, qs))
 

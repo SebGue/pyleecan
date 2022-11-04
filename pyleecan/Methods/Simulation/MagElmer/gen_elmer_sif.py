@@ -156,7 +156,7 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
     surf_list = machine.build_geometry(sym=sym)
     pm_index = 6
     Mangle = list()
-    
+
     # create Body Force LUT for required current densities TODO: only stator for now
     qs = machine.stator.winding.qs
     bf_id = 2
@@ -401,9 +401,12 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
         )
 
         winding_temp = 20.0  # Fixed for Now
-        conductivity = machine.stator.winding.conductor.cond_mat.elec.get_conductivity(
-            T_op=winding_temp, T_ref=20
-        ) * 0  # TODO no conductivity to avoid AC effects in conductors
+        conductivity = (
+            machine.stator.winding.conductor.cond_mat.elec.get_conductivity(
+                T_op=winding_temp, T_ref=20
+            )
+            * 0
+        )  # TODO no conductivity to avoid AC effects in conductors
 
         fo.write(
             "\nMaterial 5\n"
@@ -422,9 +425,9 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
                     '\tName = "PM_{1}"\n'
                     "\tRelative Permeability = {2}\n"
                     "\tMagnetization 1 = Variable time, timestep size\n"
-                    '\t\tReal MATC  "H_PM*cos(WM*(tx(0)-tx(1)) + {3}*pi/PP + {3}*pi + (RotorInitPos + Mangle{1})*pi/180)"\n'
+                    '\t\tReal MATC  "H_PM*cos({5}*WM*(tx(0)-tx(1)) + {3}*pi/PP + {3}*pi + (RotorInitPos + Mangle{1})*pi/180)"\n'
                     "\tMagnetization 2 = Variable time, timestep size\n"
-                    '\t\tReal MATC "H_PM*sin(WM*(tx(0)-tx(1)) + {3}*pi/PP + {3}*pi + (RotorInitPos + Mangle{1})*pi/180)"\n'
+                    '\t\tReal MATC "H_PM*sin({5}*WM*(tx(0)-tx(1)) + {3}*pi/PP + {3}*pi + (RotorInitPos + Mangle{1})*pi/180)"\n'
                     "\tElectric Conductivity = {4}\n"
                     "End\n".format(
                         mat_number,
@@ -432,9 +435,10 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
                         magnet_permeability,
                         int((m - 1) / magnets_per_pole),
                         round(conductivity_m, 2),
+                        output.geo.rot_dir,
                     )
                 )
-            elif magnetization_type == "radial":
+            elif magnetization_type == "radial":  # TODO check rot_dir == -1
                 fo.write(
                     "\nMaterial {0}\n"
                     '\tName = "PM_{1}"\n'
@@ -458,9 +462,9 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
                     '\tName = "PM_{1}"\n'
                     "\tRelative Permeability = {2}\n"
                     "\tMagnetization 1 = Variable time, timestep size\n"
-                    '\t\tReal MATC  "H_PM*cos(WM*(tx(0)-tx(1)) + {3}*pi/PP + {3}*pi + Aaxis*pi/180 + (Mangle{1}*pi/180))"\n'
+                    '\t\tReal MATC  "H_PM*cos({5}*WM*(tx(0)-tx(1)) + {3}*pi/PP + {3}*pi + Aaxis*pi/180 + (Mangle{1}*pi/180))"\n'
                     "\tMagnetization 2 = Variable time, timestep size\n"
-                    '\t\tReal MATC "H_PM*sin(WM*(tx(0)-tx(1)) + {3}*pi/PP + {3}*pi + Aaxis*pi/180 + (Mangle{1}*pi/180))"\n'
+                    '\t\tReal MATC "H_PM*sin({5}*WM*(tx(0)-tx(1)) + {3}*pi/PP + {3}*pi + Aaxis*pi/180 + (Mangle{1}*pi/180))"\n'
                     "\tElectric Conductivity = {4}\n"
                     "End\n".format(
                         mat_number,
@@ -468,6 +472,7 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
                         magnet_permeability,
                         int((m - 1) / magnets_per_pole),
                         round(conductivity_m, 2),
+                        output.geo.rot_dir,
                     )
                 )
             else:
