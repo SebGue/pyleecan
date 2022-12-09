@@ -242,7 +242,7 @@ def solve_power(self, LUT, Rs):
         Tem = P_out[i0][imin] / (2 * np.pi * OP.N0 / 60)
 
     out_dict = self.solve_post(
-        self, LUT, ws, Ud, Uq, Iq, Id, Phid, Phiq, P_in, P_out, Tem, i0, imin
+        LUT, ws, Ud, Uq, Iq, Id, Phid, Phiq, P_in, P_out, Tem, i0, imin
     )
 
     if is_loss_model:

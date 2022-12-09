@@ -173,7 +173,7 @@ def solve_MTPA(self, LUT, Rs):
     Tem = Tem_interp[i0][imin]
 
     out_dict = self.solve_post(
-        self, LUT, ws, Ud, Uq, Iq, Id, Phid, Phiq, P_in, P_out, Tem, i0, imin
+        LUT, ws, Ud, Uq, Iq, Id, Phid, Phiq, P_in, P_out, Tem, i0, imin
     )
 
     return out_dict
