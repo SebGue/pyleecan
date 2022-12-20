@@ -109,7 +109,7 @@ def solve_MTPA(self, LUT, Rs):
 
         if self.load_rate == 0:
             # Finding indices of operating points satisfying voltage constraint for no torque production
-            i0 = np.logical_and(U_cond, Iq == 0)
+            i0 = np.logical_and(U_cond, Iq >= 0)
 
             # Finding index of operating point for lowest current
             imin = np.argmin(np.abs(Imax_interp[i0]))
@@ -161,6 +161,12 @@ def solve_MTPA(self, LUT, Rs):
             Iq_max = Iq_vect[jq_max]
 
         niter_Tem = niter_Tem + 1
+
+        if abs(delta_Tem) > delta_Tem_max and niter_Tem < Nmax:
+            cls_name = self.__class__.__name__
+            self.get_logger().warning(
+                f"{cls_name}: No convergence reached after {Nmax} iterations."
+            )
 
     # Launch warnings
     if Umax_interp[i0][imin] > Urms_max:
