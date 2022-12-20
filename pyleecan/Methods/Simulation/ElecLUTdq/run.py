@@ -42,8 +42,6 @@ def run(self):
         Swire = machine.stator.winding.conductor.comp_surface_active()
         Npcp = machine.stator.winding.Npcp
         self.Irms_max = self.Jrms_max * Swire * Npcp
-    else:
-        self.Irms_max = output.simu.input.Irms_max
 
     if self.LUT_enforced is not None:
         # Take enforced LUT
@@ -57,7 +55,6 @@ def run(self):
         self.Iq_max = OP_matrix[:, 2].max()
 
     else:
-        # Run look up table calculation
         # Check dq current boundaries
         if self.Id_min is None:
             if self.n_Id == 1 and self.Id_max is not None:
@@ -80,13 +77,33 @@ def run(self):
             else:
                 self.Iq_max = self.Irms_max
 
-        # Run method to calculate LUT
-        LUT = self.comp_LUTdq()
+        if self.LUT_simu is not None:
+            # Run method to calculate LUT and store LUT
+            LUT = self.comp_LUTdq()
+            output.simu.elec.LUT_enforced = LUT
+        else:
+            # check for EEC with constant parameters as a fall back to solve ElecLUTdq
+            if (
+                not isinstance(self.eec, EEC_PMSM)
+                or self.eec.Phid_mag is None
+                or self.eec.Phiq_mag is None
+                or self.eec.Ld is None
+                or self.eec.Lq is None
+            ):
+                raise Exception("Cannot calculate LUTdq if self.LUT_simu is None")
 
-        # LUT.save(save_path=r"C:\Users\LAP10\Documents\Loss\LUT_eff.h5")
+            # use eec parameters
+            self.get_logger().info(
+                "Using constant EEC_PMSM parameters for ElecLUTdq calculation."
+            )
 
-        # Store LUT
-        output.simu.elec.LUT_enforced = LUT
+            # override stator resistance
+            Rs = self.eec.R1 if self.eec.R1 else Rs
+
+            # create equivalent LUT object
+            from ..ElecLUTdq import EEC2LUT
+
+            LUT = EEC2LUT(eec=self.eec)
 
     if OP.Pem_av_ref is not None or OP.Pem_av_in is not None:
         out_dict = self.solve_power(LUT, Rs)
