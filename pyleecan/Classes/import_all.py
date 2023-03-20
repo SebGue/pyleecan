@@ -94,10 +94,14 @@ from ..Classes.LamSquirrelCageMag import LamSquirrelCageMag
 from ..Classes.Lamination import Lamination
 from ..Classes.Line import Line
 from ..Classes.Loss import Loss
-from ..Classes.LossFEMM import LossFEMM
+from ..Classes.LossFEA import LossFEA
 from ..Classes.LossModel import LossModel
 from ..Classes.LossModelBertotti import LossModelBertotti
+from ..Classes.LossModelJoule import LossModelJoule
+from ..Classes.LossModelMagnet import LossModelMagnet
+from ..Classes.LossModelProximity import LossModelProximity
 from ..Classes.LossModelSteinmetz import LossModelSteinmetz
+from ..Classes.LossModelWindagePyrhonen import LossModelWindagePyrhonen
 from ..Classes.LossModelWinding import LossModelWinding
 from ..Classes.Machine import Machine
 from ..Classes.MachineAsync import MachineAsync
@@ -143,6 +147,8 @@ from ..Classes.OptiBayesAlg import OptiBayesAlg
 from ..Classes.OptiBayesAlgSmoot import OptiBayesAlgSmoot
 from ..Classes.OptiConstraint import OptiConstraint
 from ..Classes.OptiDesignVar import OptiDesignVar
+from ..Classes.OptiDesignVarInterval import OptiDesignVarInterval
+from ..Classes.OptiDesignVarSet import OptiDesignVarSet
 from ..Classes.OptiGenAlg import OptiGenAlg
 from ..Classes.OptiGenAlgNsga2Deap import OptiGenAlgNsga2Deap
 from ..Classes.OptiObjective import OptiObjective
@@ -154,6 +160,7 @@ from ..Classes.OutGeo import OutGeo
 from ..Classes.OutGeoLam import OutGeoLam
 from ..Classes.OutInternal import OutInternal
 from ..Classes.OutLoss import OutLoss
+from ..Classes.OutLossModel import OutLossModel
 from ..Classes.OutMag import OutMag
 from ..Classes.OutMagElmer import OutMagElmer
 from ..Classes.OutMagFEMM import OutMagFEMM
@@ -234,7 +241,9 @@ from ..Classes.Unit import Unit
 from ..Classes.VarLoad import VarLoad
 from ..Classes.VarLoadCurrent import VarLoadCurrent
 from ..Classes.VarLoadVoltage import VarLoadVoltage
+from ..Classes.VarOpti import VarOpti
 from ..Classes.VarParam import VarParam
+from ..Classes.VarParamSweep import VarParamSweep
 from ..Classes.VarSimu import VarSimu
 from ..Classes.VentilationCirc import VentilationCirc
 from ..Classes.VentilationPolar import VentilationPolar

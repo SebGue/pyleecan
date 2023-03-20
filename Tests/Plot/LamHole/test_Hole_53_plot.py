@@ -18,6 +18,7 @@ from pyleecan.Classes.HoleM53 import HoleM53
 from Tests import save_plot_path as save_path
 from pyleecan.Functions.labels import BOUNDARY_PROP_LAB
 
+
 """pytest for Machine with Hole 53 plot"""
 
 

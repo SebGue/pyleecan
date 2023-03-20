@@ -14,6 +14,7 @@ from pyleecan.Classes.HoleM52R import HoleM52R
 from Tests import save_plot_path as save_path
 from pyleecan.Functions.labels import BOUNDARY_PROP_LAB
 
+
 """pytest for Lamination with Hole 52 plot"""
 
 

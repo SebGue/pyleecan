@@ -16,6 +16,7 @@ from pyleecan.Classes.HoleM52 import HoleM52
 from Tests import save_plot_path as save_path
 from pyleecan.Functions.labels import BOUNDARY_PROP_LAB
 
+
 """pytest for Lamination with Hole 52 plot"""
 
 
@@ -89,7 +90,7 @@ class Test_Hole_52_plot(object):
         fig.savefig(join(save_path, "test_Lam_Hole_s52_line_label.png"), dpi=1000)
 
     def test_plot_point_labels(self, machine):
-        """Test if the point labels are assigned to the respective point."""
+        """Test if the point labels are assigned to the respective points."""
         machine.rotor.hole[0].plot_schematics(
             is_add_point_label=True,
             is_add_schematics=False,
