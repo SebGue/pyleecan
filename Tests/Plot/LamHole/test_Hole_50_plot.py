@@ -210,7 +210,7 @@ class Test_Hole_50_plot(object):
         fig.savefig(join(save_path, "test_Lam_Hole_s50_line_label.png"), dpi=1000)
 
     def test_plot_point_labels(self, machine):
-        """Test if the line labels are assigned to the respective lines."""
+        """Test if the point labels are assigned to the respective points."""
         machine.rotor.hole[0].H4 = 1 * 1e-3
         machine.rotor.hole[0].plot_schematics(
             is_add_point_label=True,
