@@ -14,6 +14,7 @@ from pyleecan.Classes.Magnet import Magnet
 from pyleecan.Classes.Shaft import Shaft
 from pyleecan.Classes.HoleM51 import HoleM51
 from Tests import save_plot_path as save_path
+from pyleecan.Functions.labels import BOUNDARY_PROP_LAB
 
 
 """pytest for Lamination with Hole 51 plot"""
@@ -149,3 +150,34 @@ class Test_Hole_51_plot(object):
         fig.savefig(join(save_path, "test_Lam_Hole_s51_8-Rotor_NNN.png"))
         # 2 for lam + 1*8 for holes
         assert len(fig.axes[0].patches) == 10
+
+    def test_plot_line_labels(self, machine):
+        """Test if the line labels are assigned to the respective lines."""
+        machine.rotor.plot(is_show_fig=False)
+        fig = plt.gcf()
+
+        surfs = machine.rotor.build_geometry()
+
+        for surf in surfs:
+            lines = surf.get_lines()
+            for line in lines:
+                mid = line.get_middle()
+                label = (
+                    line.prop_dict.get(BOUNDARY_PROP_LAB, None)
+                    if line.prop_dict
+                    else None
+                )
+                if label:
+                    plt.text(mid.real, mid.imag, label, fontsize=1)
+        fig.savefig(join(save_path, "test_Lam_Hole_s51_line_label.png"), dpi=1000)
+
+    def test_plot_point_labels(self, machine):
+        """Test if the point labels are assigned to the respective points."""
+        machine.rotor.hole[0].plot_schematics(
+            is_add_point_label=True,
+            is_add_schematics=False,
+            is_add_main_line=False,
+            is_show_fig=False,
+        )
+        fig = plt.gcf()
+        fig.savefig(join(save_path, "test_Lam_Hole_s51_point_label.png"), dpi=1000)
