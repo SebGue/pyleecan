@@ -19,7 +19,7 @@ from pyleecan.Functions.labels import BOUNDARY_PROP_LAB
 
 """pytest for Lamination with Hole 51 plot"""
 
-@pytest.mark.dev
+
 class Test_Hole_51_plot(object):
     @pytest.fixture
     def machine(self):
@@ -172,7 +172,7 @@ class Test_Hole_51_plot(object):
         fig.savefig(join(save_path, "test_Lam_Hole_s51_line_label.png"), dpi=1000)
 
     def test_plot_point_labels(self, machine):
-        """Test if the line labels are assigned to the respective lines."""
+        """Test if the point labels are assigned to the respective point."""
         machine.rotor.hole[0].plot_schematics(
             is_add_point_label=True,
             is_add_schematics=False,
