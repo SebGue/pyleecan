@@ -6962,7 +6962,8 @@
             "get_meshsolution",
             "get_path_save_fea",
             "get_path_save",
-            "gen_elmer_mesh"
+            "gen_elmer_mesh",
+            "gen_elmer_sif"
         ],
         "mother": "Magnetics",
         "name": "MagElmer",
@@ -15652,7 +15653,7 @@
         "desc": "SurfLine define by list of lines that delimit it",
         "is_internal": false,
         "methods": [
-            "comp_mesh_dict",
+            "comp_mesh",
             "draw_FEMM",
             "plot",
             "split_line",

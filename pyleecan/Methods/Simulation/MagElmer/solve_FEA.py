@@ -65,7 +65,7 @@ def solve_FEA(self, output, sym, angle, time, elmer_sif_file):
     # setup Elmer solver
     # ElmerSolver v8.4 must be installed and in the PATH
     self.get_logger().debug("Solving Simulation")
-    
+
     ElmerSolver_binary = get_path_binary("ElmerSolver")
     cmd_elmersolver = [ElmerSolver_binary, elmer_sif_file]
     self.get_logger().info(
