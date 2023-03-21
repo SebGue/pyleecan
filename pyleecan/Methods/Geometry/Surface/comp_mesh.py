@@ -19,8 +19,8 @@ def comp_mesh(self, element_size, user_mesh_dict=None):
 
     Returns
     -------
-    mesh_dict : dict
-        Dictionary containing the number of element of each line of the surface
+    mesh_list : list
+        List containing the number of element of each line of the surface
     """
     mesh_dict = {}
     label = decode_label(self.label)["lam_type"]
