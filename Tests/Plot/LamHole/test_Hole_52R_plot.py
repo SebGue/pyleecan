@@ -4,22 +4,20 @@ from os.path import join
 import pytest
 
 import matplotlib.pyplot as plt
-from numpy import pi
 
 from pyleecan.Classes.Frame import Frame
 from pyleecan.Classes.LamHole import LamHole
 from pyleecan.Classes.LamSlotWind import LamSlotWind
 from pyleecan.Classes.MachineIPMSM import MachineIPMSM
-from pyleecan.Classes.Magnet import Magnet
 from pyleecan.Classes.Shaft import Shaft
-from pyleecan.Classes.HoleM52 import HoleM52
+from pyleecan.Classes.HoleM52R import HoleM52R
 from Tests import save_plot_path as save_path
 from pyleecan.Functions.labels import BOUNDARY_PROP_LAB
 
 """pytest for Lamination with Hole 52 plot"""
 
 
-class Test_Hole_52_plot(object):
+class Test_Hole_52R_plot(object):
     @pytest.fixture
     def machine(self):
         """Run at the begining of every test to setup the machine"""
@@ -30,7 +28,7 @@ class Test_Hole_52_plot(object):
         )
         test_obj.rotor.hole = list()
         test_obj.rotor.hole.append(
-            HoleM52(Zh=8, W0=27e-3, W3=16.2e-3, H0=1e-3, H1=5e-3, H2=1e-3)
+            HoleM52R(Zh=8, W0=27e-3, W1=2e-3, H0=1e-3, H1=5e-3, H2=1e-3, R0=1e-3)
         )
         test_obj.shaft = Shaft(Drsh=test_obj.rotor.Rint * 2, Lshaft=1.2)
 
@@ -43,21 +41,21 @@ class Test_Hole_52_plot(object):
         test_obj.frame = Frame(Rint=0.12, Rext=0.12, Lfra=0.7)
         return test_obj
 
-    def test_Lam_Hole_52(self, machine):
+    def test_Lam_Hole_52R(self, machine):
         """Test machine plot hole 52 with magnet"""
         machine.plot(is_show_fig=False)
         fig = plt.gcf()
         # Rotor + 2 for stator + 0 for frame + 1 for shaft
         assert len(fig.axes[0].patches) == 29
-        fig.savefig(join(save_path, "test_Lam_Hole_s52_1-Machine.png"))
+        fig.savefig(join(save_path, "test_Lam_Hole_s52R_1-Machine.png"))
 
         machine.rotor.plot(is_show_fig=False)
         fig = plt.gcf()
-        fig.savefig(join(save_path, "test_Lam_Hole_s52_2-Rotor.png"))
+        fig.savefig(join(save_path, "test_Lam_Hole_s52R_2-Rotor.png"))
         # 2 for lam + 3*8 for holes
         assert len(fig.axes[0].patches) == 26
 
-    def test_Lam_Hole_52_no_mag(self, machine):
+    def test_Lam_Hole_52R_no_mag(self, machine):
         """Test machine plot hole 52 without magnet"""
         machine.rotor.hole[0].magnet_0 = None
         machine.rotor.plot(is_show_fig=False)
@@ -65,7 +63,7 @@ class Test_Hole_52_plot(object):
         # 2 for lam + 1*8 for holes
         assert len(fig.axes[0].patches) == 10
         fig.savefig(
-            join(save_path, "test_Lam_Hole_s52_3-Rotor hole without " "magnet.png")
+            join(save_path, "test_Lam_Hole_s52R_3-Rotor hole without " "magnet.png")
         )
 
     def test_plot_line_labels(self, machine):
@@ -86,7 +84,7 @@ class Test_Hole_52_plot(object):
                 )
                 if label:
                     plt.text(mid.real, mid.imag, label, fontsize=1)
-        fig.savefig(join(save_path, "test_Lam_Hole_s52_line_label.png"), dpi=1000)
+        fig.savefig(join(save_path, "test_Lam_Hole_s52R_line_label.png"), dpi=1000)
 
     def test_plot_point_labels(self, machine):
         """Test if the point labels are assigned to the respective points."""
@@ -97,4 +95,4 @@ class Test_Hole_52_plot(object):
             is_show_fig=False,
         )
         fig = plt.gcf()
-        fig.savefig(join(save_path, "test_Lam_Hole_s52_point_label.png"), dpi=1000)
+        fig.savefig(join(save_path, "test_Lam_Hole_s52R_point_label.png"), dpi=1000)
