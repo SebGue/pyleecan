@@ -2,15 +2,23 @@
 from .get_boundary_condition import get_boundary_condition
 from numpy import pi
 from ...Classes.Arc import Arc
+from ...Classes.Arc1 import Arc1
 from ...Classes.Arc2 import Arc2
 from ...Classes.Segment import Segment
 import cmath
+from ...Functions.labels import BOUNDARY_PROP_LAB
 
 tol = 1e-6
 
 
 def draw_surf_line(
-    surf, mesh_list, boundary_prop, factory, gmsh_dict, nsurf, mesh_size
+    surf,
+    mesh_list,
+    boundary_prop,
+    model,
+    gmsh_dict,
+    nsurf,
+    mesh_size
 ):
     """Draw the lines of a surface and handles the Arc>180deg
 
@@ -18,24 +26,27 @@ def draw_surf_line(
     ----------
     surf : Surface
         Surface object to draw
-    mesh_dict : dict
-        Dictionary to enforce the mesh (key: line id, value:nb element)
+    mesh_list : list
+        List to enforce the mesh
     boundary_prop : dict
         Dictionary to set the Boundary conditions
-    factory :
-        gmsh.model.geo
+    model : Object
+        Gmsh model
     gmsh_dict: dict
         dictionary containing the main parameters of GMSH File
     nsurf : int
         Index of the surface to draw
     mesh_size: float
         Default mesh element size
+
+    Returns
+    -------
+    None
     """
     for ii, line in enumerate(surf.get_lines()):
         n_elem = mesh_list[ii]
         n_elem = n_elem if n_elem is not None else 0
         line_kwargs = dict(
-            geo=factory,
             d=gmsh_dict,
             idx=nsurf,
             mesh_size=mesh_size,
@@ -50,16 +61,17 @@ def draw_surf_line(
                 angle=rot_dir * pi / 2.0,
                 center=line.get_center(),
                 prop_dict=line.prop_dict,
+                is_trigo_direction=line.is_trigo_direction,
             )
             arc1 = Arc2(begin=line.get_begin(), **arc_kwargs)
             arc2 = Arc2(begin=arc1.get_end(), **arc_kwargs)
             for arc in [arc1, arc2]:
-                _add_line_to_dict(line=arc, **line_kwargs)
+                _add_line_to_dict(gmodel=model, line=arc, **line_kwargs)
         elif isinstance(line, Arc) and (abs(line.get_angle() * 180.0 / pi) <= tol):
             # Don't draw anything, this is a circle and usually is repeated ?
             pass
         elif isinstance(line, (Segment, Arc)):
-            _add_line_to_dict(line=line, **line_kwargs)
+            _add_line_to_dict(gmodel=model, line=line, **line_kwargs)
         else:
             surf.get_logger().warning(
                 "Functions.GMSH.draw_GMSH(): "
@@ -67,12 +79,12 @@ def draw_surf_line(
             )
 
 
-def _add_line_to_dict(geo, line, d={}, idx=0, mesh_size=1e-2, n_elements=0, bc=None):
+def _add_line_to_dict(gmodel , line, d={}, idx=0, mesh_size=1e-2, n_elements=0, bc=None):
     """Draw a new line and add it to GMSH dictionary if it does not exist.
 
     Parameters
     ----------
-    geo : Model
+    gmodel : Model
         GMSH Model object
     line : Object
         Line Object
@@ -84,6 +96,8 @@ def _add_line_to_dict(geo, line, d={}, idx=0, mesh_size=1e-2, n_elements=0, bc=N
         Points mesh size
     n_elements : int
         Number of elements on the line for meshing control
+    bc : String
+        Boundary condition name
 
     Returns
     -------
@@ -96,17 +110,22 @@ def _add_line_to_dict(geo, line, d={}, idx=0, mesh_size=1e-2, n_elements=0, bc=N
     btag, bx, by = _find_point_tag(d, line.get_begin())
     etag, ex, ey = _find_point_tag(d, line.get_end())
     if btag is None:
-        btag = geo.addPoint(bx, by, 0, meshSize=mesh_size, tag=-1)
+        btag = gmodel.occ.addPoint(bx, by, 0, meshSize=mesh_size, tag=-1)
     else:
         dlines.extend(_find_lines_from_point(d, btag))
     if etag is None:
-        etag = geo.addPoint(ex, ey, 0, meshSize=mesh_size, tag=-1)
+        etag = gmodel.occ.addPoint(ex, ey, 0, meshSize=mesh_size, tag=-1)
     else:
         dlines.extend(_find_lines_from_point(d, etag))
+
+    if line.prop_dict and BOUNDARY_PROP_LAB in line.prop_dict:
+        line_label = line.prop_dict[BOUNDARY_PROP_LAB]
+    else:
+        line_label = None
     if isinstance(line, Arc):
         ctag, cx, cy = _find_point_tag(d, line.get_center())
         if ctag is None:
-            ctag = geo.addPoint(cx, cy, 0, meshSize=mesh_size, tag=-1)
+            ctag = gmodel.occ.addPoint(cx, cy, 0, meshSize=mesh_size, tag=-1)
         else:
             dlines.extend(_find_lines_from_point(d, ctag))
         if len(dlines) > 0:
@@ -121,13 +140,15 @@ def _add_line_to_dict(geo, line, d={}, idx=0, mesh_size=1e-2, n_elements=0, bc=N
                 else:
                     pass
             if ltag is None:
-                ltag = geo.addCircleArc(btag, ctag, etag, tag=-1)
+                ltag = gmodel.occ.addCircleArc(btag, ctag, etag, tag=-1)
                 if n_elements > 0:
-                    geo.mesh.setTransfiniteCurve(ltag, n_elements + 1, "Progression")
+                    gmodel.occ.synchronize()
+                    gmodel.mesh.setTransfiniteCurve(ltag, n_elements + 1, "Progression")
         else:
-            ltag = geo.addCircleArc(btag, ctag, etag, tag=-1)
+            ltag = gmodel.occ.addCircleArc(btag, ctag, etag, tag=-1)
             if n_elements > 0:
-                geo.mesh.setTransfiniteCurve(ltag, n_elements + 1, "Progression")
+                gmodel.occ.synchronize()
+                gmodel.mesh.setTransfiniteCurve(ltag, n_elements + 1, "Progression")
 
         # To avoid fill the dictionary with repeated lines
         repeated = False
@@ -145,6 +166,7 @@ def _add_line_to_dict(geo, line, d={}, idx=0, mesh_size=1e-2, n_elements=0, bc=N
                 {
                     nline: {
                         "tag": ltag,
+                        "label": line_label,
                         "n_elements": n_elements,
                         "bc_name": bc,
                         "begin": {"tag": btag, "coord": complex(bx, by)},
@@ -169,13 +191,15 @@ def _add_line_to_dict(geo, line, d={}, idx=0, mesh_size=1e-2, n_elements=0, bc=N
                 else:
                     pass
             if ltag is None:
-                ltag = geo.addLine(btag, etag, tag=-1)
+                ltag = gmodel.occ.addLine(btag, etag, tag=-1)
                 if n_elements > 0:
-                    geo.mesh.setTransfiniteCurve(ltag, n_elements + 1, "Progression")
+                    gmodel.occ.synchronize()
+                    gmodel.mesh.setTransfiniteCurve(ltag, n_elements + 1, "Progression")
         else:
-            ltag = geo.addLine(btag, etag, tag=-1)
+            ltag = gmodel.occ.addLine(btag, etag, tag=-1)
             if n_elements > 0:
-                geo.mesh.setTransfiniteCurve(ltag, n_elements + 1, "Progression")
+                gmodel.occ.synchronize()
+                gmodel.mesh.setTransfiniteCurve(ltag, n_elements + 1, "Progression")
 
         # To avoid fill the dictionary with repeated lines
         repeated = False
@@ -195,6 +219,7 @@ def _add_line_to_dict(geo, line, d={}, idx=0, mesh_size=1e-2, n_elements=0, bc=N
                 {
                     nline: {
                         "tag": ltag,
+                        "label": line_label,
                         "n_elements": n_elements,
                         "bc_name": bc,
                         "begin": {"tag": btag, "coord": complex(bx, by)},
