@@ -8,11 +8,14 @@ NN = 30  # number of segments per half pole
 
 def get_bore_line(self, prop_dict=None):
     """Return the bore line description
+    adapted sine field pole geometry from the text book:
+    "Müller, Germar, et al. Berechnung Elektrischer Maschinen. Hoboken, NJ, United States, Wiley, 2008."
+    ("Calculation of electric machines")
 
     Parameters
     ----------
     self : BoreSinePole
-        A BoreLSinePole object
+        A BoreSinePole object
     prop_dict : dict
         Property dictionary to apply on the lines
 
@@ -30,8 +33,10 @@ def get_bore_line(self, prop_dict=None):
     logger = self.get_logger()
 
     # Compute the shape
-    alpha1 = pi / self.N
-    w_max = _get_pole_width_max(self)
+    alpha1 = pi / self.N  # Half bore pitch [rad]
+
+    # Checking max width and W0
+    w_max = _get_pole_width_max(self)  # [m]
     if self.W0 is not None and self.W0 < w_max:
         w_max = self.W0
     elif self.W0 is not None and self.W0 > w_max:
@@ -87,6 +92,12 @@ def get_bore_line(self, prop_dict=None):
     return bore_list
 
 
+def _get_phi_max(obj):
+    """"Internal method to get max. pole angle."""
+    phi_max = fmin(lambda x: -obj.get_pole_shape(x).imag, 0, disp=False)[0]
+    return min(pi / 2, phi_max)
+
+
 def _get_pole_width_max(obj):
     """Return the max. pole width and the angle of the max. pole width
 
@@ -95,16 +106,12 @@ def _get_pole_width_max(obj):
     obj : BoreSinePole
         a BoreSinePole object
 
-
     Returns
     -------
     w_max : float
-        max. pole width
-
+        max. pole width [m]
     """
-
-    phi_max = fmin(lambda x: -obj.get_pole_shape(x).imag, 0, disp=False)[0]
-    phi_max = min(pi / 2, phi_max)
+    phi_max = _get_phi_max(obj)
     w_max = 2 * obj.get_pole_shape(phi_max).imag
 
     return w_max
@@ -121,8 +128,12 @@ def _get_phi(obj, w):
     Returns
     -------
     phi : float
-        angle of the pole width
+        angle of the pole width [rad]
     """
-
-    phi = fmin(lambda x: abs(obj.get_pole_shape(x).imag - w / 2), 0, disp=False)[0]
+    phi_max = _get_phi_max(obj)
+    phi = fmin(
+        lambda x: abs(obj.get_pole_shape(x).imag - w / 2) + max(x - phi_max, 0),
+        0,
+        disp=False,
+    )[0]
     return phi
