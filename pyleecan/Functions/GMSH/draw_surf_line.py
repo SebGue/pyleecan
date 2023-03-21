@@ -11,15 +11,7 @@ from ...Functions.labels import BOUNDARY_PROP_LAB
 tol = 1e-6
 
 
-def draw_surf_line(
-    surf,
-    mesh_list,
-    boundary_prop,
-    model,
-    gmsh_dict,
-    nsurf,
-    mesh_size
-):
+def draw_surf_line(surf, mesh_list, boundary_prop, model, gmsh_dict, nsurf, mesh_size):
     """Draw the lines of a surface and handles the Arc>180deg
 
     Parameters
@@ -56,12 +48,14 @@ def draw_surf_line(
         # Gmsh built-in engine does not allow arcs larger than 180deg
         # so arcs are split into two
         if isinstance(line, Arc) and abs(line.get_angle() * 180.0 / pi) >= 180.0:
-            rot_dir = 1 if line.is_trigo_direction == True else -1
+            if isinstance(line, Arc2):
+                rot_dir = 1 if line.angle > 0 else -1
+            else:
+                rot_dir = 1 if line.is_trigo_direction == True else -1
             arc_kwargs = dict(
                 angle=rot_dir * pi / 2.0,
                 center=line.get_center(),
                 prop_dict=line.prop_dict,
-                is_trigo_direction=line.is_trigo_direction,
             )
             arc1 = Arc2(begin=line.get_begin(), **arc_kwargs)
             arc2 = Arc2(begin=arc1.get_end(), **arc_kwargs)
@@ -79,7 +73,7 @@ def draw_surf_line(
             )
 
 
-def _add_line_to_dict(gmodel , line, d={}, idx=0, mesh_size=1e-2, n_elements=0, bc=None):
+def _add_line_to_dict(gmodel, line, d={}, idx=0, mesh_size=1e-2, n_elements=0, bc=None):
     """Draw a new line and add it to GMSH dictionary if it does not exist.
 
     Parameters
