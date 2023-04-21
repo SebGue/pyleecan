@@ -374,32 +374,26 @@ def draw_GMSH(
     # Adding Sliding Band
     #####################
     if is_sliding_band and (not is_lam_only_R) and (not is_lam_only_S):
-        sb_list = get_sliding_band(sym=sym, machine=machine)
-    else:
-        sb_list = []
-
-    # nsurf = 0
-    for surf in sb_list:
-        nsurf += 1
-        gmsh_dict.update(
-            {
-                nsurf: {
-                    "tag": None,
-                    "label": short_label(surf.label),
+        for surf in get_sliding_band(sym=sym, machine=machine):
+            nsurf += 1
+            gmsh_dict.update(
+                {
+                    nsurf: {
+                        "tag": None,
+                        "label": short_label(surf.label),
+                    }
                 }
-            }
-        )
-        # comp. number of elements on the lines & override by user values in case
-        mesh_list = surf.comp_mesh(
-            element_size=mesh_size_SB, user_mesh_dict=user_mesh_dict
-        )
+            )
+            # comp. number of elements on the lines & override by user values in case
+            mesh_list = surf.comp_mesh(
+                element_size=mesh_size_SB, user_mesh_dict=user_mesh_dict
+            )
 
-        # Draw the surface
-        draw_surf_line(
-            surf, mesh_list, boundary_prop, model, gmsh_dict, nsurf, mesh_size_SB
-        )
+            # Draw the surface
+            draw_surf_line(
+                surf, mesh_list, boundary_prop, model, gmsh_dict, nsurf, mesh_size_SB
+            )
 
-    if is_sliding_band and (not is_lam_only_R) and (not is_lam_only_S):
         if sym == 1:
             lloop1 = []
             lloop2 = []
