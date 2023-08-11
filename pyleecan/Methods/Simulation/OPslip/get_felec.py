@@ -17,7 +17,7 @@ def get_felec(self, p=None):
         Electrical Frequency [Hz]
     """
 
-    if self.slip_ref is None:
+    if self.slip_ref is None: # TODO condition doesn't is different from error msg.
         raise InputError("OPslip object can't have felec and slip_ref both None")
 
     if p is None and (self.felec is None or self.N0 is None):
@@ -35,7 +35,7 @@ def get_felec(self, p=None):
         raise InputError("OPslip object can't have felec and N0 both None")
 
     if self.slip_ref != 1:
-        self.felec = self.N0 * p / (60 * (1 - self.slip_ref))
+        return self.N0 * p / (60 * (1 - self.slip_ref))
     else:
         raise InputError(
             "Cannot calculate felec if slip_ref=1, felec must be enforced and N0 set to None or 0s"

@@ -47,8 +47,9 @@ def gen_input(self):
         self.OP.N0 = 0.1
         logger.debug("Updating N0 from 0 [rpm] to 0.1 [rpm] in gen_input")
     # Check that felec/N0 can be computed
-    self.OP.get_felec()
+    felec = self.OP.get_felec()
     outelec.OP = self.OP.copy()
+    outelec.OP.felec = felec
 
     # Set rotor rotation direction
     if self.rot_dir is None:
