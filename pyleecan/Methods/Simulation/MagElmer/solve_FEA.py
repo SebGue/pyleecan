@@ -8,6 +8,7 @@ from ....Functions.Winding.gen_phase_list import gen_name
 
 from ....Functions.labels import (
     AIRGAP_LAB,
+    ROTOR_LAB,
     ROTOR_LAB_S,
     short_label,
     decode_label,
