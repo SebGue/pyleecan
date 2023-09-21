@@ -9,6 +9,7 @@ from pyleecan.Classes.SlotM15 import SlotM15
 from pyleecan.Classes.SlotM16 import SlotM16
 from pyleecan.Classes.SlotM17 import SlotM17
 from pyleecan.Classes.SlotM18 import SlotM18
+from pyleecan.Classes.SlotM19 import SlotM19
 
 from pyleecan.Classes.SlotW10 import SlotW10
 from pyleecan.Classes.SlotW11 import SlotW11
@@ -44,6 +45,7 @@ from pyleecan.Classes.VentilationTrap import VentilationTrap
 from pyleecan.Classes.HoleMLSRPM import HoleMLSRPM
 from pyleecan.Classes.BoreFlower import BoreFlower
 from pyleecan.Classes.BoreSinePole import BoreSinePole
+from pyleecan.Classes.HoleM60 import HoleM60
 from Tests import SCHEMATICS_PATH
 from os.path import join, isdir, isfile
 from os import makedirs, remove
@@ -53,53 +55,288 @@ if not isdir(SCHEMATICS_PATH):
 
 slot_test = list()
 
-slot_test.append({"test_obj": SlotCirc(), "type_add_active": 0, "is_default": 2})
 
-slot_test.append({"test_obj": SlotM10(), "type_add_active": 2, "is_default": 2})
-slot_test.append({"test_obj": SlotM11(), "type_add_active": 2, "is_default": 2})
-slot_test.append({"test_obj": SlotM12(), "type_add_active": 2})
-slot_test.append({"test_obj": SlotM13(), "type_add_active": 2})
-slot_test.append({"test_obj": SlotM14(), "type_add_active": 2})
-slot_test.append({"test_obj": SlotM15(), "type_add_active": 2})
-slot_test.append({"test_obj": SlotM16(), "type_add_active": 2})
-slot_test.append({"test_obj": SlotM17(), "type_add_active": 2})
-slot_test.append({"test_obj": SlotM18(), "type_add_active": 2})
+slot_test.append(
+    {
+        "test_obj": SlotCirc(),
+        "type_add_active": 0,
+        "is_default": 2,
+    }
+)
 
-slot_test.append({"test_obj": SlotW10(), "type_add_active": 1})
-slot_test.append({"test_obj": SlotW11(), "type_add_active": 1})
-slot_test.append({"test_obj": SlotW12(), "type_add_active": 1})
-slot_test.append({"test_obj": SlotW13(), "type_add_active": 1})
-slot_test.append({"test_obj": SlotW14(), "type_add_active": 1})
-slot_test.append({"test_obj": SlotW15(), "type_add_active": 1})
-slot_test.append({"test_obj": SlotW16(), "type_add_active": 1})
-slot_test.append({"test_obj": SlotW21(), "type_add_active": 1})
-slot_test.append({"test_obj": SlotW22(), "type_add_active": 1})
-slot_test.append({"test_obj": SlotW23(), "type_add_active": 1})
-slot_test.append({"test_obj": SlotW24(), "type_add_active": 1})
-slot_test.append({"test_obj": SlotW25(), "type_add_active": 1})
-slot_test.append({"test_obj": SlotW26(), "type_add_active": 1})
-slot_test.append({"test_obj": SlotW27(), "type_add_active": 1})
-slot_test.append({"test_obj": SlotW28(), "type_add_active": 1})
-slot_test.append({"test_obj": SlotW29(), "type_add_active": 1})
-slot_test.append({"test_obj": SlotW60(), "type_add_active": 1})
+slot_test.append(
+    {
+        "test_obj": SlotM10(),
+        "type_add_active": 2,
+        "is_default": 2,
+    }
+)
+slot_test.append(
+    {
+        "test_obj": SlotM11(),
+        "type_add_active": 2,
+        "is_default": 2,
+    }
+)
+slot_test.append(
+    {
+        "test_obj": SlotM12(),
+        "type_add_active": 2,
+    }
+)
+slot_test.append(
+    {
+        "test_obj": SlotM13(),
+        "type_add_active": 2,
+    }
+)
+slot_test.append(
+    {
+        "test_obj": SlotM14(),
+        "type_add_active": 2,
+    }
+)
+slot_test.append(
+    {
+        "test_obj": SlotM15(),
+        "type_add_active": 2,
+    }
+)
+slot_test.append(
+    {
+        "test_obj": SlotM16(),
+        "type_add_active": 2,
+    }
+)
+slot_test.append(
+    {
+        "test_obj": SlotM17(),
+        "type_add_active": 2,
+    }
+)
+slot_test.append(
+    {
+        "test_obj": SlotM18(),
+        "type_add_active": 2,
+    }
+)
+
+slot_test.append(
+    {
+        "test_obj": SlotM19(),
+        "type_add_active": 2,
+        "is_default": 2,
+    }
+)
+
+slot_test.append(
+    {
+        "test_obj": SlotW10(),
+        "type_add_active": 1,
+    }
+)
+slot_test.append(
+    {
+        "test_obj": SlotW11(),
+        "type_add_active": 1,
+    }
+)
+slot_test.append(
+    {
+        "test_obj": SlotW11(),
+        "type_add_active": 1,
+        "method_name": "plot_schematics_constant_tooth",
+    }
+)
+slot_test.append(
+    {
+        "test_obj": SlotW12(),
+        "type_add_active": 1,
+    }
+)
+slot_test.append(
+    {
+        "test_obj": SlotW13(),
+        "type_add_active": 1,
+    }
+)
+slot_test.append(
+    {
+        "test_obj": SlotW14(),
+        "type_add_active": 1,
+    }
+)
+slot_test.append(
+    {
+        "test_obj": SlotW15(),
+        "type_add_active": 1,
+    }
+)
+slot_test.append(
+    {
+        "test_obj": SlotW16(),
+        "type_add_active": 1,
+    }
+)
+slot_test.append(
+    {
+        "test_obj": SlotW21(),
+        "type_add_active": 1,
+    }
+)
+slot_test.append(
+    {
+        "test_obj": SlotW22(),
+        "type_add_active": 1,
+    }
+)
+slot_test.append(
+    {
+        "test_obj": SlotW23(),
+        "type_add_active": 1,
+    }
+)
+slot_test.append(
+    {
+        "test_obj": SlotW23(),
+        "type_add_active": 1,
+        "method_name": "plot_schematics_constant_tooth",
+    }
+)
+slot_test.append(
+    {
+        "test_obj": SlotW23(),
+        "type_add_active": 1,
+        "method_name": "plot_schematics_constant_tooth",
+    }
+)
+slot_test.append(
+    {
+        "test_obj": SlotW24(),
+        "type_add_active": 1,
+    }
+)
+slot_test.append(
+    {
+        "test_obj": SlotW25(),
+        "type_add_active": 1,
+    }
+)
+slot_test.append(
+    {
+        "test_obj": SlotW26(),
+        "type_add_active": 1,
+    }
+)
+slot_test.append(
+    {
+        "test_obj": SlotW27(),
+        "type_add_active": 1,
+    }
+)
+slot_test.append(
+    {
+        "test_obj": SlotW28(),
+        "type_add_active": 1,
+    }
+)
+slot_test.append(
+    {
+        "test_obj": SlotW29(),
+        "type_add_active": 1,
+    }
+)
+slot_test.append(
+    {
+        "test_obj": SlotW60(),
+        "type_add_active": 1,
+    }
+)
 
 slot_test.append({"test_obj": SlotW61(), "type_add_active": 1})
 
 slot_test.append({"test_obj": SlotWLSRPM(), "type_add_active": 1})
 
+
 hole_test = list()
-hole_test.append({"test_obj": HoleM50(), "type_add_active": 2})
-hole_test.append({"test_obj": HoleM51(), "type_add_active": 2})
-hole_test.append({"test_obj": HoleM52(), "type_add_active": 2})
-hole_test.append({"test_obj": HoleM52R(), "type_add_active": 2})
-hole_test.append({"test_obj": HoleM53(), "type_add_active": 2})
-hole_test.append({"test_obj": HoleM54(), "type_add_active": 2})
-hole_test.append({"test_obj": HoleM57(), "type_add_active": 2})
-hole_test.append({"test_obj": HoleM58(), "type_add_active": 2})
-hole_test.append({"test_obj": HoleMLSRPM(), "type_add_active": 2})
-hole_test.append({"test_obj": VentilationCirc(), "type_add_active": 2})
-hole_test.append({"test_obj": VentilationPolar(), "type_add_active": 2})
-hole_test.append({"test_obj": VentilationTrap(), "type_add_active": 2})
+hole_test.append(
+    {
+        "test_obj": HoleM50(),
+        "type_add_active": 2,
+    }
+)
+hole_test.append(
+    {
+        "test_obj": HoleM51(),
+        "type_add_active": 2,
+    }
+)
+hole_test.append(
+    {
+        "test_obj": HoleM52(),
+        "type_add_active": 2,
+    }
+)
+hole_test.append(
+    {
+        "test_obj": HoleM52R(),
+        "type_add_active": 2,
+    }
+)
+hole_test.append(
+    {
+        "test_obj": HoleM53(),
+        "type_add_active": 2,
+    }
+)
+hole_test.append(
+    {
+        "test_obj": HoleM54(),
+        "type_add_active": 2,
+    }
+)
+hole_test.append(
+    {
+        "test_obj": HoleM57(),
+        "type_add_active": 2,
+    }
+)
+hole_test.append(
+    {
+        "test_obj": HoleM58(),
+        "type_add_active": 2,
+    }
+)
+hole_test.append(
+    {
+        "test_obj": HoleMLSRPM(),
+        "type_add_active": 2,
+    }
+)
+hole_test.append(
+    {
+        "test_obj": VentilationCirc(),
+        "type_add_active": 2,
+    }
+)
+hole_test.append(
+    {
+        "test_obj": VentilationPolar(),
+        "type_add_active": 2,
+    }
+)
+hole_test.append(
+    {
+        "test_obj": VentilationTrap(),
+        "type_add_active": 2,
+    }
+)
+hole_test.append(
+    {
+        "test_obj": HoleM60(),
+        "type_add_active": 2,
+    }
+)
 slot_test.extend(hole_test)
 
 
@@ -119,7 +356,7 @@ class Test_plot_schematics(object):
             is_add_schematics=True,
             is_add_main_line=True,
             save_path=file_path,
-            is_show_fig=True,
+            is_show_fig=False,
         )
         pass
 
@@ -137,7 +374,7 @@ class Test_plot_schematics(object):
             is_add_schematics=True,
             is_add_main_line=True,
             save_path=file_path,
-            is_show_fig=True,
+            is_show_fig=False,
         )
         pass
 
@@ -165,10 +402,17 @@ class Test_plot_schematics(object):
     def test_slot(self, test_dict):
         """Slot Schematics"""
         ## Empty
-        if "is_default" in test_dict:
-            file_name = type(test_dict["test_obj"]).__name__ + "_empty_int_rot.png"
+        if (
+            "method_name" in test_dict
+            and test_dict["method_name"] == "plot_schematics_constant_tooth"
+        ):
+            schematics_name = type(test_dict["test_obj"]).__name__ + "_constant_tooth"
         else:
-            file_name = type(test_dict["test_obj"]).__name__ + "_empty.png"
+            schematics_name = type(test_dict["test_obj"]).__name__
+        if "is_default" in test_dict:
+            file_name = schematics_name + "_empty_int_rot.png"
+        else:
+            file_name = schematics_name + "_empty.png"
         file_path = join(SCHEMATICS_PATH, file_name)
         # Delete previous plot
         if isfile(file_path):
@@ -176,7 +420,12 @@ class Test_plot_schematics(object):
         # Plot / Save schematics
         print("Generating " + file_name)
         test_obj = test_dict["test_obj"]
-        test_obj.plot_schematics(
+        # Get plot_method
+        if "method_name" in test_dict:
+            plot_meth = getattr(test_obj, test_dict["method_name"])
+        else:
+            plot_meth = getattr(test_obj, "plot_schematics")
+        plot_meth(
             is_default=True,
             is_add_point_label=False,
             is_add_schematics=True,
@@ -187,13 +436,10 @@ class Test_plot_schematics(object):
         )
         if "is_default" in test_dict:
             if test_dict["is_default"] == 2:  # External schematics
-                file_name = type(test_dict["test_obj"]).__name__ + "_empty_ext_sta.png"
+                file_name = schematics_name + "_empty_ext_sta.png"
             else:
                 file_name = (
-                    type(test_dict["test_obj"]).__name__
-                    + "_empty_"
-                    + str(test_dict["is_default"])
-                    + ".png"
+                    schematics_name + "_empty_" + str(test_dict["is_default"]) + ".png"
                 )
             file_path = join(SCHEMATICS_PATH, file_name)
             # Delete previous plot
@@ -201,7 +447,7 @@ class Test_plot_schematics(object):
                 remove(file_path)
             print("Generating " + file_name)
             test_obj = test_dict["test_obj"]
-            test_obj.plot_schematics(
+            plot_meth(
                 is_default=test_dict["is_default"],
                 is_add_point_label=False,
                 is_add_schematics=True,
@@ -210,9 +456,10 @@ class Test_plot_schematics(object):
                 save_path=file_path,
                 is_show_fig=False,
             )
+
         if test_dict["type_add_active"] == 1:
             ## Wind only
-            file_name = type(test_dict["test_obj"]).__name__ + "_wind.png"
+            file_name = schematics_name + "_wind.png"
             file_path = join(SCHEMATICS_PATH, file_name)
             # Delete previous plot
             if isfile(file_path):
@@ -220,7 +467,7 @@ class Test_plot_schematics(object):
             # Plot / Save schematics
             print("Generating " + file_name)
             test_obj = test_dict["test_obj"]
-            test_obj.plot_schematics(
+            plot_meth(
                 is_default=True,
                 is_add_point_label=False,
                 is_add_schematics=True,
@@ -230,7 +477,7 @@ class Test_plot_schematics(object):
                 is_show_fig=False,
             )
             ## Wind and Wedge
-            file_name = type(test_dict["test_obj"]).__name__ + "_wedge_full.png"
+            file_name = schematics_name + "_wedge_full.png"
             file_path = join(SCHEMATICS_PATH, file_name)
             # Delete previous plot
             if isfile(file_path):
@@ -238,7 +485,7 @@ class Test_plot_schematics(object):
             # Plot / Save schematics
             print("Generating " + file_name)
             test_obj = test_dict["test_obj"]
-            test_obj.plot_schematics(
+            plot_meth(
                 is_default=True,
                 is_add_point_label=False,
                 is_add_schematics=True,
@@ -249,7 +496,7 @@ class Test_plot_schematics(object):
             )
         elif test_dict["type_add_active"] == 2:
             ## Magnet only
-            file_name = type(test_dict["test_obj"]).__name__ + "_mag.png"
+            file_name = schematics_name + "_mag.png"
             file_path = join(SCHEMATICS_PATH, file_name)
             # Delete previous plot
             if isfile(file_path):
@@ -257,7 +504,7 @@ class Test_plot_schematics(object):
             # Plot / Save
             print("Generating " + file_name)
             test_obj = test_dict["test_obj"]
-            test_obj.plot_schematics(
+            plot_meth(
                 is_default=True,
                 is_add_point_label=False,
                 is_add_schematics=True,
@@ -287,14 +534,55 @@ class Test_plot_schematics(object):
             is_show_fig=False,
         )
 
+    def test_slotCirc_old(self):
+        """Slot Schematics for SlotCirc, old H0 definition"""
+        ## Empty
+        test_obj = SlotCirc()
+        file_name = "SlotCirc_empty_int_rot_old.png"
+        file_path = join(SCHEMATICS_PATH, file_name)
+        # Delete previous plot
+        if isfile(file_path):
+            remove(file_path)
+        # Plot / Save schematics
+        print("Generating " + file_name)
+        test_obj.plot_schematics(
+            is_default=True,
+            is_add_point_label=False,
+            is_add_schematics=True,
+            is_add_main_line=True,
+            is_enforce_default_H0_bore=False,
+            type_add_active=0,
+            save_path=file_path,
+            is_show_fig=False,
+        )
+        # Ext stator
+        file_name = "SlotCirc_empty_ext_sta_old.png"
+        file_path = join(SCHEMATICS_PATH, file_name)
+        # Delete previous plot
+        if isfile(file_path):
+            remove(file_path)
+        # Plot / Save schematics
+        print("Generating " + file_name)
+        test_obj.plot_schematics(
+            is_default=2,
+            is_add_point_label=False,
+            is_add_schematics=True,
+            is_add_main_line=True,
+            is_enforce_default_H0_bore=False,
+            type_add_active=0,
+            save_path=file_path,
+            is_show_fig=False,
+        )
+
 
 if __name__ == "__main__":
     a = Test_plot_schematics()
-    a.test_BoreFlower()
-    a.test_BoreSinePole()
-    # a.test_slot(slot_test[26])
-    # a.test_slot_point(slot_test[-1])
-    # for slot in slot_test:
-    #     a.test_slot(slot)
-    #     a.test_slot_point(slot)
+    # a.test_BoreFlower()
+    # a.test_BoreSinePole()
+    # a.test_slot(slot_test[21])
+    # a.test_slot_point(slot_test[20])
+    # a.test_slot_constant_tooth(slot_test[20])
+    for slot in slot_test:
+        a.test_slot(slot)
+        a.test_slot_point(slot)
     print("Done")

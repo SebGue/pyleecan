@@ -256,7 +256,8 @@
             "comp_Rmin",
             "comp_surface",
             "get_surface",
-            "plot"
+            "plot",
+            "comp_Rmax"
         ],
         "mother": "",
         "name": "Bore",
@@ -272,6 +273,16 @@
                 "type": "int",
                 "unit": "",
                 "value": 1
+            },
+            {
+                "as_dict": "",
+                "desc": "Angular offset for the bore shape",
+                "max": "",
+                "min": "",
+                "name": "alpha",
+                "type": "float",
+                "unit": "rad",
+                "value": 0
             }
         ]
     },
@@ -314,16 +325,6 @@
                 "type": "float",
                 "unit": "m",
                 "value": 0.01
-            },
-            {
-                "as_dict": "",
-                "desc": "Angular offset for the arc",
-                "max": "",
-                "min": "",
-                "name": "alpha",
-                "type": "float",
-                "unit": "rad",
-                "value": 0
             }
         ]
     },
@@ -375,16 +376,6 @@
                 "type": "float",
                 "unit": "m",
                 "value": 0.0035
-            },
-            {
-                "as_dict": "",
-                "desc": "Angular offset",
-                "max": "",
-                "min": "",
-                "name": "alpha",
-                "type": "float",
-                "unit": "rad",
-                "value": 0
             }
         ]
     },
@@ -458,16 +449,6 @@
                 "type": "float",
                 "unit": "m",
                 "value": null
-            },
-            {
-                "as_dict": "",
-                "desc": "Angular offset",
-                "max": "",
-                "min": "",
-                "name": "alpha",
-                "type": "float",
-                "unit": "rad",
-                "value": 0
             }
         ]
     },
@@ -509,6 +490,16 @@
                 "type": "int",
                 "unit": "-",
                 "value": 1
+            },
+            {
+                "as_dict": "",
+                "desc": "Name of the bore (for save)",
+                "max": "",
+                "min": "",
+                "name": "name",
+                "type": "str",
+                "unit": "-",
+                "value": ""
             }
         ]
     },
@@ -673,7 +664,7 @@
         "properties": [
             {
                 "as_dict": "",
-                "desc": "cf schematics, single wire height without insulation [m]",
+                "desc": "cf schematics, single strand height without insulation",
                 "max": "",
                 "min": "0",
                 "name": "Hwire",
@@ -683,7 +674,7 @@
             },
             {
                 "as_dict": "",
-                "desc": "cf schematics, single wire width without insulation [m]",
+                "desc": "cf schematics, single strand width without insulation",
                 "max": "",
                 "min": "0",
                 "name": "Wwire",
@@ -693,7 +684,7 @@
             },
             {
                 "as_dict": "",
-                "desc": "cf schematics, stator winding number of preformed wires (strands) in parallel per coil along radial (vertical) direction",
+                "desc": "number of form wound strands in parallel per conductor along radial (vertical) direction",
                 "max": "",
                 "min": "1",
                 "name": "Nwppc_rad",
@@ -703,7 +694,7 @@
             },
             {
                 "as_dict": "",
-                "desc": "cf schematics, stator winding number of preformed wires (strands) in parallel per coil along tangential (horizontal) direction",
+                "desc": "number of form wound strands in parallel per conductor along tangential (horizontal) direction",
                 "max": "",
                 "min": "1",
                 "name": "Nwppc_tan",
@@ -713,7 +704,7 @@
             },
             {
                 "as_dict": "",
-                "desc": "(advanced) cf schematics, winding strand insulation thickness [m]",
+                "desc": "(advanced) cf schematics, winding strand insulation thickness",
                 "max": "",
                 "min": "0",
                 "name": "Wins_wire",
@@ -723,7 +714,7 @@
             },
             {
                 "as_dict": "",
-                "desc": "(advanced) cf schematics, winding coil insulation  thickness [m]",
+                "desc": "(advanced) cf schematics, winding coil insulation  thickness",
                 "max": "",
                 "min": "0",
                 "name": "Wins_coil",
@@ -784,7 +775,7 @@
         "properties": [
             {
                 "as_dict": "",
-                "desc": "cf schematics, single wire diameter without insulation [m]",
+                "desc": "cf schematics, single strand diameter without insulation",
                 "max": "",
                 "min": "0",
                 "name": "Wwire",
@@ -794,7 +785,7 @@
             },
             {
                 "as_dict": "",
-                "desc": "(advanced) cf schematics, winding coil insulation diameter [m]",
+                "desc": "(advanced) cf schematics, conductor diameter",
                 "max": "",
                 "min": "0",
                 "name": "Wins_cond",
@@ -804,7 +795,7 @@
             },
             {
                 "as_dict": "",
-                "desc": "cf schematics, winding number of random wires (strands) in parallel per coil",
+                "desc": "number of strands in parallel per conductor",
                 "max": "",
                 "min": "1",
                 "name": "Nwppc",
@@ -814,7 +805,7 @@
             },
             {
                 "as_dict": "",
-                "desc": "(advanced) cf schematics, winding strand insulation thickness [m]",
+                "desc": "(advanced) cf schematics, winding strand insulation thickness",
                 "max": "",
                 "min": "0",
                 "name": "Wins_wire",
@@ -2641,6 +2632,7 @@
             "HoleM54",
             "HoleM57",
             "HoleM58",
+            "HoleM60",
             "HoleMLSRPM",
             "HoleMag",
             "HoleUD",
@@ -3689,6 +3681,118 @@
             }
         ]
     },
+    "HoleM60": {
+        "constants": [
+            {
+                "name": "VERSION",
+                "value": "1"
+            },
+            {
+                "name": "IS_SYMMETRICAL",
+                "value": "1"
+            }
+        ],
+        "daughters": [],
+        "desc": "V shape slot for buried magnet",
+        "is_internal": false,
+        "methods": [
+            "_comp_point_coordinate",
+            "build_geometry",
+            "plot_schematics",
+            "remove_magnet",
+            "comp_surface_magnet_id",
+            "comp_radius",
+            "has_magnet",
+            "check",
+            "comp_magnetization_dict"
+        ],
+        "mother": "HoleMag",
+        "name": "HoleM60",
+        "package": "Slot",
+        "path": "pyleecan/Generator/ClassesRef/Slot/HoleM60.csv",
+        "properties": [
+            {
+                "as_dict": "",
+                "desc": "Hole angular width",
+                "max": "",
+                "min": "0",
+                "name": "W0",
+                "type": "float",
+                "unit": "rad",
+                "value": null
+            },
+            {
+                "as_dict": "",
+                "desc": "Magnet width",
+                "max": "",
+                "min": "0",
+                "name": "W1",
+                "type": "float",
+                "unit": "m",
+                "value": null
+            },
+            {
+                "as_dict": "",
+                "desc": "Hole width",
+                "max": "",
+                "min": "0",
+                "name": "W2",
+                "type": "float",
+                "unit": "m",
+                "value": null
+            },
+            {
+                "as_dict": "",
+                "desc": "Tooth width",
+                "max": "",
+                "min": "0",
+                "name": "W3",
+                "type": "float",
+                "unit": "m",
+                "value": null
+            },
+            {
+                "as_dict": "",
+                "desc": "Magnet height",
+                "max": "",
+                "min": "0",
+                "name": "H0",
+                "type": "float",
+                "unit": "m",
+                "value": null
+            },
+            {
+                "as_dict": "",
+                "desc": "Distance from the lamination bore",
+                "max": "",
+                "min": "0",
+                "name": "H1",
+                "type": "float",
+                "unit": "m",
+                "value": null
+            },
+            {
+                "as_dict": "",
+                "desc": "First Magnet",
+                "max": "",
+                "min": "",
+                "name": "magnet_0",
+                "type": "Magnet",
+                "unit": "-",
+                "value": ""
+            },
+            {
+                "as_dict": "",
+                "desc": "Second Magnet",
+                "max": "",
+                "min": "",
+                "name": "magnet_1",
+                "type": "Magnet",
+                "unit": "-",
+                "value": ""
+            }
+        ]
+    },
     "HoleMLSRPM": {
         "constants": [
             {
@@ -3817,6 +3921,7 @@
             "HoleM53",
             "HoleM57",
             "HoleM58",
+            "HoleM60",
             "HoleMLSRPM",
             "HoleUD"
         ],
@@ -5306,7 +5411,8 @@
             "get_Zs",
             "has_magnet",
             "plot",
-            "set_pole_pair_number"
+            "set_pole_pair_number",
+            "set_Lmag"
         ],
         "mother": "Lamination",
         "name": "LamH",
@@ -5456,12 +5562,15 @@
             "build_geometry",
             "check",
             "comp_masses",
-            "comp_radius_mec",
             "comp_surfaces",
             "comp_volumes",
             "plot",
             "comp_angle_d_axis",
-            "get_magnet_number"
+            "get_magnet_number",
+            "set_Lmag",
+            "get_dim_active",
+            "get_all_mag_obj",
+            "get_magnet_by_label"
         ],
         "mother": "LamSlot",
         "name": "LamSlotMag",
@@ -5477,6 +5586,26 @@
                 "type": "Magnet",
                 "unit": "-",
                 "value": ""
+            },
+            {
+                "as_dict": "",
+                "desc": "Matrix to enforce a different relative magnetic permeability for each magnet layer (shape: [Nrad, Ntan, Zs])",
+                "max": "",
+                "min": "",
+                "name": "mur_lin_matrix",
+                "type": "ndarray",
+                "unit": "-",
+                "value": null
+            },
+            {
+                "as_dict": "",
+                "desc": "Matrix to enforce a different magnet remanence induction at 20degC for each magnet layer (shape: [Nrad, Ntan, Zs])",
+                "max": "",
+                "min": "",
+                "name": "Brm20_matrix",
+                "type": "ndarray",
+                "unit": "-",
+                "value": null
             }
         ]
     },
@@ -5494,7 +5623,6 @@
         "is_internal": false,
         "methods": [
             "check",
-            "comp_radius_mec",
             "comp_surfaces",
             "get_pole_pair_number",
             "plot",
@@ -6962,8 +7090,7 @@
             "get_meshsolution",
             "get_path_save_fea",
             "get_path_save",
-            "gen_elmer_mesh",
-            "gen_elmer_sif"
+            "gen_elmer_mesh"
         ],
         "mother": "Magnetics",
         "name": "MagElmer",
@@ -12264,6 +12391,8 @@
             "SlotM16",
             "SlotM17",
             "SlotM18",
+            "SlotM18_2",
+            "SlotM19",
             "SlotUD",
             "SlotUD2",
             "SlotW10",
@@ -12315,7 +12444,9 @@
             "is_outwards",
             "plot",
             "plot_active",
-            "set_label"
+            "set_label",
+            "is_airgap_active",
+            "is_full_pitch_active"
         ],
         "mother": "",
         "name": "Slot",
@@ -12452,7 +12583,8 @@
             "comp_surface_opening",
             "get_surface_active",
             "get_surface_opening",
-            "plot_schematics"
+            "plot_schematics",
+            "convert_to_H0_bore"
         ],
         "mother": "Slot",
         "name": "SlotCirc",
@@ -12478,6 +12610,16 @@
                 "type": "float",
                 "unit": "m",
                 "value": 0.03
+            },
+            {
+                "as_dict": "",
+                "desc": "True to define H0 from top of arc to bore radius, False top arc to middle of W0 segment",
+                "max": "",
+                "min": "",
+                "name": "is_H0_bore",
+                "type": "bool",
+                "unit": "-",
+                "value": 1
             }
         ]
     },
@@ -12617,7 +12759,8 @@
             "comp_surface",
             "comp_surface_active",
             "get_surface_active",
-            "plot_schematics"
+            "plot_schematics",
+            "is_airgap_active"
         ],
         "mother": "Slot",
         "name": "SlotM10",
@@ -12690,7 +12833,9 @@
             "comp_surface",
             "comp_surface_active",
             "get_surface_active",
-            "plot_schematics"
+            "plot_schematics",
+            "is_airgap_active",
+            "is_full_pitch_active"
         ],
         "mother": "Slot",
         "name": "SlotM11",
@@ -12763,7 +12908,8 @@
             "comp_surface",
             "comp_surface_active",
             "get_surface_active",
-            "plot_schematics"
+            "plot_schematics",
+            "is_airgap_active"
         ],
         "mother": "Slot",
         "name": "SlotM12",
@@ -12836,7 +12982,8 @@
             "comp_surface",
             "comp_surface_active",
             "get_surface_active",
-            "plot_schematics"
+            "plot_schematics",
+            "is_airgap_active"
         ],
         "mother": "Slot",
         "name": "SlotM13",
@@ -12919,7 +13066,9 @@
             "comp_surface",
             "comp_surface_active",
             "get_surface_active",
-            "plot_schematics"
+            "plot_schematics",
+            "is_airgap_active",
+            "is_full_pitch_active"
         ],
         "mother": "Slot",
         "name": "SlotM14",
@@ -13002,7 +13151,8 @@
             "comp_surface",
             "comp_surface_active",
             "get_surface_active",
-            "plot_schematics"
+            "plot_schematics",
+            "is_airgap_active"
         ],
         "mother": "Slot",
         "name": "SlotM15",
@@ -13157,7 +13307,9 @@
             "comp_surface",
             "comp_surface_active",
             "get_surface_active",
-            "plot_schematics"
+            "plot_schematics",
+            "is_airgap_active",
+            "is_full_pitch_active"
         ],
         "mother": "Slot",
         "name": "SlotM17",
@@ -13189,7 +13341,9 @@
             "comp_surface",
             "comp_surface_active",
             "get_surface_active",
-            "plot_schematics"
+            "plot_schematics",
+            "is_airgap_active",
+            "is_full_pitch_active"
         ],
         "mother": "Slot",
         "name": "SlotM18",
@@ -13205,6 +13359,125 @@
                 "type": "float",
                 "unit": "m",
                 "value": 0.001
+            }
+        ]
+    },
+    "SlotM18_2": {
+        "constants": [
+            {
+                "name": "VERSION",
+                "value": "1"
+            },
+            {
+                "name": "IS_SYMMETRICAL",
+                "value": "1"
+            }
+        ],
+        "daughters": [],
+        "desc": "Double Polar Ring magnet",
+        "is_internal": false,
+        "methods": [
+            "_comp_point_coordinate",
+            "build_geometry",
+            "check",
+            "comp_angle_opening",
+            "comp_height",
+            "comp_height_active",
+            "comp_surface",
+            "comp_surface_active",
+            "get_surface_active",
+            "plot_schematics",
+            "is_airgap_active",
+            "is_full_pitch_active",
+            "build_geometry_active"
+        ],
+        "mother": "Slot",
+        "name": "SlotM18_2",
+        "package": "Slot",
+        "path": "pyleecan/Generator/ClassesRef/Slot/SlotM18_2.csv",
+        "properties": [
+            {
+                "as_dict": "",
+                "desc": "Height of the magnet near the bore",
+                "max": "",
+                "min": "0",
+                "name": "Hmag_bore",
+                "type": "float",
+                "unit": "m",
+                "value": 0.001
+            },
+            {
+                "as_dict": "",
+                "desc": "Height of the magnet near the airgap",
+                "max": "",
+                "min": "0",
+                "name": "Hmag_gap",
+                "type": "float",
+                "unit": "m",
+                "value": 0.001
+            }
+        ]
+    },
+    "SlotM19": {
+        "constants": [
+            {
+                "name": "VERSION",
+                "value": "1"
+            },
+            {
+                "name": "IS_SYMMETRICAL",
+                "value": "1"
+            }
+        ],
+        "daughters": [],
+        "desc": "trapezoidal  Slot with trapezoidal magnet with polar top",
+        "is_internal": false,
+        "methods": [
+            "_comp_point_coordinate",
+            "build_geometry",
+            "comp_angle_opening",
+            "comp_height",
+            "comp_height_active",
+            "comp_surface",
+            "comp_surface_active",
+            "get_surface_active",
+            "plot_schematics",
+            "check"
+        ],
+        "mother": "Slot",
+        "name": "SlotM19",
+        "package": "Slot",
+        "path": "pyleecan/Generator/ClassesRef/Slot/SlotM19.csv",
+        "properties": [
+            {
+                "as_dict": "",
+                "desc": "Slot/magnet width. (top)",
+                "max": "",
+                "min": "0",
+                "name": "W0",
+                "type": "float",
+                "unit": "m",
+                "value": 0.03
+            },
+            {
+                "as_dict": "",
+                "desc": "Slot/magnet width. (bottom)",
+                "max": "",
+                "min": "0",
+                "name": "W1",
+                "type": "float",
+                "unit": "m",
+                "value": 0.02
+            },
+            {
+                "as_dict": "",
+                "desc": "Magnet Height",
+                "max": "",
+                "min": "0",
+                "name": "Hmag",
+                "type": "float",
+                "unit": "m",
+                "value": 0.00175
             }
         ]
     },
@@ -13471,6 +13744,8 @@
         "methods": [
             "_comp_line_dict",
             "_comp_point_coordinate",
+            "_set_W3",
+            "_comp_W",
             "build_geometry",
             "check",
             "comp_angle_opening",
@@ -13482,7 +13757,8 @@
             "get_H1",
             "get_surface_active",
             "get_surface_opening",
-            "plot_schematics"
+            "plot_schematics",
+            "plot_schematics_constant_tooth"
         ],
         "mother": "Slot",
         "name": "SlotW11",
@@ -13497,7 +13773,7 @@
                 "name": "W0",
                 "type": "float",
                 "unit": "m",
-                "value": 0.003
+                "value": null
             },
             {
                 "as_dict": "",
@@ -13507,7 +13783,7 @@
                 "name": "H0",
                 "type": "float",
                 "unit": "m",
-                "value": 0.003
+                "value": null
             },
             {
                 "as_dict": "",
@@ -13517,7 +13793,7 @@
                 "name": "H1",
                 "type": "float",
                 "unit": "m/rad",
-                "value": 0
+                "value": null
             },
             {
                 "as_dict": "",
@@ -13537,7 +13813,7 @@
                 "name": "W1",
                 "type": "float",
                 "unit": "m",
-                "value": 0.013
+                "value": null
             },
             {
                 "as_dict": "",
@@ -13547,7 +13823,7 @@
                 "name": "H2",
                 "type": "float",
                 "unit": "m",
-                "value": 0.02
+                "value": null
             },
             {
                 "as_dict": "",
@@ -13557,7 +13833,27 @@
                 "name": "W2",
                 "type": "float",
                 "unit": "m",
-                "value": 0.01
+                "value": null
+            },
+            {
+                "as_dict": "",
+                "desc": "True: use W3 to define the slot, False: use W2 and W1",
+                "max": "",
+                "min": "",
+                "name": "is_cstt_tooth",
+                "type": "bool",
+                "unit": "-",
+                "value": 0
+            },
+            {
+                "as_dict": "",
+                "desc": "Tooth width",
+                "max": "",
+                "min": "0",
+                "name": "W3",
+                "type": "float",
+                "unit": "m",
+                "value": null
             },
             {
                 "as_dict": "",
@@ -13567,7 +13863,7 @@
                 "name": "R1",
                 "type": "float",
                 "unit": "m",
-                "value": 0.001
+                "value": null
             }
         ]
     },
@@ -14243,6 +14539,7 @@
         "methods": [
             "_comp_line_dict",
             "_comp_point_coordinate",
+            "_set_W3",
             "_comp_W",
             "build_geometry",
             "build_geometry_active",
@@ -14255,7 +14552,9 @@
             "comp_surface_opening",
             "get_surface_active",
             "get_surface_opening",
-            "plot_schematics"
+            "plot_schematics",
+            "get_H1",
+            "plot_schematics_constant_tooth"
         ],
         "mother": "Slot",
         "name": "SlotW23",
@@ -14270,7 +14569,7 @@
                 "name": "W0",
                 "type": "float",
                 "unit": "m",
-                "value": 0.003
+                "value": null
             },
             {
                 "as_dict": "",
@@ -14280,7 +14579,7 @@
                 "name": "H0",
                 "type": "float",
                 "unit": "m",
-                "value": 0.003
+                "value": null
             },
             {
                 "as_dict": "",
@@ -14290,7 +14589,7 @@
                 "name": "H1",
                 "type": "float",
                 "unit": "m/rad",
-                "value": 0
+                "value": null
             },
             {
                 "as_dict": "",
@@ -14300,7 +14599,7 @@
                 "name": "W1",
                 "type": "float",
                 "unit": "m",
-                "value": 0.013
+                "value": null
             },
             {
                 "as_dict": "",
@@ -14310,7 +14609,7 @@
                 "name": "H2",
                 "type": "float",
                 "unit": "m",
-                "value": 0.02
+                "value": null
             },
             {
                 "as_dict": "",
@@ -14320,17 +14619,7 @@
                 "name": "W2",
                 "type": "float",
                 "unit": "m",
-                "value": 0.01
-            },
-            {
-                "as_dict": "",
-                "desc": "Tooth width",
-                "max": "",
-                "min": "0",
-                "name": "W3",
-                "type": "float",
-                "unit": "m",
-                "value": 0.01
+                "value": null
             },
             {
                 "as_dict": "",
@@ -14351,6 +14640,16 @@
                 "type": "bool",
                 "unit": "-",
                 "value": 0
+            },
+            {
+                "as_dict": "",
+                "desc": "Tooth width",
+                "max": "",
+                "min": "0",
+                "name": "W3",
+                "type": "float",
+                "unit": "m",
+                "value": null
             }
         ]
     },
@@ -15653,7 +15952,7 @@
         "desc": "SurfLine define by list of lines that delimit it",
         "is_internal": false,
         "methods": [
-            "comp_mesh",
+            "comp_mesh_dict",
             "draw_FEMM",
             "plot",
             "split_line",
@@ -16349,7 +16648,10 @@
             "get_dim_wind",
             "get_periodicity",
             "export_to_csv",
-            "clean"
+            "clean",
+            "plot_radial",
+            "plot_linear",
+            "comp_Ncps"
         ],
         "mother": "",
         "name": "Winding",
@@ -16368,7 +16670,7 @@
             },
             {
                 "as_dict": "",
-                "desc": "0 not to change the stator winding connection matrix built by pyleecan number of slots to shift the coils obtained with pyleecan winding algorithm (a, b, c becomes b, c, a with Nslot_shift_wind1=1)",
+                "desc": "Number of slots to shift the coils obtained with pyleecan winding algorithm (a, b, c becomes b, c, a with Nslot_shift_wind=1)",
                 "max": "",
                 "min": "",
                 "name": "Nslot_shift_wind",
@@ -16448,7 +16750,7 @@
             },
             {
                 "as_dict": "",
-                "desc": "Coil pitch (or coil span)",
+                "desc": "Distance (in slot) between a conductor of a certain phase and the corresponding return conductor",
                 "max": "",
                 "min": "",
                 "name": "coil_pitch",
@@ -16468,7 +16770,7 @@
             },
             {
                 "as_dict": "",
-                "desc": "Number of layers per slots",
+                "desc": "Number of different coils in a slot",
                 "max": "",
                 "min": "1",
                 "name": "Nlayer",
@@ -16535,6 +16837,26 @@
                 "type": "bool",
                 "unit": "",
                 "value": 0
+            },
+            {
+                "as_dict": "",
+                "desc": "Phase shift between both tri-phase systems in dual-tri-phase case",
+                "max": "",
+                "min": "",
+                "name": "dual_tri_phase_shift",
+                "type": "float",
+                "unit": "rad",
+                "value": null
+            },
+            {
+                "as_dict": "",
+                "desc": "True if the alimentation is wye (else delta)",
+                "max": "",
+                "min": "",
+                "name": "is_wye",
+                "type": "bool",
+                "unit": "-",
+                "value": 1
             }
         ]
     },

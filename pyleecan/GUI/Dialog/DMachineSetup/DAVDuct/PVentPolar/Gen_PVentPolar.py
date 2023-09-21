@@ -23,18 +23,6 @@ class Gen_PVentPolar(Ui_PVentPolar):
         self.si_Zh.setWhatsThis(txt)
         self.si_Zh.setToolTip(txt)
 
-        # Setup of in_Alpha0
-        txt = self.tr(u"""Shift angle of the holes around circumference""")
-        self.in_Alpha0.setWhatsThis(txt)
-        self.in_Alpha0.setToolTip(txt)
-
-        # Setup of lf_Alpha0
-        self.lf_Alpha0.validator().setBottom(0)
-        self.lf_Alpha0.validator().setTop(6.29)
-        txt = self.tr(u"""Shift angle of the holes around circumference""")
-        self.lf_Alpha0.setWhatsThis(txt)
-        self.lf_Alpha0.setToolTip(txt)
-
         # Setup of in_D0
         txt = self.tr(u"""Height of the hole""")
         self.in_D0.setWhatsThis(txt)

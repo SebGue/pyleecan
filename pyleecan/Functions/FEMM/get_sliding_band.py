@@ -76,7 +76,11 @@ def get_sliding_band(sym, lam_int, lam_ext):
         )
     else:  # Symmetry
         # Bottom line
-        Z1 = Rgap_0_int
+        if hasattr(lam_int, "slot") and lam_int.slot.is_full_pitch_active():
+            # Cylinder magnet/winding => limit is mec airgap
+            Z1 = Rgap_mec_int
+        else:
+            Z1 = Rgap_0_int
         Z2 = Rgap_mec_int + W_sb
         Z3 = Z2 * exp(1j * 2 * pi / sym)
         Z4 = Z1 * exp(1j * 2 * pi / sym)
@@ -103,7 +107,11 @@ def get_sliding_band(sym, lam_int, lam_ext):
             )
         )
         # Top line
-        Z5 = Rgap_0_ext
+        if hasattr(lam_ext, "slot") and lam_ext.slot.is_full_pitch_active():
+            # Cylinder magnet/winding => limit is mec airgap
+            Z5 = Rgap_mec_ext
+        else:
+            Z5 = Rgap_0_ext
         Z6 = Rgap_mec_ext - W_sb
         Z7 = Z6 * exp(1j * 2 * pi / sym)
         Z8 = Z5 * exp(1j * 2 * pi / sym)

@@ -193,7 +193,9 @@ def test_FEMM_Loss_diff():
 
     out = simu.run()
 
-    out.loss.loss_dict["Difference"] = (out.loss.loss_dict.values()[0] - out.loss.loss_dict.values()[1])
+    out.loss.loss_dict["Difference"] = (
+        out.loss.loss_dict.values()[0] - out.loss.loss_dict.values()[1]
+    )
 
     print(out.loss.get_power_dict())
 
@@ -460,7 +462,6 @@ def test_FEMM_Id_Iq():
 
 # To run it without pytest
 if __name__ == "__main__":
-
     # test_FEMM_Loss_diff()
     # test_FEMM_Loss_Prius()
     test_LossFEMM_Prius()

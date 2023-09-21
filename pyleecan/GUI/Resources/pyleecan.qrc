@@ -10,6 +10,8 @@
     <file>images/MachineSetup/WSlot/SlotW11_empty.png</file>
     <file>images/MachineSetup/WSlot/SlotW11_wind.png</file>
     <file>images/MachineSetup/WSlot/SlotW11_wedge_full.png</file>
+    <file>images/MachineSetup/WSlot/SlotW11_constant_tooth_wind.png</file>
+    <file>images/MachineSetup/WSlot/SlotW11_constant_tooth_wedge_full.png</file>
     <file>images/MachineSetup/WSlot/SlotW12_empty.png</file>
     <file>images/MachineSetup/WSlot/SlotW12_wind.png</file>
     <file>images/MachineSetup/WSlot/SlotW12_wedge_full.png</file>
@@ -34,6 +36,9 @@
     <file>images/MachineSetup/WSlot/SlotW23_empty.png</file>
     <file>images/MachineSetup/WSlot/SlotW23_wind.png</file>
     <file>images/MachineSetup/WSlot/SlotW23_wedge_full.png</file>
+    <file>images/MachineSetup/WSlot/SlotW23_constant_tooth_empty.png</file>
+    <file>images/MachineSetup/WSlot/SlotW23_constant_tooth_wedge_full.png</file>
+    <file>images/MachineSetup/WSlot/SlotW23_constant_tooth_wind.png</file>
     <file>images/MachineSetup/WSlot/SlotW24_empty.png</file>
     <file>images/MachineSetup/WSlot/SlotW24_wind.png</file>
     <file>images/MachineSetup/WSlot/SlotW24_wedge_full.png</file>
@@ -54,6 +59,8 @@
     <file>images/MachineSetup/WSlot/SlotW29_wedge_full.png</file>
     <file>images/MachineSetup/WMSlot/SlotCirc_empty_int_rot.png</file>
     <file>images/MachineSetup/WMSlot/SlotCirc_empty_ext_sta.png</file>
+    <file>images/MachineSetup/WMSlot/SlotCirc_empty_int_rot_old.png</file>
+    <file>images/MachineSetup/WMSlot/SlotCirc_empty_ext_sta_old.png</file>
     <file>images/MachineSetup/WMSlot/SlotM10.png</file>
     <file>images/MachineSetup/WMSlot/SlotM10_empty_int_rot.png</file>
     <file>images/MachineSetup/WMSlot/SlotM10_empty_ext_sta.png</file>
@@ -67,8 +74,9 @@
     <file>images/MachineSetup/WMSlot/SlotM16.png</file>
     <file>images/MachineSetup/WMSlot/SlotM17.png</file>
     <file>images/MachineSetup/WMSlot/SlotM18.png</file>
-    <file>images/MachineSetup/WSlot/Slot_60.PNG</file>
-    <file>images/MachineSetup/WSlot/Slot_61.PNG</file>
+    <file>images/MachineSetup/WMSlot/SlotM19.png</file>
+    <file>images/MachineSetup/WSlot/Slot_60.png</file>
+    <file>images/MachineSetup/WSlot/Slot_61.png</file>
     <file>images/MachineSetup/LamParam/CircVentDuct.png</file>
     <file>images/MachineSetup/LamParam/VentilationCirc.png</file>
     <file>images/MachineSetup/LamParam/VentilationPolar.png</file>
@@ -78,7 +86,9 @@
     <file>images/MachineSetup/Bar/ShortCircuitRing_schematics.png</file>
     <file>images/MachineSetup/WindParam/Winding param.PNG</file>
     <file>images/MachineSetup/WindParam/CondType11.png</file>
+    <file>images/MachineSetup/WindParam/CondType11_single.png</file>
     <file>images/MachineSetup/WindParam/CondType12.png</file>
+    <file>images/MachineSetup/WindParam/CondType12_single.png</file>
     <file>images/MachineSetup/LamParam/RadVentDuct.png</file>
     <file>images/MachineSetup/MachineType/DFIM.png</file>
     <file>images/MachineSetup/MachineType/machine_IPMSM.png</file>
@@ -103,9 +113,14 @@
     <file>images/MachineSetup/SMHoleMag/HoleM57_no_mag.png</file>
     <file>images/MachineSetup/SMHoleMag/HoleM58.png</file>
     <file>images/MachineSetup/SMHoleMag/HoleM58_no_mag.png</file>
+    <file>images/MachineSetup/SMHoleMag/HoleM60.png</file>
+    <file>images/MachineSetup/SMHoleMag/HoleM60_no_mag.png</file>
     <file>images/MachineSetup/MachineDimension/Dimension_Rotor_Stator.png</file>
     <file>images/MachineSetup/MachineDimension/Dimension_Shaft_Rotor_Stator.png</file>
     <file>images/MachineSetup/MachineDimension/Dimension_Stator_Rotor.png</file>
+    <file>images/MachineSetup/MachineDimension/Dimension_Rotor_Stator_mag.png</file>
+    <file>images/MachineSetup/MachineDimension/Dimension_Shaft_Rotor_Stator_mag.png</file>
+    <file>images/MachineSetup/MachineDimension/Dimension_Stator_Rotor_mag.png</file>
     <file>images/icon/pyleecan_64.png</file>
   </qresource>
 </RCC>

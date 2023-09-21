@@ -93,15 +93,17 @@ class PWSlot28(Gen_PWSlot28, QWidget):
         if self.g_wedge.isChecked():
             self.w_wedge_mat.show()
             self.img_slot.setPixmap(
-                QPixmap(u":/images/images/MachineSetup/WSlot/SlotW28_wedge_full.png")
+                QPixmap(":/images/images/MachineSetup/WSlot/SlotW28_wedge_full.png")
             )
             self.w_wedge_mat.update(self.slot, "wedge_mat", self.material_dict)
         else:
             self.w_wedge_mat.hide()
             self.slot.wedge_mat = None
             self.img_slot.setPixmap(
-                QPixmap(u":/images/images/MachineSetup/WSlot/SlotW28_wind.png")
+                QPixmap(":/images/images/MachineSetup/WSlot/SlotW28_wind.png")
             )
+        # Notify the machine GUI that the machine has changed
+        self.saveNeeded.emit()
 
     def set_W0(self):
         """Signal to update the value of W0 according to the line edit
