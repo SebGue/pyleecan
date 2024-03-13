@@ -241,7 +241,7 @@ class Ui_SLamShape(object):
             QCoreApplication.translate("SLamShape", u"Axial : 0 set (0 ducts)", None)
         )
         self.b_axial_duct.setText(
-            QCoreApplication.translate("SLamShape", u"set axial ducts", None)
+            QCoreApplication.translate("SLamShape", u"Set Axial Ducts", None)
         )
         self.g_radial.setTitle(
             QCoreApplication.translate("SLamShape", u"Radial cooling duct", None)
@@ -255,19 +255,19 @@ class Ui_SLamShape(object):
             )
         )
         self.g_notches.setTitle(
-            QCoreApplication.translate("SLamShape", u"Notches", None)
+            QCoreApplication.translate("SLamShape", u"Notches and Keys", None)
         )
         self.out_notch.setText(
             QCoreApplication.translate("SLamShape", u"0 set (0 notches)", None)
         )
         self.b_notch.setText(
-            QCoreApplication.translate("SLamShape", u"set notches", None)
+            QCoreApplication.translate("SLamShape", u"Set Notches", None)
         )
         self.g_bore.setTitle(
             QCoreApplication.translate("SLamShape", u"Uneven bore shape", None)
         )
         self.b_bore.setText(
-            QCoreApplication.translate("SLamShape", u"set uneven bore shape", None)
+            QCoreApplication.translate("SLamShape", u"Set Uneven Bore Shape", None)
         )
         self.b_previous.setText(
             QCoreApplication.translate("SLamShape", u"Previous", None)

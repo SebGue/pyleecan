@@ -9,6 +9,8 @@ from ......Classes.HoleM52 import HoleM52
 from ......GUI import gui_option
 from ......GUI.Dialog.DMachineSetup.SMHoleMag.PHoleM52.Gen_PHoleM52 import Gen_PHoleM52
 from ......Methods.Slot.Slot import SlotCheckError
+from ......GUI.Dialog.DMachineSetup.SMHoleMag import DEFAULT_MAG_MAT
+from ......GUI.Resources import pixmap_dict
 
 
 class PHoleM52(Gen_PHoleM52, QWidget):
@@ -52,7 +54,7 @@ class PHoleM52(Gen_PHoleM52, QWidget):
         self.w_mat_0.is_hide_button = True
 
         self.w_mat_1.setText("magnet_0")
-        self.w_mat_1.def_mat = "Magnet1"
+        self.w_mat_1.def_mat = DEFAULT_MAG_MAT
         self.w_mat_1.is_hide_button = True
 
         # Set unit name (m ou mm)
@@ -69,9 +71,7 @@ class PHoleM52(Gen_PHoleM52, QWidget):
 
         # Adapt GUI with/without magnet
         if hole.magnet_0 is None:  # SyRM
-            self.img_slot.setPixmap(
-                QPixmap(":/images/images/MachineSetup/SMHoleMag/HoleM52_no_mag.png")
-            )
+            self.img_slot.setPixmap(QPixmap(pixmap_dict["HoleM52_empty_int_rotor"]))
             self.w_mat_0.update(self.hole, "mat_void", self.material_dict)
             self.w_mat_1.hide()
         else:

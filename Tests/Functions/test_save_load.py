@@ -14,6 +14,8 @@ from pyleecan.Classes.LamSlotMag import LamSlotMag
 from pyleecan.Classes.LamSlotWind import LamSlotWind
 from pyleecan.Classes.MachineSIPMSM import MachineSIPMSM
 from pyleecan.Classes.MagFEMM import MagFEMM
+from pyleecan.Classes.XOutput import XOutput
+from pyleecan.Classes.DataKeeper import DataKeeper
 from pyleecan.Classes.Output import Output
 from pyleecan.Classes.PostFunction import PostFunction
 from pyleecan.Classes.Shaft import Shaft
@@ -54,7 +56,7 @@ def test_save_load_machine():
     test_obj.stator.slot = SlotW10(Zs=10, H0=0.21, W0=0.23)
     test_obj.stator.winding = Winding(qs=5, Nlayer=1, p=3)
     test_obj.rotor = LamSlotMag(L1=0.55)
-    test_obj.rotor.slot = SlotM11(W0=pi / 4, Wmag=pi / 4, Hmag=3)
+    test_obj.rotor.slot = SlotM11(W0=pi / 4, W1=pi / 4, H1=3)
     test_obj.shaft = Shaft(Lshaft=0.65)
     test_obj.frame = None
 
@@ -91,8 +93,8 @@ def test_save_load_machine():
     assert type(result.rotor.slot) is SlotM11
     assert result.rotor.slot.W0 == pi / 4
 
-    assert result.rotor.slot.Wmag == pi / 4
-    assert result.rotor.slot.Hmag == 3
+    assert result.rotor.slot.W1 == pi / 4
+    assert result.rotor.slot.H1 == 3
 
     assert type(result.shaft) is Shaft
     assert result.shaft.Lshaft == 0.65
@@ -310,7 +312,7 @@ def test_save_load_list():
     test_obj_1.stator.slot = SlotW10(Zs=10, H0=0.21, W0=0.23)
     test_obj_1.stator.winding = Winding(qs=5, p=3, Nlayer=1)
     test_obj_1.rotor = LamSlotMag(L1=0.55)
-    test_obj_1.rotor.slot = SlotM11(W0=pi / 4, Wmag=pi / 4, Hmag=3)
+    test_obj_1.rotor.slot = SlotM11(W0=pi / 4, W1=pi / 4, H1=3)
     test_obj_1.shaft = Shaft(Lshaft=0.65)
     test_obj_1.frame = None
 
@@ -350,7 +352,7 @@ def test_save_load_dict():
     test_obj_1.stator.slot = SlotW10(Zs=10, H0=0.21, W0=0.23)
     test_obj_1.stator.winding = Winding(qs=5, p=3)
     test_obj_1.rotor = LamSlotMag(L1=0.55)
-    test_obj_1.rotor.slot = SlotM11(W0=pi / 4, Wmag=pi / 4, Hmag=3)
+    test_obj_1.rotor.slot = SlotM11(W0=pi / 4, W1=pi / 4, H1=3)
     test_obj_1.shaft = Shaft(Lshaft=0.65)
     test_obj_1.frame = None
 
@@ -431,8 +433,27 @@ def test_save_load_simu(type_file):
     assert test_obj == test_obj2
 
 
+def test_save_load_slash_h5():
+    """Check that str with "/" can be save/load"""
+    test_obj = XOutput()
+    test_obj._set_None()
+    test_obj.xoutput_dict = {"x/y": DataKeeper(name="x/y")}
+
+    file_path = join(save_path, "test_save_slash.h5")
+    logger.debug(file_path)
+
+    if isfile(file_path):
+        remove(file_path)
+
+    assert not isfile(file_path)
+    test_obj.save(file_path)
+    assert isfile(file_path)
+    test_obj2 = load(file_path)
+    assert test_obj2 == test_obj
+
+
 if __name__ == "__main__":
-    test_save_load_folder_path()
+    test_save_load_slash_h5()
     # test_save_load_DXF_flat()
     # test_save_load_simu("json")
     # test_save_load_simu("h5")

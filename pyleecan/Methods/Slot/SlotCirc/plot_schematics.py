@@ -26,6 +26,8 @@ MAGNET_COLOR = config_dict["PLOT"]["COLOR_DICT"]["MAGNET_COLOR"]
 def plot_schematics(
     self,
     is_default=False,
+    is_return_default=False,
+    is_enforce_default_H0_bore=None,
     is_add_point_label=False,
     is_add_schematics=True,
     is_add_main_line=True,
@@ -43,6 +45,10 @@ def plot_schematics(
         A SlotCirc object
     is_default : int
         0: current slot values, 1: default internal rotor schematics, 2: default external stator schematics
+    is_return_default : bool
+        True: return the default lamination used for the schematics (skip plot)
+    is_enforce_default_H0_bore : bool
+        To enforce is_H0_bore on default slot (is_default=True only), None use default value
     is_add_point_label : bool
         True to display the name of the points (Z1, Z2....)
     is_add_schematics : bool
@@ -66,21 +72,31 @@ def plot_schematics(
         Figure containing the schematics
     ax : Matplotlib.axes.Axes object
         Axis containing the schematics
+    -------
+    lam : LamSlot
+        Default lamination used for the schematics
     """
 
     # Use some default parameter
     if is_default:
-        slot = type(self)(Zs=8, H0=10e-3, W0=45e-3)
+        slot = type(self)(Zs=8, H0=10e-3, W0=45e-3, is_H0_bore=True)
+        if is_enforce_default_H0_bore is not None:
+            slot.is_H0_bore = is_enforce_default_H0_bore
         if is_default == 1:  # Internal rotor schematics
             lam = LamSlot(
                 Rint=0.1, Rext=0.135, is_internal=True, is_stator=False, slot=slot
             )
+            if is_return_default:
+                return lam
         else:  # External stator schematics
             lam = LamSlot(
                 Rint=0.1, Rext=0.135, is_internal=False, is_stator=True, slot=slot
             )
+            if is_return_default:
+                return lam
         return slot.plot_schematics(
             is_default=False,
+            is_return_default=False,
             is_add_point_label=is_add_point_label,
             is_add_schematics=is_add_schematics,
             is_add_main_line=is_add_main_line,
@@ -116,9 +132,9 @@ def plot_schematics(
             # W0
             line = Segment(point_dict["Z1"], point_dict["Z2"])
             if self.is_outwards():
-                offset_label = -1 * self.H0 * 0.7
+                offset_label = -1 * self.H0 * 0.9 + 1j * 0.3 * self.W0
             else:
-                offset_label = self.H0 * 0.3
+                offset_label = self.H0 * 0.3 + 1j * 0.3 * self.W0
             line.plot(
                 fig=fig,
                 ax=ax,
@@ -130,14 +146,14 @@ def plot_schematics(
                 fontsize=SC_FONT_SIZE,
             )
             # H0
-            line = Segment(point_dict["ZC"], point_dict["ZM"])
+            line = Segment(point_dict["ZH"], point_dict["ZM"])
             line.plot(
                 fig=fig,
                 ax=ax,
                 color=ARROW_COLOR,
                 linewidth=ARROW_WIDTH,
                 label="H0",
-                offset_label=1j * -0.1 * self.W0,
+                offset_label=1j * -0.15 * self.W0,
                 is_arrow=True,
                 fontsize=SC_FONT_SIZE,
             )
@@ -171,6 +187,7 @@ def plot_schematics(
         ax.set_title("")
         ax.get_legend().remove()
         ax.set_axis_off()
+        fig.tight_layout()
 
         # Save / Show
         if save_path is not None:

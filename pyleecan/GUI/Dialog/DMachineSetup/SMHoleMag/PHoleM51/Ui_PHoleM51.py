@@ -19,7 +19,7 @@ class Ui_PHoleM51(object):
     def setupUi(self, PHoleM51):
         if not PHoleM51.objectName():
             PHoleM51.setObjectName(u"PHoleM51")
-        PHoleM51.resize(1078, 592)
+        PHoleM51.resize(1082, 847)
         PHoleM51.setMinimumSize(QSize(740, 440))
         PHoleM51.setMaximumSize(QSize(16777215, 16777215))
         self.horizontalLayout = QHBoxLayout(PHoleM51)
@@ -38,7 +38,7 @@ class Ui_PHoleM51(object):
         self.img_slot.setAutoFillBackground(False)
         self.img_slot.setFrameShape(QFrame.NoFrame)
         self.img_slot.setPixmap(
-            QPixmap(u":/images/images/MachineSetup/SMHoleMag/HoleM51.png")
+            QPixmap(u":/images/images/MachineSetup/SMHoleMag/HoleM51_mag_int_rotor.png")
         )
         self.img_slot.setScaledContents(False)
         self.img_slot.setAlignment(Qt.AlignCenter)
@@ -73,9 +73,9 @@ class Ui_PHoleM51(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 247, 572))
-        self.verticalLayout_4 = QVBoxLayout(self.scrollAreaWidgetContents)
-        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 268, 823))
+        self.verticalLayout_2 = QVBoxLayout(self.scrollAreaWidgetContents)
+        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.gridLayout = QGridLayout()
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setSizeConstraint(QLayout.SetDefaultConstraint)
@@ -245,37 +245,61 @@ class Ui_PHoleM51(object):
 
         self.gridLayout.addWidget(self.unit_W7, 10, 2, 1, 1)
 
-        self.verticalLayout_4.addLayout(self.gridLayout)
+        self.verticalLayout_2.addLayout(self.gridLayout)
 
+        self.gridLayout_2 = QGridLayout()
+        self.gridLayout_2.setObjectName(u"gridLayout_2")
         self.w_mat_0 = WMatSelect(self.scrollAreaWidgetContents)
         self.w_mat_0.setObjectName(u"w_mat_0")
         self.w_mat_0.setMinimumSize(QSize(100, 0))
 
-        self.verticalLayout_4.addWidget(self.w_mat_0)
+        self.gridLayout_2.addWidget(self.w_mat_0, 0, 1, 1, 1)
+
+        self.is_magnet_0 = QCheckBox(self.scrollAreaWidgetContents)
+        self.is_magnet_0.setObjectName(u"is_magnet_0")
+
+        self.gridLayout_2.addWidget(self.is_magnet_0, 1, 0, 1, 1)
 
         self.w_mat_1 = WMatSelect(self.scrollAreaWidgetContents)
         self.w_mat_1.setObjectName(u"w_mat_1")
+        sizePolicy2 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.w_mat_1.sizePolicy().hasHeightForWidth())
+        self.w_mat_1.setSizePolicy(sizePolicy2)
         self.w_mat_1.setMinimumSize(QSize(100, 0))
 
-        self.verticalLayout_4.addWidget(self.w_mat_1)
+        self.gridLayout_2.addWidget(self.w_mat_1, 1, 1, 1, 1)
+
+        self.is_magnet_1 = QCheckBox(self.scrollAreaWidgetContents)
+        self.is_magnet_1.setObjectName(u"is_magnet_1")
+
+        self.gridLayout_2.addWidget(self.is_magnet_1, 2, 0, 1, 1)
 
         self.w_mat_2 = WMatSelect(self.scrollAreaWidgetContents)
         self.w_mat_2.setObjectName(u"w_mat_2")
         self.w_mat_2.setMinimumSize(QSize(100, 0))
 
-        self.verticalLayout_4.addWidget(self.w_mat_2)
+        self.gridLayout_2.addWidget(self.w_mat_2, 2, 1, 1, 1)
+
+        self.is_magnet_2 = QCheckBox(self.scrollAreaWidgetContents)
+        self.is_magnet_2.setObjectName(u"is_magnet_2")
+
+        self.gridLayout_2.addWidget(self.is_magnet_2, 3, 0, 1, 1)
 
         self.w_mat_3 = WMatSelect(self.scrollAreaWidgetContents)
         self.w_mat_3.setObjectName(u"w_mat_3")
         self.w_mat_3.setMinimumSize(QSize(100, 0))
 
-        self.verticalLayout_4.addWidget(self.w_mat_3)
+        self.gridLayout_2.addWidget(self.w_mat_3, 3, 1, 1, 1)
+
+        self.verticalLayout_2.addLayout(self.gridLayout_2)
 
         self.verticalSpacer_2 = QSpacerItem(
             20, 7, QSizePolicy.Minimum, QSizePolicy.Expanding
         )
 
-        self.verticalLayout_4.addItem(self.verticalSpacer_2)
+        self.verticalLayout_2.addItem(self.verticalSpacer_2)
 
         self.g_output = QGroupBox(self.scrollAreaWidgetContents)
         self.g_output.setObjectName(u"g_output")
@@ -308,7 +332,7 @@ class Ui_PHoleM51(object):
 
         self.verticalLayout.addItem(self.verticalSpacer)
 
-        self.verticalLayout_4.addWidget(self.g_output)
+        self.verticalLayout_2.addWidget(self.g_output)
 
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
 
@@ -351,7 +375,7 @@ class Ui_PHoleM51(object):
         self.in_W0.setText(QCoreApplication.translate("PHoleM51", u"W0", None))
         self.unit_W0.setText(QCoreApplication.translate("PHoleM51", u"m", None))
         self.in_W1.setText(QCoreApplication.translate("PHoleM51", u"W1", None))
-        self.unit_W1.setText(QCoreApplication.translate("PHoleM51", u"rad", None))
+        self.unit_W1.setText(QCoreApplication.translate("PHoleM51", u"[rad]", None))
         self.in_W2.setText(QCoreApplication.translate("PHoleM51", u"W2", None))
         self.unit_W2.setText(QCoreApplication.translate("PHoleM51", u"m", None))
         self.in_W3.setText(QCoreApplication.translate("PHoleM51", u"W3", None))
@@ -364,6 +388,9 @@ class Ui_PHoleM51(object):
         self.unit_W6.setText(QCoreApplication.translate("PHoleM51", u"m", None))
         self.in_W7.setText(QCoreApplication.translate("PHoleM51", u"W7", None))
         self.unit_W7.setText(QCoreApplication.translate("PHoleM51", u"m", None))
+        self.is_magnet_0.setText("")
+        self.is_magnet_1.setText("")
+        self.is_magnet_2.setText("")
         self.g_output.setTitle(QCoreApplication.translate("PHoleM51", u"Output", None))
         self.out_slot_surface.setText(
             QCoreApplication.translate("PHoleM51", u"Slot suface : ?", None)

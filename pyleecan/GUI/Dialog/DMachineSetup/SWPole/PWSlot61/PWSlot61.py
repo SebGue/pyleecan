@@ -4,7 +4,6 @@ import PySide2.QtCore
 from PySide2.QtCore import Signal
 from PySide2.QtWidgets import QWidget
 
-from ......Classes.SlotW61 import SlotW61
 from ......GUI import gui_option
 from ......GUI.Dialog.DMachineSetup.SWPole.PWSlot61.Gen_PWSlot61 import Gen_PWSlot61
 from ......Methods.Slot.Slot import SlotCheckError
@@ -227,7 +226,6 @@ class PWSlot61(Gen_PWSlot61, QWidget):
         )
         self.out_tooth_width.hide()
         if self.check(self.lamination) is None:
-
             # Compute all the needed output as string
             w_surf = format(
                 gui_option.unit.get_m2(self.slot.comp_surface_active()), ".4g"

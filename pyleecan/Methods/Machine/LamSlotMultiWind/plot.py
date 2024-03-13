@@ -1,16 +1,17 @@
 from matplotlib.patches import Patch
 import matplotlib.pyplot as plt
 
-from ....Functions.labels import decode_label, WIND_LAB, BAR_LAB, LAM_LAB
+from ....Functions.labels import decode_label, WIND_LAB, BAR_LAB
 from ....Functions.Winding.find_wind_phase_color import find_wind_phase_color
 from ....Functions.Winding.gen_phase_list import gen_name
 from ....Functions.init_fig import init_fig
 from ....definitions import config_dict
 from ....Classes.WindingSC import WindingSC
+from ....Functions.Plot.get_color_legend_from_surface import (
+    get_color_legend_from_surface,
+)
 
 PHASE_COLORS = config_dict["PLOT"]["COLOR_DICT"]["PHASE_COLORS"]
-ROTOR_COLOR = config_dict["PLOT"]["COLOR_DICT"]["ROTOR_COLOR"]
-STATOR_COLOR = config_dict["PLOT"]["COLOR_DICT"]["STATOR_COLOR"]
 PLUS_HATCH = "++"
 MINUS_HATCH = ".."
 
@@ -31,6 +32,7 @@ def plot(
     is_show_fig=True,
     save_path=None,
     win_title=None,
+    is_winding_connection=False,
 ):
     """Plot the Lamination with empty Slots in a matplotlib fig
 
@@ -58,6 +60,8 @@ def plot(
         False to return the patches
     is_show_fig : bool
         To call show at the end of the method
+    is_winding_connection : bool
+        True to display winding connections (not used)
 
     Returns
     -------
@@ -68,11 +72,6 @@ def plot(
     ax : Matplotlib.axes.Axes object
         Axis containing the plot
     """
-
-    if self.is_stator:
-        lam_color = STATOR_COLOR
-    else:
-        lam_color = ROTOR_COLOR
 
     (fig, ax, patch_leg, label_leg) = init_fig(fig=fig, ax=ax, shape="rectangle")
 
@@ -97,13 +96,7 @@ def plot(
     patches = list()
     for surf in surf_list:
         label_dict = decode_label(surf.label)
-        if LAM_LAB in label_dict["surf_type"]:
-            patches.extend(
-                surf.get_patches(
-                    color=lam_color, is_edge_only=is_edge_only, edgecolor=edgecolor
-                )
-            )
-        elif WIND_LAB in label_dict["surf_type"] or BAR_LAB in label_dict["surf_type"]:
+        if WIND_LAB in label_dict["surf_type"] or BAR_LAB in label_dict["surf_type"]:
             if not is_lam_only:
                 color, sign = find_wind_phase_color(wind_mat=wind_mat, label=surf.label)
                 if sign == "+" and is_add_sign:
@@ -121,9 +114,19 @@ def plot(
                     )
                 )
         else:
-            patches.extend(
-                surf.get_patches(is_edge_only=is_edge_only, edgecolor=edgecolor)
-            )
+            color, legend = get_color_legend_from_surface(surf, is_lam_only)
+
+            if color is not None:
+                patches.extend(
+                    surf.get_patches(
+                        color=color,
+                        is_edge_only=is_edge_only,
+                        edgecolor=edgecolor,
+                    )
+                )
+            if not is_edge_only and legend is not None and legend not in label_leg:
+                label_leg.append(legend)
+                patch_leg.append(Patch(color=color))
 
     # Display the result
     if is_display:
@@ -161,19 +164,12 @@ def plot(
         # Add the legend
         if not is_edge_only:
             if self.is_stator and "Stator" not in label_leg:
-                patch_leg.append(Patch(color=STATOR_COLOR))
-                label_leg.append("Stator")
                 ax.set_title("Stator with empty slot")
             elif not self.is_stator and "Rotor" not in label_leg:
-                patch_leg.append(Patch(color=ROTOR_COLOR))
-                label_leg.append("Rotor")
                 ax.set_title("Rotor with Winding")
             # Add the winding legend only if needed
             if not is_lam_only:
-                if isinstance(self.winding, WindingSC):
-                    patch_leg.append(Patch(color=PHASE_COLORS[0]))
-                    label_leg.append(prefix + "Bar")
-                elif self.winding is not None:
+                if self.winding is not None:
                     phase_name = [prefix + n for n in gen_name(qs, is_add_phase=True)]
                     for ii in range(qs):
                         if not phase_name[ii] in label_leg and not is_add_sign:
@@ -181,14 +177,14 @@ def plot(
                             index = ii % len(PHASE_COLORS)
                             patch_leg.append(Patch(color=PHASE_COLORS[index]))
                             label_leg.append(phase_name[ii])
-                        if not phase_name[ii] + " +" in label_leg and is_add_sign:
+                        if not "Phase +" in label_leg and is_add_sign:
                             # Avoid adding twice the same label
                             index = ii % len(PHASE_COLORS)
                             patch_leg.append(
                                 Patch(color=PHASE_COLORS[index], hatch=PLUS_HATCH)
                             )
                             label_leg.append(phase_name[ii] + " +")
-                        if not phase_name[ii] + " -" in label_leg and is_add_sign:
+                        if not "Phase -" in label_leg and is_add_sign:
                             # Avoid adding twice the same label
                             index = ii % len(PHASE_COLORS)
                             patch_leg.append(

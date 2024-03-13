@@ -3,7 +3,6 @@ from ....Classes.LamSlotWind import LamSlotWind
 from ....Functions.init_fig import init_fig
 from ....definitions import config_dict
 
-BAR_COLOR = config_dict["PLOT"]["COLOR_DICT"]["BAR_COLOR"]
 SCR_COLOR = config_dict["PLOT"]["COLOR_DICT"]["SCR_COLOR"]
 
 
@@ -19,6 +18,7 @@ def plot(
     edgecolor=None,
     is_add_arrow=False,
     is_show_fig=True,
+    is_winding_connection=False,
 ):
     """Plot the Lamination in a matplotlib fig
 
@@ -44,6 +44,8 @@ def plot(
         Color of the edges if is_edge_only=True
     is_show_fig : bool
         To call show at the end of the method
+    is_winding_connection : bool
+        True to display winding connections (not used)
 
     Returns
     -------

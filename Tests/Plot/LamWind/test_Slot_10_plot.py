@@ -91,7 +91,7 @@ class Test_Slot_10_plot(object):
         fig = plt.gcf()
         assert len(fig.axes[0].patches) == 26
         fig.savefig(join(save_path, "test_Lam_Wind_s10_2-Rotor.png"))
-        # 2 for lam + Zs*4 for wind
+        # 2 for lam + 6*4 for wind
         assert len(fig.axes[0].patches) == 26
         # Don't display the plot
         assert len(test_obj.rotor.plot(is_display=False, is_show_fig=False)) == 26
@@ -99,7 +99,7 @@ class Test_Slot_10_plot(object):
         test_obj.stator.plot(is_show_fig=False)
         fig = plt.gcf()
         fig.savefig(join(save_path, "test_Lam_Wind_s10_3-Stator.png"))
-        # 2 for lam + Zs*4 for wind
+        # 2 for lam + 6*4 for wind
         assert len(fig.axes[0].patches) == 26
 
         lines = test_obj.stator.slot.build_geometry_half_tooth(is_top=False)
@@ -211,4 +211,12 @@ class Test_Slot_10_plot(object):
         fig.savefig(join(save_path, "test_Lam_Wind_s10_Stator.png"))
 
         result = test_obj.stator.plot(is_display=False)
+        # 2 lam + 4*6 wind
         assert len(result) == 26
+
+
+if __name__ == "__main__":
+    a = Test_Slot_10_plot()
+    a.test_Lam_Wind_10_wind_22()
+    a.test_plot_stator_true()
+    print("Done")

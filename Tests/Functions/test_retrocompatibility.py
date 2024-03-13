@@ -7,7 +7,11 @@ import pytest
 from numpy import array_equal
 from pyleecan.definitions import DATA_DIR
 from pyleecan.Functions.load import load
-from pyleecan.Functions.Load.retrocompatibility import is_before_version
+from pyleecan.Functions.Load.retrocompatibility import (
+    is_before_version,
+    convert_Wmag_Hmag,
+    is_Wmag_Hmag,
+)
 from Tests import TEST_DATA_DIR
 
 # 4: OP_matrix convertion (ndarray to object)
@@ -47,6 +51,38 @@ hole_list.append(  # WindingCW1L
     {
         "ref": join(DATA_DIR, "Machine", "BMW_i3.json"),
         "old": join(TEST_DATA_DIR, "Retrocompatibility", "Label", "BMW_i3.json"),
+    }
+)
+
+# VarParam convertion (rename to VarParamSweep)
+varparam_list = list()
+varparam_list.append(
+    {
+        "ref": join(
+            TEST_DATA_DIR, "Retrocompatibility", "VarParam", "VarParam_ref.json"
+        ),
+        "old": join(
+            TEST_DATA_DIR, "Retrocompatibility", "VarParam", "VarParam_old.json"
+        ),
+    }
+)
+
+# OptiConstraint & OptiDesignVar convertion
+opti_list = list()
+opti_list.append(
+    {
+        "ref": join(
+            TEST_DATA_DIR,
+            "Retrocompatibility",
+            "Optimisation",
+            "OptiConstraint_and_OptiDesignVar_ref.json",
+        ),
+        "old": join(
+            TEST_DATA_DIR,
+            "Retrocompatibility",
+            "Optimisation",
+            "OptiConstraint_and_OptiDesignVar_old.json",
+        ),
     }
 )
 
@@ -91,11 +127,26 @@ wind_list.append(  # WindingDW1L
     }
 )
 
+Hmag_Wmag_list = list()
+Hmag_Wmag_list.append(  # WindingCW1L
+    {
+        "ref": join(DATA_DIR, "Machine", "Benchmark.json"),
+        "old": join(
+            TEST_DATA_DIR, "Retrocompatibility", "WmagHmag", "Benchmark_old.json"
+        ),
+    }
+)
+
 
 def test_save_OPM_None_retro():
     """Check that the OP_matrix convertion works with None"""
     simu = load(
-        join(TEST_DATA_DIR, "Retrocompatibility", "OP_matrix", "test_OPM_None.json",),
+        join(
+            TEST_DATA_DIR,
+            "Retrocompatibility",
+            "OP_matrix",
+            "test_OPM_None.json",
+        ),
     )
     assert simu.var_simu.OP_matrix is None
 
@@ -165,6 +216,99 @@ def test_save_load_wind_retro(file_dict):
     ), msg
 
 
+@pytest.mark.parametrize("file_dict", varparam_list)
+def test_load_varparam(file_dict):
+    """Check that the VarParam into VarParamSweep convertion works"""
+    ref = load(file_dict["ref"])
+    old = load(file_dict["old"])
+
+    # Check old file is converted to current version
+    msg = "Error for " + ref.name + ": VarParam is not converted into VarParamSweep"
+    assert ref.name == old.name, msg
+
+
+@pytest.mark.parametrize("file_dict", opti_list)
+def test_load_opti(file_dict):
+    """Check that the OptiConstraint & OptiDesignVar convertion works"""
+    ref = load(file_dict["ref"])
+    old = load(file_dict["old"])
+
+    msg = "Error for OptiConstraint, get_variable is not converted into keeper"
+    for ii in range(len(old.problem.constraint)):
+        if hasattr(old.problem.constraint[ii], "keeper"):
+            assert (
+                old.problem.constraint[ii]._keeper_str
+                == ref.problem.constraint[ii]._keeper_str
+            )
+        else:
+            assert False, msg
+
+    msg = "Error for OptiDesignVar, not converted into OptiDesignVarInterval"
+    for ii, designvar in enumerate(old.problem.design_var):
+        assert isinstance(designvar, type(ref.problem.design_var[ii])), msg
+
+
+@pytest.mark.parametrize("file_dict", Hmag_Wmag_list)
+def test_load_Hmag_Wmag(file_dict):
+    """Check that the Hmag_Wmag into Hmag_Wmag convertion works"""
+    ref = load(file_dict["ref"])
+    old = load(file_dict["old"])
+
+    # Check old file is converted to current version
+    assert ref.rotor.slot.W1 == old.rotor.slot.W1
+    assert ref.rotor.slot.H1 == old.rotor.slot.H1
+
+
+def test_fct_Hmag_Wmag():
+    """Check that Hmag/Wmag update works for all slots"""
+
+    for ii in range(7):
+        test_dict = {
+            "H0": 0.1,
+            "Hmag": 0.2,
+            "W0": 0.3,
+            "Wmag": 0.4,
+            "Zs": 10,
+            "__class__": "SlotM1" + str(ii),
+            "is_bore": True,
+            "wedge_mat": None,
+        }
+        assert is_Wmag_Hmag(test_dict)
+        updated_dict = convert_Wmag_Hmag(test_dict)
+        assert "Hmag" not in updated_dict
+        assert "Wmag" not in updated_dict
+        assert updated_dict["H1"] == 0.2
+        assert updated_dict["W1"] == 0.4
+
+    # SlotM18 case
+    test_dict = {
+        "Hmag": 0.2,
+        "Zs": 10,
+        "__class__": "SlotM18",
+        "is_bore": True,
+        "wedge_mat": None,
+    }
+    assert is_Wmag_Hmag(test_dict)
+    updated_dict = convert_Wmag_Hmag(test_dict)
+    assert "Hmag" not in updated_dict
+    assert updated_dict["H0"] == 0.2
+
+    # SlotM19 case
+    test_dict = {
+        "Hmag": 0.2,
+        "W0": 0.3,
+        "W1": 0.4,
+        "Zs": 10,
+        "__class__": "SlotM19",
+        "is_bore": True,
+        "wedge_mat": None,
+    }
+    assert is_Wmag_Hmag(test_dict)
+    updated_dict = convert_Wmag_Hmag(test_dict)
+    assert "Hmag" not in updated_dict
+    assert updated_dict["H0"] == 0.2
+
+
 def test_before_version():
     """Check that we can detect previous version"""
     assert is_before_version("1.2.3", "1.2.1")
@@ -180,12 +324,15 @@ def test_before_version():
 
 if __name__ == "__main__":
     test_save_OPM_None_retro()
-    for file_dict in OPM_list:
-        test_save_OPM_retro(file_dict)
+    # for file_dict in OPM_list:
+    #    test_save_OPM_retro(file_dict)
 
     # for file_dict in hole_list:
     #     test_save_load_hole_retro(file_dict)
 
     # for file_dict in wind_list:
     #     test_save_load_wind_retro(file_dict)
+    for file_dict in Hmag_Wmag_list:
+        test_load_Hmag_Wmag(file_dict)
+
     print("Done")

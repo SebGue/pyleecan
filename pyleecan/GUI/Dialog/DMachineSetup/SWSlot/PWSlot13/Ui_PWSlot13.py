@@ -36,7 +36,9 @@ class Ui_PWSlot13(object):
         self.img_slot.setSizePolicy(sizePolicy)
         self.img_slot.setMaximumSize(QSize(16777215, 16777215))
         self.img_slot.setPixmap(
-            QPixmap(u":/images/images/MachineSetup/WSlot/SlotW13_wedge_full.png")
+            QPixmap(
+                u":/images/images/MachineSetup/WSlot/SlotW13_wedge_full_ext_stator.png"
+            )
         )
         self.img_slot.setScaledContents(False)
         self.img_slot.setAlignment(Qt.AlignCenter)
@@ -262,7 +264,7 @@ class Ui_PWSlot13(object):
             1, QCoreApplication.translate("PWSlot13", u"[rad]", None)
         )
         self.c_H1_unit.setItemText(
-            2, QCoreApplication.translate("PWSlot13", u"[deg]", None)
+            2, QCoreApplication.translate("PWSlot13", u"[\u00b0]", None)
         )
 
         self.in_H2.setText(QCoreApplication.translate("PWSlot13", u"H2", None))

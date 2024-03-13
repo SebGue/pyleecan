@@ -45,6 +45,22 @@ class Gen_DMatSetup(Ui_DMatSetup):
         self.unit_rho_elec.setWhatsThis(txt)
         self.unit_rho_elec.setToolTip(txt)
 
+        # Setup of in_alpha_elec
+        txt = self.tr(u"""Thermal resistivity coefficient""")
+        self.in_alpha_elec.setWhatsThis(txt)
+        self.in_alpha_elec.setToolTip(txt)
+
+        # Setup of lf_alpha_elec
+        self.lf_alpha_elec.validator().setBottom(0)
+        txt = self.tr(u"""Thermal resistivity coefficient""")
+        self.lf_alpha_elec.setWhatsThis(txt)
+        self.lf_alpha_elec.setToolTip(txt)
+
+        # Setup of unit_alpha_elec
+        txt = self.tr(u"""Thermal resistivity coefficient""")
+        self.unit_alpha_elec.setWhatsThis(txt)
+        self.unit_alpha_elec.setToolTip(txt)
+
         # Setup of in_cost_unit
         txt = self.tr(u"""Cost of one kilo of material""")
         self.in_cost_unit.setWhatsThis(txt)

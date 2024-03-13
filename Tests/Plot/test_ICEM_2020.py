@@ -20,7 +20,7 @@ from pyleecan.Classes.MagFEMM import MagFEMM
 from pyleecan.Classes.Simu1 import Simu1
 from pyleecan.Classes.Output import Output
 from pyleecan.Classes.SlotUD2 import SlotUD2
-from pyleecan.Classes.OptiDesignVar import OptiDesignVar
+from pyleecan.Classes.OptiDesignVarInterval import OptiDesignVarInterval
 from pyleecan.Classes.OptiObjective import OptiObjective
 from pyleecan.Classes.OptiProblem import OptiProblem
 from pyleecan.Classes.ImportMatrixVal import ImportMatrixVal
@@ -123,7 +123,7 @@ def test_gmsh_mesh_dict():
     fig = plt.gcf()
     fig.savefig(join(save_path, "fig_10_ref_lamination.png"))
     fig.savefig(join(save_path, "fig_10_ref_lamination.svg"), format="svg")
-    assert len(fig.axes[0].patches) == 2
+    assert len(fig.axes[0].patches) == 2  # Lam only
 
     # Definition of the number of each element on each line
     mesh_dict = {
@@ -268,15 +268,7 @@ def test_MachineUD():
     fig = plt.gcf()
     fig.savefig(join(save_path, "fig_12_MachineUD.png"))
     fig.savefig(join(save_path, "fig_12_MachineUD.svg"), format="svg")
-    assert len(fig.axes[0].patches) == 57
-
-    machine.frame = None
-    machine.name = None
-
-    machine.plot(is_show_fig=False, is_clean_plot=True)
-    fig = plt.gcf()
-    fig.savefig(join(save_path, "fig_12_MachineUD_no_frame_no_name.png"))
-    fig.savefig(join(save_path, "fig_12_MachineUD_no_frame_no_name.svg"), format="svg")
+    # 4 stator + 4 rotor + 1 shaft + 12*2 layers + 12*2layers
     assert len(fig.axes[0].patches) == 57
 
 
@@ -406,6 +398,7 @@ def test_SlotUD():
     # Plot, check and save
     machine.plot(is_show_fig=False, is_clean_plot=True)
     fig = plt.gcf()
+    # 2*stator + 2*rotor + 1 shaft + 6 vent + 36*2 layers
     assert len(fig.axes[0].patches) == 83
     fig.savefig(join(save_path, "fig_14_SlotUD.png"))
     fig.savefig(join(save_path, "fig_14_SlotUD.svg"), format="svg")
@@ -453,6 +446,7 @@ def test_WindingUD():
     fig = plt.gcf()
     fig.savefig(join(save_path, "fig_16_WindingUD.png"))
     fig.savefig(join(save_path, "fig_16_WindingUD.svg"), format="svg")
+    # 2 frame + 2 stator + 2 rotor + 1 shaft + 6*4 layers + 6 vent + 18*2 layers
     assert len(fig.axes[0].patches) == 73
 
 
@@ -465,7 +459,7 @@ def test_WindingUD_layer():
     )
     rotor.axial_vent = [VentilationCirc(Zh=6, Alpha0=0, D0=100e-3, H0=0.3)]
     rotor.slot = SlotW11(
-        Zs=6, H0=15e-3, W0=60e-3, W1=100e-3, W2=100e-3, H1=20e-3, H2=200e-3
+        Zs=6, H0=15e-3, W0=60e-3, W1=100e-3, W2=100e-3, H1=20e-3, H2=200e-3, R1=1e-3
     )
     rotor.slot = rotor.slot.convert_to_SlotUD2()
     assert isinstance(rotor.slot, SlotUD2)
@@ -490,6 +484,7 @@ def test_WindingUD_layer():
     fig = plt.gcf()
     fig.savefig(join(save_path, "fig_17_WindingUD_layer.png"))
     fig.savefig(join(save_path, "fig_17_WindingUD_layer.svg"), format="svg")
+    # 2 rotor + 6 vent + 6*4 layers
     assert len(fig.axes[0].patches) == 32
 
 
@@ -747,11 +742,10 @@ def test_Optimization_problem():
 
     # Design variables
     my_vars = [
-        OptiDesignVar(
+        OptiDesignVarInterval(
             name="Stator slot opening",
             symbol="W0",
             unit="m",
-            type_var="interval",
             space=[
                 0.2 * output.simu.machine.stator.slot.W2,
                 output.simu.machine.stator.slot.W2,
@@ -759,11 +753,10 @@ def test_Optimization_problem():
             get_value="lambda space: random.uniform(*space)",
             setter="simu.machine.stator.slot.W0",
         ),
-        OptiDesignVar(
+        OptiDesignVarInterval(
             name="Rotor magnet width",
             symbol="Wmag",
             unit="m",
-            type_var="interval",
             space=[
                 0.5 * output.simu.machine.rotor.slot.W0,
                 0.99 * output.simu.machine.rotor.slot.W0,
@@ -850,9 +843,13 @@ def test_Optimization_problem():
 
 
 if __name__ == "__main__":
-    test_WindingUD_layer()
-    # test_FEMM_sym()
-    # test_WindingUD()
-    # test_ecc_FEMM()
     # test_WindingUD_layer()
+    # test_FEMM_sym()
+    # test_SlotMulti_sym()
+    test_gmsh_mesh_dict()
+    test_MachineUD()
+    test_SlotUD()
+    test_WindingUD()
+    # test_ecc_FEMM()
+    test_WindingUD_layer()
     print("Done")

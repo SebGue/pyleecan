@@ -8,16 +8,22 @@ from .....Classes.LamSlotWind import LamSlotWind
 from .....Classes.Slot import Slot
 from .....Classes.SlotW60 import SlotW60
 from .....Classes.SlotW61 import SlotW61
+from .....Classes.SlotW62 import SlotW62
+from .....Classes.SlotW63 import SlotW63
+from .....Classes.SlotW29 import SlotW29
 from .....Classes.Slot import Slot
 from .....GUI.Dialog.DMachineSetup.SWPole.PWSlot60.PWSlot60 import PWSlot60
 from .....GUI.Dialog.DMachineSetup.SWPole.PWSlot61.PWSlot61 import PWSlot61
+from .....GUI.Dialog.DMachineSetup.SWPole.PWSlot62.PWSlot62 import PWSlot62
+from .....GUI.Dialog.DMachineSetup.SWPole.PWSlot63.PWSlot63 import PWSlot63
+from .....GUI.Dialog.DMachineSetup.SWSlot.PWSlot29.PWSlot29 import PWSlot29
 from .....GUI.Dialog.DMachineSetup.SWPole.Ui_SWPole import Ui_SWPole
 from .....Functions.Plot.set_plot_gui_icon import set_plot_gui_icon
 
 # List to convert index of combobox to slot type
-INIT_INDEX = [SlotW60, SlotW61]
+INIT_INDEX = [SlotW60, SlotW61, SlotW62, SlotW63, SlotW29]
 NAME_INDEX = [slot.__name__ for slot in INIT_INDEX]
-WIDGET_LIST = [PWSlot60, PWSlot61]
+WIDGET_LIST = [PWSlot60, PWSlot61, PWSlot62, PWSlot63, PWSlot29]
 
 
 class SWPole(Ui_SWPole, QWidget):
@@ -51,11 +57,18 @@ class SWPole(Ui_SWPole, QWidget):
         self.machine = machine
         self.material_dict = material_dict
         self.is_stator = is_stator
+        self.test_err_msg = None  # To check the error messages in test
 
         self.b_help.hide()
 
         # Avoid erase all the parameters when navigating though the slots
-        self.previous_slot = {SlotW60: None, SlotW61: None}
+        self.previous_slot = {
+            SlotW60: None,
+            SlotW61: None,
+            SlotW62: None,
+            SlotW63: None,
+            SlotW29: None,
+        }
 
         if self.is_stator:
             self.obj = machine.stator
@@ -127,8 +140,8 @@ class SWPole(Ui_SWPole, QWidget):
         Zs : int
             The current value of Zs
         """
-        sp_txt = self.tr("Slot pitch = 360 / Zs = ")
-        self.in_Zs.setText("Zs = 2*p = " + str(Zs))
+        sp_txt = self.tr("Slot pitch: 360 / Zs = ")
+        self.in_Zs.setText("Zs: 2*p = " + str(Zs))
 
         if Zs in [None, 0]:
             self.out_Slot_pitch.setText(sp_txt + "?")
@@ -139,9 +152,9 @@ class SWPole(Ui_SWPole, QWidget):
             self.out_Slot_pitch.setText(
                 sp_txt
                 + "%.4g" % (Slot_pitch)
-                + " ° ("
+                + " [°] ("
                 + "%.4g" % (Slot_pitch_rad)
-                + " rad)"
+                + " [rad])"
             )
 
     def s_update_slot(self):
@@ -187,7 +200,8 @@ class SWPole(Ui_SWPole, QWidget):
         error = self.check(self.obj)
 
         if error:  # Error => Display it
-            QMessageBox().critical(self, self.tr("Error"), error)
+            self.test_err_msg = error
+            QMessageBox().critical(self, self.tr("Error"), self.test_err_msg)
         else:  # No error => Plot the lamination
             self.obj.plot()
             set_plot_gui_icon()

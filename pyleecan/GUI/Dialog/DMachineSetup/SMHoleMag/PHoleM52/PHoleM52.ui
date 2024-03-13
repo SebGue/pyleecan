@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>934</width>
+    <width>1153</width>
     <height>440</height>
    </rect>
   </property>
@@ -52,7 +52,7 @@
         <string/>
        </property>
        <property name="pixmap">
-        <pixmap resource="../../../../Resources/pyleecan.qrc">:/images/images/MachineSetup/SMHoleMag/HoleM52.png</pixmap>
+        <pixmap resource="../../../../Resources/pyleecan.qrc">:/images/images/MachineSetup/SMHoleMag/HoleM52_mag_int_rotor.png</pixmap>
        </property>
        <property name="scaledContents">
         <bool>false</bool>

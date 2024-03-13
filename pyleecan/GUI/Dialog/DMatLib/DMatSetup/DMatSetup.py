@@ -2,7 +2,11 @@ from os.path import join, dirname, isfile
 from PySide2.QtWidgets import QDialog, QMessageBox, QLayout
 from PySide2.QtCore import Qt, Signal
 from logging import getLogger
-from numpy import pi, array, array_equal
+from numpy import pi, array, array_equal, transpose
+from PySide2.QtCore import Qt
+from PySide2.QtWidgets import QDialog, QMessageBox
+from .....GUI import gui_option
+from pyleecan.Functions.GUI.log_error import log_error
 
 from .....GUI.Dialog.DMatLib.DMatSetup.Gen_DMatSetup import Gen_DMatSetup
 from .....Classes.Material import Material
@@ -11,6 +15,9 @@ from .....Classes.ImportMatrix import ImportMatrix
 from .....Classes.ImportMatrixXls import ImportMatrixXls
 from .....Functions.path_tools import rel_file_path
 from .....loggers import GUI_LOG_NAME
+
+import matplotlib.pyplot as plt
+from .....Functions.Plot.set_plot_gui_icon import set_plot_gui_icon
 
 
 class DMatSetup(Gen_DMatSetup, QDialog):
@@ -35,12 +42,18 @@ class DMatSetup(Gen_DMatSetup, QDialog):
         """
         # Build the interface according to the .ui file
         QDialog.__init__(self)
+        self.setWindowFlag(Qt.WindowMinimizeButtonHint, True)
+        self.setWindowFlag(Qt.WindowMaximizeButtonHint, True)
         self.setupUi(self)
 
         self.is_save_needed = False
         self.init_name = None  # Initial name of current Material (to revert rename)
         self.init_path = None  # Initial part of current Material (for rename)
         self.mat = None  # Current material being edited
+
+        # Unit setup
+        self.lf_Wlam.unit = "m"
+        self.unit_Wlam.setText("[" + gui_option.unit.get_m_name() + "]")
 
         # Set initial material
         if material is not None:
@@ -52,11 +65,16 @@ class DMatSetup(Gen_DMatSetup, QDialog):
         self.cb_material_type.currentIndexChanged.connect(self.set_is_isotropic)
         # Elec
         self.lf_rho_elec.editingFinished.connect(self.set_rho_elec)
+        self.lf_alpha_elec.editingFinished.connect(self.set_alpha_elec)
         # Magnetics
         self.lf_mur_lin.editingFinished.connect(self.set_mur_lin)
         self.lf_Brm20.editingFinished.connect(self.set_Brm20)
         self.lf_alpha_Br.editingFinished.connect(self.set_alpha_Br)
         self.lf_Wlam.editingFinished.connect(self.set_Wlam)
+        self.b_plot_BrmHc.clicked.connect(self.plot_BrmHc)
+        self.b_plot_BrmHc.setToolTip(
+            "Plot Magnetic remanent flux density and Magnetic \nexcitation coercitivity as a function of temperature"
+        )
         # Economical
         self.lf_cost_unit.editingFinished.connect(self.set_cost_unit)
         # Thermics
@@ -82,6 +100,13 @@ class DMatSetup(Gen_DMatSetup, QDialog):
         self.lf_nu_yz.editingFinished.connect(self.set_nu_yz)
         self.tab_values.saveNeeded.connect(self.set_table_values)
         self.c_type_material.currentIndexChanged.connect(self.change_type_material)
+
+        # Losses
+        self.tab_values_losses.saveNeeded.connect(self.set_table_values_losses)
+        self.b_plot_losses.clicked.connect(self.s_plot_losses)
+
+        self.ax = None
+        self.fig = None
 
         # Connect buttons
         self.b_delete.clicked.connect(lambda: self.materialToDelete.emit())
@@ -125,19 +150,27 @@ class DMatSetup(Gen_DMatSetup, QDialog):
         self.mat = material
         self.init_name = self.mat.name  # Keep to revert rename
         self.init_path = self.mat.path
-        getLogger(GUI_LOG_NAME).debug("DMatSetup: Setting material " + self.mat.name)
+        getLogger(GUI_LOG_NAME).debug(
+            "DMatSetup: Setting material " + str(self.mat.name)
+        )
 
         self.le_name.setText(self.mat.name)
+        self.cb_material_type.blockSignals(True)
         if self.mat.is_isotropic:
             self.cb_material_type.setCurrentIndex(1)
+            self.nav_meca.setCurrentIndex(1)
+            self.nav_ther.setCurrentIndex(1)
         else:
             self.cb_material_type.setCurrentIndex(0)
-
+            self.nav_meca.setCurrentIndex(0)
+            self.nav_ther.setCurrentIndex(0)
+        self.cb_material_type.blockSignals(False)
         # === check material attribute and set values ===
         # Elec
         if self.mat.elec is None:
             self.set_default("elec")
         self.lf_rho_elec.setValue(self.mat.elec.rho)
+        self.lf_alpha_elec.setValue(self.mat.elec.alpha)
 
         # Economical
         if self.mat.eco is None:
@@ -197,7 +230,10 @@ class DMatSetup(Gen_DMatSetup, QDialog):
 
         self.lf_mur_lin.setValue(self.mat.mag.mur_lin)
         self.lf_Brm20.setValue(self.mat.mag.Brm20)
-        self.lf_alpha_Br.setValue(self.mat.mag.alpha_Br)
+        if self.mat.mag.alpha_Br is None:
+            self.lf_alpha_Br.setValue(None)
+        else:
+            self.lf_alpha_Br.setValue(self.mat.mag.alpha_Br * 100)
         self.lf_Wlam.setValue(self.mat.mag.Wlam)
         # Setup tab values
         if not isinstance(self.mat.mag.BH_curve, ImportMatrixVal):
@@ -209,9 +245,9 @@ class DMatSetup(Gen_DMatSetup, QDialog):
         self.tab_values.setWindowFlags(self.tab_values.windowFlags() & ~Qt.Dialog)
         self.tab_values.title = self.g_BH_import.title()
         self.tab_values.N_row_txt = "Nb of Points"
-        self.tab_values.shape_max = (None, 2)
+        self.tab_values.shape_expected = (None, 2)
         self.tab_values.shape_min = (None, 2)
-        self.tab_values.col_header = ["H-curve(A/m)", "B-curve(T)"]
+        self.tab_values.col_header = ["H [A/m]", "B [T]"]
         self.tab_values.unit_order = ["First column H", "First column B"]
         self.tab_values.button_plot_title = "B(H)"
         self.tab_values.si_col.hide()
@@ -221,13 +257,27 @@ class DMatSetup(Gen_DMatSetup, QDialog):
         self.tab_values.b_export.setHidden(False)
 
         if isinstance(self.mat.mag.BH_curve, ImportMatrixXls):
-            self.mat.mag.BH_curve = ImportMatrixVal(self.mat.mag.BH_curve.get_data())
+            try:
+                self.mat.mag.BH_curve = ImportMatrixVal(
+                    self.mat.mag.BH_curve.get_data()
+                )
+            except Exception as e:
+                logger = getLogger(GUI_LOG_NAME)
+                logger.error(
+                    "Unable to import B(H) curve from Excel for "
+                    + str(self.mat.name)
+                    + ":\n"
+                    + str(e),
+                )
+                self.mat.mag.BH_curve = ImportMatrixVal(array([[0, 0]]))
             self.tab_values.data = self.mat.mag.BH_curve.get_data()
         elif not isinstance(self.mat.mag.BH_curve, ImportMatrixVal):
+            self.mat.mag.BH_curve = ImportMatrixVal(array([[0, 0]]))
             self.tab_values.data = array([[0, 0]])
         elif self.mat.mag.BH_curve.get_data() is not None:
             self.tab_values.data = self.mat.mag.BH_curve.get_data()
         else:
+            self.mat.mag.BH_curve = ImportMatrixVal(array([[0, 0]]))
             self.tab_values.data = array([[0, 0]])
         self.tab_values.update()
 
@@ -235,7 +285,9 @@ class DMatSetup(Gen_DMatSetup, QDialog):
             self.mat.mag.BH_curve.value, array([[0, 0]])
         ):
             self.c_type_material.setCurrentIndex(2)
-        elif self.mat.mag.Brm20 != 0 and self.mat.mag.alpha_Br != 0:
+        elif self.mat.mag.Brm20 is None and self.mat.mag.alpha_Br is None:
+            self.c_type_material.setCurrentIndex(0)
+        elif self.mat.mag.Brm20 != 0 or self.mat.mag.alpha_Br != 0:
             self.c_type_material.setCurrentIndex(1)
         else:
             self.c_type_material.setCurrentIndex(0)
@@ -249,6 +301,65 @@ class DMatSetup(Gen_DMatSetup, QDialog):
         self.blockSignals(True)
         self.set_save_needed(is_save_needed=is_save_needed)
         self.blockSignals(False)
+
+        # Setup tab values losses
+        if not isinstance(self.mat.mag.LossData, ImportMatrixVal):
+            self.g_losses_import.setChecked(False)
+        elif array_equal(self.mat.mag.LossData.value, array([[0], [0], [0]])):
+            self.g_losses_import.setChecked(False)
+        else:
+            self.g_losses_import.setChecked(True)
+        self.tab_values_losses.setWindowFlags(
+            self.tab_values_losses.windowFlags() & ~Qt.Dialog
+        )
+        self.tab_values_losses.title = self.g_losses_import.title()
+        self.tab_values_losses.N_row_txt = "Nb of Line"
+        self.tab_values_losses.shape_min = (None, 3)
+        self.tab_values_losses.col_header = [
+            "f [Hz]",
+            "B [T]",
+            "Loss [W/kg]",
+        ]
+
+        self.tab_values_losses.si_col.hide()
+        self.tab_values_losses.in_col.hide()
+        self.tab_values_losses.b_plot.hide()
+
+        self.tab_values_losses.in_row.show()
+        self.tab_values_losses.si_row.show()
+
+        self.tab_values_losses.b_close.hide()
+        self.tab_values_losses.b_import.setHidden(False)
+        self.tab_values_losses.b_export.setHidden(False)
+
+        # Matrix is save with 3 line in file .json and in object simu but in GUI it's display with 3 colum
+        if isinstance(self.mat.mag.LossData, ImportMatrixXls):
+            try:
+                self.mat.mag.LossData = ImportMatrixVal(
+                    self.mat.mag.LossData.get_data()
+                )
+
+            except Exception as e:
+                logger = getLogger(GUI_LOG_NAME)
+                logger.error(
+                    "Unable to import losses from Excel for "
+                    + str(self.mat.name)
+                    + ":\n"
+                    + str(e),
+                )
+                self.mat.mag.LossData = ImportMatrixVal(array([[0, 0, 0]]))
+            self.tab_values_losses.data = transpose(self.mat.mag.LossData.get_data())
+        elif not isinstance(self.mat.mag.LossData, ImportMatrixVal):
+            self.mat.mag.LossData = ImportMatrixVal(array([[0], [0], [0]]))
+            self.tab_values_losses.data = array([[0, 0, 0]])
+        elif self.mat.mag.LossData.get_data() is not None:
+            self.tab_values_losses.data = transpose(self.mat.mag.LossData.get_data())
+        else:
+            self.mat.mag.LossData = ImportMatrixVal(array([[0, 0, 0]]))
+            self.tab_values_losses.data = array([[0], [0], [0]])
+
+        self.tab_values_losses.update()
+        self.mat.mag.LossData.value = transpose(self.tab_values_losses.data)
 
     def set_default(self, attr):
         """When mat.elec or mat.mag are None, initialize with default values
@@ -366,6 +477,22 @@ class DMatSetup(Gen_DMatSetup, QDialog):
             self.mat.elec.rho = self.lf_rho_elec.value()
             self.set_save_needed(is_save_needed=True)
 
+    def set_alpha_elec(self):
+        """Signal to update the value of alpha_elec according to the line edit
+
+        Parameters
+        ----------
+        self :
+            A DMatSetup object
+
+        Returns
+        -------
+        None
+        """
+        if self.mat.elec.alpha != self.lf_alpha_elec.value():
+            self.mat.elec.alpha = self.lf_alpha_elec.value()
+            self.set_save_needed(is_save_needed=True)
+
     def set_mur_lin(self):
         """Signal to update the value of mur_lin according to the line edit
 
@@ -412,8 +539,8 @@ class DMatSetup(Gen_DMatSetup, QDialog):
         -------
         None
         """
-        if self.mat.mag.alpha_Br != self.lf_alpha_Br.value():
-            self.mat.mag.alpha_Br = self.lf_alpha_Br.value()
+        if self.mat.mag.alpha_Br != self.lf_alpha_Br.value() / 100:
+            self.mat.mag.alpha_Br = self.lf_alpha_Br.value() / 100
             self.set_save_needed(is_save_needed=True)
 
     def set_Wlam(self):
@@ -431,6 +558,19 @@ class DMatSetup(Gen_DMatSetup, QDialog):
         if self.mat.mag.Wlam != self.lf_Wlam.value():
             self.mat.mag.Wlam = self.lf_Wlam.value()
             self.set_save_needed(is_save_needed=True)
+
+    def plot_BrmHc(self):
+        """Plot the magnet material property as fct of temperature
+
+        Parameters
+        ----------
+        self :
+            A DMatSetup object
+        """
+        try:
+            self.mat.mag.plot_BrmHc()
+        except Exception as e:
+            log_error(self, "Error while for Brm/Hc plot:\n" + str(e))
 
     def set_cost_unit(self):
         """Signal to update the value of cost_unit according to the line edit
@@ -793,6 +933,7 @@ class DMatSetup(Gen_DMatSetup, QDialog):
         """
 
         if self.c_type_material.currentIndex() == 0:  # Linear
+            self.b_plot_BrmHc.setHidden(True)
             self.in_Brm20.setHidden(True)
             self.lf_Brm20.setHidden(True)
             self.unit_Brm20.setHidden(True)
@@ -802,6 +943,7 @@ class DMatSetup(Gen_DMatSetup, QDialog):
             self.nav_mag.setCurrentIndex(0)
 
         elif self.c_type_material.currentIndex() == 1:  # Magnetic
+            self.b_plot_BrmHc.setHidden(False)
             self.in_Brm20.setHidden(False)
             self.lf_Brm20.setHidden(False)
             self.unit_Brm20.setHidden(False)
@@ -812,3 +954,107 @@ class DMatSetup(Gen_DMatSetup, QDialog):
 
         else:  # Lamination
             self.nav_mag.setCurrentIndex(1)
+
+    def set_table_values_losses(self):
+        """Signal to update the value of the table according to the table
+
+        Parameters
+        ----------
+        self :
+            A DMatSetup object
+
+        Returns
+        -------
+        None
+        """
+        if isinstance(self.mat.mag.LossData, ImportMatrixVal):
+            if not array_equal(
+                self.mat.mag.LossData.value, self.tab_values_losses.get_data()
+            ):
+                self.mat.mag.LossData.value = transpose(
+                    self.tab_values_losses.get_data()
+                )
+                self.set_save_needed(is_save_needed=True)
+        elif isinstance(self.mat.mag.LossData, (ImportMatrixXls, ImportMatrix)):
+            self.mat.mag.LossData = transpose(
+                ImportMatrixVal(self.tab_values_losses.get_data())
+            )
+            self.set_save_needed(is_save_needed=True)
+
+    def s_plot_losses(self):
+        """Signal to plot the value of the Loss table
+
+        Parameters
+        ----------
+        self :
+            A DMatSetup object
+
+        Returns
+        -------
+        None
+        """
+        try:
+            data = self.tab_values_losses.data
+        except Exception as e:
+            self.test_err_msg = f"Error while plotting losses, {e}"
+            log_error(
+                self,
+                self.test_err_msg,
+                self.mat.mag.get_logger(),
+                is_popup=True,
+                is_warning=False,
+            )
+
+        if len(data.shape) == 2 and data.shape[1] == 3:
+            # Data in column
+            self.fig, self.ax = plt.subplots()
+            a = data[0, 0]
+            temp = 0
+            end = 0
+            one_curve = True
+            while temp < data.shape[0] - 1:
+                temp += 1
+                if a != data[temp, 0]:
+                    a = format(a, ".8g")
+                    one_curve = False
+                    self.ax.plot(
+                        data[end:temp, 1],
+                        data[end:temp, 2],
+                        label=f" {a} [Hz]",
+                    )
+                    end = temp
+                    a = data[temp, 0]
+
+            if one_curve:
+                a = format(data[0, 0], ".8g")
+                self.ax.plot(
+                    data[:, 1],
+                    data[:, 2],
+                    label=f" {a} [Hz]",
+                )
+
+            else:
+                a = format(a, ".8g")
+                self.ax.plot(
+                    data[end:temp, 1],
+                    data[end:temp, 2],
+                    label=f" {a} [Hz]",
+                )
+
+            self.ax.set_xlabel("B [T]")
+            self.ax.set_ylabel("Loss [W/Kg]")
+            self.ax.set_xlim(left=min(data[:, 1]))
+            self.ax.set_ylim(bottom=min(data[:, 2]))
+
+            self.ax.legend()
+            self.ax.set_yscale("log")
+            self.ax.grid(True)
+            self.ax.set_title("Curve Loss(B)")
+
+            manager = plt.get_current_fig_manager()
+            if manager is not None:
+                manager.set_window_title(f"{self.mat.name}: Curve Loss(B)")
+
+            self.fig.show()
+
+        set_plot_gui_icon()

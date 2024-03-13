@@ -36,7 +36,7 @@ class Ui_PWSlot22(object):
         self.img_slot.setSizePolicy(sizePolicy)
         self.img_slot.setMaximumSize(QSize(16777215, 16777215))
         self.img_slot.setPixmap(
-            QPixmap(u":/images/images/MachineSetup/WSlot/SlotW22_wind.png")
+            QPixmap(u":/images/images/MachineSetup/WSlot/SlotW22_wind_ext_stator.png")
         )
         self.img_slot.setScaledContents(False)
         self.img_slot.setAlignment(Qt.AlignCenter)
@@ -202,7 +202,7 @@ class Ui_PWSlot22(object):
             0, QCoreApplication.translate("PWSlot22", u"[rad]", None)
         )
         self.c_W2_unit.setItemText(
-            1, QCoreApplication.translate("PWSlot22", u"[deg]", None)
+            1, QCoreApplication.translate("PWSlot22", u"[\u00b0]", None)
         )
 
         self.in_H0.setText(QCoreApplication.translate("PWSlot22", u"H0", None))
@@ -214,7 +214,7 @@ class Ui_PWSlot22(object):
             0, QCoreApplication.translate("PWSlot22", u"[rad]", None)
         )
         self.c_W0_unit.setItemText(
-            1, QCoreApplication.translate("PWSlot22", u"[deg]", None)
+            1, QCoreApplication.translate("PWSlot22", u"[\u00b0]", None)
         )
 
         self.unit_H2.setText(QCoreApplication.translate("PWSlot22", u"m", None))
