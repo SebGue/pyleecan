@@ -796,8 +796,15 @@ def solve_FEA(self, output, sym, angle, time, angle_rotor, Is, Ir):
             "\tCalculate Maxwell Stress = Logical True\n"
             "\tCalculate JxB = Logical True\n"
             "\tCalculate Magnetic Field Strength = Logical True\n"
-            "End\n"
         )
+        # there seems to be some changes to Elmer so simlation won't run without ...
+        fo.write(
+            "\t! Enforcing fields to be continuous "
+            + "is a little problematic for discontious fields\n"
+        )
+        fo.write("\tCalculate Nodal Fields = {0}\n".format("Logical False"))
+        fo.write("\tCalculate Elemental Fields = {0}\n".format("Logical True"))
+        fo.write("End\n")
 
         fo.write(
             "\nSolver 4\n"

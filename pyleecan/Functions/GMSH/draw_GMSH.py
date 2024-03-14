@@ -142,7 +142,7 @@ def draw_GMSH(
             # first surface is a SurfRing (cf Lamination.build_geometry)
             rotor_surf[0] = rotor_surf[0].out_surf
         rotor_list.extend(rotor_surf)
-    
+
     stator_list = list()
     if not is_lam_only_R:
         stator_list.extend(machine.stator.build_geometry(sym=sym, alpha=alpha))
@@ -267,7 +267,7 @@ def draw_GMSH(
         # want five spherical inclusions, whose mesh should be conformal with the mesh
         # of the cube: we thus use `fragment()', which intersects all volumes in a
         # conformal manner (without creating duplicate interfaces):
-        
+
         # lam_surf_tag = gmsh_dict[lam_rotor_surf_id]["tag"]
         # tags = hole_tags
         # ov, ovv = gmsh.model.occ.fragment(
@@ -657,160 +657,175 @@ def draw_GMSH(
                     else:
                         s_data["tag"] = factory.addPlaneSurface([cloop], tag=-1)
                     factory.synchronize()
-                    pg = model.addPhysicalGroup(2, [s_data["tag"]])
-                    model.setPhysicalName(2, pg, s_data["label"])
-                    if AIRGAP_LAB in s_data["label"] and BOT_LAB in s_data["label"]:
-                        rotor_ag_before = (2, s_data["tag"])
-                        rotor_ag_key_before = s_key
-                    if AIRGAP_LAB in s_data["label"] and TOP_LAB in s_data["label"]:
-                        stator_ag_before = (2, s_data["tag"])
-                        stator_ag_key_before = s_key
 
-            if is_sliding_band and (not is_lam_only_R) and (not is_lam_only_S):
-                rotor_surf_gmsh_list = []
-                for tid in rotor_dict:
-                    # Discard Origin
-                    if tid == 0:
-                        continue
-                    rotor_surf_gmsh_list.append((2, tid))
-
-                stator_surf_gmsh_list = []
-                for tid in stator_dict:
-                    # Discard Origin
-                    if tid == 0:
-                        continue
-                    stator_surf_gmsh_list.append((2, tid))
-
-                cut1 = model.occ.cut(
-                    [rotor_ag_before],
-                    rotor_surf_gmsh_list,
-                    removeObject=True,
-                    removeTool=False,
-                )
-                cut2 = model.occ.cut(
-                    [stator_ag_before],
-                    stator_surf_gmsh_list,
-                    removeObject=True,
-                    removeTool=False,
-                )
-
-                if len(cut1[0]) > 1:
-                    # Remove extra surfaces
-                    model.occ.remove([cut1[0][0]])
-                    factory.synchronize()
-                    pg = model.addPhysicalGroup(2, [cut1[0][1][1]])
-                    model.setPhysicalName(2, pg, lab_int + "_" + AIRGAP_LAB + BOT_LAB)
-                else:
-                    factory.synchronize()
-                    pg = model.addPhysicalGroup(2, [cut1[0][0][1]])
-                    model.setPhysicalName(2, pg, lab_int + "_" + AIRGAP_LAB + BOT_LAB)
-
-                # Look at the lines in the resulting surface, then update the dictionary
-                # with MASTER/SLAVE BC when line angles match symmetry angles
-                # MASTER is x-axis and SLAVE is 2Pi/sym
-                rotor_ag_after = model.getEntitiesForPhysicalGroup(2, pg)
-                rotor_ag_new_lines = model.getBoundary([(2, rotor_ag_after)])
-                nline = 0
-                for type_entity_l, rotor_ag_line in rotor_ag_new_lines:
-                    rotor_ag_new_points = model.getBoundary(
-                        [(type_entity_l, abs(rotor_ag_line))]
-                    )
-                    btag = rotor_ag_new_points[0][1]
-                    etag = rotor_ag_new_points[1][1]
-                    bxy = model.getValue(0, btag, [])
-                    exy = model.getValue(0, etag, [])
-                    exy_angle = cmath.phase(complex(exy[0], exy[1]))
-                    bxy_angle = cmath.phase(complex(bxy[0], bxy[1]))
-                    if exy_angle == bxy_angle and abs(exy_angle) < 1e-6:
-                        b_name = boundary_prop[AS_BR_LAB]
-                        l_name = AS_BR_LAB
-                    elif (exy_angle == bxy_angle) and (
-                        abs(abs(exy_angle) - 2.0 * pi / sym) < 1e-6
-                    ):
-                        b_name = boundary_prop[AS_BL_LAB]
-                        l_name = AS_BL_LAB
+                    # only add air gap pyhsical group after cutting to avoid issues
+                    if not AIRGAP_LAB in s_data["label"]:
+                        pg = model.addPhysicalGroup(2, [s_data["tag"]])
+                        model.setPhysicalName(2, pg, s_data["label"])
                     else:
-                        b_name = None
-                        l_name = None
-                    gmsh_dict[rotor_ag_before[1]].update(
-                        {
-                            "tag": rotor_ag_after[0],
-                            "label": lab_int + "_" + AIRGAP_LAB + BOT_LAB,
-                            nline: {
-                                "tag": abs(rotor_ag_line),
-                                "label": l_name,
-                                "n_elements": None,
-                                "bc_name": b_name,
-                                "begin": {
-                                    "tag": btag,
-                                    "coord": complex(bxy[0], bxy[1]),
-                                },
-                                "end": {"tag": etag, "coord": complex(exy[0], exy[1])},
-                                "arc_angle": None,
-                                "line_angle": None,
-                            },
-                        }
-                    )
-                    nline = nline + 1
+                        if BOT_LAB in s_data["label"]:
+                            rotor_ag_before = (2, s_data["tag"])
+                            rotor_ag_key_before = s_key
+                        if TOP_LAB in s_data["label"]:
+                            stator_ag_before = (2, s_data["tag"])
+                            stator_ag_key_before = s_key
 
-                if len(cut2[0]) > 1:
-                    # Remove extra surfaces
-                    model.occ.remove([cut2[0][0]])
-                    factory.synchronize()
-                    pg = model.addPhysicalGroup(2, [cut2[0][1][1]])
-                    model.setPhysicalName(2, pg, lab_ext + "_" + AIRGAP_LAB + TOP_LAB)
+            rotor_surf_gmsh_list = []
+            for tid in rotor_dict:
+                # Discard Origin
+                if tid == 0:
+                    continue
+                rotor_surf_gmsh_list.append((2, tid))
+
+            stator_surf_gmsh_list = []
+            for tid in stator_dict:
+                # Discard Origin
+                if tid == 0:
+                    continue
+                stator_surf_gmsh_list.append((2, tid))
+
+            cut1 = model.occ.cut(
+                [rotor_ag_before],
+                rotor_surf_gmsh_list,
+                removeObject=True,
+                removeTool=False,
+            )
+            cut2 = model.occ.cut(
+                [stator_ag_before],
+                stator_surf_gmsh_list,
+                removeObject=True,
+                removeTool=False,
+            )
+
+            if len(cut1[0]) > 1:
+                # Remove extra surfaces
+                model.occ.remove([cut1[0][0]])
+                factory.synchronize()
+                pg = model.addPhysicalGroup(2, [cut1[0][1][1]])
+                model.setPhysicalName(2, pg, lab_int + "_" + AIRGAP_LAB + BOT_LAB)
+            else:
+                factory.synchronize()
+                pg = model.addPhysicalGroup(2, [cut1[0][0][1]])
+                model.setPhysicalName(2, pg, lab_int + "_" + AIRGAP_LAB + BOT_LAB)
+
+            # Look at the lines in the resulting surface, then update the dictionary
+            # with MASTER/SLAVE BC when line angles match symmetry angles
+            # MASTER is x-axis and SLAVE is 2Pi/sym
+            rotor_ag_after = model.getEntitiesForPhysicalGroup(2, pg)
+            if len(rotor_ag_after) > 1:
+                output.get_logger().warning(
+                    "Found more than one entities while generating sliding band. "
+                    + "Only first entity will be used."
+                )
+            rotor_ag_new_lines = model.getBoundary([(2, rotor_ag_after[0])])
+            
+            nline = 0
+            for type_entity_l, rotor_ag_line in rotor_ag_new_lines:
+                rotor_ag_new_points = model.getBoundary(
+                    [(type_entity_l, abs(rotor_ag_line))]
+                )
+                btag = rotor_ag_new_points[0][1]
+                etag = rotor_ag_new_points[1][1]
+                bxy = model.getValue(0, btag, [])
+                exy = model.getValue(0, etag, [])
+                exy_angle = cmath.phase(complex(exy[0], exy[1]))
+                bxy_angle = cmath.phase(complex(bxy[0], bxy[1]))
+                if exy_angle == bxy_angle and abs(exy_angle) < 1e-6:
+                    b_name = boundary_prop[AS_BR_LAB]
+                    l_name = AS_BR_LAB
+                elif (exy_angle == bxy_angle) and (
+                    abs(abs(exy_angle) - 2.0 * pi / sym) < 1e-6
+                ):
+                    b_name = boundary_prop[AS_BL_LAB]
+                    l_name = AS_BL_LAB
                 else:
-                    factory.synchronize()
-                    pg = model.addPhysicalGroup(2, [cut2[0][0][1]])
-                    model.setPhysicalName(2, pg, lab_ext + "_" + AIRGAP_LAB + TOP_LAB)
-
-                # Look at the lines in the resulting surface, then update the dictionary
-                # with MASTER/SLAVE BC when line angles match symmetry angles
-                # MASTER is x-axis and SLAVE is 2Pi/sym
-                stator_ag_after = model.getEntitiesForPhysicalGroup(2, pg)
-                stator_ag_new_lines = model.getBoundary([(2, stator_ag_after)])
-                nline = 0
-                for type_entity_l, stator_ag_line in stator_ag_new_lines:
-                    stator_ag_new_points = model.getBoundary(
-                        [(type_entity_l, abs(stator_ag_line))]
-                    )
-                    btag = stator_ag_new_points[0][1]
-                    etag = stator_ag_new_points[1][1]
-                    bxy = model.getValue(0, btag, [])
-                    exy = model.getValue(0, etag, [])
-                    exy_angle = cmath.phase(complex(exy[0], exy[1]))
-                    bxy_angle = cmath.phase(complex(bxy[0], bxy[1]))
-                    if exy_angle == bxy_angle and abs(exy_angle) < 1e-6:
-                        b_name = boundary_prop[AS_TR_LAB]
-                        l_name = AS_TR_LAB
-                    elif (exy_angle == bxy_angle) and (
-                        abs(abs(exy_angle) - 2.0 * pi / sym) < 1e-6
-                    ):
-                        b_name = boundary_prop[AS_TL_LAB]
-                        l_name = AS_TL_LAB
-                    else:
-                        b_name = None
-                        l_name = None
-                    gmsh_dict[stator_ag_before[1]].update(
-                        {
-                            "tag": stator_ag_after[0],
-                            "label": lab_ext + "_" + AIRGAP_LAB + TOP_LAB,
-                            nline: {
-                                "tag": abs(stator_ag_line),
-                                "label": l_name,
-                                "n_elements": None,
-                                "bc_name": b_name,
-                                "begin": {
-                                    "tag": btag,
-                                    "coord": complex(bxy[0], bxy[1]),
-                                },
-                                "end": {"tag": etag, "coord": complex(exy[0], exy[1])},
-                                "arc_angle": None,
-                                "line_angle": None,
+                    b_name = None
+                    l_name = None
+                gmsh_dict[rotor_ag_before[1]].update(
+                    {
+                        "tag": rotor_ag_after[0],
+                        "label": lab_int + "_" + AIRGAP_LAB + BOT_LAB,
+                        nline: {
+                            "tag": abs(rotor_ag_line),
+                            "label": l_name,
+                            "n_elements": None,
+                            "bc_name": b_name,
+                            "begin": {
+                                "tag": btag,
+                                "coord": complex(bxy[0], bxy[1]),
                             },
-                        }
-                    )
-                    nline = nline + 1
+                            "end": {"tag": etag, "coord": complex(exy[0], exy[1])},
+                            "arc_angle": None,
+                            "line_angle": None,
+                        },
+                    }
+                )
+                nline = nline + 1
+
+            if len(cut2[0]) > 1:
+                # Remove extra surfaces
+                model.occ.remove([cut2[0][0]])
+                factory.synchronize()
+                pg = model.addPhysicalGroup(2, [cut2[0][1][1]])
+                model.setPhysicalName(2, pg, lab_ext + "_" + AIRGAP_LAB + TOP_LAB)
+            else:
+                factory.synchronize()
+                pg = model.addPhysicalGroup(2, [cut2[0][0][1]])
+                model.setPhysicalName(2, pg, lab_ext + "_" + AIRGAP_LAB + TOP_LAB)
+
+            # Look at the lines in the resulting surface, then update the dictionary
+            # with MASTER/SLAVE BC when line angles match symmetry angles
+            # MASTER is x-axis and SLAVE is 2Pi/sym
+            stator_ag_after = model.getEntitiesForPhysicalGroup(2, pg)
+            if len(stator_ag_after) > 1:
+                output.get_logger().warning(
+                    "Found more than one entities while generating sliding band. "
+                    + "Only first entity will be used."
+                )
+            stator_ag_new_lines = model.getBoundary([(2, stator_ag_after[0])])
+
+            nline = 0
+            for type_entity_l, stator_ag_line in stator_ag_new_lines:
+                stator_ag_new_points = model.getBoundary(
+                    [(type_entity_l, abs(stator_ag_line))]
+                )
+                btag = stator_ag_new_points[0][1]
+                etag = stator_ag_new_points[1][1]
+                bxy = model.getValue(0, btag, [])
+                exy = model.getValue(0, etag, [])
+                exy_angle = cmath.phase(complex(exy[0], exy[1]))
+                bxy_angle = cmath.phase(complex(bxy[0], bxy[1]))
+                if exy_angle == bxy_angle and abs(exy_angle) < 1e-6:
+                    b_name = boundary_prop[AS_TR_LAB]
+                    l_name = AS_TR_LAB
+                elif (exy_angle == bxy_angle) and (
+                    abs(abs(exy_angle) - 2.0 * pi / sym) < 1e-6
+                ):
+                    b_name = boundary_prop[AS_TL_LAB]
+                    l_name = AS_TL_LAB
+                else:
+                    b_name = None
+                    l_name = None
+                gmsh_dict[stator_ag_before[1]].update(
+                    {
+                        "tag": stator_ag_after[0],
+                        "label": lab_ext + "_" + AIRGAP_LAB + TOP_LAB,
+                        nline: {
+                            "tag": abs(stator_ag_line),
+                            "label": l_name,
+                            "n_elements": None,
+                            "bc_name": b_name,
+                            "begin": {
+                                "tag": btag,
+                                "coord": complex(bxy[0], bxy[1]),
+                            },
+                            "end": {"tag": etag, "coord": complex(exy[0], exy[1])},
+                            "arc_angle": None,
+                            "line_angle": None,
+                        },
+                    }
+                )
+                nline = nline + 1
 
     ###################
     # Adding Airbox
