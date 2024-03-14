@@ -260,39 +260,7 @@ def draw_GMSH(
             )
         factory.synchronize()
 
-        # rotor_cloops = lam_and_holes
-
-        # --- from t16.py (gmsh tutorial) ---
-        # If we had wanted five empty holes we would have used `cut()' again. Here we
-        # want five spherical inclusions, whose mesh should be conformal with the mesh
-        # of the cube: we thus use `fragment()', which intersects all volumes in a
-        # conformal manner (without creating duplicate interfaces):
-
-        # lam_surf_tag = gmsh_dict[lam_rotor_surf_id]["tag"]
-        # tags = hole_tags
-        # ov, ovv = gmsh.model.occ.fragment(
-        #     [(2, tag) for tag in tags],[]
-        # )
-        # gmsh.model.occ.synchronize()
-
-        # ov, ovv = gmsh.model.occ.fragment(
-        #     [(2,lam_surf_tag)],[(2, tag) for tag in tags]
-        # )
-
-        # # ov contains all the generated entities of the same dimension as the input
-        # # entities:
-        # print("fragment produced volumes:")
-        # for e in ov:
-        #     print(e)
-
-        # gmsh.model.occ.synchronize()
-
-        # # ovv contains the parent-child relationships for all the input entities:
-        # print("before/after fragment relations:")
-        # for e in zip([(2, lam_surf_tag)] + [(2, tag) for tag in hole_tags], ovv):
-        #     print("parent " + str(e[0]) + " -> child " + str(e[1]))
-
-        # finally  add physical groups
+        # finally add physical groups
         for s_data in gmsh_dict.values():
             if s_data["tag"] in hole_tags:
                 pg = model.addPhysicalGroup(2, [s_data["tag"]])
