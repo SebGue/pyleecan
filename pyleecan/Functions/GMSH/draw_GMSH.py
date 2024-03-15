@@ -36,6 +36,7 @@ from ...Functions.GMSH.draw_surf_line import draw_surf_line
 from ...Functions.GMSH.comp_gmsh_mesh_dict import comp_gmsh_mesh_dict
 import sys
 import gmsh
+import cmath
 
 from os import replace
 from os.path import splitext
@@ -404,8 +405,7 @@ def draw_GMSH(
                         "label": short_label(surf.label),
                     }
                 }
-            }
-        )
+            )
         # comp. number of elements on the lines & override by user values in case
         mesh_dict = comp_gmsh_mesh_dict(
             surface=surf, element_size=mesh_size_SB, user_mesh_dict=user_mesh_dict
@@ -677,7 +677,7 @@ def draw_GMSH(
                     + "Only first entity will be used."
                 )
             rotor_ag_new_lines = model.getBoundary([(2, rotor_ag_after[0])])
-            
+
             nline = 0
             for type_entity_l, rotor_ag_line in rotor_ag_new_lines:
                 rotor_ag_new_points = model.getBoundary(
