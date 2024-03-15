@@ -64,7 +64,7 @@ def draw_surf_line(
                 is_trigo_direction=line.is_trigo_direction,
             )
             for arc in [arc1, arc2]:
-                _add_agline_to_dict(
+                _add_line_to_dict(
                     gmodel=model,
                     line=arc,
                     d=gmsh_dict,
