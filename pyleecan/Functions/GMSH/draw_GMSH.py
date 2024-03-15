@@ -614,16 +614,17 @@ def draw_GMSH(
 
                 if lloop:
                     cloop = factory.addCurveLoop(lloop)
-                    if (
-                        AIRGAP_LAB in label_dict["surf_type"]
-                        and BOT_LAB in label_dict["surf_type"]
-                        and isinstance(machine, MachineSIPMSM)
-                    ):
-                        s_data["tag"] = factory.addPlaneSurface(
-                            [cloop] + rotor_cloops, tag=-1
-                        )
-                    else:
-                        s_data["tag"] = factory.addPlaneSurface([cloop], tag=-1)
+                    # if (
+                    #     AIRGAP_LAB in label_dict["surf_type"]
+                    #     and BOT_LAB in label_dict["surf_type"]
+                    #     and isinstance(machine, MachineSIPMSM)
+                    # ):
+                    #     s_data["tag"] = factory.addPlaneSurface(
+                    #         [cloop] + rotor_cloops, tag=-1
+                    #     )
+                    # else:
+                    #     s_data["tag"] = factory.addPlaneSurface([cloop], tag=-1)
+                    s_data["tag"] = factory.addPlaneSurface([cloop], tag=-1)
                     factory.synchronize()
 
                     # only add air gap pyhsical group after cutting to avoid issues
@@ -686,7 +687,7 @@ def draw_GMSH(
                     + "Only first entity will be used."
                 )
             rotor_ag_new_lines = model.getBoundary([(2, rotor_ag_after[0])])
-            
+
             nline = 0
             for type_entity_l, rotor_ag_line in rotor_ag_new_lines:
                 rotor_ag_new_points = model.getBoundary(

@@ -812,7 +812,7 @@ def solve_FEA(self, output, sym, angle, time, angle_rotor, Is, Ir):
             '\tProcedure = "ResultOutputSolve" "ResultOutputSolver"\n'
             '\tOutput File Name = "{0}"\n'
             "\tVtu Format = True\n"
-            "\tBinary Output = True\n"
+            "\tBinary Output = False\n"  # there are issues with Elmer binary sometimes
             "\tSingle Precision = True\n"
             "\tSave Geometry Ids = True\n"
             "\tShow Variables = True\n"
@@ -961,7 +961,7 @@ def solve_FEA(self, output, sym, angle, time, angle_rotor, Is, Ir):
     elmersolver.terminate()
     self.get_logger().info("ElmerSolver call complete!")
 
-    self.get_meshsolution(output)
+    # self.get_meshsolution(output) # TODO fix issue with new meshsolution obj.
 
     Na = angle.size
     Nt = time.size - 1

@@ -54,15 +54,15 @@ def draw_surf_line(
                 end=line.get_middle(),
                 radius=rot_dir * line.comp_radius(),
                 prop_dict=line.prop_dict,
-                is_trigo_direction=line.is_trigo_direction
+                is_trigo_direction=line.is_trigo_direction,
             )
             arc2 = Arc1(
                 begin=line.get_middle(),
                 end=line.get_end(),
                 radius=rot_dir * line.comp_radius(),
                 prop_dict=line.prop_dict,
-                is_trigo_direction=line.is_trigo_direction
-            )  
+                is_trigo_direction=line.is_trigo_direction,
+            )
             for arc in [arc1, arc2]:
                 _add_agline_to_dict(
                     gmodel=model,
@@ -77,7 +77,7 @@ def draw_surf_line(
             # Don't draw anything, this is a circle and usually is repeated ?
             pass
         else:
-            _add_agline_to_dict(
+            _add_line_to_dict(
                 gmodel=model,
                 line=line,
                 d=gmsh_dict,
@@ -88,8 +88,8 @@ def draw_surf_line(
             )
 
 
-def _add_agline_to_dict(gmodel, line, d={}, idx=0, mesh_size=1e-2, n_elements=0, bc=None):
-    """Draw a new Air Gap line and add it to GMSH dictionary if it does not exist
+def _add_line_to_dict(gmodel, line, d={}, idx=0, mesh_size=1e-2, n_elements=0, bc=None):
+    """Draw a new line and add it to GMSH dictionary if it does not exist
 
     Parameters
     ----------
@@ -113,7 +113,7 @@ def _add_agline_to_dict(gmodel, line, d={}, idx=0, mesh_size=1e-2, n_elements=0,
     None
     """
 
-    # TO-DO: Allow repeated points for the rotor and stator sliding bands
+    # TODO: Allow repeated points for the rotor and stator sliding bands
     dlines = list()
     ltag = None
     btag, bx, by = _find_point_tag(d, line.get_begin())
@@ -127,10 +127,7 @@ def _add_agline_to_dict(gmodel, line, d={}, idx=0, mesh_size=1e-2, n_elements=0,
     else:
         dlines.extend(_find_lines_from_point(d, etag))
 
-    if (
-        line.prop_dict 
-        and BOUNDARY_PROP_LAB in line.prop_dict
-    ):
+    if line.prop_dict and BOUNDARY_PROP_LAB in line.prop_dict:
         line_label = line.prop_dict[BOUNDARY_PROP_LAB]
     else:
         line_label = None
@@ -271,7 +268,6 @@ def _find_lines_from_point(d={}, ptag=-1):
                 if pvalues["tag"] == ptag:
                     lines.append(lvalues["tag"])
     return lines
-
 
 
 def _find_point_tag(d={}, p=complex(0.0, 0.0)):
