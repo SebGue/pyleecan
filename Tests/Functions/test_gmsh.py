@@ -40,3 +40,5 @@ def test_slot_10():
         Nlayer=20,
         display=False,
     )
+
+    return None

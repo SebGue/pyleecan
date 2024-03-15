@@ -77,7 +77,7 @@ def test_gmsh_ipm():
     with open("test_gmsh_ipm.json", "w") as fw:
         json.dump(gmsh_dict, fw, default=encode_complex, indent=4)
 
-    return gmsh_dict
+    return None
 
 
 @pytest.mark.long_5s
@@ -118,7 +118,7 @@ def test_gmsh_spm():
     with open("test_gmsh_spm.json", "w") as fw:
         json.dump(gmsh_dict, fw, default=encode_complex, indent=4)
 
-    return gmsh_dict
+    return None
 
 
 @pytest.mark.long_5s
@@ -158,7 +158,7 @@ def test_gmsh_benchmark():
     with open("test_gmsh_ipm.json", "w") as fw:
         json.dump(gmsh_dict, fw, default=encode_complex, indent=4)
 
-    return gmsh_dict
+    return None
 
 
 def encode_complex(z):
