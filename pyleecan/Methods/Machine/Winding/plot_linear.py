@@ -151,7 +151,6 @@ def plot_linear(
     for idx_phase, phase in enumerate(head):
         coils = list()  # list of points that constitutes the coils of a phase
         for coil in phase:
-
             # Step 2-2-1: Building 6 points to have the following coil pattern
             #        P1
             #       /  \
@@ -360,7 +359,7 @@ def plot_linear(
         title = "Rotor winding linear pattern"
         prefix = "Rotor "
     # Add machine name if available
-    if self.parent.parent is not None and self.parent.parent.name not in ["", None]:  
+    if self.parent.parent is not None and self.parent.parent.name not in ["", None]:
         win_title = self.parent.parent.name + " " + title
     else:
         win_title = title

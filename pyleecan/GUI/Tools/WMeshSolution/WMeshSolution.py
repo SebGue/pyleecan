@@ -47,7 +47,6 @@ class WMeshSolution(QWidget):
         self.onSelectionChanged()  # trigger initial plot
 
     def setupUi(self):
-
         self.mainLayout = QVBoxLayout()
         self.subLayout = QHBoxLayout()
 
@@ -168,7 +167,7 @@ class WMeshSolution(QWidget):
             field = field[index]
 
         xy = self._mesh.get_node()
-        tri = self._mesh.get_cell()[0]["triangle"]
+        tri = self._mesh.get_element()[0]["triangle"]
 
         # plot
         x, y = xy[:, 0], xy[:, 1]

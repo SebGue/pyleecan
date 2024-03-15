@@ -4,7 +4,6 @@ from sys import executable
 try:
     import setuptools
 except ImportError:  # Install setuptools if needed
-
     # run 'pip install setuptools'
     system("{} -m pip install setuptools".format(executable))
 
@@ -45,10 +44,11 @@ install_requires = [
     "pyfemm>=0.1.3",
     "PySide2>=5.15.2",
     "pyuff>=1.25",
-    "pyvista>=0.25.3,<=0.31.3",
+    "pyvista>=0.42.3",
     "SciDataTool>=2.5.0",
     "scipy>=1.4.1",
     "setuptools",
+    "vtk>=9.2.6",
     "xlrd>=1.2.0",
     "xlwt>=1.3.0",
 ]
