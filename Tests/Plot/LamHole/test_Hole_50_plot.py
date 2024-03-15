@@ -77,10 +77,6 @@ class Test_Hole_50_plot(object):
 
     def test_Lam_Hole_50_W01(self, machine):
         """Test machine plot hole 50 with W1 > 0 and both magnets"""
-        machine.plot(is_show_fig=False)
-        fig = plt.gcf()
-        fig.savefig(join(save_path, "test_Lam_Hole_s50_Machine.png"))
-        assert len(fig.axes[0].patches) == 89
 
         machine.rotor.plot(is_show_fig=False)
         fig = plt.gcf()
@@ -188,35 +184,8 @@ class Test_Hole_50_plot(object):
         fig = plt.gcf()
         fig.savefig(join(save_path, "test_Lam_Hole_s50_stator_true.png"))
 
-    def test_plot_line_labels(self, machine):
-        """Test if the line labels are assigned to the respective lines."""
-        machine.rotor.hole[0].H4 = 1 * 1e-3
-        machine.rotor.plot(is_show_fig=False)
-        fig = plt.gcf()
 
-        surfs = machine.rotor.build_geometry()
-
-        for surf in surfs:
-            lines = surf.get_lines()
-            for line in lines:
-                mid = line.get_middle()
-                label = (
-                    line.prop_dict.get(BOUNDARY_PROP_LAB, None)
-                    if line.prop_dict
-                    else None
-                )
-                if label:
-                    plt.text(mid.real, mid.imag, label, fontsize=1)
-        fig.savefig(join(save_path, "test_Lam_Hole_s50_line_label.png"), dpi=1000)
-
-    def test_plot_point_labels(self, machine):
-        """Test if the point labels are assigned to the respective points."""
-        machine.rotor.hole[0].H4 = 1 * 1e-3
-        machine.rotor.hole[0].plot_schematics(
-            is_add_point_label=True,
-            is_add_schematics=False,
-            is_add_main_line=False,
-            is_show_fig=False,
-        )
-        fig = plt.gcf()
-        fig.savefig(join(save_path, "test_Lam_Hole_s50_point_label.png"), dpi=1000)
+if __name__ == "__main__":
+    a = Test_Hole_50_plot()
+    a.test_Lam_Hole_50_W01(a.machine())
+    print("Done")

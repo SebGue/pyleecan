@@ -2,14 +2,10 @@
 import pytest
 
 from pyleecan.Classes.SlotW11 import SlotW11
-from numpy import ndarray, arcsin, exp, angle, pi
-from scipy.optimize import fsolve
+from numpy import arcsin, exp, pi
 from pyleecan.Classes.LamSlot import LamSlot
-from pyleecan.Classes.Segment import Segment
-from pyleecan.Classes.SurfLine import SurfLine
-from pyleecan.Classes.Arc1 import Arc1
 from pyleecan.Classes.Slot import Slot
-from pyleecan.Methods.Slot.SlotW11 import S11_H1rCheckError
+from pyleecan.Methods.Slot.SlotW11 import S11_H1rCheckError, S11_R1CheckError
 
 # For AlmostEqual
 DELTA = 1e-6
@@ -35,6 +31,30 @@ slotW11_test.append(
         "Aw": 0.1086124,
         "SO_exp": 3.258746174548993e-05,
         "SW_exp": 3.7426990e-04,
+        "H_exp": 0.03263591876947885,
+    }
+)
+
+# Internal Slot / H1m / Cst slot/ R1*2 == W2 (round top)
+lam = LamSlot(is_internal=True, Rext=0.1325)
+lam.slot = SlotW11(
+    H0=1e-3,
+    H1=1.5e-3,
+    H1_is_rad=False,
+    H2=30e-3,
+    W0=12e-3,
+    W1=14e-3,
+    W2=12e-3,
+    is_cstt_tooth=False,
+    R1=6e-3,
+)
+slotW11_test.append(
+    {
+        "test_obj": lam,
+        "S_exp": 0.0004011361295,
+        "Aw": 0.10695210774,
+        "SO_exp": 3.258746174548993e-05,
+        "SW_exp": 0.00036854866776,
         "H_exp": 0.03263591876947885,
     }
 )
@@ -340,6 +360,10 @@ class Test_SlotW11_meth(object):
         )
 
         with pytest.raises(S11_H1rCheckError) as context:
+            lam.slot.check()
+
+        lam.slot.R1 = 0
+        with pytest.raises(S11_R1CheckError) as context:
             lam.slot.check()
 
     def test_comp_W(self):

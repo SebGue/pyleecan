@@ -27,6 +27,7 @@ MAGNET_COLOR = config_dict["PLOT"]["COLOR_DICT"]["MAGNET_COLOR"]
 def plot_schematics(
     self,
     is_default=False,
+    is_return_default=False,
     is_add_point_label=False,
     is_add_schematics=True,
     is_add_main_line=True,
@@ -44,6 +45,8 @@ def plot_schematics(
         A SlotM19 object
     is_default : bool
         True: plot default schematics, else use current slot values
+    is_return_default : bool
+        True: return the default lamination used for the schematics (skip plot)
     is_add_point_label : bool
         True to display the name of the points (Z1, Z2....)
     is_add_schematics : bool
@@ -67,17 +70,32 @@ def plot_schematics(
         Figure containing the schematics
     ax : Matplotlib.axes.Axes object
         Axis containing the schematics
+    -------
+    lam : LamSlot
+        Default lamination used for the schematics
     """
 
     # Use some default parameter
     if is_default:
         # definir paramètre par défault
-        slot = type(self)(Zs=4, W0=30e-3, Hmag=17.5e-3, W1=20e-3)
-        lam = LamSlot(
-            Rint=0.1, Rext=0.135, is_internal=True, is_stator=False, slot=slot
-        )
+        slot = type(self)(Zs=4, W0=30e-3, H0=17.5e-3, W1=20e-3)
+        if is_default == 1:  # Internal Rotor schematics
+            lam = LamSlot(
+                Rint=0.1, Rext=0.135, is_internal=True, is_stator=False, slot=slot
+            )
+            if is_return_default:
+                return lam
+
+        else:  # External Stator schematics
+            lam = LamSlot(
+                Rint=0.1, Rext=0.135, is_internal=False, is_stator=True, slot=slot
+            )
+            if is_return_default:
+                return lam
+
         return slot.plot_schematics(
             is_default=False,
+            is_return_default=False,
             is_add_point_label=is_add_point_label,
             is_add_schematics=is_add_schematics,
             is_add_main_line=is_add_main_line,
@@ -122,31 +140,46 @@ def plot_schematics(
                 color=ARROW_COLOR,
                 linewidth=ARROW_WIDTH,
                 label="W0",
-                offset_label=sign * self.Hmag * 0.4,
+                offset_label=sign * self.H0 * 0.4,
                 is_arrow=True,
                 fontsize=SC_FONT_SIZE,
             )
             # W1
             plot_quote(
                 Z1=point_dict["Z1"],
-                Zlim1=point_dict["Z1"] - sign * 0.5 * self.Hmag,
-                Zlim2=point_dict["Z4"] - sign * 0.5 * self.Hmag,
+                Zlim1=point_dict["Z1"] - sign * 0.5 * self.H0,
+                Zlim2=point_dict["Z4"] - sign * 0.5 * self.H0,
                 Z2=point_dict["Z4"],
-                offset_label=0.25 * self.Hmag,
+                offset_label=0.25 * self.H0,
                 fig=fig,
                 ax=ax,
                 label="W1",
             )
-            # Hmag
+            if lam.is_internal == False and lam.is_stator == True:
+                # Hkey
+                mid = point_dict["Zmid"]
+                line = Segment(mid, mid - sign * self.H0)
+                line.plot(
+                    fig=fig,
+                    ax=ax,
+                    color=ARROW_COLOR,
+                    linewidth=ARROW_WIDTH,
+                    label="H0",
+                    offset_label=1j * 0.1 * self.H0 - 0.0025,
+                    is_arrow=True,
+                    fontsize=SC_FONT_SIZE,
+                )
+
+            # H0
             mid = point_dict["Zmid"]
-            line = Segment(mid, mid - sign * self.Hmag)
+            line = Segment(mid, mid - sign * self.H0)
             line.plot(
                 fig=fig,
                 ax=ax,
                 color=ARROW_COLOR,
                 linewidth=ARROW_WIDTH,
-                label="Hmag",
-                offset_label=1j * 0.1 * self.Hmag - 0.0025,
+                label="H0",
+                offset_label=1j * 0.1 * self.H0 - 0.0025,
                 is_arrow=True,
                 fontsize=SC_FONT_SIZE,
             )
@@ -196,6 +229,7 @@ def plot_schematics(
         ax.set_title("")
         ax.get_legend().remove()
         ax.set_axis_off()
+        fig.tight_layout()
 
         # Save / Show
         if save_path is not None:

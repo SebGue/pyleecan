@@ -15,16 +15,13 @@ def get_indices_limited(
     ----------
     meshsolution : MeshSolution
         a MeshSolution object
-
     label : str
         label of a MeshSolution solution field
-
     group_names : list of str
         list of the groups names or string of a single group
 
     max_value : float
         max. field magnitude (over time)
-
     min_value : float
         min. field magnitude (over time)
 
@@ -34,13 +31,10 @@ def get_indices_limited(
         surface area of the specified groups and indices
 
     """
-    if group_names is not None:
-        grp = meshsolution.get_group(group_names=group_names)
-    else:
-        grp = meshsolution
-    msh = grp.get_mesh()
+    grp = meshsolution.get_group(group_names=group_names)
+    msh = grp.mesh
 
-    indices = msh.cell["triangle"].indice
+    indices = msh.element_dict["triangle"].indice
 
     field = grp.get_field(label=label)
 

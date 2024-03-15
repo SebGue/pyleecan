@@ -1,23 +1,20 @@
 # -*- coding: utf-8 -*-
-from operator import is_
-from numpy import arange, append as np_append
-from meshio import read
 from os.path import join, split, splitext
 
-from SciDataTool import DataTime, Data1D, VectorField, Norm_ref
+from meshio import read
+from numpy import arange
+from SciDataTool import Data1D, DataTime, Norm_ref, VectorField
 
-from ....Classes.SolutionData import SolutionData
-from ....Classes.SolutionVector import SolutionVector
 from ....Classes.MeshSolution import MeshSolution
 from ....Classes.MeshVTK import MeshVTK
-
+from ....Classes.SolutionData import SolutionData
+from ....Classes.SolutionVector import SolutionVector
 from ....Methods.Elmer.ElmerResultsVTU import ElmerResultsVTUError
-
 
 # TODO add groups, see get_meshsolution of MagFEMM
 
 
-def build_meshsolution(self, is_point_data=True):
+def build_meshsolution(self):
     """Get the mesh and solution data from an Elmer VTU results file
 
     Parameters
@@ -25,13 +22,10 @@ def build_meshsolution(self, is_point_data=True):
     self : ElmerResultsVTU
         a ElmerResultsVTU object
 
-    is_point_data : bool
-        True if the MeshSolution should be created from point data, else cell data
-
     Returns
     -------
-    meshsol: MeshSolution
-        MeshSolution created from the corresponding VTU file
+    success: bool
+        Information if meshsolution could be created
 
     """
     # create meshsolution
@@ -45,30 +39,23 @@ def build_meshsolution(self, is_point_data=True):
 
     meshvtk = MeshVTK(path=save_path, name=file_name, format="vtu")
     # TODO maybe convert to MeshMat before
-    meshsol.mesh = [meshvtk]
+    meshsol.mesh = meshvtk
 
     # get the solution data on the mesh
     meshsolvtu = read(self.file_path)
-    data = meshsolvtu.point_data if is_point_data else meshsolvtu.cell_data
+    pt_data = meshsolvtu.point_data  # point_data is of type dict
 
     # setup axes
-    if is_point_data:
-        indices = arange(meshsolvtu.points.shape[0])
-    else:
-        indices = arange(
-            meshsolvtu.cells[0].data.shape[0] + meshsolvtu.cells[1].data.shape[0]
-        )
+    indices = arange(meshsolvtu.points.shape[0])
     Indices = Data1D(name="indice", values=indices, is_components=True)
 
     # store only data from store dict if available
     comp_ext = ["x", "y", "z"]
 
-    sol_list = []  # list of solutions
-
-    for key, value in data.items():
+    for key, value in pt_data.items():
         # check if value should be stored
         if key in self.store_dict.keys():
-            siz = value.shape[1] if is_point_data else value[0].shape[1]
+            siz = value.shape[1]
             # only regard max. 3 components
             if siz > 3:
                 self.get_logger().warning(
@@ -80,8 +67,6 @@ def build_meshsolution(self, is_point_data=True):
 
             components = []
             comp_name = []
-            if not is_point_data:
-                value = np_append(value[0], value[1], axis=0)
 
             # loop though components
             for i in range(siz):
@@ -106,13 +91,15 @@ def build_meshsolution(self, is_point_data=True):
             # setup solution depending on number of field components
             if siz == 1:
                 field = components[0]
-                sol_list.append(
-                    SolutionData(
-                        field=field,
-                        type_cell="point",
-                        label=self.store_dict[key]["symbol"],
-                    )
+                solution = SolutionData(
+                    field=field,
+                    type_element="point",
+                    label=self.store_dict[key]["symbol"],
                 )
+
+                label = self.store_dict[key]["symbol"]
+                meshsol.add_solution(solution=solution, label=label)
+
             else:
                 comps = {}
                 for i in range(siz):
@@ -122,14 +109,13 @@ def build_meshsolution(self, is_point_data=True):
                     symbol=self.store_dict[key]["symbol"],
                     components=comps,
                 )
-                sol_list.append(
-                    SolutionVector(
-                        field=field,
-                        type_cell="point",
-                        label=self.store_dict[key]["symbol"],
-                    )
+                solution = SolutionVector(
+                    field=field,
+                    type_element="point",
+                    label=self.store_dict[key]["symbol"],
                 )
+                label = self.store_dict[key]["symbol"]
 
-    meshsol.solution = sol_list
+                meshsol.add_solution(solution=solution, label=label)
 
     return meshsol

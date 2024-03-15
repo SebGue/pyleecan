@@ -36,7 +36,7 @@ class Ui_PWSlot11(object):
         self.img_slot.setSizePolicy(sizePolicy)
         self.img_slot.setMaximumSize(QSize(16777215, 16777215))
         self.img_slot.setPixmap(
-            QPixmap(u":/images/images/MachineSetup/WSlot/SlotW11_wind.png")
+            QPixmap(u":/images/images/MachineSetup/WSlot/SlotW11_wind_ext_stator.png")
         )
         self.img_slot.setScaledContents(False)
         self.img_slot.setAlignment(Qt.AlignCenter)
@@ -218,6 +218,12 @@ class Ui_PWSlot11(object):
 
         self.verticalLayout_3.addWidget(self.g_wedge)
 
+        self.verticalSpacer = QSpacerItem(
+            20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding
+        )
+
+        self.verticalLayout_3.addItem(self.verticalSpacer)
+
         self.w_out = WWSlotOut(self.scrollAreaWidgetContents)
         self.w_out.setObjectName(u"w_out")
 
@@ -233,6 +239,12 @@ class Ui_PWSlot11(object):
         QWidget.setTabOrder(self.lf_W3, self.lf_H0)
         QWidget.setTabOrder(self.lf_H0, self.lf_H1)
         QWidget.setTabOrder(self.lf_H1, self.lf_H2)
+        QWidget.setTabOrder(self.lf_H2, self.lf_R1)
+        QWidget.setTabOrder(self.lf_R1, self.g_wedge)
+        QWidget.setTabOrder(self.g_wedge, self.c_H1_unit)
+        QWidget.setTabOrder(self.c_H1_unit, self.is_cst_tooth)
+        QWidget.setTabOrder(self.is_cst_tooth, self.scrollArea)
+        QWidget.setTabOrder(self.scrollArea, self.txt_constraint)
 
         self.retranslateUi(PWSlot11)
 
