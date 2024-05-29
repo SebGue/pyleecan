@@ -393,10 +393,10 @@ def solve_FEA(self, output, sym, angle, time, angle_rotor, Is, Ir):
         fo.write(
             "\nHeader\n"
             "\tCHECK KEYWORDS Warn\n"
-            '\tMesh DB "{0}"\n'
+            '\tMesh DB "."\n'
             '\tInclude Path "."\n'
-            '\tResults Directory "{1}"\n'
-            "End\n".format(elmermesh_folder, elmermesh_folder)
+            '\tResults Directory "."\n'
+            "End\n"
         )
 
         fo.write("\nConstants\n" "\tPermittivity of Vacuum = 8.8542e-12\n" "End\n")
@@ -796,8 +796,15 @@ def solve_FEA(self, output, sym, angle, time, angle_rotor, Is, Ir):
             "\tCalculate Maxwell Stress = Logical True\n"
             "\tCalculate JxB = Logical True\n"
             "\tCalculate Magnetic Field Strength = Logical True\n"
-            "End\n"
         )
+        # there seems to be some changes to Elmer so simlation won't run without ...
+        fo.write(
+            "\t! Enforcing fields to be continuous "
+            + "is a little problematic for discontious fields\n"
+        )
+        fo.write("\tCalculate Nodal Fields = {0}\n".format("Logical False"))
+        fo.write("\tCalculate Elemental Fields = {0}\n".format("Logical True"))
+        fo.write("End\n")
 
         fo.write(
             "\nSolver 4\n"
@@ -805,7 +812,7 @@ def solve_FEA(self, output, sym, angle, time, angle_rotor, Is, Ir):
             '\tProcedure = "ResultOutputSolve" "ResultOutputSolver"\n'
             '\tOutput File Name = "{0}"\n'
             "\tVtu Format = True\n"
-            "\tBinary Output = True\n"
+            "\tBinary Output = False\n"  # there are issues with Elmer binary sometimes
             "\tSingle Precision = True\n"
             "\tSave Geometry Ids = True\n"
             "\tShow Variables = True\n"
@@ -942,7 +949,10 @@ def solve_FEA(self, output, sym, angle, time, angle_rotor, Is, Ir):
         "Calling ElmerSolver: " + " ".join(map(str, cmd_elmersolver))
     )
     elmersolver = subprocess.Popen(
-        cmd_elmersolver, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=project_name
+        cmd_elmersolver,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        cwd=project_name,
     )
     (stdout, stderr) = elmersolver.communicate()
     elmersolver.wait()
