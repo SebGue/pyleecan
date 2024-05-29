@@ -112,7 +112,7 @@ def test_gmsh_spm():
         user_mesh_dict=mesh_dict,
         is_sliding_band=True,
         is_airbox=True,
-        path_save=join(save_path, "GSMH_model_spm.msh"),
+        path_save=join(save_path, "test_gmsh_spm.msh"),
     )
 
     with open(join(save_path, "test_gmsh_spm.json"), "w") as fw:
@@ -152,10 +152,10 @@ def test_gmsh_benchmark():
         user_mesh_dict=mesh_dict,
         is_sliding_band=True,
         is_airbox=True,
-        path_save=join(save_path, "GSMH_model_benchmark.geo"),
+        path_save=join(save_path, "test_gmsh_benchmark.geo"),
     )
 
-    with open(join(save_path, "test_gmsh_ipm.json"), "w") as fw:
+    with open(join(save_path, "test_gmsh_benchmark.json"), "w") as fw:
         json.dump(gmsh_dict, fw, default=encode_complex, indent=4)
 
     return None
@@ -191,7 +191,7 @@ def test_gmsh_WRSM():
         user_mesh_dict=mesh_dict,
         is_sliding_band=True,
         is_airbox=True,
-        path_save=join(save_path, "GSMH_model_Zoe.msh"),
+        path_save=join(save_path, "test_gmsh_Zoe.msh"),
     )
 
     with open(join(save_path, "test_gmsh_Zoe.json"), "w") as fw:
@@ -230,7 +230,7 @@ def test_gmsh_SCIM():
         user_mesh_dict=mesh_dict,
         is_sliding_band=True,
         is_airbox=True,
-        path_save=join(save_path, "GSMH_model_RT.msh"),
+        path_save=join(save_path, "test_gmsh_RT.msh"),
     )
 
     with open(join(save_path, "test_gmsh_RT.json"), "w") as fw:
@@ -248,3 +248,4 @@ if __name__ == "__main__":
     # gmsh_dict = test_gmsh_ipm()
     # gmsh_dict = test_gmsh_spm()
     test_gmsh_benchmark()
+    # test_gmsh_SCIM()
