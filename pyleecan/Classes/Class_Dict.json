@@ -8084,7 +8084,8 @@
             "get_meshsolution",
             "get_path_save_fea",
             "get_path_save",
-            "gen_elmer_mesh"
+            "gen_elmer_mesh",
+            "gen_elmer_sif"
         ],
         "mother": "Magnetics",
         "name": "MagElmer",

@@ -18,3 +18,4 @@ Simulation,Magnetics,comp_flux_airgap,VERSION,1,Magnetic module: Finite Element 
 ,,get_path_save_fea,,,,
 ,,get_path_save,,,,
 ,,gen_elmer_mesh,,,,
+,,gen_elmer_sif,,,,

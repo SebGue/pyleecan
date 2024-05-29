@@ -76,37 +76,16 @@ def comp_flux_airgap(self, output, axes_dict, Is_val=None, Ir_val=None):
 
     # post process GMSH mesh with ElmerGrid
     if not self.gen_elmer_mesh(output):
-        print("Something went wrong!")
+        self.get_logger().error(
+            "Something went wrong while processing mesh with ElmerGrid."
+        )
 
-    # elmermesh_folder = self.get_path_save_fea(output)
-    # cmd_elmergrid = [
-    #     "ElmerGrid",
-    #     "14",
-    #     "2",
-    #     gmsh_filename,
-    #     "-2d",
-    #     "-autoclean",
-    #     "-names",
-    #     "-out",
-    #     elmermesh_folder,
-    # ]
-    # process_elmergrid = subprocess.Popen(
-    #     cmd_elmergrid, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    # )
-    # (stdout, stderr) = process_elmergrid.communicate()
-    #
-    # process_elmergrid.wait()
-    # if process_elmergrid.returncode != 0:
-    #     print(stdout)
-    #     print(stderr)
-    #     # pass
-
-    # setup Elmer solver
-    # TODO add respective functions or methods
+    # generate the elmer solver input file
+    elmer_sif_file = self.gen_elmer_sif(output, sym, time, angle_rotor, Is_val, Ir_val)
 
     # Solve for all time step and store all the results in output
     Br, Bt, Bz, Tem, Phi_wind_stator = self.solve_FEA(
-        output, sym, angle, time, angle_rotor, Is_val, Ir_val
+        output, sym, angle, time, elmer_sif_file
     )
 
     # Store standards Magnetics outputs in out_dict
