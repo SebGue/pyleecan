@@ -71,7 +71,7 @@ def test_ipm_Elmer():
     # simu.input.Iq_ref = 250  # [A]
     # simu.input.Nt_tot = 32 * 8    # Number of time step
     # simu.input.Na_tot = 2048     # Spatial discretization
-    simu.input.OP = OPdq(N0=2000)  # Rotor speed [rpm]
+    simu.input.OP = OPdq(N0=1)  # Rotor speed [rpm]
     p = Toyota_Prius.stator.winding.p
     time = linspace(0, 60 / simu.input.OP.N0, num=32 * p, endpoint=False)
     simu.input.time = time
@@ -134,7 +134,7 @@ def test_spm_Elmer():
     # simu.input.Iq_ref = 250  # [A]
     # simu.input.Nt_tot = 32 * 8    # Number of time step
     # simu.input.Na_tot = 2048     # Spatial discretization
-    simu.input.OP = OPdq(N0=2000)  # Rotor speed [rpm]
+    simu.input.OP = OPdq(N0=1)  # Rotor speed [rpm]
     p = PMSM_A.stator.winding.p
     time = linspace(0, 60 / simu.input.OP.N0, num=32 * p, endpoint=False)
     simu.input.time = time
