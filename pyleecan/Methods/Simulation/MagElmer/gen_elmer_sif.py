@@ -142,6 +142,202 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
     surf_wind = machine.stator.slot.comp_surface_active()
     ror = machine.rotor.comp_radius_mec()
     sir = machine.stator.comp_radius_mec()
+
+    if isinstance(machine, MachineSIPMSM):
+        # magnet_0 = machine.rotor.slot.magnet[0]
+        magnet_0 = machine.rotor.magnet
+    elif isinstance(machine, MachineIPMSM):
+        magnet_dict = machine.rotor.hole[0].get_magnet_dict()
+        magnet_0 = magnet_dict["magnet_0"]
+    else:
+        self.get_logger().info("ElmerSolver [Error]: Unsupported Machine Geometry")
+        return False
+
+    surf_list = machine.build_geometry(sym=sym)
+    pm_index = 6
+    Mangle = list()
+    Ncond_Aplus = 1
+    Ncond_Aminus = 1
+    Ncond_Bplus = 1
+    Ncond_Bminus = 1
+    Ncond_Cplus = 1
+    Ncond_Cminus = 1
+    Ncond_Dplus = 1
+    Ncond_Dminus = 1
+    Ncond_Eplus = 1
+    Ncond_Eminus = 1
+    Ncond_Fplus = 1
+    Ncond_Fminus = 1
+    Npcp = machine.stator.winding.Npcp
+    for surf in surf_list:
+        label = short_label(surf.label)
+        label_dict = decode_label(label)
+        point_ref = surf.point_ref
+        if HOLEM_LAB_S in label_dict["surf_type"]:  # LamHole
+            mag_obj = get_obj_from_label(machine, label_dict=label_dict)
+            if mag_obj.type_magnetization == 1:  # Parallel
+                magnetization_type = "parallel"
+                # calculate pole angle and angle of pole middle
+                T_id = label_dict["T_id"]
+                hole = mag_obj.parent
+                Zh = hole.Zh
+                alpha_p = 360 / Zh
+                mag_0 = (
+                    floor_divide(np_angle(point_ref, deg=True), alpha_p) + 0.5
+                ) * alpha_p
+
+                mag_dict = hole.comp_magnetization_dict()
+                mag = mag_0 + mag_dict["magnet_" + str(T_id)] * 180 / pi
+                # modifiy magnetisation of south poles
+                if (label_dict["S_id"] % 2) == 1:
+                    mag = mag + 180
+            else:
+                raise NotImplementedYetError(
+                    "Only parallele magnetization are available for HoleMagnet"
+                )
+            if bodies.get(label, None) is not None:
+                Mangle.append(mag)
+                bodies[label]["mat"] = pm_index
+                bodies[label]["eq"] = 1
+                bodies[label]["bf"] = 1
+                bodies[label]["tg"] = 1
+                pm_index = pm_index + 1
+        elif MAG_LAB in label_dict["surf_type"]:
+            mag_obj = get_obj_from_label(machine, label_dict=label_dict)
+            if mag_obj.type_magnetization == 0 and (label_dict["S_id"] % 2) == 0:
+                mag = 0  # North pole magnet
+                magnetization_type = "radial"
+            elif mag_obj.type_magnetization == 0:
+                mag = 180  # South pole magnet
+                magnetization_type = "radial"
+            elif mag_obj.type_magnetization == 1 and (label_dict["S_id"] % 2) == 0:
+                mag = np_angle(point_ref) * 180 / pi  # North pole magnet
+                magnetization_type = "parallel"
+            elif mag_obj.type_magnetization == 1:
+                mag = np_angle(point_ref) * 180 / pi + 180  # South pole magnet
+                magnetization_type = "parallel"
+            elif mag_obj.type_magnetization == 2:
+                Zs = mag_obj.parent.slot.Zs
+                mag = str(-(Zs / 2 - 1)) + " * theta + 90 "
+                magnetization_type = "hallback"
+            else:
+                continue
+            if bodies.get(label, None) is not None:
+                Mangle.append(mag)
+                bodies[label]["mat"] = pm_index
+                bodies[label]["eq"] = 1
+                bodies[label]["bf"] = 1
+                bodies[label]["tg"] = 1
+                pm_index = pm_index + 1
+        elif WIND_LAB_S in label_dict["surf_type"]:
+            lam_obj = get_obj_from_label(machine, label_dict=label_dict)
+            wind_mat = lam_obj.winding.get_connection_mat(lam_obj.get_Zs())
+            Nrad_id = label_dict["R_id"]  # zone radial coordinate
+            Ntan_id = label_dict["T_id"]  # zone tangential coordinate
+            Zs_id = label_dict["S_id"]  # Zone slot number coordinate
+            # Get the phase value in the correct slot zone
+            q_id = get_phase_id(wind_mat, Nrad_id, Ntan_id, Zs_id)
+            Ncond = wind_mat[Nrad_id, Ntan_id, Zs_id, q_id]
+            s = sign(Ncond)
+            if bodies.get(label, None) is not None:
+                bodies[label]["mat"] = 5
+                bodies[label]["eq"] = 1
+                if q_id == 0 and s == 1:
+                    bodies[label]["bf"] = 2
+                    Ncond_Aplus = abs(Ncond)
+                elif q_id == 0 and s == -1:
+                    bodies[label]["bf"] = 3
+                    Ncond_Aminus = abs(Ncond)
+                elif q_id == 1 and s == 1:
+                    bodies[label]["bf"] = 4
+                    Ncond_Bplus = abs(Ncond)
+                elif q_id == 1 and s == -1:
+                    bodies[label]["bf"] = 5
+                    Ncond_Bminus = abs(Ncond)
+                elif q_id == 2 and s == 1:
+                    bodies[label]["bf"] = 6
+                    Ncond_Cplus = abs(Ncond)
+                elif q_id == 2 and s == -1:
+                    bodies[label]["bf"] = 7
+                    Ncond_Cminus = abs(Ncond)
+                elif q_id == 3 and s == 1:
+                    bodies[label]["bf"] = 8
+                    Ncond_Dplus = abs(Ncond)
+                elif q_id == 3 and s == -1:
+                    bodies[label]["bf"] = 9
+                    Ncond_Dminus = abs(Ncond)
+                elif q_id == 4 and s == 1:
+                    bodies[label]["bf"] = 10
+                    Ncond_Eplus = abs(Ncond)
+                elif q_id == 4 and s == -1:
+                    bodies[label]["bf"] = 11
+                    Ncond_Eminus = abs(Ncond)
+                elif q_id == 5 and s == 1:
+                    bodies[label]["bf"] = 12
+                    Ncond_Fplus = abs(Ncond)
+                elif q_id == 5 and s == -1:
+                    bodies[label]["bf"] = 13
+                    Ncond_Fminus = abs(Ncond)
+                else:
+                    pass
+        elif (
+            LAM_LAB_S in label_dict["surf_type"]
+            and ROTOR_LAB_S in label_dict["lam_label"]
+            and bodies.get(label, None) is not None
+        ):
+            bodies[label]["mat"] = 4
+            bodies[label]["eq"] = 1
+            bodies[label]["bf"] = 1
+            bodies[label]["tg"] = 1
+        elif (
+            LAM_LAB_S in label_dict["surf_type"]
+            and STATOR_LAB_S in label_dict["lam_label"]
+            and bodies.get(label, None) is not None
+        ):
+            bodies[label]["mat"] = 3
+            bodies[label]["eq"] = 1
+        elif (
+            SHAFT_LAB in label_dict["surf_type"] and bodies.get(label, None) is not None
+        ):
+            bodies[label]["mat"] = 1
+            bodies[label]["eq"] = 1
+            bodies[label]["bf"] = 1
+            bodies[label]["tg"] = 1
+        elif (
+            HOLEV_LAB_S in label_dict["surf_type"]
+            and bodies.get(label, None) is not None
+        ):
+            bodies[label]["mat"] = 1
+            bodies[label]["eq"] = 1
+            bodies[label]["bf"] = 1
+            bodies[label]["tg"] = 1
+        else:
+            pass
+
+    # The following bodies are not in the dictionary
+    bodies[ROTOR_LAB + "-0_" + AIRGAP_LAB + BOT_LAB]["bf"] = 1
+    bodies[NO_LAM_LAB + "_" + SLID_LAB + BOT_LAB]["bf"] = 1  # Sliding band bottom
+
+    No_Magnets = pm_index - 6
+    magnet_temp = self.T_mag
+    Hcm20 = magnet_0.mat_type.mag.get_Hc()
+    Br = magnet_0.mat_type.mag.get_Brm(T_op=self.T_mag)
+    magnet_permeability = magnet_0.mat_type.mag.mur_lin
+    conductivity_m = magnet_0.mat_type.elec.get_conductivity(
+        T_op=magnet_temp, T_ref=20.0
+    )
+
+    skip_steps = 1  # Fixed for now
+    degrees_step = 1  # Fixed for now
+    current_angle = 0 - pp * degrees_step * skip_steps
+    angle_shift = self.angle_rotor_shift - self.angle_stator_shift
+    rotor_init_pos = machine.comp_angle_rotor_initial() + angle_shift
+    rotor_d_axis = machine.rotor.comp_angle_d_axis() * 180.0 / pi
+    Ncond = 1  # Fixed for Now
+    Cp = 1  # Fixed for Now
+    qs = len(machine.stator.get_name_phase())
+
+    # generate sif file
     with open(elmer_sif_file, "wt") as fo:
         fo.write("! File Generated by pyleecan v{0}\n".format(__version__))
         fo.write(
@@ -149,201 +345,6 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
         )
         fo.write("$ PP = {0}                ! Pole pairs\n".format(pp))
         fo.write("$ WE = PP*WM              ! Electrical Frequency [Hz]\n")
-
-        if isinstance(machine, MachineSIPMSM):
-            # magnet_0 = machine.rotor.slot.magnet[0]
-            magnet_0 = machine.rotor.magnet
-        elif isinstance(machine, MachineIPMSM):
-            magnet_dict = machine.rotor.hole[0].get_magnet_dict()
-            magnet_0 = magnet_dict["magnet_0"]
-        else:
-            self.get_logger().info("ElmerSolver [Error]: Unsupported Machine Geometry")
-            return False
-
-        surf_list = machine.build_geometry(sym=sym)
-        pm_index = 6
-        Mangle = list()
-        Ncond_Aplus = 1
-        Ncond_Aminus = 1
-        Ncond_Bplus = 1
-        Ncond_Bminus = 1
-        Ncond_Cplus = 1
-        Ncond_Cminus = 1
-        Ncond_Dplus = 1
-        Ncond_Dminus = 1
-        Ncond_Eplus = 1
-        Ncond_Eminus = 1
-        Ncond_Fplus = 1
-        Ncond_Fminus = 1
-        Npcp = machine.stator.winding.Npcp
-        for surf in surf_list:
-            label = short_label(surf.label)
-            label_dict = decode_label(label)
-            point_ref = surf.point_ref
-            if HOLEM_LAB_S in label_dict["surf_type"]:  # LamHole
-                mag_obj = get_obj_from_label(machine, label_dict=label_dict)
-                if mag_obj.type_magnetization == 1:  # Parallel
-                    magnetization_type = "parallel"
-                    # calculate pole angle and angle of pole middle
-                    T_id = label_dict["T_id"]
-                    hole = mag_obj.parent
-                    Zh = hole.Zh
-                    alpha_p = 360 / Zh
-                    mag_0 = (
-                        floor_divide(np_angle(point_ref, deg=True), alpha_p) + 0.5
-                    ) * alpha_p
-
-                    mag_dict = hole.comp_magnetization_dict()
-                    mag = mag_0 + mag_dict["magnet_" + str(T_id)] * 180 / pi
-                    # modifiy magnetisation of south poles
-                    if (label_dict["S_id"] % 2) == 1:
-                        mag = mag + 180
-                else:
-                    raise NotImplementedYetError(
-                        "Only parallele magnetization are available for HoleMagnet"
-                    )
-                if bodies.get(label, None) is not None:
-                    Mangle.append(mag)
-                    bodies[label]["mat"] = pm_index
-                    bodies[label]["eq"] = 1
-                    bodies[label]["bf"] = 1
-                    bodies[label]["tg"] = 1
-                    pm_index = pm_index + 1
-            elif MAG_LAB in label_dict["surf_type"]:
-                mag_obj = get_obj_from_label(machine, label_dict=label_dict)
-                if mag_obj.type_magnetization == 0 and (label_dict["S_id"] % 2) == 0:
-                    mag = 0  # North pole magnet
-                    magnetization_type = "radial"
-                elif mag_obj.type_magnetization == 0:
-                    mag = 180  # South pole magnet
-                    magnetization_type = "radial"
-                elif mag_obj.type_magnetization == 1 and (label_dict["S_id"] % 2) == 0:
-                    mag = np_angle(point_ref) * 180 / pi  # North pole magnet
-                    magnetization_type = "parallel"
-                elif mag_obj.type_magnetization == 1:
-                    mag = np_angle(point_ref) * 180 / pi + 180  # South pole magnet
-                    magnetization_type = "parallel"
-                elif mag_obj.type_magnetization == 2:
-                    Zs = mag_obj.parent.slot.Zs
-                    mag = str(-(Zs / 2 - 1)) + " * theta + 90 "
-                    magnetization_type = "hallback"
-                else:
-                    continue
-                if bodies.get(label, None) is not None:
-                    Mangle.append(mag)
-                    bodies[label]["mat"] = pm_index
-                    bodies[label]["eq"] = 1
-                    bodies[label]["bf"] = 1
-                    bodies[label]["tg"] = 1
-                    pm_index = pm_index + 1
-            elif WIND_LAB_S in label_dict["surf_type"]:
-                lam_obj = get_obj_from_label(machine, label_dict=label_dict)
-                wind_mat = lam_obj.winding.get_connection_mat(lam_obj.get_Zs())
-                Nrad_id = label_dict["R_id"]  # zone radial coordinate
-                Ntan_id = label_dict["T_id"]  # zone tangential coordinate
-                Zs_id = label_dict["S_id"]  # Zone slot number coordinate
-                # Get the phase value in the correct slot zone
-                q_id = get_phase_id(wind_mat, Nrad_id, Ntan_id, Zs_id)
-                Ncond = wind_mat[Nrad_id, Ntan_id, Zs_id, q_id]
-                s = sign(Ncond)
-                if bodies.get(label, None) is not None:
-                    bodies[label]["mat"] = 5
-                    bodies[label]["eq"] = 1
-                    if q_id == 0 and s == 1:
-                        bodies[label]["bf"] = 2
-                        Ncond_Aplus = abs(Ncond)
-                    elif q_id == 0 and s == -1:
-                        bodies[label]["bf"] = 3
-                        Ncond_Aminus = abs(Ncond)
-                    elif q_id == 1 and s == 1:
-                        bodies[label]["bf"] = 4
-                        Ncond_Bplus = abs(Ncond)
-                    elif q_id == 1 and s == -1:
-                        bodies[label]["bf"] = 5
-                        Ncond_Bminus = abs(Ncond)
-                    elif q_id == 2 and s == 1:
-                        bodies[label]["bf"] = 6
-                        Ncond_Cplus = abs(Ncond)
-                    elif q_id == 2 and s == -1:
-                        bodies[label]["bf"] = 7
-                        Ncond_Cminus = abs(Ncond)
-                    elif q_id == 3 and s == 1:
-                        bodies[label]["bf"] = 8
-                        Ncond_Dplus = abs(Ncond)
-                    elif q_id == 3 and s == -1:
-                        bodies[label]["bf"] = 9
-                        Ncond_Dminus = abs(Ncond)
-                    elif q_id == 4 and s == 1:
-                        bodies[label]["bf"] = 10
-                        Ncond_Eplus = abs(Ncond)
-                    elif q_id == 4 and s == -1:
-                        bodies[label]["bf"] = 11
-                        Ncond_Eminus = abs(Ncond)
-                    elif q_id == 5 and s == 1:
-                        bodies[label]["bf"] = 12
-                        Ncond_Fplus = abs(Ncond)
-                    elif q_id == 5 and s == -1:
-                        bodies[label]["bf"] = 13
-                        Ncond_Fminus = abs(Ncond)
-                    else:
-                        pass
-            elif (
-                LAM_LAB_S in label_dict["surf_type"]
-                and ROTOR_LAB_S in label_dict["lam_label"]
-                and bodies.get(label, None) is not None
-            ):
-                bodies[label]["mat"] = 4
-                bodies[label]["eq"] = 1
-                bodies[label]["bf"] = 1
-                bodies[label]["tg"] = 1
-            elif (
-                LAM_LAB_S in label_dict["surf_type"]
-                and STATOR_LAB_S in label_dict["lam_label"]
-                and bodies.get(label, None) is not None
-            ):
-                bodies[label]["mat"] = 3
-                bodies[label]["eq"] = 1
-            elif (
-                SHAFT_LAB in label_dict["surf_type"]
-                and bodies.get(label, None) is not None
-            ):
-                bodies[label]["mat"] = 1
-                bodies[label]["eq"] = 1
-                bodies[label]["bf"] = 1
-                bodies[label]["tg"] = 1
-            elif (
-                HOLEV_LAB_S in label_dict["surf_type"]
-                and bodies.get(label, None) is not None
-            ):
-                bodies[label]["mat"] = 1
-                bodies[label]["eq"] = 1
-                bodies[label]["bf"] = 1
-                bodies[label]["tg"] = 1
-            else:
-                pass
-
-        # The following bodies are not in the dictionary
-        bodies[ROTOR_LAB + "-0_" + AIRGAP_LAB + BOT_LAB]["bf"] = 1
-        bodies[NO_LAM_LAB + "_" + SLID_LAB + BOT_LAB]["bf"] = 1  # Sliding band bottom
-
-        No_Magnets = pm_index - 6
-        magnet_temp = self.T_mag
-        Hcm20 = magnet_0.mat_type.mag.get_Hc()
-        Br = magnet_0.mat_type.mag.get_Brm(T_op=self.T_mag)
-        magnet_permeability = magnet_0.mat_type.mag.mur_lin
-        conductivity_m = magnet_0.mat_type.elec.get_conductivity(
-            T_op=magnet_temp, T_ref=20.0
-        )
-
-        skip_steps = 1  # Fixed for now
-        degrees_step = 1  # Fixed for now
-        current_angle = 0 - pp * degrees_step * skip_steps
-        angle_shift = self.angle_rotor_shift - self.angle_stator_shift
-        rotor_init_pos = machine.comp_angle_rotor_initial() + angle_shift
-        rotor_d_axis = machine.rotor.comp_angle_d_axis() * 180.0 / pi
-        Ncond = 1  # Fixed for Now
-        Cp = 1  # Fixed for Now
-        qs = len(machine.stator.get_name_phase())
 
         fo.write(
             "$ H_PM = {0}              ! Magnetization at 20 deg C [A/m]\n".format(
@@ -389,6 +390,7 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
 
         fo.write("\nConstants\n" "\tPermittivity of Vacuum = 8.8542e-12\n" "End\n")
 
+        # Simulation Section
         fo.write(
             "\nSimulation\n"
             "\tMax Output Level = 4\n"
@@ -406,6 +408,7 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
             "End\n".format(1.0, timelen, timesize_str[1:-1], timeinterval_str[1:-1])
         )
 
+        # Materials Section
         fo.write("\n!--- MATERIALS ---\n")
         fo.write(
             "Material 1\n"
@@ -450,7 +453,7 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
             "End\n".format(round(conductivity, 2))
         )
 
-        magnets_per_pole = No_Magnets  # TO-DO: Assumes only one pole drawn
+        magnets_per_pole = No_Magnets  # TODO: Assumes only one pole drawn
         for m in range(1, magnets_per_pole + 1):
             mat_number = 5 + m
             if magnetization_type == "parallel":
@@ -518,14 +521,9 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
                     )
                 )
 
+        # Body Forces Section
         fo.write("\n!--- BODY FORCES ---\n")
 
-        # fo.write("Body Force 1\n"
-        #          "\tName = \"BodyForce_Rotation\"\n"
-        #          "\t$omega = (180/pi)*WM\n"
-        #          "\tMesh Rotate 3 = Variable time, timestep size\n"
-        #          "\t\tReal MATC \"omega*(tx(0)-tx(1)) + RotorInitPos\"\n"
-        #          "End\n")
         fo.write(
             "Body Force 1\n"
             '\tName = "BodyForce_Rotation"\n'
@@ -540,78 +538,6 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
                 )
             )
         fo.write("\tEnd\n" "End\n")
-
-        # fo.write("Body Force 2\n"
-        #          "\tName = \"J_A_PLUS\"\n"
-        #          "\tCurrent Density = Variable time, timestep size\n"
-        #          "\t\tReal MATC \"(Is/Carea) * ({0}/Cp) * sin(WE * (tx(0)-tx(1)) + Gamma)\"\n"
-        #          "End\n".format(Ncond_Aplus))
-
-        # fo.write("Body Force 3\n"
-        #          "\tName = \"J_A_MINUS\"\n"
-        #          "\tCurrent Density = Variable time, timestep size\n"
-        #          "\t\tReal MATC \"-(Is/Carea) * ({0}/Cp) * sin(WE * (tx(0)-tx(1)) + Gamma)\"\n"
-        #          "End\n".format(Ncond_Aminus))
-
-        # fo.write("Body Force 4\n"
-        #          "\tName = \"J_B_PLUS\"\n"
-        #          "\tCurrent Density = Variable time, timestep size\n"
-        #          "\t\tReal MATC \"(Is/Carea) * ({0}/Cp) * sin(WE * (tx(0)-tx(1)) - Shift + Gamma)\"\n"
-        #          "End\n".format(Ncond_Bplus))
-        #
-        # fo.write("Body Force 5\n"
-        #          "\tName = \"J_B_MINUS\"\n"
-        #          "\tCurrent Density = Variable time, timestep size\n"
-        #          "\t\tReal MATC \"-(Is/Carea) * ({0}/Cp) * sin(WE * (tx(0)-tx(1)) - Shift + Gamma)\"\n"
-        #          "End\n".format(Ncond_Bminus))
-        #
-        # fo.write("Body Force 6\n"
-        #          "\tName = \"J_C_PLUS\"\n"
-        #          "\tCurrent Density = Variable time, timestep size\n"
-        #          "\t\tReal MATC \"(Is/Carea) * ({0}/Cp) * sin(WE * (tx(0)-tx(1)) - 2*Shift + Gamma)\"\n"
-        #          "End\n".format(Ncond_Cplus))
-        #
-        # fo.write("Body Force 7\n"
-        #          "\tName = \"J_C_MINUS\"\n"
-        #          "\tCurrent Density = Variable time, timestep size\n"
-        #          "\t\tReal MATC \"-(Is/Carea) * ({0}/Cp) * sin(WE * (tx(0)-tx(1)) - 2*Shift + Gamma)\"\n"
-        #          "End\n".format(Ncond_Cminus))
-        #
-        # fo.write("Body Force 8\n"
-        #          "\tName = \"J_D_PLUS\"\n"
-        #          "\tCurrent Density = Variable time, timestep size\n"
-        #          "\t\tReal MATC \"(Is/Carea) * ({0}/Cp) * sin(WE * (tx(0)-tx(1)) - 3*Shift + Gamma)\"\n"
-        #          "End\n".format(Ncond_Dplus))
-        #
-        # fo.write("Body Force 9\n"
-        #          "\tName = \"J_D_MINUS\"\n"
-        #          "\tCurrent Density = Variable time, timestep size\n"
-        #          "\t\tReal MATC \"-(Is/Carea) * ({0}/Cp) * sin(WE * (tx(0)-tx(1)) - 3*Shift + Gamma)\"\n"
-        #          "End\n".format(Ncond_Dminus))
-        #
-        # fo.write("Body Force 10\n"
-        #          "\tName = \"J_E_PLUS\"\n"
-        #          "\tCurrent Density = Variable time, timestep size\n"
-        #          "\t\tReal MATC \"(Is/Carea) * ({0}/Cp) * sin(WE * (tx(0)-tx(1)) - 4*Shift + Gamma)\"\n"
-        #          "End\n".format(Ncond_Eplus))
-        #
-        # fo.write("Body Force 11\n"
-        #          "\tName = \"J_E_MINUS\"\n"
-        #          "\tCurrent Density = Variable time, timestep size\n"
-        #          "\t\tReal MATC \"-(Is/Carea) * ({0}/Cp) * sin(WE * (tx(0)-tx(1)) - 4*Shift + Gamma)\"\n"
-        #          "End\n".format(Ncond_Eminus))
-        #
-        # fo.write("Body Force 12\n"
-        #          "\tName = \"J_F_PLUS\"\n"
-        #          "\tCurrent Density = Variable time, timestep size\n"
-        #          "\t\tReal MATC \"(Is/Carea) * ({0}/Cp) * sin(WE * (tx(0)-tx(1)) - 5*Shift + Gamma)\"\n"
-        #          "End\n".format(Ncond_Fplus))
-        #
-        # fo.write("Body Force 13\n"
-        #          "\tName = \"J_F_MINUS\"\n"
-        #          "\tCurrent Density = Variable time, timestep size\n"
-        #          "\t\tReal MATC \"-(Is/Carea) * ({0}/Cp) * sin(WE * (tx(0)-tx(1)) - 5*Shift + Gamma)\"\n"
-        #          "End\n".format(Ncond_Fminus))
 
         fo.write(
             "Body Force 2\n"
@@ -703,6 +629,7 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
             )
         fo.write("\tEnd\n" "End\n")
 
+        # Bodies Section
         fo.write("\n!--- BODIES ---\n")
         for k, v in bodies.items():
             bid = bodies[k]["id"]
@@ -726,6 +653,7 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
                 )
             fo.write("End\n\n")
 
+        # Equation Section
         fo.write(
             "Equation 1\n"
             '\tName = "Model_Domain"\n'
@@ -733,6 +661,7 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
             "End\n"
         )
 
+        # Solver Section
         fo.write("\n!--- SOLVERS ---\n")
         fo.write(
             "Solver 1\n"
@@ -831,6 +760,7 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
             "End\n".format("scalars.dat")
         )
 
+        # Boundaries Section
         fo.write("\n!--- BOUNDARIES ---\n")
         for k, v in boundaries.items():
             if k == "VP0_BOUNDARY":
