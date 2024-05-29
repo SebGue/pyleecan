@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from os.path import join
-import subprocess
 
 from ....Functions.GMSH.draw_GMSH import draw_GMSH
 from ....Classes.OutMagElmer import OutMagElmer

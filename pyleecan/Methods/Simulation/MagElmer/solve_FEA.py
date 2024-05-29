@@ -1,44 +1,11 @@
-import numpy as np
 import subprocess
 
 from numpy import zeros, loadtxt
 from os.path import split
-from SciDataTool import DataTime, VectorField, Data1D
 from os.path import join
 
-from ....Functions.Winding.gen_phase_list import gen_name
-
-
-from ....Classes.Magnetics import Magnetics
-from ....Functions.labels import (
-    AIRGAP_LAB,
-    ROTOR_LAB,
-    ROTOR_LAB_S,
-    short_label,
-    decode_label,
-    get_obj_from_label,
-    LAM_LAB_S,
-    STATOR_LAB_S,
-    HOLEV_LAB_S,
-    HOLEM_LAB_S,
-    WIND_LAB_S,
-    MAG_LAB,
-    SHAFT_LAB,
-    NO_LAM_LAB,
-    SLID_LAB,
-    BOT_LAB,
-)
-from ....Functions.Winding.find_wind_phase_color import get_phase_id
 from .... import __version__
 from ....Functions.get_path_binary import get_path_binary
-
-from ....Classes.HoleM50 import HoleM50
-from ....Classes.HoleM51 import HoleM51
-from ....Classes.HoleM52 import HoleM52
-from ....Classes.HoleM53 import HoleM53
-from ....Classes.MachineSIPMSM import MachineSIPMSM
-from ....Classes.MachineIPMSM import MachineIPMSM
-from ....Methods import NotImplementedYetError
 
 
 def solve_FEA(self, output, sym, angle, time, elmer_sif_file):
