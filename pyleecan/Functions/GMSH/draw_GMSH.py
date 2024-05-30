@@ -536,63 +536,62 @@ def draw_GMSH(
                 else:
                     continue
 
-            if is_sliding_band and (not is_lam_only_R) and (not is_lam_only_S):
-                rotor_surf_gmsh_list = []
-                for tid in rotor_dict:
-                    # Discard Origin
-                    if tid == 0:
-                        continue
-                    rotor_surf_gmsh_list.append((2, tid))
+            rotor_surf_gmsh_list = []
+            for tid in rotor_dict:
+                # Discard Origin
+                if tid == 0:
+                    continue
+                rotor_surf_gmsh_list.append((2, tid))
 
-                stator_surf_gmsh_list = []
-                for tid in stator_dict:
-                    # Discard Origin
-                    if tid == 0:
-                        continue
-                    stator_surf_gmsh_list.append((2, tid))
+            stator_surf_gmsh_list = []
+            for tid in stator_dict:
+                # Discard Origin
+                if tid == 0:
+                    continue
+                stator_surf_gmsh_list.append((2, tid))
 
-                cut1 = model.occ.cut(
-                    [rotor_ag_before],
-                    rotor_surf_gmsh_list,
-                    removeObject=True,
-                    removeTool=False,
-                )
+            cut1 = model.occ.cut(
+                [rotor_ag_before],
+                rotor_surf_gmsh_list,
+                removeObject=True,
+                removeTool=False,
+            )
 
-                # All These because CUT alone is not working for the stator
-                stat_copy = model.occ.copy(stator_surf_gmsh_list)
-                ints1 = model.occ.intersect(
-                    [stator_ag_before],
-                    [stat_copy[0]],
-                    removeObject=True,
-                    removeTool=True,
-                    tag=-1,
-                )
-                stat_copy.pop(0)
-                cut2 = model.occ.cut(
-                    ints1[0], stat_copy, removeObject=True, removeTool=True, tag=-1
-                )
+            # All These because CUT alone is not working for the stator
+            stat_copy = model.occ.copy(stator_surf_gmsh_list)
+            ints1 = model.occ.intersect(
+                [stator_ag_before],
+                [stat_copy[0]],
+                removeObject=True,
+                removeTool=True,
+                tag=-1,
+            )
+            stat_copy.pop(0)
+            cut2 = model.occ.cut(
+                ints1[0], stat_copy, removeObject=True, removeTool=True, tag=-1
+            )
 
-                if len(cut1[0]) > 1:
-                    # Remove extra surfaces
-                    model.occ.remove([cut1[0][1]])
-                    factory.synchronize()
-                    pg = model.addPhysicalGroup(2, [cut1[0][0][1]])
-                    model.setPhysicalName(2, pg, lab_int + "_" + AIRGAP_LAB + BOT_LAB)
-                else:
-                    factory.synchronize()
-                    pg = model.addPhysicalGroup(2, [cut1[0][0][1]])
-                    model.setPhysicalName(2, pg, lab_int + "_" + AIRGAP_LAB + BOT_LAB)
+            if len(cut1[0]) > 1:
+                # Remove extra surfaces
+                model.occ.remove([cut1[0][1]])
+                factory.synchronize()
+                pg = model.addPhysicalGroup(2, [cut1[0][0][1]])
+                model.setPhysicalName(2, pg, lab_int + "_" + AIRGAP_LAB + BOT_LAB)
+            else:
+                factory.synchronize()
+                pg = model.addPhysicalGroup(2, [cut1[0][0][1]])
+                model.setPhysicalName(2, pg, lab_int + "_" + AIRGAP_LAB + BOT_LAB)
 
-                if len(cut2[0]) > 1:
-                    # Remove extra surfaces
-                    model.occ.remove([cut2[0][0]])
-                    factory.synchronize()
-                    pg = model.addPhysicalGroup(2, [cut2[0][1][1]])
-                    model.setPhysicalName(2, pg, lab_ext + "_" + AIRGAP_LAB + TOP_LAB)
-                else:
-                    factory.synchronize()
-                    pg = model.addPhysicalGroup(2, [cut2[0][0][1]])
-                    model.setPhysicalName(2, pg, lab_ext + "_" + AIRGAP_LAB + TOP_LAB)
+            if len(cut2[0]) > 1:
+                # Remove extra surfaces
+                model.occ.remove([cut2[0][0]])
+                factory.synchronize()
+                pg = model.addPhysicalGroup(2, [cut2[0][1][1]])
+                model.setPhysicalName(2, pg, lab_ext + "_" + AIRGAP_LAB + TOP_LAB)
+            else:
+                factory.synchronize()
+                pg = model.addPhysicalGroup(2, [cut2[0][0][1]])
+                model.setPhysicalName(2, pg, lab_ext + "_" + AIRGAP_LAB + TOP_LAB)
 
         else:
             for s_key, s_data in gmsh_dict.items():
