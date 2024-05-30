@@ -2,7 +2,6 @@ from .get_boundary_condition import get_boundary_condition
 from numpy import pi
 from ...Classes.Arc import Arc
 from ...Classes.Arc1 import Arc1
-from ...Classes.Arc2 import Arc2
 import cmath
 from ...Functions.labels import BOUNDARY_PROP_LAB
 
@@ -113,30 +112,24 @@ def _add_line_to_dict(gmodel, line, d={}, idx=0, mesh_size=1e-2, n_elements=0, b
     None
     """
 
-    # TO-DO: Allow repeated points for the rotor and stator sliding bands
     dlines = list()
     ltag = None
-    btag, bx, by = _find_point_tag(d, line.get_begin())
-    etag, ex, ey = _find_point_tag(d, line.get_end())
-    if btag is None:
-        btag = gmodel.occ.addPoint(bx, by, 0, meshSize=mesh_size, tag=-1)
-    else:
-        dlines.extend(_find_lines_from_point(d, btag))
-    if etag is None:
-        etag = gmodel.occ.addPoint(ex, ey, 0, meshSize=mesh_size, tag=-1)
-    else:
-        dlines.extend(_find_lines_from_point(d, etag))
+    bz = line.get_begin()
+    ez = line.get_end()
+    bx, by = bz.real, bz.imag
+    ex, ey = ez.real, ez.imag
+
+    btag = gmodel.occ.addPoint(bx, by, 0, meshSize=mesh_size, tag=-1)
+    etag = gmodel.occ.addPoint(ex, ey, 0, meshSize=mesh_size, tag=-1)
 
     if line.prop_dict and BOUNDARY_PROP_LAB in line.prop_dict:
         line_label = line.prop_dict[BOUNDARY_PROP_LAB]
     else:
         line_label = None
     if isinstance(line, Arc):
-        ctag, cx, cy = _find_point_tag(d, line.get_center())
-        if ctag is None:
-            ctag = gmodel.occ.addPoint(cx, cy, 0, meshSize=mesh_size, tag=-1)
-        else:
-            dlines.extend(_find_lines_from_point(d, ctag))
+        cz = line.get_center()
+        cx, cy = cz.real, cz.imag
+        ctag = gmodel.occ.addPoint(cx, cy, 0, meshSize=mesh_size, tag=-1)
         if len(dlines) > 0:
             for iline in dlines:
                 p = _find_points_from_line(d, iline)
@@ -240,68 +233,6 @@ def _add_line_to_dict(gmodel, line, d={}, idx=0, mesh_size=1e-2, n_elements=0, b
             )
 
     return None
-
-
-def _find_lines_from_point(d={}, ptag=-1):
-    """Find lines that have the given point tag
-
-    Parameters
-    ----------
-    d : Dictionary
-        GMSH dictionary
-    ptag : int
-        point tag
-
-    Returns
-    -------
-    ltag : int
-        List of line tags
-    """
-    lines = list()
-    for s_data in d.values():
-        for lvalues in s_data.values():
-            if type(lvalues) is not dict:
-                continue
-            for pvalues in lvalues.values():
-                if type(pvalues) is not dict:
-                    continue
-                if pvalues["tag"] == ptag:
-                    lines.append(lvalues["tag"])
-    return lines
-
-
-def _find_point_tag(d={}, p=complex(0.0, 0.0)):
-    """Find a point in the GMSH dictionary
-
-    Parameters
-    ----------
-    d : Dictionary
-        GMSH dictionary
-    p : Complex
-        Point coordinates
-
-    Returns
-    -------
-    tag : int
-        Existing tag number or new one if it does not exist
-    real : float
-        Real coordinates of point
-    imag : float
-        Imaginary coordinates of point
-    """
-    tol = 1e-6
-    for s_data in d.values():
-        for lvalues in s_data.values():
-            if type(lvalues) is not dict:
-                continue
-            for pvalues in lvalues.values():
-                if type(pvalues) is not dict:
-                    continue
-                if pvalues["tag"] is not None:
-                    b = pvalues["coord"]
-                    if abs(p.real - b.real) < tol and abs(p.imag - b.imag) < tol:
-                        return pvalues["tag"], b.real, b.imag
-    return None, p.real, p.imag
 
 
 def _find_points_from_line(d={}, ltag=-1):
