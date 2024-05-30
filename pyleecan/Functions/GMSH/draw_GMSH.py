@@ -151,7 +151,7 @@ def draw_GMSH(
     # Adding Rotor
     #####################
     # set origin
-    oo = factory.addPoint(0, 0, 0, 0, tag=-1)
+    oo = factory.addPoint(0, 0, 0, 0)
     gmsh_dict = {
         0: {
             "tag": 0,
@@ -202,7 +202,7 @@ def draw_GMSH(
             )
 
         lam_and_holes = list()
-        ext_lam_loop = None
+        lam_loop = None
         rotor_cloops = list()
         hole_tags = list()
         # loop though all (surface) entries of the rotor lamination
@@ -214,9 +214,8 @@ def draw_GMSH(
 
             # build a lineloop of the surfaces lines
             for lvalues in s_data.values():
-                if type(lvalues) is not dict:
-                    continue
-                lloop.extend([lvalues["tag"]])
+                if isinstance(lvalues, dict):
+                    lloop.extend([lvalues["tag"]])
             cloop = factory.addCurveLoop(lloop)
 
             label_dict = decode_label(s_data["label"])
@@ -230,7 +229,7 @@ def draw_GMSH(
 
             # search for the holes to substract from rotor lam
             if LAM_LAB_S in label_dict["surf_type"]:
-                ext_lam_loop = cloop
+                lam_loop = cloop
             else:
                 # MachineSIPSM does not have holes in rotor lam
                 # only shaft is taken out if symmetry is one
@@ -247,27 +246,25 @@ def draw_GMSH(
 
                 # Shaft, magnets and magnet pocket surfaces are created
                 if not is_lam_only_R:
-                    s_data["tag"] = factory.addPlaneSurface([cloop], tag=-1)
+                    s_data["tag"] = factory.addPlaneSurface([cloop])
                     factory.synchronize()
                     hole_tags.append(s_data["tag"])
 
         # rotor lamination is built
-        if ext_lam_loop is not None:
-            lam_and_holes.insert(0, ext_lam_loop)
+        if lam_loop is not None:
+            lam_and_holes.insert(0, lam_loop)
+
+        lam_dict = gmsh_dict[lam_rotor_surf_id]
         if len(lam_and_holes) > 0:
-            gmsh_dict[lam_rotor_surf_id]["tag"] = factory.addPlaneSurface(
-                lam_and_holes, tag=-1
-            )
+            lam_dict["tag"] = factory.addPlaneSurface(lam_and_holes)
         factory.synchronize()
 
         # finally add physical groups
         for s_data in gmsh_dict.values():
             if s_data["tag"] in hole_tags:
-                pg = model.addPhysicalGroup(2, [s_data["tag"]])
-                model.setPhysicalName(2, pg, s_data["label"])
+                model.addPhysicalGroup(2, [s_data["tag"]], name=s_data["label"])
 
-        pg = model.addPhysicalGroup(2, [gmsh_dict[lam_rotor_surf_id]["tag"]])
-        model.setPhysicalName(2, pg, gmsh_dict[lam_rotor_surf_id]["label"])
+        model.addPhysicalGroup(2, [lam_dict["tag"]], name=lam_dict["label"])
 
         gmsh.model.occ.synchronize()
 
@@ -363,19 +360,15 @@ def draw_GMSH(
                 ):
                     # Winding surfaces are created
                     if WIND_LAB_S in s_data["label"]:
-                        s_data["tag"] = factory.addPlaneSurface([cloop], tag=-1)
+                        s_data["tag"] = factory.addPlaneSurface([cloop])
                         factory.synchronize()
-                        pg = model.addPhysicalGroup(2, [s_data["tag"]])
-                        model.setPhysicalName(2, pg, s_data["label"])
+                        model.addPhysicalGroup(2, [s_data["tag"]], name=s_data["label"])
                     # Lamination surfaces are created
                     else:
                         inner_cloop = factory.addCurveLoop(inner_loop)
-                        s_data["tag"] = factory.addPlaneSurface(
-                            [cloop, inner_cloop], tag=-1
-                        )
+                        s_data["tag"] = factory.addPlaneSurface([cloop, inner_cloop])
                         factory.synchronize()
-                        pg = model.addPhysicalGroup(2, [s_data["tag"]])
-                        model.setPhysicalName(2, pg, s_data["label"])
+                        model.addPhysicalGroup(2, [s_data["tag"]], name=s_data["label"])
             else:
                 for lvalues in s_data.values():
                     if type(lvalues) is not dict:
@@ -388,10 +381,9 @@ def draw_GMSH(
                 if LAM_LAB_S in decode_label(s_data["label"])["surf_type"] or (
                     not is_lam_only_S
                 ):
-                    s_data["tag"] = factory.addPlaneSurface([cloop], tag=-1)
+                    s_data["tag"] = factory.addPlaneSurface([cloop])
                     factory.synchronize()
-                    pg = model.addPhysicalGroup(2, [s_data["tag"]])
-                    model.setPhysicalName(2, pg, s_data["label"])
+                    model.addPhysicalGroup(2, [s_data["tag"]], name=s_data["label"])
 
     stator_dict = gmsh_dict.copy()
     gmsh_dict.update(rotor_dict)
@@ -506,31 +498,29 @@ def draw_GMSH(
                     AIRGAP_LAB in label_dict["surf_type"]
                     and BOT_LAB in label_dict["surf_type"]
                 ):
-                    s_data["tag"] = factory.addPlaneSurface([cloop1], tag=-1)
+                    s_data["tag"] = factory.addPlaneSurface([cloop1])
                     factory.synchronize()
                     rotor_ag_before = (2, s_data["tag"])
                 elif (
                     SLID_LAB in label_dict["surf_type"]
                     and BOT_LAB in label_dict["surf_type"]
                 ):
-                    s_data["tag"] = factory.addPlaneSurface([cloop2, cloop1], tag=-1)
+                    s_data["tag"] = factory.addPlaneSurface([cloop2, cloop1])
                     factory.synchronize()
-                    pg = model.addPhysicalGroup(2, [s_data["tag"]])
-                    model.setPhysicalName(2, pg, s_data["label"])
+                    model.addPhysicalGroup(2, [s_data["tag"]], name=s_data["label"])
                 elif (
                     SLID_LAB in label_dict["surf_type"]
                     and TOP_LAB in label_dict["surf_type"]
                 ):
-                    s_data["tag"] = factory.addPlaneSurface([cloop4, cloop3], tag=-1)
+                    s_data["tag"] = factory.addPlaneSurface([cloop4, cloop3])
                     factory.synchronize()
-                    pg = model.addPhysicalGroup(2, [s_data["tag"]])
-                    model.setPhysicalName(2, pg, s_data["label"])
+                    model.addPhysicalGroup(2, [s_data["tag"]], name=s_data["label"])
                 elif (
                     AIRGAP_LAB in label_dict["surf_type"]
                     and TOP_LAB in label_dict["surf_type"]
                 ):
-                    s_data["tag"] = factory.addPlaneSurface([cloop5, cloop4], tag=-1)
-                    # s_data["tag"] = factory.addPlaneSurface([cloop5], tag=-1)
+                    s_data["tag"] = factory.addPlaneSurface([cloop5, cloop4])
+                    # s_data["tag"] = factory.addPlaneSurface([cloop5])
                     factory.synchronize()
                     stator_ag_before = (2, s_data["tag"])
                 else:
@@ -568,30 +558,25 @@ def draw_GMSH(
             )
             stat_copy.pop(0)
             cut2 = model.occ.cut(
-                ints1[0], stat_copy, removeObject=True, removeTool=True, tag=-1
+                ints1[0], stat_copy, removeObject=True, removeTool=True
             )
 
             if len(cut1[0]) > 1:
                 # Remove extra surfaces
                 model.occ.remove([cut1[0][1]])
-                factory.synchronize()
-                pg = model.addPhysicalGroup(2, [cut1[0][0][1]])
-                model.setPhysicalName(2, pg, lab_int + "_" + AIRGAP_LAB + BOT_LAB)
-            else:
-                factory.synchronize()
-                pg = model.addPhysicalGroup(2, [cut1[0][0][1]])
-                model.setPhysicalName(2, pg, lab_int + "_" + AIRGAP_LAB + BOT_LAB)
+            factory.synchronize()
+            model.addPhysicalGroup(
+                2, [cut1[0][0][1]], name=lab_int + "_" + AIRGAP_LAB + BOT_LAB
+            )
 
+            name = lab_ext + "_" + AIRGAP_LAB + TOP_LAB
             if len(cut2[0]) > 1:
                 # Remove extra surfaces
                 model.occ.remove([cut2[0][0]])
                 factory.synchronize()
-                pg = model.addPhysicalGroup(2, [cut2[0][1][1]])
-                model.setPhysicalName(2, pg, lab_ext + "_" + AIRGAP_LAB + TOP_LAB)
+                model.addPhysicalGroup(2, [cut2[0][1][1]], name=name)
             else:
-                factory.synchronize()
-                pg = model.addPhysicalGroup(2, [cut2[0][0][1]])
-                model.setPhysicalName(2, pg, lab_ext + "_" + AIRGAP_LAB + TOP_LAB)
+                model.addPhysicalGroup(2, [cut2[0][0][1]], name=name)
 
         else:
             for s_key, s_data in gmsh_dict.items():
@@ -618,14 +603,12 @@ def draw_GMSH(
                         and BOT_LAB in label_dict["surf_type"]
                         and isinstance(machine, MachineSIPMSM)
                     ):
-                        s_data["tag"] = factory.addPlaneSurface(
-                            [cloop] + rotor_cloops, tag=-1
-                        )
+                        s_data["tag"] = factory.addPlaneSurface([cloop] + rotor_cloops)
                     else:
-                        s_data["tag"] = factory.addPlaneSurface([cloop], tag=-1)
+                        s_data["tag"] = factory.addPlaneSurface([cloop])
                     factory.synchronize()
-                    pg = model.addPhysicalGroup(2, [s_data["tag"]])
-                    model.setPhysicalName(2, pg, s_data["label"])
+                    model.addPhysicalGroup(2, [s_data["tag"]], name=s_data["label"])
+
                     if AIRGAP_LAB in s_data["label"] and BOT_LAB in s_data["label"]:
                         rotor_ag_before = (2, s_data["tag"])
                         rotor_ag_key_before = s_key
@@ -660,16 +643,15 @@ def draw_GMSH(
                 removeTool=False,
             )
 
+            name = lab_int + "_" + AIRGAP_LAB + BOT_LAB
             if len(cut1[0]) > 1:
                 # Remove extra surfaces
                 model.occ.remove([cut1[0][0]])
                 factory.synchronize()
-                pg = model.addPhysicalGroup(2, [cut1[0][1][1]])
-                model.setPhysicalName(2, pg, lab_int + "_" + AIRGAP_LAB + BOT_LAB)
+                model.addPhysicalGroup(2, [cut1[0][1][1]], name=name)
             else:
                 factory.synchronize()
-                pg = model.addPhysicalGroup(2, [cut1[0][0][1]])
-                model.setPhysicalName(2, pg, lab_int + "_" + AIRGAP_LAB + BOT_LAB)
+                model.addPhysicalGroup(2, [cut1[0][0][1]], name=name)
 
             # Look at the lines in the resulting surface, then update the dictionary
             # with MASTER/SLAVE BC when line angles match symmetry angles
@@ -719,16 +701,15 @@ def draw_GMSH(
                 )
                 nline = nline + 1
 
+            name = lab_ext + "_" + AIRGAP_LAB + TOP_LAB
             if len(cut2[0]) > 1:
                 # Remove extra surfaces
                 model.occ.remove([cut2[0][0]])
                 factory.synchronize()
-                pg = model.addPhysicalGroup(2, [cut2[0][1][1]])
-                model.setPhysicalName(2, pg, lab_ext + "_" + AIRGAP_LAB + TOP_LAB)
+                pg = model.addPhysicalGroup(2, [cut2[0][1][1]], name=name)
             else:
                 factory.synchronize()
-                pg = model.addPhysicalGroup(2, [cut2[0][0][1]])
-                model.setPhysicalName(2, pg, lab_ext + "_" + AIRGAP_LAB + TOP_LAB)
+                pg = model.addPhysicalGroup(2, [cut2[0][0][1]], name=name)
 
             # Look at the lines in the resulting surface, then update the dictionary
             # with MASTER/SLAVE BC when line angles match symmetry angles
@@ -826,10 +807,9 @@ def draw_GMSH(
 
         if lloop:
             cloop = factory.addCurveLoop(lloop)
-            s_data["tag"] = factory.addPlaneSurface([cloop], tag=-1)
+            s_data["tag"] = factory.addPlaneSurface([cloop])
             factory.synchronize()
-            pg = model.addPhysicalGroup(2, [s_data["tag"]])
-            model.setPhysicalName(2, pg, s_data["label"])
+            model.addPhysicalGroup(2, [s_data["tag"]], name=s_data["label"])
 
     # Set boundary conditions in gmsh lines
     boundary_list = list(set(boundary_prop.values()))
@@ -841,8 +821,7 @@ def draw_GMSH(
                     bc_id.extend([abs(lvalues["tag"])])
         if bc_id:
             factory.synchronize()
-            pg = model.addPhysicalGroup(1, bc_id)
-            model.setPhysicalName(1, pg, propname)
+            model.addPhysicalGroup(1, bc_id, name=propname)
 
     # Set all line labels as physical groups
     if is_set_labels:
@@ -862,8 +841,7 @@ def draw_GMSH(
 
         for label, tags in groups.items():
             factory.synchronize()
-            pg = model.addPhysicalGroup(1, tags)
-            model.setPhysicalName(1, pg, label)
+            model.addPhysicalGroup(1, tags, name=label)
 
     # save mesh or geo file depending on file extension
     filename, file_extension = splitext(path_save)
