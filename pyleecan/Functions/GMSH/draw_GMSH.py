@@ -648,10 +648,10 @@ def draw_GMSH(
                 # Remove extra surfaces
                 model.occ.remove([cut1[0][0]])
                 factory.synchronize()
-                model.addPhysicalGroup(2, [cut1[0][1][1]], name=name)
+                pg = model.addPhysicalGroup(2, [cut1[0][1][1]], name=name)
             else:
                 factory.synchronize()
-                model.addPhysicalGroup(2, [cut1[0][0][1]], name=name)
+                pg = model.addPhysicalGroup(2, [cut1[0][0][1]], name=name)
 
             # Look at the lines in the resulting surface, then update the dictionary
             # with MASTER/SLAVE BC when line angles match symmetry angles
