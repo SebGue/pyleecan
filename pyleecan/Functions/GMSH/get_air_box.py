@@ -41,14 +41,14 @@ def get_air_box(sym, machine):
 
     surf_list = list()
     if sym == 1:  # Complete machine
-        _get_ring_segment(R_ext, R_ab, 0, pi, surf_list, idx=1)
-        _get_ring_segment(R_ext, R_ab, pi, 2 * pi, surf_list, idx=2)
+        _get_ring_segment(R_ab, R_ext, 0, pi, surf_list, idx=1)
+        _get_ring_segment(R_ab, R_ext, pi, 2 * pi, surf_list, idx=2)
 
     else:  # Symmetry
         # Internal AirGap
         _get_ring_segment(
-            R_ext,
             R_ab,
+            R_ext,
             0,
             2 * pi / sym,
             surf_list,
