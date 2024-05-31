@@ -1,19 +1,11 @@
-from ...Classes.Arc import Arc
-from ...Classes.Arc2 import Arc2
 from ...Classes.MachineSIPMSM import MachineSIPMSM
-from ...Classes.MachineSCIM import MachineSCIM
-from ...Classes.MachineWRSM import MachineWRSM
 
 from ...Functions.labels import (
-    HOLEM_LAB_S,
-    MAG_LAB,
-    BAR_LAB,
     short_label,
     LAM_LAB,
     YOKE_LAB,
     WIND_LAB_S,
     LAM_LAB_S,
-    SHAFT_LAB,
     decode_label,
     SLID_LAB,
     AIRGAP_LAB,
@@ -33,10 +25,8 @@ from ...Functions.labels import (
 from ...Functions.GMSH import InputError
 from ...Functions.GMSH.get_sliding_band import get_sliding_band
 from ...Functions.GMSH.get_air_box import get_air_box
-from ...Functions.GMSH.get_boundary_condition import get_boundary_condition
 from ...Functions.GMSH.draw_surf_line import draw_surf_line
 from ...Functions.GMSH.comp_gmsh_mesh_dict import comp_gmsh_mesh_dict
-import sys
 import gmsh
 import cmath
 
@@ -102,7 +92,6 @@ def draw_GMSH(
     # get machine
     machine = output.simu.machine
     mesh_dict = {}
-    tol = 1e-6
 
     # Default stator mesh element size
     mesh_size_S = machine.stator.Rext / 100.0  # Stator
@@ -150,6 +139,8 @@ def draw_GMSH(
             rotor_surf[0] = rotor_surf[0].out_surf
         surf_list.extend(rotor_surf)
 
+        # TODO split SurfRing into object and cutting tool
+
         # draw all surfaces lines in gmsh and store needed information in gmsh_dict
         for surf in surf_list:
             nSurf += 1  # surface number
@@ -168,81 +159,46 @@ def draw_GMSH(
             )
 
         # generate surfaces (from lines) in gmsh and add surface tags to gmsh_dict
-        lam_and_holes = list()
-        lam_loop = None
         rotor_cloops = list()
-        hole_tags = list()
 
-        # loop though all (surface) entries of the rotor lamination
-        for s_data in gmsh_dict.values():
+        for surf in gmsh_dict.values():
             # build a lineloop of the surfaces lines
-            lloop = []
-            for lvalues in s_data.values():
+            lines = []
+            for lvalues in surf.values():
                 if isinstance(lvalues, dict):
-                    lloop.extend([lvalues["tag"]])
-            cloop = factory.addCurveLoop(lloop)
+                    lines.extend([lvalues["tag"]])
+            cloop = factory.addCurveLoop(lines)
 
-            label_dict = decode_label(s_data["label"])
-            if (
-                MAG_LAB in label_dict["surf_type"]
-                or HOLEM_LAB_S in label_dict["surf_type"]
-                or BAR_LAB in label_dict["surf_type"]
-            ):
-                # rotor surfaces for substraction (cutting) from air gap
-                rotor_cloops.extend([cloop])
+            surf["tag"] = factory.addPlaneSurface([cloop])
+            factory.synchronize()
 
-            # search for the holes to substract from rotor lam
-            if LAM_LAB_S in label_dict["surf_type"]:
-                lam_loop = cloop
-            else:
-                # if sym == 1:
-                #     lam_and_holes.extend([cloop])
-                # elif SHAFT_LAB not in label_dict["surf_type"]:
-                #     lam_and_holes.extend([cloop])
+        # cut all holes from lamination
+        for idx, surf in gmsh_dict.items():
+            if idx == idLam:  # skip if lamination
+                continue
 
-                # MachineSIPSM does not have holes in rotor lam
-                # only shaft is taken out if symmetry is one
-                if isinstance(machine, (MachineSIPMSM, MachineSCIM, MachineWRSM)):
-                    if sym == 1 and SHAFT_LAB in label_dict["surf_type"]:
-                        lam_and_holes.extend([cloop])
-                else:
-                    if sym == 1:
-                        lam_and_holes.extend([cloop])
-                    elif SHAFT_LAB not in label_dict["surf_type"]:
-                        lam_and_holes.extend([cloop])
-                    else:
-                        pass
+            cut = model.occ.cut(
+                [(2, gmsh_dict[idLam]["tag"])],
+                [(2, surf["tag"])],
+                removeObject=True,
+                removeTool=False,
+            )
+            gmsh_dict[idLam]["tag"] = cut[0][0][1]
 
-                # Shaft, magnets and magnet pocket surfaces are created
-                if not is_lam_only_R:
-                    s_data["tag"] = factory.addPlaneSurface([cloop])
-                    factory.synchronize()
-                    hole_tags.append(s_data["tag"])
-
-        print([gmsh_dict[idx]["label"] for idx in lam_and_holes])
-        # rotor lamination is built
-        if lam_loop is not None:
-            lam_and_holes.insert(0, lam_loop)
-
-        lam_dict = gmsh_dict[idLam]
-        if len(lam_and_holes) > 0:
-            lam_dict["tag"] = factory.addPlaneSurface(lam_and_holes)
         factory.synchronize()
 
-        # finally add physical groups
+        # finally add physical groups TODO maybe only after cutting
         for s_data in gmsh_dict.values():
-            if s_data["tag"] in hole_tags:
-                model.addPhysicalGroup(2, [s_data["tag"]], name=s_data["label"])
+            model.addPhysicalGroup(2, [s_data["tag"]], name=s_data["label"])
 
-        model.addPhysicalGroup(2, [lam_dict["tag"]], name=lam_dict["label"])
-
-        gmsh.model.occ.synchronize()
+        factory.synchronize()
 
     # store rotor dict
     rotor_dict = gmsh_dict.copy()
 
     #####################
     # Adding Stator
+    # TODO basically same code for rotor and stator -> reduce dup. code e.g. with functions
     #####################
     gmsh_dict = {}  # init new dict for stator
 
@@ -253,14 +209,9 @@ def draw_GMSH(
 
         for surf in stator_list:
             nSurf += 1
-            gmsh_dict.update(
-                {
-                    nSurf: {
-                        "tag": None,
-                        "label": short_label(surf.label),
-                    }
-                }
-            )
+            gmsh_dict.update({nSurf: {"tag": None, "label": short_label(surf.label)}})
+            if LAM_LAB in decode_label(surf.label)["surf_type"]:
+                idLam = nSurf  # index of lamination
 
             # comp. number of elements on the lines & override by user values in case
             mesh_dict = comp_gmsh_mesh_dict(
@@ -269,69 +220,40 @@ def draw_GMSH(
 
             # Draw the surface
             draw_surf_line(
-                surf,
-                mesh_dict,
-                boundary_prop,
-                model,
-                gmsh_dict,
-                nSurf,
-                mesh_size_S,
+                surf, mesh_dict, boundary_prop, model, gmsh_dict, nSurf, mesh_size_S
             )
+        # generate surfaces (from lines) in gmsh and add surface tags to gmsh_dict
+        for surf in gmsh_dict.values():
+            # build a lineloop of the surfaces lines
+            lines = []
+            for lvalues in surf.values():
+                if isinstance(lvalues, dict):
+                    lines.extend([lvalues["tag"]])
+            cloop = factory.addCurveLoop(lines)
 
+            surf["tag"] = factory.addPlaneSurface([cloop])
+            factory.synchronize()
+
+        # cut all holes from lamination
+        for idx, surf in gmsh_dict.items():
+            if idx == idLam:  # skip if lamination
+                continue
+
+            cut = model.occ.cut(
+                [(2, gmsh_dict[idLam]["tag"])],
+                [(2, surf["tag"])],
+                removeObject=True,
+                removeTool=False,
+            )
+            gmsh_dict[idLam]["tag"] = cut[0][0][1]
+
+        factory.synchronize()
+
+        # finally add physical groups TODO maybe only after cutting
         for s_data in gmsh_dict.values():
-            lloop = []
-            if sym == 1:
-                inner_loop = []
-                # build a lineloop of the surfaces lines independently for yoke
-                # and bore is considered a hole
-                for lvalues in s_data.values():
-                    if type(lvalues) is not dict:
-                        continue
+            model.addPhysicalGroup(2, [s_data["tag"]], name=s_data["label"])
 
-                    if WIND_LAB_S in s_data["label"]:
-                        lloop.extend([lvalues["tag"]])
-                        inner_loop.extend([lvalues["tag"]])
-                    elif (
-                        lvalues["label"] is not None
-                        and LAM_LAB in lvalues["label"]
-                        and YOKE_LAB in lvalues["label"]
-                    ):
-                        lloop.extend([lvalues["tag"]])
-                    else:
-                        inner_loop.extend([lvalues["tag"]])
-                # print(s_data["label"],lloop,inner_loop)
-                cloop = factory.addCurveLoop(lloop)
-                # stator_cloops.append(cloop)
-
-                if LAM_LAB_S in decode_label(s_data["label"])["surf_type"] or (
-                    not is_lam_only_S
-                ):
-                    # Winding surfaces are created
-                    if WIND_LAB_S in s_data["label"]:
-                        s_data["tag"] = factory.addPlaneSurface([cloop])
-                        factory.synchronize()
-                        model.addPhysicalGroup(2, [s_data["tag"]], name=s_data["label"])
-                    # Lamination surfaces are created
-                    else:
-                        inner_cloop = factory.addCurveLoop(inner_loop)
-                        s_data["tag"] = factory.addPlaneSurface([cloop, inner_cloop])
-                        factory.synchronize()
-                        model.addPhysicalGroup(2, [s_data["tag"]], name=s_data["label"])
-            else:
-                for lvalues in s_data.values():
-                    if type(lvalues) is not dict:
-                        continue
-                    lloop.extend([lvalues["tag"]])
-                cloop = factory.addCurveLoop(lloop)
-                # stator_cloops.append(cloop)
-
-                # All surfaces are created
-                if LAM_LAB_S in decode_label(s_data["label"])["surf_type"] or (
-                    not is_lam_only_S
-                ):
-                    s_data["tag"] = factory.addPlaneSurface([cloop])
-                    factory.synchronize()
-                    model.addPhysicalGroup(2, [s_data["tag"]], name=s_data["label"])
+        factory.synchronize()
 
     stator_dict = gmsh_dict.copy()
     gmsh_dict.update(rotor_dict)
@@ -347,14 +269,7 @@ def draw_GMSH(
     # nSurf = 0
     for surf in sb_list:
         nSurf += 1
-        gmsh_dict.update(
-            {
-                nSurf: {
-                    "tag": None,
-                    "label": short_label(surf.label),
-                }
-            }
-        )
+        gmsh_dict.update({nSurf: {"tag": None, "label": short_label(surf.label)}})
         # comp. number of elements on the lines & override by user values in case
         mesh_dict = comp_gmsh_mesh_dict(
             surface=surf, element_size=mesh_size_SB, user_mesh_dict=user_mesh_dict
@@ -362,13 +277,7 @@ def draw_GMSH(
 
         # Draw the surface
         draw_surf_line(
-            surf,
-            mesh_dict,
-            boundary_prop,
-            model,
-            gmsh_dict,
-            nSurf,
-            mesh_size_SB,
+            surf, mesh_dict, boundary_prop, model, gmsh_dict, nSurf, mesh_size_SB
         )
 
     if is_sliding_band and (not is_lam_only_R) and (not is_lam_only_S):
@@ -696,14 +605,7 @@ def draw_GMSH(
     # Default airbox mesh element size
     for surf in ab_list:
         nSurf += 1
-        gmsh_dict.update(
-            {
-                nSurf: {
-                    "tag": None,
-                    "label": short_label(surf.label),
-                }
-            }
-        )
+        gmsh_dict.update({nSurf: {"tag": None, "label": short_label(surf.label)}})
 
         # comp. number of elements on the lines & override by user values in case
         mesh_dict = comp_gmsh_mesh_dict(
@@ -712,13 +614,7 @@ def draw_GMSH(
 
         # Draw the surface
         draw_surf_line(
-            surf,
-            mesh_dict,
-            boundary_prop,
-            model,
-            gmsh_dict,
-            nSurf,
-            mesh_size_AB,
+            surf, mesh_dict, boundary_prop, model, gmsh_dict, nSurf, mesh_size_AB
         )
 
     for s_id, s_data in gmsh_dict.items():
