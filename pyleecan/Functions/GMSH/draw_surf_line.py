@@ -66,7 +66,7 @@ def draw_surf_line(
                 _add_line_to_dict(
                     gmodel=model,
                     line=arc,
-                    d=gmsh_dict,
+                    gmsh_dict=gmsh_dict,
                     idx=nsurf,
                     mesh_size=mesh_size,
                     n_elements=n_elem,
@@ -79,7 +79,7 @@ def draw_surf_line(
             _add_line_to_dict(
                 gmodel=model,
                 line=line,
-                d=gmsh_dict,
+                gmsh_dict=gmsh_dict,
                 idx=nsurf,
                 mesh_size=mesh_size,
                 n_elements=n_elem,
@@ -87,7 +87,9 @@ def draw_surf_line(
             )
 
 
-def _add_line_to_dict(gmodel, line, d={}, idx=0, mesh_size=1e-2, n_elements=0, bc=None):
+def _add_line_to_dict(
+    gmodel, line, gmsh_dict={}, idx=0, mesh_size=1e-2, n_elements=0, bc=None
+):
     """Draw a new line and add it to GMSH dictionary if it does not exist
 
     Parameters
@@ -154,29 +156,26 @@ def _add_line_to_dict(gmodel, line, d={}, idx=0, mesh_size=1e-2, n_elements=0, b
 
         # To avoid fill the dictionary with repeated lines
         repeated = False
-        for lvalues in d[idx].values():
-            if type(lvalues) is not dict:
-                continue
-            else:
-                if lvalues["tag"] == ltag:
-                    repeated = True
+        # for lvalues in gmsh_dict[idx].values():
+        #     if type(lvalues) is not dict:
+        #         continue
+        #     else:
+        #         if lvalues["tag"] == ltag:
+        #             repeated = True
 
         if not repeated:
-            nline = len(d[idx]) - 2
             arc_angle = cmath.phase(complex(ex, ey)) - cmath.phase(complex(bx, by))
-            d[idx].update(
+            gmsh_dict[idx]["lines"].append(
                 {
-                    nline: {
-                        "tag": ltag,
-                        "label": line_label,
-                        "n_elements": n_elements,
-                        "bc_name": bc,
-                        "begin": {"tag": btag, "coord": complex(bx, by)},
-                        "end": {"tag": etag, "coord": complex(ex, ey)},
-                        "cent": {"tag": ctag, "coord": complex(cx, cy)},
-                        "arc_angle": arc_angle,
-                        "line_angle": None,
-                    }
+                    "tag": ltag,
+                    "label": line_label,
+                    "n_elements": n_elements,
+                    "bc_name": bc,
+                    "begin": {"tag": btag, "coord": complex(bx, by)},
+                    "end": {"tag": etag, "coord": complex(ex, ey)},
+                    "cent": {"tag": ctag, "coord": complex(cx, cy)},
+                    "arc_angle": arc_angle,
+                    "line_angle": None,
                 }
             )
 
@@ -205,37 +204,34 @@ def _add_line_to_dict(gmodel, line, d={}, idx=0, mesh_size=1e-2, n_elements=0, b
 
         # To avoid fill the dictionary with repeated lines
         repeated = False
-        for lvalues in d[idx].values():
-            if type(lvalues) is not dict:
-                continue
-            else:
-                if lvalues["tag"] == ltag:
-                    repeated = True
+        # for lvalues in gmsh_dict[idx].values():
+        #     if type(lvalues) is not dict:
+        #         continue
+        #     else:
+        #         if lvalues["tag"] == ltag:
+        #             repeated = True
 
         if not repeated:
-            nline = len(d[idx]) - 2
             line_angle = 0.5 * (
                 cmath.phase(complex(ex, ey)) + cmath.phase(complex(bx, by))
             )
-            d[idx].update(
+            gmsh_dict[idx]["lines"].append(
                 {
-                    nline: {
-                        "tag": ltag,
-                        "label": line_label,
-                        "n_elements": n_elements,
-                        "bc_name": bc,
-                        "begin": {"tag": btag, "coord": complex(bx, by)},
-                        "end": {"tag": etag, "coord": complex(ex, ey)},
-                        "arc_angle": None,
-                        "line_angle": line_angle,
-                    }
+                    "tag": ltag,
+                    "label": line_label,
+                    "n_elements": n_elements,
+                    "bc_name": bc,
+                    "begin": {"tag": btag, "coord": complex(bx, by)},
+                    "end": {"tag": etag, "coord": complex(ex, ey)},
+                    "arc_angle": None,
+                    "line_angle": line_angle,
                 }
             )
 
     return None
 
 
-def _find_points_from_line(d={}, ltag=-1):
+def _find_points_from_line(gmsh_dict={}, ltag=-1):
     """Find points tag from existing lines
 
     Parameters
@@ -253,8 +249,8 @@ def _find_points_from_line(d={}, ltag=-1):
     btag = None
     etag = None
     ctag = None
-    for s_data in d.values():
-        for lvalues in s_data.values():
+    for surf in gmsh_dict.values():
+        for lvalues in surf.values():
             if type(lvalues) is not dict:
                 continue
             if lvalues["tag"] != ltag:

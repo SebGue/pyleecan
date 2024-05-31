@@ -2,7 +2,7 @@
 from numpy import exp, pi
 
 from ...Classes.Arc1 import Arc1
-from ...Classes.Arc2 import Arc2
+from ...Classes.SurfRing import SurfRing
 from ...Classes.Circle import Circle
 from ...Classes.Segment import Segment
 from ...Classes.SurfLine import SurfLine
@@ -33,7 +33,6 @@ def get_air_box(sym, machine):
         Outer surface (Air Box)
     """
     lam_list = machine.get_lam_list()
-    lam_int = lam_list[0]
     lam_ext = lam_list[1]
 
     R_ext = lam_ext.get_Ryoke()
@@ -41,58 +40,69 @@ def get_air_box(sym, machine):
 
     surf_list = list()
     if sym == 1:  # Complete machine
-        _get_ring_segment(R_ab, R_ext, 0, pi, surf_list, idx=1)
-        _get_ring_segment(R_ab, R_ext, pi, 2 * pi, surf_list, idx=2)
+
+        ext_cir = Circle(
+            center=0,
+            radius=R_ab,
+            label=NO_LAM_LAB + "_" + AIRBOX_LAB,
+            point_ref=(R_ab / 2) * exp(1j * pi / 2),
+            prop_dict={BOUNDARY_PROP_LAB: AIRBOX_R_LAB},
+        )
+
+        int_cir = Circle(
+            center=0,
+            radius=R_ext,
+            label=NO_LAM_LAB + "_" + AIRBOX_LAB,
+            point_ref=(R_ext / 2) * exp(1j * pi / 2),
+            prop_dict={BOUNDARY_PROP_LAB: AIRBOX_R_LAB},
+        )
+
+        surf_list.append(
+            SurfRing(
+                out_surf=ext_cir,
+                in_surf=int_cir,
+                label=NO_LAM_LAB + "_" + AIRBOX_LAB,
+                point_ref=(R_ab / 2) * exp(1j * pi / 2),
+            )
+        )
 
     else:  # Symmetry
         # Internal AirGap
-        _get_ring_segment(
-            R_ab,
-            R_ext,
-            0,
-            2 * pi / sym,
-            surf_list,
-            prop_R={BOUNDARY_PROP_LAB: AIRBOX_SR_LAB},
-            prop_L={BOUNDARY_PROP_LAB: AIRBOX_SL_LAB},
+        Z1 = R_ext
+        Z0 = Z1 * exp(1j * 2 * pi / sym)
+        Z2 = R_ab
+        Z3 = Z2 * exp(1j * 2 * pi / sym)
+        airbox_lines = list()
+        airbox_lines.append(
+            Segment(begin=Z1, end=Z2, prop_dict={BOUNDARY_PROP_LAB: AIRBOX_SR_LAB})
+        )
+        airbox_lines.append(
+            Arc1(
+                begin=Z2,
+                end=Z3,
+                radius=R_ab,
+                prop_dict={BOUNDARY_PROP_LAB: AIRBOX_R_LAB},
+                is_trigo_direction=True,
+            )
+        )
+        airbox_lines.append(
+            Segment(begin=Z3, end=Z0, prop_dict={BOUNDARY_PROP_LAB: AIRBOX_SL_LAB})
+        )
+        # airbox_lines.append(Arc2(begin=Z0, center=0.0, angle=-2 * pi / sym))
+        airbox_lines.append(
+            Arc1(
+                begin=Z0,
+                end=Z1,
+                radius=-R_ext,
+                is_trigo_direction=False,
+            )
+        )
+        surf_list.append(
+            SurfLine(
+                line_list=airbox_lines,
+                # point_ref=0.0 * Z2 * exp(1j * pi / sym),
+                label=NO_LAM_LAB + "_" + AIRBOX_LAB,
+            )
         )
 
     return surf_list
-
-
-def _get_ring_segment(
-    Rext, Rint, angle_start, angle_end, surf_list, prop_R=None, prop_L=None, idx=None
-):
-    """Get a ring surface."""
-    Z1 = Rint * exp(1j * angle_start)
-    Z0 = Rint * exp(1j * angle_end)
-    Z2 = Rext * exp(1j * angle_start)
-    Z3 = Rext * exp(1j * angle_end)
-    airbox_lines = list()
-    airbox_lines.append(Segment(begin=Z1, end=Z2, prop_dict=prop_R))
-    airbox_lines.append(
-        Arc1(
-            begin=Z2,
-            end=Z3,
-            radius=Rext,
-            prop_dict={BOUNDARY_PROP_LAB: AIRBOX_R_LAB},
-            is_trigo_direction=True,
-        )
-    )
-    airbox_lines.append(Segment(begin=Z3, end=Z0, prop_dict=prop_L))
-    # airbox_lines.append(Arc2(begin=Z0, center=0.0, angle=-2 * pi / sym))
-    airbox_lines.append(
-        Arc1(
-            begin=Z0,
-            end=Z1,
-            radius=-Rint,
-            is_trigo_direction=False,
-        )
-    )
-    lab_idx = "" if idx is None else "Pt" + str(idx)
-    surf_list.append(
-        SurfLine(
-            line_list=airbox_lines,
-            # point_ref=0.0 * Z2 * exp(1j * pi / sym),
-            label=NO_LAM_LAB + "_" + AIRBOX_LAB + lab_idx,
-        )
-    )
