@@ -71,7 +71,7 @@ def test_gmsh_ipm():
         user_mesh_dict=mesh_dict,
         is_sliding_band=True,
         is_airbox=True,
-        path_save=join(save_path, "GSMH_model_ipm.msh"),
+        path_save=join(save_path, "test_gmsh_ipm.msh"),
     )
 
     with open(join(save_path, "test_gmsh_ipm.json"), "w") as fw:
