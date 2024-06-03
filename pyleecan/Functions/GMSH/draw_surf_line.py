@@ -46,39 +46,27 @@ def draw_surf_line(
         bc_name = get_boundary_condition(line, boundary_prop)
         # Gmsh built-in engine does not allow arcs larger than 180deg
         # so arcs are split into two
+        # TODO check now that we use OCC kernal
         if isinstance(line, Arc) and abs(line.get_angle() * 180.0 / pi) >= 180.0:
             rot_dir = 1 if line.is_trigo_direction == True else -1
-            arc1 = Arc1(
-                begin=line.get_begin(),
-                end=line.get_middle(),
+            kwargs = dict(
                 radius=rot_dir * line.comp_radius(),
                 prop_dict=line.prop_dict,
                 is_trigo_direction=line.is_trigo_direction,
             )
-            arc2 = Arc1(
-                begin=line.get_middle(),
-                end=line.get_end(),
-                radius=rot_dir * line.comp_radius(),
-                prop_dict=line.prop_dict,
-                is_trigo_direction=line.is_trigo_direction,
-            )
-            for arc in [arc1, arc2]:
-                _add_line_to_dict(
-                    gmodel=model,
-                    line=arc,
-                    gmsh_dict=gmsh_dict,
-                    idx=nsurf,
-                    mesh_size=mesh_size,
-                    n_elements=n_elem,
-                    bc=bc_name,
-                )
+            arc1 = Arc1(begin=line.get_begin(), end=line.get_middle(), **kwargs)
+            arc2 = Arc1(begin=line.get_middle(), end=line.get_end(), **kwargs)
+            lines = [arc1, arc2]
         elif isinstance(line, Arc) and (abs(line.get_angle() * 180.0 / pi) <= tol):
-            # Don't draw anything, this is a circle and usually is repeated ?
-            pass
+            # Don't draw anything, this is a circle and usually is repeated ? TODO check
+            lines = []
         else:
+            lines = [line]
+
+        for _line in lines:
             _add_line_to_dict(
                 gmodel=model,
-                line=line,
+                line=_line,
                 gmsh_dict=gmsh_dict,
                 idx=nsurf,
                 mesh_size=mesh_size,
@@ -114,7 +102,6 @@ def _add_line_to_dict(
     None
     """
 
-    dlines = list()
     ltag = None
     bz = line.get_begin()
     ez = line.get_end()
@@ -132,101 +119,43 @@ def _add_line_to_dict(
         cz = line.get_center()
         cx, cy = cz.real, cz.imag
         ctag = gmodel.occ.addPoint(cx, cy, 0, meshSize=mesh_size, tag=-1)
-        if len(dlines) > 0:
-            for iline in dlines:
-                p = _find_points_from_line(d, iline)
-                if p[0] == btag and p[1] == etag and p[2] == ctag:
-                    ltag = iline
-                    break
-                elif p[0] == etag and p[1] == btag and p[2] == ctag:
-                    ltag = -iline
-                    break
-                else:
-                    pass
-            if ltag is None:
-                ltag = gmodel.occ.addCircleArc(btag, ctag, etag, tag=-1)
-                if n_elements > 0:
-                    gmodel.occ.synchronize()
-                    gmodel.mesh.setTransfiniteCurve(ltag, n_elements + 1, "Progression")
-        else:
-            ltag = gmodel.occ.addCircleArc(btag, ctag, etag, tag=-1)
-            if n_elements > 0:
-                gmodel.occ.synchronize()
-                gmodel.mesh.setTransfiniteCurve(ltag, n_elements + 1, "Progression")
+        ltag = gmodel.occ.addCircleArc(btag, ctag, etag, tag=-1)
+        if n_elements > 0:
+            gmodel.occ.synchronize()
+            gmodel.mesh.setTransfiniteCurve(ltag, n_elements + 1, "Progression")
 
-        # To avoid fill the dictionary with repeated lines
-        repeated = False
-        # for lvalues in gmsh_dict[idx].values():
-        #     if type(lvalues) is not dict:
-        #         continue
-        #     else:
-        #         if lvalues["tag"] == ltag:
-        #             repeated = True
-
-        if not repeated:
-            arc_angle = cmath.phase(complex(ex, ey)) - cmath.phase(complex(bx, by))
-            gmsh_dict[idx]["lines"].append(
-                {
-                    "tag": ltag,
-                    "label": line_label,
-                    "n_elements": n_elements,
-                    "bc_name": bc,
-                    "begin": {"tag": btag, "coord": complex(bx, by)},
-                    "end": {"tag": etag, "coord": complex(ex, ey)},
-                    "cent": {"tag": ctag, "coord": complex(cx, cy)},
-                    "arc_angle": arc_angle,
-                    "line_angle": None,
-                }
-            )
+        typ = "Circle"  # in terms of GMSH naming scheme
+        arc_angle = cmath.phase(complex(ex, ey)) - cmath.phase(complex(bx, by))
+        line_angle = None
 
     else:
-        if len(dlines) > 0:
-            for iline in dlines:
-                p = _find_points_from_line(d, iline)
-                if p[0] == btag and p[1] == etag:
-                    ltag = iline
-                    break
-                elif p[0] == etag and p[1] == btag:
-                    ltag = -iline
-                    break
-                else:
-                    pass
-            if ltag is None:
-                ltag = gmodel.occ.addLine(btag, etag, tag=-1)
-                if n_elements > 0:
-                    gmodel.occ.synchronize()
-                    gmodel.mesh.setTransfiniteCurve(ltag, n_elements + 1, "Progression")
-        else:
-            ltag = gmodel.occ.addLine(btag, etag, tag=-1)
-            if n_elements > 0:
-                gmodel.occ.synchronize()
-                gmodel.mesh.setTransfiniteCurve(ltag, n_elements + 1, "Progression")
+        ltag = gmodel.occ.addLine(btag, etag, tag=-1)
+        if n_elements > 0:
+            gmodel.occ.synchronize()
+            gmodel.mesh.setTransfiniteCurve(ltag, n_elements + 1, "Progression")
 
-        # To avoid fill the dictionary with repeated lines
-        repeated = False
-        # for lvalues in gmsh_dict[idx].values():
-        #     if type(lvalues) is not dict:
-        #         continue
-        #     else:
-        #         if lvalues["tag"] == ltag:
-        #             repeated = True
+        typ = "Line"
+        ctag = None
+        arc_angle = None
+        line_angle = 0.5 * (cmath.phase(complex(ex, ey)) + cmath.phase(complex(bx, by)))
 
-        if not repeated:
-            line_angle = 0.5 * (
-                cmath.phase(complex(ex, ey)) + cmath.phase(complex(bx, by))
-            )
-            gmsh_dict[idx]["lines"].append(
-                {
-                    "tag": ltag,
-                    "label": line_label,
-                    "n_elements": n_elements,
-                    "bc_name": bc,
-                    "begin": {"tag": btag, "coord": complex(bx, by)},
-                    "end": {"tag": etag, "coord": complex(ex, ey)},
-                    "arc_angle": None,
-                    "line_angle": line_angle,
-                }
-            )
+    COM = gmodel.occ.getCenterOfMass(1, ltag)
+
+    line_dict = {
+        "tag": ltag,
+        "label": line_label,
+        "n_elements": n_elements,
+        "bc_name": bc,
+        "begin": {"tag": btag, "coord": (bx, by, 0)},
+        "end": {"tag": etag, "coord": (ex, ey, 0)},
+        "cent": {"tag": ctag, "coord": (cx, cy, 0)} if ctag else None,
+        "arc_angle": arc_angle,
+        "line_angle": line_angle,
+        "COM": COM,
+        "typ": typ,
+    }
+
+    gmsh_dict[idx]["lines"].append(line_dict)
 
     return None
 
