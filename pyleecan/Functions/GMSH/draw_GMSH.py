@@ -30,7 +30,7 @@ import gmsh
 from os import replace
 from os.path import splitext
 
-from numpy import pi
+from numpy import pi, angle
 
 from ...Functions.get_logger import get_logger
 
@@ -152,12 +152,6 @@ def draw_GMSH(
 
         factory.synchronize()
 
-        # finally add physical groups TODO maybe only after cutting
-        for surf in gmsh_dict.values():
-            model.addPhysicalGroup(2, [surf["tag"]], name=surf["label"])
-
-        factory.synchronize()
-
     # store rotor dict
     rotor_dict = gmsh_dict.copy()
 
@@ -189,12 +183,6 @@ def draw_GMSH(
         surf["tag"] = model.occ.cut(
             [(2, surf["tag"])], tools, removeObject=True, removeTool=False
         )[0][0][1]
-
-        factory.synchronize()
-
-        # finally add physical groups TODO maybe only after cutting
-        for surf in gmsh_dict.values():
-            model.addPhysicalGroup(2, [surf["tag"]], name=surf["label"])
 
         factory.synchronize()
 
@@ -238,13 +226,7 @@ def draw_GMSH(
 
         factory.synchronize()
 
-        # finally add physical groups TODO maybe only after cutting
-        for surf in gmsh_dict.values():
-            model.addPhysicalGroup(2, [surf["tag"]], name=surf["label"])
-
-        factory.synchronize()
-
-        # append air gap and sliding band to stator and rotor
+        # append air gap and sliding band to respective dict
         for idx, surf in gmsh_dict.items():
             if ROTOR_LAB_S in surf["label"]:
                 rotor_dict.update({idx: gmsh_dict[idx]})
@@ -268,150 +250,31 @@ def draw_GMSH(
         for surf in gmsh_dict.values():
             _draw_surf(factory, surf)
 
-        # finally add physical groups TODO maybe only after cutting
-        for surf in gmsh_dict.values():
-            model.addPhysicalGroup(2, [surf["tag"]], name=surf["label"])
+    stator_dict.update(gmsh_dict)
 
-        factory.synchronize()
-
-        stator_dict.update(gmsh_dict)
-
-
+    ######################
+    ### Finalize Model ###
+    ######################
     gmsh_dict = {}
-    gmsh_dict.update(stator_dict)
     gmsh_dict.update(rotor_dict)
+    gmsh_dict.update(stator_dict)
 
-    # if is_sliding_band and (not is_lam_only_R) and (not is_lam_only_S):
-    #     if sym == 1:
-    #
-    #     else:
-    #
-    #         # Look at the lines in the resulting surface, then update the dictionary
-    #         # with MASTER/SLAVE BC when line angles match symmetry angles
-    #         # MASTER is x-axis and SLAVE is 2Pi/sym
-    #         rotor_ag_after = model.getEntitiesForPhysicalGroup(2, pg)
-    #         rotor_ag_new_lines = model.getBoundary([(2, rotor_ag_after)])
-    #         nline = 0
-    #         for type_entity_l, rotor_ag_line in rotor_ag_new_lines:
-    #             rotor_ag_new_points = model.getBoundary(
-    #                 [(type_entity_l, abs(rotor_ag_line))]
-    #             )
-    #             btag = rotor_ag_new_points[0][1]
-    #             etag = rotor_ag_new_points[1][1]
-    #             bxy = model.getValue(0, btag, [])
-    #             exy = model.getValue(0, etag, [])
-    #             exy_angle = cmath.phase(complex(exy[0], exy[1]))
-    #             bxy_angle = cmath.phase(complex(bxy[0], bxy[1]))
-    #             if exy_angle == bxy_angle and abs(exy_angle) < 1e-6:
-    #                 b_name = boundary_prop[AS_BR_LAB]
-    #                 l_name = AS_BR_LAB
-    #             elif (exy_angle == bxy_angle) and (
-    #                 abs(abs(exy_angle) - 2.0 * pi / sym) < 1e-6
-    #             ):
-    #                 b_name = boundary_prop[AS_BL_LAB]
-    #                 l_name = AS_BL_LAB
-    #             else:
-    #                 b_name = None
-    #                 l_name = None
-    #             gmsh_dict[rotor_ag_before[1]].update(
-    #                 {
-    #                     "tag": rotor_ag_after[0],
-    #                     "label": lab_int + "_" + AIRGAP_LAB + BOT_LAB,
-    #                     nline: {
-    #                         "tag": abs(rotor_ag_line),
-    #                         "label": l_name,
-    #                         "n_elements": None,
-    #                         "bc_name": b_name,
-    #                         "begin": {
-    #                             "tag": btag,
-    #                             "coord": complex(bxy[0], bxy[1]),
-    #                         },
-    #                         "end": {"tag": etag, "coord": complex(exy[0], exy[1])},
-    #                         "arc_angle": None,
-    #                         "line_angle": None,
-    #                     },
-    #                 }
-    #             )
-    #             nline = nline + 1
-
-    #         name = lab_ext + "_" + AIRGAP_LAB + TOP_LAB
-    #         if len(cut2[0]) > 1:
-    #             # Remove extra surfaces
-    #             model.occ.remove([cut2[0][0]])
-    #             factory.synchronize()
-    #             pg = model.addPhysicalGroup(2, [cut2[0][1][1]], name=name)
-    #         else:
-    #             factory.synchronize()
-    #             pg = model.addPhysicalGroup(2, [cut2[0][0][1]], name=name)
-
-    #         # Look at the lines in the resulting surface, then update the dictionary
-    #         # with MASTER/SLAVE BC when line angles match symmetry angles
-    #         # MASTER is x-axis and SLAVE is 2Pi/sym
-    #         stator_ag_after = model.getEntitiesForPhysicalGroup(2, pg)
-    #         stator_ag_new_lines = model.getBoundary([(2, stator_ag_after)])
-    #         nline = 0
-    #         for type_entity_l, stator_ag_line in stator_ag_new_lines:
-    #             stator_ag_new_points = model.getBoundary(
-    #                 [(type_entity_l, abs(stator_ag_line))]
-    #             )
-    #             btag = stator_ag_new_points[0][1]
-    #             etag = stator_ag_new_points[1][1]
-    #             bxy = model.getValue(0, btag, [])
-    #             exy = model.getValue(0, etag, [])
-    #             exy_angle = cmath.phase(complex(exy[0], exy[1]))
-    #             bxy_angle = cmath.phase(complex(bxy[0], bxy[1]))
-    #             if exy_angle == bxy_angle and abs(exy_angle) < 1e-6:
-    #                 b_name = boundary_prop[AS_TR_LAB]
-    #                 l_name = AS_TR_LAB
-    #             elif (exy_angle == bxy_angle) and (
-    #                 abs(abs(exy_angle) - 2.0 * pi / sym) < 1e-6
-    #             ):
-    #                 b_name = boundary_prop[AS_TL_LAB]
-    #                 l_name = AS_TL_LAB
-    #             else:
-    #                 b_name = None
-    #                 l_name = None
-    #             gmsh_dict[stator_ag_before[1]].update(
-    #                 {
-    #                     "tag": stator_ag_after[0],
-    #                     "label": lab_ext + "_" + AIRGAP_LAB + TOP_LAB,
-    #                     nline: {
-    #                         "tag": abs(stator_ag_line),
-    #                         "label": l_name,
-    #                         "n_elements": None,
-    #                         "bc_name": b_name,
-    #                         "begin": {
-    #                             "tag": btag,
-    #                             "coord": complex(bxy[0], bxy[1]),
-    #                         },
-    #                         "end": {"tag": etag, "coord": complex(exy[0], exy[1])},
-    #                         "arc_angle": None,
-    #                         "line_angle": None,
-    #                     },
-    #                 }
-    #             )
-    #             nline = nline + 1
-
-    # update line tags
+    # finally add physical groups
     for surf in gmsh_dict.values():
-        lines = []
-        dimTags = model.getBoundary([(2, surf['tag'])])
-        for dimTag in dimTags:
-            typ = model.getType(dimTag[0], dimTag[1])
-            bnd = model.getBoundary([dimTag])
-            coord = [model.getValue(0, dTag[1], []) for dTag in bnd]
-            lines.append(dict(tag=dimTag[1], typ=typ, coord=coord))
+        model.addPhysicalGroup(2, [surf["tag"]], name=surf["label"])
 
-        for line in surf['lines']:
-            print()
+    factory.synchronize()
 
+    # while cutting surfaces, GMSH may have altered line tags
+    # so we need to update our gmsh_dict
+    _update_lines(output, model, gmsh_dict)
 
     # Set boundary conditions in gmsh lines
     boundary_list = list(set(boundary_prop.values()))
     for propname in boundary_list:
         bc_id = []
         for surf in gmsh_dict.values():
-            for line in surf['lines']:
+            for line in surf["lines"]:
                 if line["bc_name"] == propname:
                     bc_id.extend([abs(line["tag"])])
         if bc_id:
@@ -420,7 +283,6 @@ def draw_GMSH(
 
         print(propname)
         print(bc_id)
-            
 
     # Set all line labels as physical groups
     if is_set_labels:
@@ -474,6 +336,7 @@ def _draw_lines(model, surf, gmsh_dict, nSurf, bnd_prop, mesh_size, user_mesh):
         surface=surf, element_size=mesh_size, user_mesh_dict=user_mesh
     )
 
+    # if surface is a SurfRing, first draw inner lines as a cutting tool
     if isinstance(surf, SurfRing):
         tool = surf.in_surf
         tool_dict = {0: {"tag": None, "label": None, "refSurfId": nSurf, "lines": []}}
@@ -510,3 +373,115 @@ def _draw_surf(factory, surf):
         factory.synchronize()
 
     return None
+
+
+def _update_lines(output, model, gmsh_dict, tolerance=1e-9):
+    """Update line tags in gmsh_dict if possible."""
+    for surf in gmsh_dict.values():
+
+        # get the list of lines for the surface
+        new_lines = _get_surf_line_list(model, surf)
+        old_lines = surf["lines"]
+
+        # check the original list of lines if there is a corresponding line
+        # in the new line list of the GMSH model
+        for old_line in old_lines:
+            # readability
+            p1_old = old_line["begin"]["coord"]
+            p2_old = old_line["end"]["coord"]
+            com_old = old_line["COM"]  # center of mass
+            typ_old = old_line["typ"]
+
+            update_count = 0
+            for new_line in new_lines:
+                # skip if the new line was already used for an update
+                if "skip" in new_line:
+                    continue
+
+                # readability
+                p1_new = new_line["coord"][0]
+                p2_new = new_line["coord"][1]
+                com_new = new_line["COM"]  # center of mass
+                typ_new = new_line["typ"]
+
+                # some conditions to identify matching lines
+                condcc = _norm(com_old, com_new) <= tolerance
+                cond11 = _norm(p1_old, p1_new) <= tolerance
+                cond22 = _norm(p2_old, p2_new) <= tolerance
+                cond21 = _norm(p2_old, p1_new) <= tolerance
+                cond12 = _norm(p1_old, p2_new) <= tolerance
+                condtyp = typ_old == typ_new
+
+                if condcc and ((cond11 and cond22) or (cond12 and cond21)):
+                    # lines seem to match perfectly so update tag
+                    # ... but we don't care for sign
+                    old_line["tag"] = new_line["tag"]
+                    new_line["skip"] = True  # TODO is it valid to skip?
+                    update_count += 1
+
+                elif (cond11 or cond12 or cond21 or cond22) and condtyp:
+                    # at least one point of line match, do further checks
+                    if typ_new == "Line":
+                        # ckeck if new line is on old line
+                        if _is_line_inside(p1_new, p2_new, p1_old, p2_old):
+                            print()
+
+                    print()
+
+            if update_count == 0 and old_line["bc_name"]:
+                output.get_logger().warning(
+                    "draw_gmsh warning: _update_line_tags() "
+                    + "found no line to update tag - "
+                    + f"old line tag: {old_line['tag']} - surface: {surf['label']}"
+                )
+
+
+def _norm(p1, p2):
+    """Calculate the norm of 3 points in n dimensions."""
+    sqr = [(x1 - x2) ** 2 for x1, x2 in zip(p1, p2)]
+    return sum(sqr) ** 1 / 2
+
+
+def _get_surf_line_list(model, surf):
+    # get the list of lines for the surface
+    lines = []
+    dimTags = model.getBoundary([(2, surf["tag"])])
+    for dimTag in dimTags:
+        dimTag = [dimTag[0], abs(dimTag[1])]
+        typ = model.getType(dimTag[0], dimTag[1])
+        bnd = model.getBoundary([dimTag])
+        coord = [model.getValue(0, dTag[1], []) for dTag in bnd]
+        COM = model.occ.getCenterOfMass(*dimTag)
+        lines_dict = dict(tag=dimTag[1], typ=typ, coord=coord, COM=COM)
+        lines.append(lines_dict)
+
+    return lines
+
+
+def _is_on_line(p1, p2, q2):
+    """Check if point q lies on line segment 'pr'"""
+    if (
+        p1[0] <= max(p2[0], q2[0])
+        and p1[0] >= min(p2[0], q2[0])
+        and p1[1] <= max(p2[1], q2[1])
+        and p1[1] >= min(p2[1], q2[1])
+    ):
+        return True
+    return False
+
+
+def _is_collinear(p0, p1, p2, tolerance=1e-9):
+    x1, y1 = p1[0] - p0[0], p1[1] - p0[1]
+    x2, y2 = p2[0] - p0[0], p2[1] - p0[1]
+    cond = abs(x1 * y2 - x2 * y1) < tolerance
+    return cond
+
+
+def _is_line_inside(p1, q1, p2, q2):
+    """Return True if points p2 and q2 are completely inside 'p1q1'"""
+    # Check if p2 and q2 are collinear with p1q1 and lie on segment p1q1
+    if _is_collinear(p1, q1, p2) == 0 and _is_collinear(p1, q1, q2) == 0:
+        if _is_on_line(p2, p1, q1) and _is_on_line(q2, p1, q1):
+            return True
+
+    return False
