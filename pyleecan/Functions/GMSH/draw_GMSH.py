@@ -276,7 +276,11 @@ def draw_GMSH(
 
         stator_dict.update(gmsh_dict)
 
-    print()
+
+    gmsh_dict = {}
+    gmsh_dict.update(stator_dict)
+    gmsh_dict.update(rotor_dict)
+
     # if is_sliding_band and (not is_lam_only_R) and (not is_lam_only_S):
     #     if sym == 1:
     #
@@ -388,23 +392,41 @@ def draw_GMSH(
     #             )
     #             nline = nline + 1
 
+    # update line tags
+    for surf in gmsh_dict.values():
+        lines = []
+        dimTags = model.getBoundary([(2, surf['tag'])])
+        for dimTag in dimTags:
+            typ = model.getType(dimTag[0], dimTag[1])
+            bnd = model.getBoundary([dimTag])
+            coord = [model.getValue(0, dTag[1], []) for dTag in bnd]
+            lines.append(dict(tag=dimTag[1], typ=typ, coord=coord))
+
+        for line in surf['lines']:
+            print()
+
+
     # Set boundary conditions in gmsh lines
     boundary_list = list(set(boundary_prop.values()))
     for propname in boundary_list:
         bc_id = []
-        for s_data in gmsh_dict.values():
-            for lvalues in s_data.values():
-                if isinstance(lvalues, dict) and lvalues["bc_name"] == propname:
-                    bc_id.extend([abs(lvalues["tag"])])
+        for surf in gmsh_dict.values():
+            for line in surf['lines']:
+                if line["bc_name"] == propname:
+                    bc_id.extend([abs(line["tag"])])
         if bc_id:
-            factory.synchronize()
             model.addPhysicalGroup(1, bc_id, name=propname)
+            factory.synchronize()
+
+        print(propname)
+        print(bc_id)
+            
 
     # Set all line labels as physical groups
     if is_set_labels:
         groups = {}
-        for s_data in gmsh_dict.values():
-            for lvalues in s_data.values():
+        for surf in gmsh_dict.values():
+            for lvalues in surf.values():
                 if (
                     type(lvalues) is not dict
                     or "label" not in lvalues
