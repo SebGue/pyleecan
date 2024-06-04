@@ -378,31 +378,35 @@ def _draw_surf(factory, surf):
 def _update_lines(output, model, gmsh_dict, tolerance=1e-9):
     """Update line tags in gmsh_dict if possible."""
     for surf in gmsh_dict.values():
+        # prepare list to store actual line tags and bcs
+        surf["new_lines"] = []
 
         # get the list of lines for the surface
         new_lines = _get_surf_line_list(model, surf)
         old_lines = surf["lines"]
+        if "cut" in surf:
+            for tool in surf["cut"].values():
+                old_lines.extend(tool["lines"])
 
-        # check the original list of lines if there is a corresponding line
-        # in the new line list of the GMSH model
-        for old_line in old_lines:
+        # loop all new lines to get original bc
+        for new_line in new_lines:
             # readability
-            p1_old = old_line["begin"]["coord"]
-            p2_old = old_line["end"]["coord"]
-            com_old = old_line["COM"]  # center of mass
-            typ_old = old_line["typ"]
+            p1_new = new_line["coord"][0]
+            p2_new = new_line["coord"][1]
+            com_new = new_line["COM"]  # center of mass
+            typ_new = new_line["typ"]
 
-            update_count = 0
-            for new_line in new_lines:
-                # skip if the new line was already used for an update
-                if "skip" in new_line:
+            updated = False
+            for old_line in old_lines:
+                # skip if line has been found already
+                if updated:
                     continue
 
                 # readability
-                p1_new = new_line["coord"][0]
-                p2_new = new_line["coord"][1]
-                com_new = new_line["COM"]  # center of mass
-                typ_new = new_line["typ"]
+                p1_old = old_line["begin"]["coord"]
+                p2_old = old_line["end"]["coord"]
+                com_old = old_line["COM"]  # center of mass
+                typ_old = old_line["typ"]
 
                 # some conditions to identify matching lines
                 condcc = _norm(com_old, com_new) <= tolerance
@@ -414,26 +418,46 @@ def _update_lines(output, model, gmsh_dict, tolerance=1e-9):
 
                 if condcc and ((cond11 and cond22) or (cond12 and cond21)):
                     # lines seem to match perfectly so update tag
-                    # ... but we don't care for sign
-                    old_line["tag"] = new_line["tag"]
-                    new_line["skip"] = True  # TODO is it valid to skip?
-                    update_count += 1
+                    updated = True
 
-                elif (cond11 or cond12 or cond21 or cond22) and condtyp:
+                elif condtyp:
                     # at least one point of line match, do further checks
                     if typ_new == "Line":
                         # ckeck if new line is on old line
-                        if _is_line_inside(p1_new, p2_new, p1_old, p2_old):
-                            print()
+                        cond1 = _is_collinear(p1_old, p2_old, p1_new)
+                        cond2 = _is_collinear(p1_old, p2_old, p2_new)
+                        if cond1:
+                            if cond2:
+                                cond3 = _is_on_line(p1_new, p1_old, p2_old)
+                                cond4 = _is_on_line(p2_new, p1_old, p2_old)
+                                if cond3 and cond4:
+                                    updated = True
+                    elif typ_new == "Circle":
+                        pass
 
-                    print()
+                if updated:
+                    surf["new_lines"].append(
+                        dict(
+                            tag=new_line["tag"],
+                            bc_name=old_line["bc_name"],
+                            typ=new_line["typ"],
+                        )
+                    )
 
-            if update_count == 0 and old_line["bc_name"]:
+            if not updated:
+                surf["new_lines"].append(
+                    dict(
+                        tag=new_line["tag"],
+                        bc_name=None,
+                        typ=new_line["typ"],
+                    )
+                )
                 output.get_logger().warning(
                     "draw_gmsh warning: _update_line_tags() "
-                    + "found no line to update tag - "
-                    + f"old line tag: {old_line['tag']} - surface: {surf['label']}"
+                    + "found no corresponding line"
+                    + f" for {new_line['typ']} {new_line['tag']} in surface '{surf['label']}'."
                 )
+        pass
 
 
 def _norm(p1, p2):
@@ -459,7 +483,7 @@ def _get_surf_line_list(model, surf):
 
 
 def _is_on_line(p1, p2, q2):
-    """Check if point q lies on line segment 'pr'"""
+    """Check if point p1 lies on line segment 'p2q2'"""
     if (
         p1[0] <= max(p2[0], q2[0])
         and p1[0] >= min(p2[0], q2[0])
@@ -475,13 +499,3 @@ def _is_collinear(p0, p1, p2, tolerance=1e-9):
     x2, y2 = p2[0] - p0[0], p2[1] - p0[1]
     cond = abs(x1 * y2 - x2 * y1) < tolerance
     return cond
-
-
-def _is_line_inside(p1, q1, p2, q2):
-    """Return True if points p2 and q2 are completely inside 'p1q1'"""
-    # Check if p2 and q2 are collinear with p1q1 and lie on segment p1q1
-    if _is_collinear(p1, q1, p2) == 0 and _is_collinear(p1, q1, q2) == 0:
-        if _is_on_line(p2, p1, q1) and _is_on_line(q2, p1, q1):
-            return True
-
-    return False
