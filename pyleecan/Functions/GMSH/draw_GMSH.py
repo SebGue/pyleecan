@@ -4,6 +4,9 @@ from ...Functions.labels import (
     ROTOR_LAB_S,
     STATOR_LAB_S,
     AIRGAP_LAB,
+    LAM_LAB,
+    STATOR_LAB,
+    YOKE_LAB,
 )
 from ...Functions.GMSH import InputError
 from ...Classes.SurfRing import SurfRing
@@ -91,6 +94,7 @@ def draw_GMSH(
     gmsh.option.setNumber("Geometry.LineNumbers", 0)
     gmsh.option.setNumber("Mesh.CharacteristicLengthMin", min(mesh_size_S, mesh_size_R))
     gmsh.option.setNumber("Mesh.CharacteristicLengthMax", max(mesh_size_S, mesh_size_R))
+    gmsh.option.setNumber("Mesh.MeshSizeFactor", 3)
     model.add("Pyleecan")
 
     alpha = 0
@@ -138,6 +142,10 @@ def draw_GMSH(
     #####################
     gmsh_dict = {}  # init new dict for stator
 
+    # remove VP0 BC if air box is used
+    if is_airbox and (not is_lam_only_R) and (not is_lam_only_S):
+        boundary_prop.pop(STATOR_LAB + "-0_" + LAM_LAB + YOKE_LAB)
+
     # nSurf = 0
     if not is_lam_only_R:
         stator_list = list()
@@ -170,6 +178,8 @@ def draw_GMSH(
     # Adding Sliding Band
     #####################
     gmsh_dict = {}
+    rotor_air_dict = {}
+    stator_air_dict = {}
 
     if is_sliding_band and (not is_lam_only_R) and (not is_lam_only_S):
         sb_list = get_sliding_band(sym=sym, machine=machine)
@@ -205,8 +215,6 @@ def draw_GMSH(
         factory.synchronize()
 
         # store air gap and sliding band to respective dict
-        rotor_air_dict = {}
-        stator_air_dict = {}
         for idx, surf in gmsh_dict.items():
             if ROTOR_LAB_S in surf["label"]:
                 rotor_air_dict.update({idx: gmsh_dict[idx]})
@@ -231,8 +239,6 @@ def draw_GMSH(
             _draw_surf(factory, surf)
 
     airbox_dict = gmsh_dict.copy()
-
-    # TODO test 'is_airbox = False' -> VP0
 
     ######################
     ### Finalize Model ###
@@ -470,7 +476,7 @@ def _get_updated_lines(output, line, new_lines, tolerance=1e-9):
 
     if not updated:
         output.get_logger().warning(
-            "draw_gmsh warning: "
+            "draw_gmsh() - Warning: "
             + "Found no corresponding line"
             + f" for {line['typ']} {line['tag']} with BC '{line['bc_name']}''."
         )
@@ -482,6 +488,7 @@ def _set_element_size(output, model, factory, gmsh_dict):
     """Try to set element sizes of each surface line."""
     # get all (orginal) lines and all new lines (without duplicates)
     # still line tags are not up to date due to cutting surfaces
+    size_dict = {}
     for surf in gmsh_dict.values():
         # set size seperately on each surface to avoid conflicts
         line_list = surf["lines"]
@@ -506,16 +513,21 @@ def _set_element_size(output, model, factory, gmsh_dict):
                     tag = line_new["tag"]
                     len_new = _norm(line_new["coord"][0], line_new["coord"][1])
                     n_elem_new = int(max(round(n_elem / len_old * len_new), 1))
-                    model.mesh.setTransfiniteCurve(tag, n_elem_new + 1, "Progression")
+                    if tag not in size_dict or size_dict[tag] < n_elem_new:
+                        model.mesh.setTransfiniteCurve(
+                            tag, n_elem_new + 1, "Progression"
+                        )
+                        size_dict[tag] = n_elem_new
                     factory.synchronize()
-                    print(
-                        f"Surface '{surf['label']}' Line {tag} set TransfiniteCurve {n_elem_new} "
-                    )
+                    # print(
+                    #     f"Surface '{surf['label']}' Line {tag} set TransfiniteCurve {n_elem_new} "
+                    # )
             else:
                 for line_new in lines:
-                    model.mesh.setTransfiniteCurve(
-                        line_new["tag"], n_elem + 1, "Progression"
-                    )
+                    tag = line_new["tag"]
+                    if tag not in size_dict or size_dict[tag] < n_elem:
+                        model.mesh.setTransfiniteCurve(tag, n_elem + 1, "Progression")
+                        size_dict[tag] = n_elem
                     factory.synchronize()
 
 

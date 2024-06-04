@@ -21,6 +21,8 @@ from ....Functions.labels import (
     AIRBOX_SL_LAB,
     AIRBOX_SR_LAB,
     AIRBOX_R_LAB,
+    LAM_LAB,
+    YOKE_LAB,
 )
 
 R_LAB = ROTOR_LAB + "-0_"
@@ -54,3 +56,5 @@ MagElmer_BP_dict[SBR_T_LAB] = "SB_STATOR_BOUNDARY"
 MagElmer_BP_dict[AIRBOX_SR_LAB] = "MASTER_STATOR_BOUNDARY"
 MagElmer_BP_dict[AIRBOX_SL_LAB] = "SLAVE_STATOR_BOUNDARY"
 MagElmer_BP_dict[AIRBOX_R_LAB] = "VP0_BOUNDARY"
+
+MagElmer_BP_dict[S_LAB+LAM_LAB+YOKE_LAB] = "VP0_BOUNDARY"

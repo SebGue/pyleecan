@@ -1,6 +1,6 @@
 from math import ceil, sqrt
 from ...Functions.labels import BOUNDARY_PROP_LAB
-from ...Functions.labels import short_label
+from ...Functions.labels import short_label, decode_label
 
 
 def comp_gmsh_mesh_dict(surface, element_size, user_mesh_dict={}):
@@ -26,33 +26,23 @@ def comp_gmsh_mesh_dict(surface, element_size, user_mesh_dict={}):
     """
 
     mesh_dict = dict()
-    label = short_label(surface.label)
-    # TODO: Airgap surfaces are special cases due to the boolean operations
-    if "Airgap" in label:
-        return mesh_dict
-
     lines = surface.get_lines()
-    if label in user_mesh_dict:
-        elements_in_surface = user_mesh_dict[label]
-        area = surface.comp_surface()
-        element_size = area / elements_in_surface
-        # Assumption: equilateral triangle
-        side_size = sqrt(element_size * 4.0 / 1.73)
-    else:
-        side_size = element_size
 
+    # get element size
+    if surface.label in user_mesh_dict:
+        element_size = user_mesh_dict[surface.label]
+
+    # compute number of elements for all lines based on element size
     for ii, line in enumerate(lines):
-        label = str(ii)
-        # Overwrite number of elements given by boundary name in user_mesh_dict
-        if (
-            line.prop_dict
-            and BOUNDARY_PROP_LAB in line.prop_dict
-            and line.prop_dict[BOUNDARY_PROP_LAB] in user_mesh_dict
-        ):
-            mesh_dict[label] = user_mesh_dict[line.prop_dict[BOUNDARY_PROP_LAB]]
-        else:
-            length = line.comp_length()
-            number_of_element = ceil(length / side_size)
-            mesh_dict[label] = number_of_element
+        length = line.comp_length()
+        number_of_element = ceil(length / element_size)
+        mesh_dict[str(ii)] = number_of_element
+
+        # overwrite number of elements given by boundary name in user_mesh_dict
+        bc_prop = (
+            line.prop_dict.get(BOUNDARY_PROP_LAB, None) if line.prop_dict else None
+        )
+        if bc_prop in user_mesh_dict:
+            mesh_dict[str(ii)] = user_mesh_dict[bc_prop]
 
     return mesh_dict
