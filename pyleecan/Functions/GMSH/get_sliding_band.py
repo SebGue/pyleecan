@@ -1,21 +1,15 @@
 # -*- coding: utf-8 -*-
 from numpy import exp, pi
-import cmath
 
-from ...Classes.Arc import Arc
 from ...Classes.Arc1 import Arc1
-from ...Classes.Arc2 import Arc2
 from ...Classes.Circle import Circle
 from ...Classes.Segment import Segment
 from ...Classes.SurfLine import SurfLine
 from ...Classes.SurfRing import SurfRing
-from ...Classes.MachineSIPMSM import MachineSIPMSM
 from ...Functions.labels import (
     AIRGAP_LAB,
     SLID_LAB,
     AIRBOX_LAB,
-    BOT_LAB,
-    TOP_LAB,
     BOUNDARY_PROP_LAB,
     SBS_TR_LAB,
     SBS_TL_LAB,
@@ -29,7 +23,6 @@ from ...Functions.labels import (
     AS_BL_LAB,
     AR_B_LAB,
     AR_T_LAB,
-    AIRBOX_R_LAB,
 )
 
 
@@ -60,7 +53,7 @@ def get_sliding_band(sym, machine):
     Sor = lam_ext.Rext
     Wgap_mec = Rgap_mec_ext - Rgap_mec_int
     W_sb = Wgap_mec / 4  # Width sliding band
-    tol = 0.1e-3  # Tolerance
+    tol = 0 * 0.1e-3  # gap between both sliding regions
 
     surf_list = list()
     if sym == 1:  # Complete machine
@@ -73,7 +66,7 @@ def get_sliding_band(sym, machine):
             prop_dict={BOUNDARY_PROP_LAB: AR_B_LAB},
         )
         surf_list.append(int_airgap_cir)
-        
+
         # Internal Sliding band
         int_sb_cir = Circle(
             center=0,
@@ -136,8 +129,10 @@ def get_sliding_band(sym, machine):
         Z0 = 0 * exp(1j * 2 * pi / sym)
         Z2 = Rgap_mec_int + W_sb
         Z3 = Z2 * exp(1j * 2 * pi / sym)
-        airgap_lines = [Segment(begin=Z0, end=Z2, prop_dict={BOUNDARY_PROP_LAB: AS_BR_LAB})]
-                    
+        airgap_lines = [
+            Segment(begin=Z0, end=Z2, prop_dict={BOUNDARY_PROP_LAB: AS_BR_LAB})
+        ]
+
         int_airgap_arc = Arc1(
             begin=Z2,
             end=Z3,

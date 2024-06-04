@@ -3,21 +3,7 @@ from ...Functions.labels import (
     LAM_LAB_S,
     ROTOR_LAB_S,
     STATOR_LAB_S,
-    decode_label,
-    SLID_LAB,
     AIRGAP_LAB,
-    BOT_LAB,
-    TOP_LAB,
-    AIRBOX_LAB,
-    AIRBOX_R_LAB,
-    AR_B_LAB,
-    AR_T_LAB,
-    SBR_B_LAB,
-    SBR_T_LAB,
-    AS_BL_LAB,
-    AS_BR_LAB,
-    AS_TL_LAB,
-    AS_TR_LAB,
 )
 from ...Functions.GMSH import InputError
 from ...Classes.SurfRing import SurfRing
@@ -30,9 +16,7 @@ import gmsh
 from os import replace
 from os.path import splitext
 
-from numpy import pi, angle
-
-from ...Functions.get_logger import get_logger
+from numpy import pi
 
 
 def draw_GMSH(
@@ -88,18 +72,12 @@ def draw_GMSH(
 
     # get machine
     machine = output.simu.machine
-    mesh_dict = {}
 
     # Default stator mesh element size
     mesh_size_S = machine.stator.Rext / 100.0  # Stator
     mesh_size_R = machine.rotor.Rext / 25.0  # Rotor
     mesh_size_SB = 2.0 * pi * machine.rotor.Rext / 360.0  # Sliding Band
     mesh_size_AB = machine.stator.Rext / 50.0  # AirBox
-    lam_list = machine.get_lam_list()
-    lam_int = lam_list[0]
-    lam_ext = lam_list[1]
-    lab_int = lam_int.get_label()
-    lab_ext = lam_ext.get_label()
 
     # For readibility
     model = gmsh.model
@@ -309,26 +287,30 @@ def draw_GMSH(
     _set_default_boundaries(output, model, factory, rotor_combined_dict, boundary_prop)
     _set_default_boundaries(output, model, factory, stator_combined_dict, boundary_prop)
 
+    # try to recover element sizes from original lines and set line element sizes
+    _set_element_size(output, model, factory, gmsh_dict)
+
     # set all line labels as physical groups
     # TODO add 'not in boundary_list' since they have been set already
     if is_set_labels:
-        groups = {}
-        for surf in gmsh_dict.values():
-            for lvalues in surf.values():
-                if (
-                    type(lvalues) is not dict
-                    or "label" not in lvalues
-                    or not lvalues["label"]
-                ):
-                    continue
+        pass  # TODO
+        # groups = {}
+        # for surf in gmsh_dict.values():
+        #     for lvalues in surf.values():
+        #         if (
+        #             type(lvalues) is not dict
+        #             or "label" not in lvalues
+        #             or not lvalues["label"]
+        #         ):
+        #             continue
 
-                if lvalues["label"] not in groups.keys():
-                    groups[lvalues["label"]] = []
-                groups[lvalues["label"]].append(abs(lvalues["tag"]))
+        #         if lvalues["label"] not in groups.keys():
+        #             groups[lvalues["label"]] = []
+        #         groups[lvalues["label"]].append(abs(lvalues["tag"]))
 
-        for label, tags in groups.items():
-            factory.synchronize()
-            model.addPhysicalGroup(1, tags, name=label)
+        # for label, tags in groups.items():
+        #     factory.synchronize()
+        #     model.addPhysicalGroup(1, tags, name=label)
 
     # save mesh or geo file depending on file extension
     filename, file_extension = splitext(path_save)
@@ -411,15 +393,14 @@ def _set_default_boundaries(output, model, factory, gmsh_dict, boundary_prop):
             for tool in surf["cut"].values():
                 line_list.extend(tool["lines"])
 
-    new_line_dict = {}
+    new_line_list = []
+    used_tags = set()
     for surf in gmsh_dict.values():
         for line in _get_surf_line_list(model, surf):
             tag = line["tag"]
-            new_line_dict[tag] = line
-
-    new_line_list = []
-    for line in new_line_dict.values():
-        new_line_list.append(line)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                new_line_list.append(line)
 
     # set default boundary conditions in gmsh lines
     boundary_list = list(set(boundary_prop.values()))
@@ -497,10 +478,51 @@ def _get_updated_lines(output, line, new_lines, tolerance=1e-9):
     return updated
 
 
+def _set_element_size(output, model, factory, gmsh_dict):
+    """Try to set element sizes of each surface line."""
+    # get all (orginal) lines and all new lines (without duplicates)
+    # still line tags are not up to date due to cutting surfaces
+    for surf in gmsh_dict.values():
+        # set size seperately on each surface to avoid conflicts
+        line_list = surf["lines"]
+        if "cut" in surf:
+            for tool in surf["cut"].values():
+                line_list.extend(tool["lines"])
+
+        new_line_list = _get_surf_line_list(model, surf)
+
+        # inherit element size to new line if possible
+        for line in line_list:
+            # skip if number of elements is not set
+            if line["n_elements"] == 0:
+                continue
+
+            lines = _get_updated_lines(output, line, new_line_list)
+
+            n_elem = line["n_elements"]
+            if line["typ"] == "Line":
+                len_old = _norm(line["begin"]["coord"], line["end"]["coord"])
+                for line_new in lines:
+                    tag = line_new["tag"]
+                    len_new = _norm(line_new["coord"][0], line_new["coord"][1])
+                    n_elem_new = int(max(round(n_elem / len_old * len_new), 1))
+                    model.mesh.setTransfiniteCurve(tag, n_elem_new + 1, "Progression")
+                    factory.synchronize()
+                    print(
+                        f"Surface '{surf['label']}' Line {tag} set TransfiniteCurve {n_elem_new} "
+                    )
+            else:
+                for line_new in lines:
+                    model.mesh.setTransfiniteCurve(
+                        line_new["tag"], n_elem + 1, "Progression"
+                    )
+                    factory.synchronize()
+
+
 def _norm(p1, p2):
     """Calculate the norm of 3 points in n dimensions."""
     sqr = [(x1 - x2) ** 2 for x1, x2 in zip(p1, p2)]
-    return sum(sqr) ** 1 / 2
+    return sum(sqr) ** (1 / 2)
 
 
 def _get_surf_line_list(model, surf):

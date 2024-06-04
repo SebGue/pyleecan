@@ -120,24 +120,18 @@ def _add_line_to_dict(
         cx, cy = cz.real, cz.imag
         ctag = gmodel.occ.addPoint(cx, cy, 0, meshSize=mesh_size, tag=-1)
         ltag = gmodel.occ.addCircleArc(btag, ctag, etag, tag=-1)
-        if n_elements > 0:
-            gmodel.occ.synchronize()
-            gmodel.mesh.setTransfiniteCurve(ltag, n_elements + 1, "Progression")
-
         typ = "Circle"  # in terms of GMSH naming scheme
         arc_angle = cmath.phase(complex(ex, ey)) - cmath.phase(complex(bx, by))
         line_angle = None
 
     else:
         ltag = gmodel.occ.addLine(btag, etag, tag=-1)
-        if n_elements > 0:
-            gmodel.occ.synchronize()
-            gmodel.mesh.setTransfiniteCurve(ltag, n_elements + 1, "Progression")
-
         typ = "Line"
         ctag = None
         arc_angle = None
         line_angle = 0.5 * (cmath.phase(complex(ex, ey)) + cmath.phase(complex(bx, by)))
+
+    gmodel.occ.synchronize()
 
     COM = gmodel.occ.getCenterOfMass(1, ltag)
 
@@ -158,41 +152,3 @@ def _add_line_to_dict(
     gmsh_dict[idx]["lines"].append(line_dict)
 
     return None
-
-
-def _find_points_from_line(gmsh_dict={}, ltag=-1):
-    """Find points tag from existing lines
-
-    Parameters
-    ----------
-    d : Dictionary
-        GMSH dictionary
-    ltag : int
-        line tag
-
-    Returns
-    -------
-    coord : float
-        Coordinates of point if found
-    """
-    btag = None
-    etag = None
-    ctag = None
-    for surf in gmsh_dict.values():
-        for lvalues in surf.values():
-            if type(lvalues) is not dict:
-                continue
-            if lvalues["tag"] != ltag:
-                continue
-            else:
-                for pid, pvalues in lvalues.items():
-                    if type(pvalues) is not dict:
-                        continue
-                    if pid == "begin":
-                        btag = pvalues["tag"]
-                    elif pid == "end":
-                        etag = pvalues["tag"]
-                    elif pid == "cent":
-                        ctag = pvalues["tag"]
-                break
-    return [btag, etag, ctag]
