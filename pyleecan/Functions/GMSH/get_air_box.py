@@ -54,7 +54,6 @@ def get_air_box(sym, machine):
             radius=R_ext,
             label=NO_LAM_LAB + "_" + AIRBOX_LAB,
             point_ref=(R_ext / 2) * exp(1j * pi / 2),
-            prop_dict={BOUNDARY_PROP_LAB: AIRBOX_R_LAB},
         )
 
         surf_list.append(

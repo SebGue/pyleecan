@@ -121,7 +121,6 @@ def get_sliding_band(sym, machine):
             radius=Rext,
             label=lab_ext + "_" + AIRBOX_LAB,
             point_ref=(Rgap_mec_ext - W_sb / 2) * exp(1j * pi / 2),
-            prop_dict={BOUNDARY_PROP_LAB: AIRBOX_R_LAB},
         )
         surf_list.append(
             SurfRing(

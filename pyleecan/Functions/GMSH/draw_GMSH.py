@@ -226,12 +226,14 @@ def draw_GMSH(
 
         factory.synchronize()
 
-        # append air gap and sliding band to respective dict
+        # store air gap and sliding band to respective dict
+        rotor_air_dict = {}
+        stator_air_dict = {}
         for idx, surf in gmsh_dict.items():
             if ROTOR_LAB_S in surf["label"]:
-                rotor_dict.update({idx: gmsh_dict[idx]})
+                rotor_air_dict.update({idx: gmsh_dict[idx]})
             if STATOR_LAB_S in surf["label"]:
-                stator_dict.update({idx: gmsh_dict[idx]})
+                stator_air_dict.update({idx: gmsh_dict[idx]})
 
     ###################
     # Adding Airbox
@@ -250,41 +252,65 @@ def draw_GMSH(
         for surf in gmsh_dict.values():
             _draw_surf(factory, surf)
 
-    stator_dict.update(gmsh_dict)
+    airbox_dict = gmsh_dict.copy()
+
+    # TODO test 'is_airbox = False' -> VP0
 
     ######################
     ### Finalize Model ###
     ######################
-    gmsh_dict = {}
-    gmsh_dict.update(rotor_dict)
-    gmsh_dict.update(stator_dict)
 
-    # finally add physical groups
+    # dict of all surfaces
+    gmsh_dict = {
+        **rotor_dict,
+        **rotor_air_dict,
+        **stator_dict,
+        **stator_air_dict,
+        **airbox_dict,
+    }
+
+    # get all surfaces
+    dimTagsRotor = []
+    for surf in rotor_dict.values():
+        dimTagsRotor.append((2, surf["tag"]))
+
+    dimTagsStator = []
+    for surf in stator_dict.values():
+        dimTagsStator.append((2, surf["tag"]))
+
+    dimTagsRotorAir = []
+    for surf in rotor_air_dict.values():
+        dimTagsRotorAir.append((2, surf["tag"]))
+
+    dimTagsStatorAir = []
+    for surf in stator_air_dict.values():
+        dimTagsStatorAir.append((2, surf["tag"]))
+
+    dimTagsAirBox = []
+    for surf in airbox_dict.values():
+        dimTagsAirBox.append((2, surf["tag"]))
+
+    # make all interfaces coherent (except sliding band)
+    factory.fragment(dimTagsRotor, dimTagsRotorAir)
+    factory.fragment(dimTagsStator, dimTagsStatorAir)
+    factory.fragment(dimTagsStator, dimTagsAirBox)
+    factory.synchronize()
+
+    # finally add surface physical groups
     for surf in gmsh_dict.values():
         model.addPhysicalGroup(2, [surf["tag"]], name=surf["label"])
 
     factory.synchronize()
 
-    # while cutting surfaces, GMSH may have altered line tags
-    # so we need to update our gmsh_dict
-    _update_lines(output, model, gmsh_dict)
+    # set default boundaries on rotor and stator seperately to avoid issues
+    rotor_combined_dict = {**rotor_dict, **rotor_air_dict}
+    stator_combined_dict = {**stator_dict, **stator_air_dict, **airbox_dict}
 
-    # Set boundary conditions in gmsh lines
-    boundary_list = list(set(boundary_prop.values()))
-    for propname in boundary_list:
-        bc_id = []
-        for surf in gmsh_dict.values():
-            for line in surf["lines"]:
-                if line["bc_name"] == propname:
-                    bc_id.extend([abs(line["tag"])])
-        if bc_id:
-            model.addPhysicalGroup(1, bc_id, name=propname)
-            factory.synchronize()
+    _set_default_boundaries(output, model, factory, rotor_combined_dict, boundary_prop)
+    _set_default_boundaries(output, model, factory, stator_combined_dict, boundary_prop)
 
-        print(propname)
-        print(bc_id)
-
-    # Set all line labels as physical groups
+    # set all line labels as physical groups
+    # TODO add 'not in boundary_list' since they have been set already
     if is_set_labels:
         groups = {}
         for surf in gmsh_dict.values():
@@ -375,89 +401,100 @@ def _draw_surf(factory, surf):
     return None
 
 
-def _update_lines(output, model, gmsh_dict, tolerance=1e-9):
-    """Update line tags in gmsh_dict if possible."""
+def _set_default_boundaries(output, model, factory, gmsh_dict, boundary_prop):
+    # get all (orginal) lines and all new lines (without duplicates)
+    # still line tags are not up to date due to cutting surfaces
+    line_list = []
     for surf in gmsh_dict.values():
-        # prepare list to store actual line tags and bcs
-        surf["new_lines"] = []
-
-        # get the list of lines for the surface
-        new_lines = _get_surf_line_list(model, surf)
-        old_lines = surf["lines"]
+        line_list.extend(surf["lines"])
         if "cut" in surf:
             for tool in surf["cut"].values():
-                old_lines.extend(tool["lines"])
+                line_list.extend(tool["lines"])
 
-        # loop all new lines to get original bc
-        for new_line in new_lines:
-            # readability
-            p1_new = new_line["coord"][0]
-            p2_new = new_line["coord"][1]
-            com_new = new_line["COM"]  # center of mass
-            typ_new = new_line["typ"]
+    new_line_dict = {}
+    for surf in gmsh_dict.values():
+        for line in _get_surf_line_list(model, surf):
+            tag = line["tag"]
+            new_line_dict[tag] = line
 
-            updated = False
-            for old_line in old_lines:
-                # skip if line has been found already
-                if updated:
-                    continue
+    new_line_list = []
+    for line in new_line_dict.values():
+        new_line_list.append(line)
 
-                # readability
-                p1_old = old_line["begin"]["coord"]
-                p2_old = old_line["end"]["coord"]
-                com_old = old_line["COM"]  # center of mass
-                typ_old = old_line["typ"]
+    # set default boundary conditions in gmsh lines
+    boundary_list = list(set(boundary_prop.values()))
+    for propname in boundary_list:
+        # get relevant lines
+        bc_line_list = []
+        for line in line_list:
+            if line["bc_name"] == propname:
+                bc_line_list.append(line.copy())
 
-                # some conditions to identify matching lines
-                condcc = _norm(com_old, com_new) <= tolerance
-                cond11 = _norm(p1_old, p1_new) <= tolerance
-                cond22 = _norm(p2_old, p2_new) <= tolerance
-                cond21 = _norm(p2_old, p1_new) <= tolerance
-                cond12 = _norm(p1_old, p2_new) <= tolerance
-                condtyp = typ_old == typ_new
+        # update line tag
+        new_bc_lines = []
+        for line in bc_line_list:
+            lines = _get_updated_lines(output, line, new_line_list)
+            new_bc_lines.extend(lines)
 
-                if condcc and ((cond11 and cond22) or (cond12 and cond21)):
-                    # lines seem to match perfectly so update tag
-                    updated = True
+        if new_bc_lines:
+            tags = list(set([line["tag"] for line in new_bc_lines]))  # remove dup.
+            model.addPhysicalGroup(1, tags, name=propname)
+            factory.synchronize()
 
-                elif condtyp:
-                    # at least one point of line match, do further checks
-                    if typ_new == "Line":
-                        # ckeck if new line is on old line
-                        cond1 = _is_collinear(p1_old, p2_old, p1_new)
-                        cond2 = _is_collinear(p1_old, p2_old, p2_new)
-                        if cond1:
-                            if cond2:
-                                cond3 = _is_on_line(p1_new, p1_old, p2_old)
-                                cond4 = _is_on_line(p2_new, p1_old, p2_old)
-                                if cond3 and cond4:
-                                    updated = True
-                    elif typ_new == "Circle":
-                        pass
 
-                if updated:
-                    surf["new_lines"].append(
-                        dict(
-                            tag=new_line["tag"],
-                            bc_name=old_line["bc_name"],
-                            typ=new_line["typ"],
-                        )
-                    )
+def _get_updated_lines(output, line, new_lines, tolerance=1e-9):
+    """Get the tags of actual lines in gmsh that are on 'line' or match 'line' completely."""
 
-            if not updated:
-                surf["new_lines"].append(
-                    dict(
-                        tag=new_line["tag"],
-                        bc_name=None,
-                        typ=new_line["typ"],
-                    )
-                )
-                output.get_logger().warning(
-                    "draw_gmsh warning: _update_line_tags() "
-                    + "found no corresponding line"
-                    + f" for {new_line['typ']} {new_line['tag']} in surface '{surf['label']}'."
-                )
-        pass
+    # readability
+    p1 = line["begin"]["coord"]
+    p2 = line["end"]["coord"]
+    com = line["COM"]  # center of mass
+    typ = line["typ"]
+
+    # loop all new lines to get original bc
+    updated = []
+    for new_line in new_lines:
+        # readability
+        p1_new = new_line["coord"][0]
+        p2_new = new_line["coord"][1]
+        com_new = new_line["COM"]  # center of mass
+        typ_new = new_line["typ"]
+
+        # some conditions to identify matching lines
+        condcc = _norm(com, com_new) <= tolerance
+        cond11 = _norm(p1, p1_new) <= tolerance
+        cond22 = _norm(p2, p2_new) <= tolerance
+        cond21 = _norm(p2, p1_new) <= tolerance
+        cond12 = _norm(p1, p2_new) <= tolerance
+        condtyp = typ == typ_new
+
+        if condcc and ((cond11 and cond22) or (cond12 and cond21)):
+            # lines seem to match perfectly so we don't need to search further
+            return [new_line]
+
+        if condtyp:
+            # at least one point of line match, do further checks
+            if typ_new == "Line":
+                # ckeck if new line is on old line
+                cond1 = _is_collinear(p1, p2, p1_new)
+                cond2 = _is_collinear(p1, p2, p2_new)
+                if cond1:
+                    if cond2:
+                        cond3 = _is_on_line(p1_new, p1, p2)
+                        cond4 = _is_on_line(p2_new, p1, p2)
+                        if cond3 and cond4:
+                            updated.append(new_line)
+            elif typ_new == "Circle":
+                pass  # TODO
+
+    if not updated:
+        output.get_logger().warning(
+            "draw_gmsh warning: "
+            + "Found no corresponding line"
+            + f" for {line['typ']} {line['tag']} with BC '{line['bc_name']}''."
+        )
+
+    return updated
 
 
 def _norm(p1, p2):
@@ -482,13 +519,13 @@ def _get_surf_line_list(model, surf):
     return lines
 
 
-def _is_on_line(p1, p2, q2):
+def _is_on_line(p1, p2, q2, tolerance=1e-9):
     """Check if point p1 lies on line segment 'p2q2'"""
     if (
-        p1[0] <= max(p2[0], q2[0])
-        and p1[0] >= min(p2[0], q2[0])
-        and p1[1] <= max(p2[1], q2[1])
-        and p1[1] >= min(p2[1], q2[1])
+        p1[0] <= (max(p2[0], q2[0]) + tolerance)
+        and p1[0] >= (min(p2[0], q2[0]) - tolerance)
+        and p1[1] <= (max(p2[1], q2[1]) + tolerance)
+        and p1[1] >= (min(p2[1], q2[1]) - tolerance)
     ):
         return True
     return False
