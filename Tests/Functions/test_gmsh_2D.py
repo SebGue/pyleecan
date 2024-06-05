@@ -19,31 +19,32 @@ try:
 except:
     draw_GMSH = ImportError
 
-mesh_dict = {
-    "Lamination_Rotor_Bore_Radius_Ext": 180,
-    "surface_line_0": 5,
-    "surface_line_1": 10,
-    "surface_line_2": 5,
-    "surface_line_3": 5,
-    "surface_line_4": 10,
-    "surface_line_5": 5,
-    "Lamination_Stator_Bore_Radius_Int": 10,
-    "Lamination_Stator_Yoke_Side_Right": 30,
-    "Lamination_Stator_Yoke_Side_Left": 30,
-    "int_airgap_arc": 120,
-    "int_sb_arc": 120,
-    "ext_airgap_arc": 120,
-    "ext_sb_arc": 120,
-    "airbox_line_1": 10,
-    "airbox_line_2": 10,
-    "airbox_arc": 20,
+mm = 1e-3
+
+user_mesh_dict = {
+    # surfaces: element size
+    "None_Shaft": 4 * mm,
+    "None_Airbox": 4 * mm,
+    "Stator-0_SlidingBand": 0.5 * mm,
+    "Rotor-0_SlidingBand": 0.5 * mm,
+    # lines: number of elements
+    "ABSide-Right": 6,
+    "ABSide-Left": 6,
+    "Stator-0_LaminationYoke": 150,
+    "sliding_sideline_Top_Right": 2,
+    "sliding_sideline_Top_Left": 2,
+    "sliding_radius_Top": 100,
+    "airgap_radius_Bot": 200,
+    "sliding_sideline_Bot_Right": 4,
+    "sliding_sideline_Bot_Left": 4,
+    "sliding_radius_Bot": 200,
+    "airgap_radius_Bot": 200,
 }
 
 
 @pytest.mark.long_5s
 @pytest.mark.GMSH2D
 @pytest.mark.IPMSM
-@pytest.mark.SingleOP
 def test_gmsh_ipm():
     """Check generation of the 2D mesh with gmsh"""
     if isinstance(draw_GMSH, ImportError):
@@ -68,7 +69,7 @@ def test_gmsh_ipm():
         boundary_prop=MagElmer_BP_dict,
         is_lam_only_S=False,
         is_lam_only_R=False,
-        user_mesh_dict=mesh_dict,
+        user_mesh_dict=user_mesh_dict,
         is_sliding_band=True,
         is_airbox=True,
         path_save=join(save_path, "test_gmsh_ipm.msh"),
@@ -83,7 +84,6 @@ def test_gmsh_ipm():
 @pytest.mark.long_5s
 @pytest.mark.GMSH2D
 @pytest.mark.SPMSM
-@pytest.mark.SingleOP
 def test_gmsh_spm():
     """Check generation of the 2D mesh with gmsh"""
     if isinstance(draw_GMSH, ImportError):
@@ -101,7 +101,6 @@ def test_gmsh_spm():
     # Create the Simulation
     mySimu = Simu1(name="test_gmsh_spm", machine=PMSM_A)
     myResults = Output(simu=mySimu)
-    mesh_dict["Lamination_Rotor_Bore_Radius_Ext"] = 20
 
     gmsh_dict = draw_GMSH(
         output=myResults,
@@ -109,7 +108,7 @@ def test_gmsh_spm():
         boundary_prop=MagElmer_BP_dict,
         is_lam_only_S=False,
         is_lam_only_R=False,
-        user_mesh_dict=mesh_dict,
+        user_mesh_dict=user_mesh_dict,
         is_sliding_band=True,
         is_airbox=True,
         path_save=join(save_path, "test_gmsh_spm.msh"),
@@ -123,8 +122,7 @@ def test_gmsh_spm():
 
 @pytest.mark.long_5s
 @pytest.mark.GMSH2D
-# @pytest.mark.SPMSM
-@pytest.mark.SingleOP
+@pytest.mark.SPMSM
 def test_gmsh_benchmark():
     """Check generation of the 2D mesh with gmsh"""
     if isinstance(draw_GMSH, ImportError):
@@ -149,7 +147,7 @@ def test_gmsh_benchmark():
         boundary_prop=MagElmer_BP_dict,
         is_lam_only_S=False,
         is_lam_only_R=False,
-        user_mesh_dict=mesh_dict,
+        user_mesh_dict=user_mesh_dict,
         is_sliding_band=True,
         is_airbox=True,
         path_save=join(save_path, "test_gmsh_benchmark.geo"),
@@ -163,7 +161,6 @@ def test_gmsh_benchmark():
 
 @pytest.mark.long_5s
 @pytest.mark.GMSH2D
-@pytest.mark.SingleOP
 def test_gmsh_WRSM():
     """Check generation of the 2D mesh with gmsh"""
     if isinstance(draw_GMSH, ImportError):
@@ -188,7 +185,7 @@ def test_gmsh_WRSM():
         boundary_prop=MagElmer_BP_dict,
         is_lam_only_S=False,
         is_lam_only_R=False,
-        user_mesh_dict=mesh_dict,
+        user_mesh_dict=user_mesh_dict,
         is_sliding_band=True,
         is_airbox=True,
         path_save=join(save_path, "test_gmsh_Zoe.msh"),
@@ -202,7 +199,6 @@ def test_gmsh_WRSM():
 
 @pytest.mark.long_5s
 @pytest.mark.GMSH2D
-@pytest.mark.SingleOP
 def test_gmsh_SCIM():
     """Check generation of the 2D mesh with gmsh"""
     if isinstance(draw_GMSH, ImportError):
@@ -227,7 +223,7 @@ def test_gmsh_SCIM():
         boundary_prop=MagElmer_BP_dict,
         is_lam_only_S=False,
         is_lam_only_R=False,
-        user_mesh_dict=mesh_dict,
+        user_mesh_dict=user_mesh_dict,
         is_sliding_band=True,
         is_airbox=True,
         path_save=join(save_path, "test_gmsh_RT.msh"),
