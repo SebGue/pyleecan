@@ -144,6 +144,7 @@ def draw_GMSH(
 
     # remove VP0 BC if air box is used
     if is_airbox and (not is_lam_only_R) and (not is_lam_only_S):
+        boundary_prop = boundary_prop.copy()
         boundary_prop.pop(STATOR_LAB + "-0_" + LAM_LAB + YOKE_LAB)
 
     # nSurf = 0
@@ -345,18 +346,22 @@ def _draw_lines(model, surf, gmsh_dict, nSurf, bnd_prop, mesh_size, user_mesh):
         {nSurf: {"tag": None, "label": short_label(surf.label), "lines": []}}
     )
 
-    # comp. number of elements on the lines & override by user values in case
-    mesh_dict = comp_gmsh_mesh_dict(
-        surface=surf, element_size=mesh_size, user_mesh_dict=user_mesh
-    )
+    # common args for comp_gmsh_mesh_dict
+    kwargs = dict(element_size=mesh_size, user_mesh_dict=user_mesh)
 
     # if surface is a SurfRing, first draw inner lines as a cutting tool
     if isinstance(surf, SurfRing):
         tool = surf.in_surf
         tool_dict = {0: {"tag": None, "label": None, "refSurfId": nSurf, "lines": []}}
+        # comp. number of elements on the lines & override by user values in case
+        mesh_dict = comp_gmsh_mesh_dict(surface=tool, **kwargs)
+        # draw the surface lines    
         draw_surf_line(tool, mesh_dict, bnd_prop, model, tool_dict, 0, mesh_size)
         gmsh_dict[nSurf].update({"cut": tool_dict})
         surf = surf.out_surf
+
+    # comp. number of elements on the lines & override by user values in case
+    mesh_dict = comp_gmsh_mesh_dict(surface=surf, **kwargs)
 
     # draw the surface lines
     draw_surf_line(surf, mesh_dict, bnd_prop, model, gmsh_dict, nSurf, mesh_size)
@@ -465,12 +470,11 @@ def _get_updated_lines(output, line, new_lines, tolerance=1e-9):
                 # ckeck if new line is on old line
                 cond1 = _is_collinear(p1, p2, p1_new)
                 cond2 = _is_collinear(p1, p2, p2_new)
-                if cond1:
-                    if cond2:
-                        cond3 = _is_on_line(p1_new, p1, p2)
-                        cond4 = _is_on_line(p2_new, p1, p2)
-                        if cond3 and cond4:
-                            updated.append(new_line)
+                if cond1 and cond2:
+                    cond3 = _is_on_line(p1_new, p1, p2)
+                    cond4 = _is_on_line(p2_new, p1, p2)
+                    if cond3 and cond4:
+                        updated.append(new_line)
             elif typ_new == "Circle":
                 pass  # TODO
 
@@ -485,7 +489,7 @@ def _get_updated_lines(output, line, new_lines, tolerance=1e-9):
 
 
 def _set_element_size(output, model, factory, gmsh_dict):
-    """Try to set element sizes of each surface line."""
+    """Try to inherit element sizes for each surface line."""
     # get all (orginal) lines and all new lines (without duplicates)
     # still line tags are not up to date due to cutting surfaces
     size_dict = {}
