@@ -71,7 +71,7 @@ def comp_flux_airgap(self, output, axes_dict, Is_val=None, Ir_val=None):
     else:
         self.get_logger().debug("Reusing the FEA file: " + self.import_file)
         # output.mag.internal.FEA_dict = self.FEA_dict
-        pass
+        pass  # TODO implement file reuse
 
     # post process GMSH mesh with ElmerGrid
     if not self.gen_elmer_mesh(output):
@@ -82,18 +82,19 @@ def comp_flux_airgap(self, output, axes_dict, Is_val=None, Ir_val=None):
     # generate the elmer solver input file
     elmer_sif_file = self.gen_elmer_sif(output, sym, time, angle_rotor, Is_val, Ir_val)
 
-    # Solve for all time step and store all the results in output
-    Br, Bt, Bz, Tem, Phi_wind_stator = self.solve_FEA(
-        output, sym, angle, time, elmer_sif_file
-    )
+    if not self.is_gen_only:
+        # Solve for all time step and store all the results in output
+        Br, Bt, Bz, Tem, Phi_wind_stator = self.solve_FEA(
+            output, sym, angle, time, elmer_sif_file
+        )
 
-    # Store standards Magnetics outputs in out_dict
-    out_dict["B_{rad}"] = Br
-    out_dict["B_{circ}"] = Bt
-    out_dict["B_{ax}"] = Bz
-    out_dict["Tem"] = Tem
-    out_dict["Phi_wind_stator"] = Phi_wind_stator
+        # Store standards Magnetics outputs in out_dict
+        out_dict["B_{rad}"] = Br
+        out_dict["B_{circ}"] = Bt
+        out_dict["B_{ax}"] = Bz
+        out_dict["Tem"] = Tem
+        out_dict["Phi_wind_stator"] = Phi_wind_stator
 
-    # TODO store other Elmer outputs in out_dict
+        # TODO store other Elmer outputs in out_dict
 
     return out_dict
