@@ -355,7 +355,7 @@ def _draw_lines(model, surf, gmsh_dict, nSurf, bnd_prop, mesh_size, user_mesh):
         tool_dict = {0: {"tag": None, "label": None, "refSurfId": nSurf, "lines": []}}
         # comp. number of elements on the lines & override by user values in case
         mesh_dict = comp_gmsh_mesh_dict(surface=tool, **kwargs)
-        # draw the surface lines    
+        # draw the surface lines
         draw_surf_line(tool, mesh_dict, bnd_prop, model, tool_dict, 0, mesh_size)
         gmsh_dict[nSurf].update({"cut": tool_dict})
         surf = surf.out_surf
