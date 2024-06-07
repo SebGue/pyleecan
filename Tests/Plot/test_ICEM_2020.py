@@ -96,7 +96,7 @@ def test_FEMM_sym():
     )
 
 
-@pytest.mark.GMSH2D
+@pytest.mark.GMSH3D
 def test_gmsh_mesh_dict():
     """Figure 10: Generate a 3D mesh with Gmsh by setting the
     number of element on each lines
@@ -157,7 +157,7 @@ def test_gmsh_mesh_dict():
 
 
 @pytest.mark.skip
-@pytest.mark.GMSH2D
+@pytest.mark.GMSH3D
 def test_SlotMulti_sym():
     """Figure 11: Genera
     te a 3D mesh with GMSH for a lamination
