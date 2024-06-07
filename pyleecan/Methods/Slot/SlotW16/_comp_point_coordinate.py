@@ -44,7 +44,7 @@ def _comp_point_coordinate(self):
     # x4t = xct
     # O, Z3, Zc align => -y3t*xct+x3t*yct = 0
 
-    y5t = -self.W3 / 2
+    y5t = self.W3 / 2
     y4t = y5t
     yct = y5t - self.R1
 
