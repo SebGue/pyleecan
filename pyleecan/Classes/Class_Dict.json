@@ -2062,7 +2062,7 @@
                 "name": "Jrms_max",
                 "size": "",
                 "type": "float",
-                "unit": "A/m\u00c2\u00b2",
+                "unit": "A/m\u00b2",
                 "value": null
             },
             {
@@ -8084,8 +8084,7 @@
             "get_meshsolution",
             "get_path_save_fea",
             "get_path_save",
-            "gen_elmer_mesh",
-            "gen_elmer_sif"
+            "gen_elmer_mesh"
         ],
         "mother": "Magnetics",
         "name": "MagElmer",
@@ -11270,7 +11269,7 @@
                 "name": "Jrms",
                 "size": "",
                 "type": "float",
-                "unit": "A/m\u00c2\u00b2",
+                "unit": "A/m\u00b2",
                 "value": null
             },
             {
