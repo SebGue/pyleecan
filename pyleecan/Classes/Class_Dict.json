@@ -2062,7 +2062,7 @@
                 "name": "Jrms_max",
                 "size": "",
                 "type": "float",
-                "unit": "A/m\u00b2",
+                "unit": "A/m\u00c2\u00b2",
                 "value": null
             },
             {
@@ -8084,7 +8084,8 @@
             "get_meshsolution",
             "get_path_save_fea",
             "get_path_save",
-            "gen_elmer_mesh"
+            "gen_elmer_mesh",
+            "gen_elmer_sif"
         ],
         "mother": "Magnetics",
         "name": "MagElmer",
@@ -8170,29 +8171,7 @@
             },
             {
                 "as_dict": "",
-                "desc": "To use a dxf version of the rotor instead of build_geometry",
-                "max": "",
-                "min": "",
-                "name": "rotor_dxf",
-                "size": "",
-                "type": "DXFImport",
-                "unit": "",
-                "value": null
-            },
-            {
-                "as_dict": "",
-                "desc": "To use a dxf version of the rotor instead of build_geometry",
-                "max": "",
-                "min": "",
-                "name": "stator_dxf",
-                "size": "",
-                "type": "DXFImport",
-                "unit": "",
-                "value": null
-            },
-            {
-                "as_dict": "",
-                "desc": "To import an existing simulation file",
+                "desc": "To import an existing simulation file - not implemented yet",
                 "max": "",
                 "min": "",
                 "name": "import_file",
@@ -8203,7 +8182,7 @@
             },
             {
                 "as_dict": "",
-                "desc": "To run Elmer in parallel (the parallelization is on the time loop)",
+                "desc": "To run Elmer in parallel",
                 "max": "",
                 "min": "",
                 "name": "nb_worker",
@@ -8211,6 +8190,17 @@
                 "type": "int",
                 "unit": "",
                 "value": 1
+            },
+            {
+                "as_dict": "",
+                "desc": "Only generate simulation files but don't run simulation",
+                "max": "",
+                "min": "",
+                "name": "is_gen_only",
+                "size": "",
+                "type": "bool",
+                "unit": "",
+                "value": 0
             }
         ]
     },
@@ -11269,7 +11259,7 @@
                 "name": "Jrms",
                 "size": "",
                 "type": "float",
-                "unit": "A/m\u00b2",
+                "unit": "A/m\u00c2\u00b2",
                 "value": null
             },
             {

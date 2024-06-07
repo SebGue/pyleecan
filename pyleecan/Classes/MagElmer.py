@@ -155,10 +155,9 @@ class MagElmer(Magnetics):
         is_get_mesh=False,
         is_save_FEA=False,
         transform_list=-1,
-        rotor_dxf=None,
-        stator_dxf=None,
         import_file="",
         nb_worker=1,
+        is_gen_only=False,
         is_remove_slotS=False,
         is_remove_slotR=False,
         is_remove_ventS=False,
@@ -210,14 +209,12 @@ class MagElmer(Magnetics):
                 is_save_FEA = init_dict["is_save_FEA"]
             if "transform_list" in list(init_dict.keys()):
                 transform_list = init_dict["transform_list"]
-            if "rotor_dxf" in list(init_dict.keys()):
-                rotor_dxf = init_dict["rotor_dxf"]
-            if "stator_dxf" in list(init_dict.keys()):
-                stator_dxf = init_dict["stator_dxf"]
             if "import_file" in list(init_dict.keys()):
                 import_file = init_dict["import_file"]
             if "nb_worker" in list(init_dict.keys()):
                 nb_worker = init_dict["nb_worker"]
+            if "is_gen_only" in list(init_dict.keys()):
+                is_gen_only = init_dict["is_gen_only"]
             if "is_remove_slotS" in list(init_dict.keys()):
                 is_remove_slotS = init_dict["is_remove_slotS"]
             if "is_remove_slotR" in list(init_dict.keys()):
@@ -264,10 +261,9 @@ class MagElmer(Magnetics):
         self.is_get_mesh = is_get_mesh
         self.is_save_FEA = is_save_FEA
         self.transform_list = transform_list
-        self.rotor_dxf = rotor_dxf
-        self.stator_dxf = stator_dxf
         self.import_file = import_file
         self.nb_worker = nb_worker
+        self.is_gen_only = is_gen_only
         # Call Magnetics init
         super(MagElmer, self).__init__(
             is_remove_slotS=is_remove_slotS,
@@ -311,20 +307,9 @@ class MagElmer(Magnetics):
             + str(self.transform_list).replace(linesep, linesep + "\t")
             + linesep
         )
-        if self.rotor_dxf is not None:
-            tmp = self.rotor_dxf.__str__().replace(linesep, linesep + "\t").rstrip("\t")
-            MagElmer_str += "rotor_dxf = " + tmp
-        else:
-            MagElmer_str += "rotor_dxf = None" + linesep + linesep
-        if self.stator_dxf is not None:
-            tmp = (
-                self.stator_dxf.__str__().replace(linesep, linesep + "\t").rstrip("\t")
-            )
-            MagElmer_str += "stator_dxf = " + tmp
-        else:
-            MagElmer_str += "stator_dxf = None" + linesep + linesep
         MagElmer_str += 'import_file = "' + str(self.import_file) + '"' + linesep
         MagElmer_str += "nb_worker = " + str(self.nb_worker) + linesep
+        MagElmer_str += "is_gen_only = " + str(self.is_gen_only) + linesep
         return MagElmer_str
 
     def __eq__(self, other):
@@ -350,13 +335,11 @@ class MagElmer(Magnetics):
             return False
         if other.transform_list != self.transform_list:
             return False
-        if other.rotor_dxf != self.rotor_dxf:
-            return False
-        if other.stator_dxf != self.stator_dxf:
-            return False
         if other.import_file != self.import_file:
             return False
         if other.nb_worker != self.nb_worker:
+            return False
+        if other.is_gen_only != self.is_gen_only:
             return False
         return True
 
@@ -473,32 +456,6 @@ class MagElmer(Magnetics):
                 diff_list.append(name + ".transform_list" + val_str)
             else:
                 diff_list.append(name + ".transform_list")
-        if (other.rotor_dxf is None and self.rotor_dxf is not None) or (
-            other.rotor_dxf is not None and self.rotor_dxf is None
-        ):
-            diff_list.append(name + ".rotor_dxf None mismatch")
-        elif self.rotor_dxf is not None:
-            diff_list.extend(
-                self.rotor_dxf.compare(
-                    other.rotor_dxf,
-                    name=name + ".rotor_dxf",
-                    ignore_list=ignore_list,
-                    is_add_value=is_add_value,
-                )
-            )
-        if (other.stator_dxf is None and self.stator_dxf is not None) or (
-            other.stator_dxf is not None and self.stator_dxf is None
-        ):
-            diff_list.append(name + ".stator_dxf None mismatch")
-        elif self.stator_dxf is not None:
-            diff_list.extend(
-                self.stator_dxf.compare(
-                    other.stator_dxf,
-                    name=name + ".stator_dxf",
-                    ignore_list=ignore_list,
-                    is_add_value=is_add_value,
-                )
-            )
         if other._import_file != self._import_file:
             if is_add_value:
                 val_str = (
@@ -523,6 +480,18 @@ class MagElmer(Magnetics):
                 diff_list.append(name + ".nb_worker" + val_str)
             else:
                 diff_list.append(name + ".nb_worker")
+        if other._is_gen_only != self._is_gen_only:
+            if is_add_value:
+                val_str = (
+                    " (self="
+                    + str(self._is_gen_only)
+                    + ", other="
+                    + str(other._is_gen_only)
+                    + ")"
+                )
+                diff_list.append(name + ".is_gen_only" + val_str)
+            else:
+                diff_list.append(name + ".is_gen_only")
         # Filter ignore differences
         diff_list = list(filter(lambda x: x not in ignore_list, diff_list))
         return diff_list
@@ -545,10 +514,9 @@ class MagElmer(Magnetics):
         if self.transform_list is not None:
             for value in self.transform_list:
                 S += getsizeof(value)
-        S += getsizeof(self.rotor_dxf)
-        S += getsizeof(self.stator_dxf)
         S += getsizeof(self.import_file)
         S += getsizeof(self.nb_worker)
+        S += getsizeof(self.is_gen_only)
         return S
 
     def as_dict(self, type_handle_ndarray=0, keep_function=False, **kwargs):
@@ -579,24 +547,9 @@ class MagElmer(Magnetics):
         MagElmer_dict["transform_list"] = (
             self.transform_list.copy() if self.transform_list is not None else None
         )
-        if self.rotor_dxf is None:
-            MagElmer_dict["rotor_dxf"] = None
-        else:
-            MagElmer_dict["rotor_dxf"] = self.rotor_dxf.as_dict(
-                type_handle_ndarray=type_handle_ndarray,
-                keep_function=keep_function,
-                **kwargs
-            )
-        if self.stator_dxf is None:
-            MagElmer_dict["stator_dxf"] = None
-        else:
-            MagElmer_dict["stator_dxf"] = self.stator_dxf.as_dict(
-                type_handle_ndarray=type_handle_ndarray,
-                keep_function=keep_function,
-                **kwargs
-            )
         MagElmer_dict["import_file"] = self.import_file
         MagElmer_dict["nb_worker"] = self.nb_worker
+        MagElmer_dict["is_gen_only"] = self.is_gen_only
         # The class name is added to the dict for deserialisation purpose
         # Overwrite the mother class name
         MagElmer_dict["__class__"] = "MagElmer"
@@ -619,16 +572,9 @@ class MagElmer(Magnetics):
             transform_list_val = None
         else:
             transform_list_val = self.transform_list.copy()
-        if self.rotor_dxf is None:
-            rotor_dxf_val = None
-        else:
-            rotor_dxf_val = self.rotor_dxf.copy()
-        if self.stator_dxf is None:
-            stator_dxf_val = None
-        else:
-            stator_dxf_val = self.stator_dxf.copy()
         import_file_val = self.import_file
         nb_worker_val = self.nb_worker
+        is_gen_only_val = self.is_gen_only
         is_remove_slotS_val = self.is_remove_slotS
         is_remove_slotR_val = self.is_remove_slotR
         is_remove_ventS_val = self.is_remove_ventS
@@ -660,10 +606,9 @@ class MagElmer(Magnetics):
             is_get_mesh=is_get_mesh_val,
             is_save_FEA=is_save_FEA_val,
             transform_list=transform_list_val,
-            rotor_dxf=rotor_dxf_val,
-            stator_dxf=stator_dxf_val,
             import_file=import_file_val,
             nb_worker=nb_worker_val,
+            is_gen_only=is_gen_only_val,
             is_remove_slotS=is_remove_slotS_val,
             is_remove_slotR=is_remove_slotR_val,
             is_remove_ventS=is_remove_ventS_val,
@@ -696,12 +641,9 @@ class MagElmer(Magnetics):
         self.is_get_mesh = None
         self.is_save_FEA = None
         self.transform_list = None
-        if self.rotor_dxf is not None:
-            self.rotor_dxf._set_None()
-        if self.stator_dxf is not None:
-            self.stator_dxf._set_None()
         self.import_file = None
         self.nb_worker = None
+        self.is_gen_only = None
         # Set to None the properties inherited from Magnetics
         super(MagElmer, self)._set_None()
 
@@ -835,80 +777,6 @@ class MagElmer(Magnetics):
         """,
     )
 
-    def _get_rotor_dxf(self):
-        """getter of rotor_dxf"""
-        return self._rotor_dxf
-
-    def _set_rotor_dxf(self, value):
-        """setter of rotor_dxf"""
-        if isinstance(value, str):  # Load from file
-            try:
-                value = load_init_dict(value)[1]
-            except Exception as e:
-                self.get_logger().error(
-                    "Error while loading " + value + ", setting None instead"
-                )
-                value = None
-        if isinstance(value, dict) and "__class__" in value:
-            class_obj = import_class(
-                "pyleecan.Classes", value.get("__class__"), "rotor_dxf"
-            )
-            value = class_obj(init_dict=value)
-        elif type(value) is int and value == -1:  # Default constructor
-            DXFImport = import_class("pyleecan.Classes", "DXFImport", "rotor_dxf")
-            value = DXFImport()
-        check_var("rotor_dxf", value, "DXFImport")
-        self._rotor_dxf = value
-
-        if self._rotor_dxf is not None:
-            self._rotor_dxf.parent = self
-
-    rotor_dxf = property(
-        fget=_get_rotor_dxf,
-        fset=_set_rotor_dxf,
-        doc="""To use a dxf version of the rotor instead of build_geometry
-
-        :Type: DXFImport
-        """,
-    )
-
-    def _get_stator_dxf(self):
-        """getter of stator_dxf"""
-        return self._stator_dxf
-
-    def _set_stator_dxf(self, value):
-        """setter of stator_dxf"""
-        if isinstance(value, str):  # Load from file
-            try:
-                value = load_init_dict(value)[1]
-            except Exception as e:
-                self.get_logger().error(
-                    "Error while loading " + value + ", setting None instead"
-                )
-                value = None
-        if isinstance(value, dict) and "__class__" in value:
-            class_obj = import_class(
-                "pyleecan.Classes", value.get("__class__"), "stator_dxf"
-            )
-            value = class_obj(init_dict=value)
-        elif type(value) is int and value == -1:  # Default constructor
-            DXFImport = import_class("pyleecan.Classes", "DXFImport", "stator_dxf")
-            value = DXFImport()
-        check_var("stator_dxf", value, "DXFImport")
-        self._stator_dxf = value
-
-        if self._stator_dxf is not None:
-            self._stator_dxf.parent = self
-
-    stator_dxf = property(
-        fget=_get_stator_dxf,
-        fset=_set_stator_dxf,
-        doc="""To use a dxf version of the rotor instead of build_geometry
-
-        :Type: DXFImport
-        """,
-    )
-
     def _get_import_file(self):
         """getter of import_file"""
         return self._import_file
@@ -921,7 +789,7 @@ class MagElmer(Magnetics):
     import_file = property(
         fget=_get_import_file,
         fset=_set_import_file,
-        doc="""To import an existing simulation file
+        doc="""To import an existing simulation file - not implemented yet
 
         :Type: str
         """,
@@ -939,8 +807,26 @@ class MagElmer(Magnetics):
     nb_worker = property(
         fget=_get_nb_worker,
         fset=_set_nb_worker,
-        doc="""To run Elmer in parallel (the parallelization is on the time loop)
+        doc="""To run Elmer in parallel
 
         :Type: int
+        """,
+    )
+
+    def _get_is_gen_only(self):
+        """getter of is_gen_only"""
+        return self._is_gen_only
+
+    def _set_is_gen_only(self, value):
+        """setter of is_gen_only"""
+        check_var("is_gen_only", value, "bool")
+        self._is_gen_only = value
+
+    is_gen_only = property(
+        fget=_get_is_gen_only,
+        fset=_set_is_gen_only,
+        doc="""Only generate simulation files but don't run simulation
+
+        :Type: bool
         """,
     )
