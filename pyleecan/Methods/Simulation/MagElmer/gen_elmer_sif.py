@@ -30,8 +30,11 @@ from ....Classes.Section import Section
 from ....Classes.SolverInputFile import SolverInputFile
 from ....Methods.Elmer.Section import File, Variable, MATC
 
+# some constants
 ROTOR_SLIDING_BAND_LABEL = ROTOR_LAB_S + "-0_" + SLID_LAB
 ROTOR_AIRGAP_LABEL = ROTOR_LAB_S + "-0_" + AIRGAP_LAB
+DEFAULT_EQUATION = 1
+DEFAULT_MATERIAL = 1  # Air
 
 
 def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
@@ -100,8 +103,8 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
                 else:
                     bodies[field_name] = {
                         "id": field_value,
-                        "mat": 1,  # Air by Default
-                        "eq": 1,  # RigidMeshMapper by Default
+                        "mat": DEFAULT_MATERIAL,  # air by Default
+                        "eq": DEFAULT_EQUATION,
                         "bf": None,
                         "tg": None,
                     }
@@ -152,9 +155,9 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
     pm_index = 6
     Mangle = list()
 
-    # create Body Force LUT for required current densities TODO: only stator for now
+    # initialize Body Force LUT for required current densities TODO: only stator for now
     qs = machine.stator.winding.qs
-    bf_id = 2
+    bf_id = 2  # first Body Force is used for rotation (i.e. Rigid Mesh Mapper)
     bf_LUT = dict()
     for ii in range(qs):
         bf_LUT[ii] = dict()
@@ -164,6 +167,13 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
         label = short_label(surf.label)
         label_dict = decode_label(label)
         point_ref = surf.point_ref
+
+        # check if surface is in Elmer model
+        if not bodies.get(label, None):
+            self.get_logger().warning(
+                f"{label}: Surface is not in Elmer model. Skipping surface."
+            )
+            continue  # skip this surface
 
         # hole magnets
         if HOLEM_LAB_S in label_dict["surf_type"]:
@@ -187,13 +197,12 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
                 raise NotImplementedYetError(
                     "Only parallele magnetization are available for HoleMagnet"
                 )
-            if bodies.get(label, None) is not None:
-                Mangle.append(mag)
-                bodies[label]["mat"] = pm_index
-                bodies[label]["eq"] = 1
-                bodies[label]["bf"] = 1
-                bodies[label]["tg"] = 1
-                pm_index = pm_index + 1
+
+            Mangle.append(mag)
+            bodies[label]["mat"] = pm_index
+            bodies[label]["bf"] = 1
+            bodies[label]["tg"] = 1
+            pm_index += 1
 
         # surface magents
         elif MAG_LAB in label_dict["surf_type"]:
@@ -215,14 +224,13 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
                 mag = str(-(Zs / 2 - 1)) + " * theta + 90 "
                 magnetization_type = "hallback"
             else:
-                continue
-            if bodies.get(label, None) is not None:
-                Mangle.append(mag)
-                bodies[label]["mat"] = pm_index
-                bodies[label]["eq"] = 1
-                bodies[label]["bf"] = 1
-                bodies[label]["tg"] = 1
-                pm_index = pm_index + 1
+                raise NotImplementedYetError("Magnetization type not implemented yet.")
+
+            Mangle.append(mag)
+            bodies[label]["mat"] = pm_index
+            bodies[label]["bf"] = 1
+            bodies[label]["tg"] = 1
+            pm_index += 1
 
         # windings
         elif WIND_LAB_S in label_dict["surf_type"]:
@@ -232,26 +240,25 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
             Ntan_id = label_dict["T_id"]  # zone tangential coordinate
             Zs_id = label_dict["S_id"]  # Zone slot number coordinate
             # Get the phase value in the correct slot zone
-            q_id = get_phase_id(wind_mat, Nrad_id, Ntan_id, Zs_id)
-            Ncond = wind_mat[Nrad_id, Ntan_id, Zs_id, q_id]
-            if bodies.get(label, None) is not None:
-                bodies[label]["mat"] = 5
-                bodies[label]["eq"] = 1
-                if Ncond not in bf_LUT[q_id]:
-                    bf_LUT[q_id][Ncond] = bf_id
-                    bodies[label]["bf"] = bf_id
-                    bf_id += 1
-                else:
-                    bodies[label]["bf"] = bf_LUT[q_id][Ncond]
+            phase_id = get_phase_id(wind_mat, Nrad_id, Ntan_id, Zs_id)
+            Ncond = wind_mat[Nrad_id, Ntan_id, Zs_id, phase_id]
+            bodies[label]["mat"] = 5
+            # reuse a Body Force if the phase and the number of conductors is the same
+            if Ncond not in bf_LUT[phase_id]:
+                bf_LUT[phase_id][Ncond] = bf_id
+                bodies[label]["bf"] = bf_id
+                bf_id += 1
+            else:
+                bodies[label]["bf"] = bf_LUT[phase_id][Ncond]
+            mask = _get_mask_name(phase_id, Ncond)
+            bodies[label]["mask"] = mask
 
         # rotor lamination
         elif (
             LAM_LAB_S in label_dict["surf_type"]
             and ROTOR_LAB_S in label_dict["lam_label"]
-            and bodies.get(label, None) is not None
         ):
             bodies[label]["mat"] = 4
-            bodies[label]["eq"] = 1
             bodies[label]["bf"] = 1
             bodies[label]["tg"] = 1
 
@@ -259,39 +266,33 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
         elif (
             LAM_LAB_S in label_dict["surf_type"]
             and STATOR_LAB_S in label_dict["lam_label"]
-            and bodies.get(label, None) is not None
         ):
             bodies[label]["mat"] = 3
-            bodies[label]["eq"] = 1
 
         # shaft
-        elif (
-            SHAFT_LAB in label_dict["surf_type"] and bodies.get(label, None) is not None
-        ):
+        elif SHAFT_LAB in label_dict["surf_type"]:
             bodies[label]["mat"] = 1
-            bodies[label]["eq"] = 1
             bodies[label]["bf"] = 1
             bodies[label]["tg"] = 1
 
         # ventilation hole
-        elif (
-            HOLEV_LAB_S in label_dict["surf_type"]
-            and bodies.get(label, None) is not None
-        ):
+        elif HOLEV_LAB_S in label_dict["surf_type"]:
             bodies[label]["mat"] = 1
-            bodies[label]["eq"] = 1
             bodies[label]["bf"] = 1
             bodies[label]["tg"] = 1
 
-        # unknown
+        # surface type is not implemented yet
         else:
-            pass  # TODO at least give warning
+            self.get_logger().warning(
+                f"{label}: Surface type is not implemnted yet. "
+                + "Setting default body properties"
+            )
 
     # The following bodies are not in the surf_list (see above)
     bodies[ROTOR_AIRGAP_LABEL]["bf"] = 1
-    bodies[ROTOR_SLIDING_BAND_LABEL]["bf"] = 1  # Sliding band bottom
+    bodies[ROTOR_SLIDING_BAND_LABEL]["bf"] = 1
 
-    # get magnet parameter
+    # get magnet parameter # TODO use magnet temperature
     No_Magnets = pm_index - 6
     magnet_temp = self.T_mag
     Hcm20 = magnet_0.mat_type.mag.get_Hc()
@@ -301,15 +302,21 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
         T_op=magnet_temp, T_ref=20.0
     )
 
+    # winding parameter
+    winding_temp = 20.0  # Fixed for Now
+    cond_mat = machine.stator.winding.conductor.cond_mat
+    conductivity = cond_mat.elec.get_conductivity(T_op=winding_temp, T_ref=20)
+    Ncond = 1  # Fixed for Now
+    Cp = 1  # Fixed for Now
+    qs = len(machine.stator.get_name_phase())
+
+    # misc. parameter
     skip_steps = 1  # Fixed for now
     degrees_step = 1  # Fixed for now
     current_angle = 0 - pp * degrees_step * skip_steps
     angle_shift = self.angle_rotor_shift - self.angle_stator_shift
     rotor_init_pos = machine.comp_angle_rotor_initial() + angle_shift
     rotor_d_axis = machine.rotor.comp_angle_d_axis() * 180.0 / pi
-    Ncond = 1  # Fixed for Now
-    Cp = 1  # Fixed for Now
-    qs = len(machine.stator.get_name_phase())
 
     ##########################
     ### generate sif file  ###
@@ -389,10 +396,6 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
         fo.write('\tInclude "{0}"\n'.format(rotor_mat_file))
         fo.write("End\n")
 
-        winding_temp = 20.0  # Fixed for Now
-        cond_mat = machine.stator.winding.conductor.cond_mat
-        conductivity = cond_mat.elec.get_conductivity(T_op=winding_temp, T_ref=20)
-
         fo.write("\nMaterial 5\n")
         fo.write('\tName = "Copper"\n')
         fo.write("\tRelative Permeability = 1\n")
@@ -457,15 +460,15 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
         fo.write("\tEnd\n" "End\n")
 
         # current density Body Forces
-        for q_id, Ncond_dict in bf_LUT.items():
+        for phase_id, Ncond_dict in bf_LUT.items():
             for Ncond, ii in Ncond_dict.items():
                 fo.write(f"Body Force {ii}\n")
-                fo.write(f'\tName = "Phase_{q_id}_BF_{ii}"\n')
+                fo.write(f'\tName = "Phase_{phase_id}_BF_{ii}"\n')
                 fo.write("\tCurrent Density = Variable time\n")
                 fo.write("\t\tReal\n")
                 fo.write("\t\t0.0\t\t0.0\n")
                 for tt in range(1, timelen + 1):
-                    J = Ncond * Is[q_id, tt - 1] / surf_wind
+                    J = Ncond * Is[phase_id, tt - 1] / surf_wind
                     fo.write("\t\t{:.2e}\t\t{:.3f}\n".format(time[tt], J))
                 fo.write("\tEnd\n" "End\n")
 
@@ -489,6 +492,9 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
                 fo.write("\tTorque Groups = Integer {0}\n".format(btg))
             if k == ROTOR_SLIDING_BAND_LABEL:
                 fo.write("\tR Inner = Real {0}\n" "\tR Outer = Real {1}\n".format(ror, sir))  # fmt: skip
+            if "mask" in v:
+                fo.write("\t{0} = Logical True\n".format(v["mask"]))
+
             fo.write("End\n\n")
 
         # Equation Section
@@ -564,12 +570,12 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
         fo.write("\tEquation = SaveLine\n")
         fo.write('\tFilename = "{0}"\n'.format("lines.dat"))
         fo.write('\tProcedure = "SaveData" "SaveLine"\n')
-        fo.write("\tVariable 1 = Magnetic Flux Density 1\n")
-        fo.write("\tVariable 2 = Magnetic Flux Density 2\n")
-        fo.write("\tVariable 3 = Magnetic Flux Density 3\n")
-        fo.write("\tVariable 4 = Magnetic Flux Density e 1\n")
-        fo.write("\tVariable 5 = Magnetic Flux Density e 2\n")
-        fo.write("\tVariable 6 = Magnetic Flux Density e 3\n")
+        # fo.write("\tVariable 1 = Magnetic Flux Density 1\n")
+        # fo.write("\tVariable 2 = Magnetic Flux Density 2\n")
+        # fo.write("\tVariable 3 = Magnetic Flux Density 3\n")
+        fo.write("\tVariable 1 = Magnetic Flux Density e 1\n")
+        fo.write("\tVariable 2 = Magnetic Flux Density e 2\n")
+        fo.write("\tVariable 3 = Magnetic Flux Density e 3\n")
         fo.write("End\n")
 
         fo.write("\nSolver 6\n")
@@ -577,6 +583,15 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
         fo.write('\tFilename = "{0}"\n'.format("scalars.dat"))
         fo.write('\tProcedure = "SaveData" "SaveScalars"\n')
         fo.write("\tShow Norm Index = 1\n")
+        var_id = 1
+        for phase_id, val in bf_LUT.items():
+            for Ncond in val.keys():
+                mask = _get_mask_name(phase_id, Ncond)
+                fo.write("\tVariable {0} = A\n".format(var_id))
+                fo.write("\tOperator {0} = body int\n".format(var_id))
+                fo.write("\tMask Name {0} = {1}\n".format(var_id, mask))
+                var_id += 1
+
         fo.write("End\n")
 
         # Boundaries Section
@@ -659,3 +674,7 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
                 fo.write("End\n\n")
 
     return elmer_sif_file
+
+
+def _get_mask_name(phase_id, Ncond):
+    return f"Phase_{phase_id}_" + str(int(Ncond))
