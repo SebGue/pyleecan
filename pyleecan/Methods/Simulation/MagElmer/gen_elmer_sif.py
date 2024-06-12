@@ -234,14 +234,7 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
 
         # windings
         elif WIND_LAB_S in label_dict["surf_type"]:
-            lam_obj = get_obj_from_label(machine, label_dict=label_dict)
-            wind_mat = lam_obj.winding.get_connection_mat(lam_obj.get_Zs())
-            Nrad_id = label_dict["R_id"]  # zone radial coordinate
-            Ntan_id = label_dict["T_id"]  # zone tangential coordinate
-            Zs_id = label_dict["S_id"]  # Zone slot number coordinate
-            # Get the phase value in the correct slot zone
-            phase_id = get_phase_id(wind_mat, Nrad_id, Ntan_id, Zs_id)
-            Ncond = wind_mat[Nrad_id, Ntan_id, Zs_id, phase_id]
+            phase_id, Ncond = _get_wind_props(machine, label)
             bodies[label]["mat"] = 5
             # reuse a Body Force if the phase and the number of conductors is the same
             if Ncond not in bf_LUT[phase_id]:
@@ -250,8 +243,7 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
                 bf_id += 1
             else:
                 bodies[label]["bf"] = bf_LUT[phase_id][Ncond]
-            mask = _get_mask_name(phase_id, Ncond)
-            bodies[label]["mask"] = mask
+            bodies[label]["winding"] = True
 
         # rotor lamination
         elif (
@@ -474,15 +466,15 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
 
         # Bodies Section
         fo.write("\n!--- BODIES ---\n")
-        for k, v in bodies.items():
-            bid = bodies[k]["id"]
-            beq = bodies[k]["eq"]
-            bmat = bodies[k]["mat"]
-            bf = bodies[k]["bf"]
-            btg = bodies[k]["tg"]
+        for label, body in bodies.items():
+            bid = body["id"]
+            beq = body["eq"]
+            bmat = body["mat"]
+            bf = body["bf"]
+            btg = body["tg"]
 
             fo.write("Body {0}\n".format(bid))
-            fo.write("\tName = {0}\n".format(k))
+            fo.write("\tName = {0}\n".format(label))
             fo.write("\tEquation = {0}\n".format(beq))
             fo.write("\tMaterial = {0}\n".format(bmat))
 
@@ -490,10 +482,10 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
                 fo.write("\tBody Force = {0}\n".format(bf))
             if btg is not None:
                 fo.write("\tTorque Groups = Integer {0}\n".format(btg))
-            if k == ROTOR_SLIDING_BAND_LABEL:
+            if label == ROTOR_SLIDING_BAND_LABEL:
                 fo.write("\tR Inner = Real {0}\n" "\tR Outer = Real {1}\n".format(ror, sir))  # fmt: skip
-            if "mask" in v:
-                fo.write("\t{0} = Logical True\n".format(v["mask"]))
+            if body.get("winding", False):
+                fo.write("\t{0} = Logical True\n".format(label))
 
             fo.write("End\n\n")
 
@@ -517,7 +509,7 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
         fo.write("\tExec Solver = Always\n")
         fo.write("\tVariable = A\n")
 
-        fo.write("\tNonlinear System Convergence Tolerance = {0}\n".format(1e-6))
+        fo.write("\tNonlinear System Convergence Tolerance = {0}\n".format(1e-7))
         fo.write("\tNonlinear System Max Iterations = {0}\n".format(100))
         fo.write("\tNonlinear System Min Iterations = {0}\n".format(1))
         fo.write("\tNonlinear System Newton After Iterations = {0}\n".format(5))
@@ -531,7 +523,7 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
         fo.write("\tLinear System Preconditioning =  {0}\n".format("ILU2"))
         fo.write("\tLinear System Max Iterations =  {0}\n".format(5000))
         fo.write("\tLinear System Residual Output =  {0}\n".format(20))
-        fo.write("\tLinear System Convergence Tolerance =  {0}\n".format(1e-7))
+        fo.write("\tLinear System Convergence Tolerance =  {0}\n".format(1e-9))
         fo.write("\tMortar BCs Additive =  {0}\n".format("Logical True"))
         fo.write("End\n")
 
@@ -584,14 +576,12 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
         fo.write('\tProcedure = "SaveData" "SaveScalars"\n')
         fo.write("\tShow Norm Index = 1\n")
         var_id = 1
-        for phase_id, val in bf_LUT.items():
-            for Ncond in val.keys():
-                mask = _get_mask_name(phase_id, Ncond)
+        for label, body in bodies.items():
+            if body.get("winding", False):
                 fo.write("\tVariable {0} = A\n".format(var_id))
                 fo.write("\tOperator {0} = body int\n".format(var_id))
-                fo.write("\tMask Name {0} = {1}\n".format(var_id, mask))
+                fo.write("\tMask Name {0} = {1}\n".format(var_id, label))
                 var_id += 1
-
         fo.write("End\n")
 
         # Boundaries Section
@@ -676,5 +666,15 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
     return elmer_sif_file
 
 
-def _get_mask_name(phase_id, Ncond):
-    return f"Phase_{phase_id}_" + str(int(Ncond))
+def _get_wind_props(machine, label):
+    label_dict = decode_label(label)
+    lam_obj = get_obj_from_label(machine, label_dict=label_dict)
+    wind_mat = lam_obj.winding.get_connection_mat(lam_obj.get_Zs())
+    Nrad_id = label_dict["R_id"]  # zone radial coordinate
+    Ntan_id = label_dict["T_id"]  # zone tangential coordinate
+    Zs_id = label_dict["S_id"]  # Zone slot number coordinate
+    # Get the phase value in the correct slot zone
+    phase_id = get_phase_id(wind_mat, Nrad_id, Ntan_id, Zs_id)
+    Ncond = wind_mat[Nrad_id, Ntan_id, Zs_id, phase_id]
+
+    return phase_id, Ncond
