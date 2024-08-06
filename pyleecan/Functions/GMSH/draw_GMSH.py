@@ -77,10 +77,11 @@ def draw_GMSH(
     machine = output.simu.machine
 
     # Default stator mesh element size
-    mesh_size_S = machine.stator.Rext / 100.0  # Stator
-    mesh_size_R = machine.rotor.Rext / 25.0  # Rotor
+    mesh_size = 2 * pi * machine.rotor.Rext / 180
+    mesh_size_min = mesh_size / 4
+    mesh_size_max = mesh_size
     mesh_size_SB = 2.0 * pi * machine.rotor.Rext / 360.0  # Sliding Band
-    mesh_size_AB = machine.stator.Rext / 50.0  # AirBox
+    mesh_size_AB = mesh_size / 2  # AirBox
 
     # For readibility
     model = gmsh.model
@@ -92,8 +93,8 @@ def draw_GMSH(
     gmsh.option.setNumber("Geometry.CopyMeshingMethod", 1)
     gmsh.option.setNumber("Geometry.PointNumbers", 0)
     gmsh.option.setNumber("Geometry.LineNumbers", 0)
-    gmsh.option.setNumber("Mesh.CharacteristicLengthMin", min(mesh_size_S, mesh_size_R))
-    gmsh.option.setNumber("Mesh.CharacteristicLengthMax", max(mesh_size_S, mesh_size_R))
+    gmsh.option.setNumber("Mesh.CharacteristicLengthMin", mesh_size_min)
+    gmsh.option.setNumber("Mesh.CharacteristicLengthMax", mesh_size_max)
     gmsh.option.setNumber("Mesh.MeshSizeFactor", 3)
     model.add("Pyleecan")
 
@@ -121,7 +122,7 @@ def draw_GMSH(
         # draw all surfaces lines in gmsh and store needed information in gmsh_dict
         for surf in surf_list:
             nSurf += 1  # surface number
-            args = [boundary_prop, mesh_size_R, user_mesh_dict]
+            args = [boundary_prop, mesh_size, user_mesh_dict]
             _draw_lines(model, surf, gmsh_dict, nSurf, *args)
 
         # draw surfaces (from lines) in gmsh and add surface tags to gmsh_dict
@@ -155,7 +156,7 @@ def draw_GMSH(
 
         for surf in stator_list:
             nSurf += 1
-            args = [boundary_prop, mesh_size_S, user_mesh_dict]
+            args = [boundary_prop, mesh_size, user_mesh_dict]
             _draw_lines(model, surf, gmsh_dict, nSurf, *args)
 
         # draw surfaces (from lines) in gmsh and add surface tags to gmsh_dict
