@@ -99,6 +99,12 @@ def draw_GMSH(
 
     alpha = 0
 
+    # remove VP0 BC if air box is used
+    if is_airbox and (not is_lam_only_R) and (not is_lam_only_S):
+        lab_ext = machine.get_lam_list()[1].get_label()
+        boundary_prop = boundary_prop.copy()
+        boundary_prop.pop(lab_ext + "_" + LAM_LAB + YOKE_LAB)
+
     #####################
     # Adding Rotor
     #####################
@@ -141,11 +147,6 @@ def draw_GMSH(
     # Adding Stator
     #####################
     gmsh_dict = {}  # init new dict for stator
-
-    # remove VP0 BC if air box is used
-    if is_airbox and (not is_lam_only_R) and (not is_lam_only_S):
-        boundary_prop = boundary_prop.copy()
-        boundary_prop.pop(STATOR_LAB + "-0_" + LAM_LAB + YOKE_LAB)
 
     # nSurf = 0
     if not is_lam_only_R:
@@ -279,6 +280,7 @@ def draw_GMSH(
     factory.fragment(dimTagsRotor, dimTagsRotorAir)
     factory.fragment(dimTagsStator, dimTagsStatorAir)
     factory.fragment(dimTagsStator, dimTagsAirBox)
+    factory.fragment(dimTagsRotor, dimTagsAirBox)
     factory.synchronize()
 
     # finally add surface physical groups
@@ -289,7 +291,11 @@ def draw_GMSH(
 
     # set default boundaries on rotor and stator seperately to avoid issues
     rotor_combined_dict = {**rotor_dict, **rotor_air_dict}
-    stator_combined_dict = {**stator_dict, **stator_air_dict, **airbox_dict}
+    stator_combined_dict = {**stator_dict, **stator_air_dict}
+    if machine.stator.is_outwards():
+        stator_combined_dict.update(airbox_dict)
+    else:
+        rotor_combined_dict.update(airbox_dict)
 
     _set_default_boundaries(output, model, factory, rotor_combined_dict, boundary_prop)
     _set_default_boundaries(output, model, factory, stator_combined_dict, boundary_prop)

@@ -587,7 +587,7 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
         # Boundaries Section
         fo.write("\n!--- BOUNDARIES ---\n")
         for k, v in boundaries.items():
-            if k == "VP0_BOUNDARY":
+            if k == "ROTOR_EXT_BOUNDARY" or k == "STATOR_EXT_BOUNDARY":
                 fo.write("Boundary Condition {0}\n".format(v))
                 fo.write("\tName = {0}\n".format(k))
                 fo.write("\tA = Real 0\n")
