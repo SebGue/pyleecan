@@ -3,7 +3,8 @@ import re
 
 from matplotlib import pyplot
 
-from numpy import zeros, loadtxt
+from numpy import pi, unique, zeros, loadtxt, sin, cos, angle as np_angle
+from scipy.interpolate import interp1d
 from os.path import split
 from os.path import join
 
@@ -11,6 +12,9 @@ from .... import __version__
 from ....Functions.get_path_binary import get_path_binary
 from ....Functions.labels import (
     STATOR_LAB_S,
+    STATOR_LAB,
+    ROTOR_LAB_S,
+    ROTOR_LAB,
     WIND_LAB_S,
     decode_label,
     get_obj_from_label,
@@ -18,7 +22,7 @@ from ....Functions.labels import (
 from ....Functions.Winding.find_wind_phase_color import get_phase_id
 
 
-def solve_FEA(self, output, sym, angle, time, elmer_sif_file):
+def solve_FEA(self, output, out_dict, sym, angle, time, elmer_sif_file):
     """
     Solve Elmer model to calculate airgap flux density, torque instantaneous/average/ripple values,
     flux induced in stator windings and flux density, field and permeability maps
@@ -70,9 +74,11 @@ def solve_FEA(self, output, sym, angle, time, elmer_sif_file):
     (stdout, stderr) = elmersolver.communicate()
     elmersolver.wait()
     self.get_logger().info(stdout.decode("UTF-8"))
+
     if elmersolver.returncode != 0:
         self.get_logger().info("ElmerSolver [Error]: " + stderr.decode("UTF-8"))
         return False
+
     elmersolver.terminate()
     self.get_logger().info("ElmerSolver call complete!")
 
@@ -85,10 +91,12 @@ def solve_FEA(self, output, sym, angle, time, elmer_sif_file):
     L1 = machine.stator.comp_length()
     save_path = self.get_path_save(output)
 
-    scalars_file = join(elmermesh_folder, "scalars.dat")
-    results = _get_scalars(scalars_file)
+    # get the air gap flux result
+    _get_fields(join(elmermesh_folder, "lines.dat"), out_dict, time, angle)
 
     # get data
+    results = _get_scalars(join(elmermesh_folder, "scalars.dat"))
+
     tq = results["group 1 torque"]
     agt = results["air gap torque"]
 
@@ -98,6 +106,7 @@ def solve_FEA(self, output, sym, angle, time, elmer_sif_file):
     # im: inertial moment
 
     # get flux linkage
+    # TODO get windings of all respective laminations
     if hasattr(machine.stator, "winding") and machine.stator.winding is not None:
         qs = machine.stator.winding.qs  # Winding phase number
 
@@ -115,26 +124,23 @@ def solve_FEA(self, output, sym, angle, time, elmer_sif_file):
                 wind_dict[label]["phase"] = phase_id
                 wind_dict[label]["Ncond"] = Ncond
 
-        Phi_wind_stator = zeros((Nt, qs))
-        for item in wind_dict.values():
-            Phi_wind_stator[:, item["phase"]] += item["results"] * item["Ncond"]
+        if "Phi_wind" in out_dict and STATOR_LAB + "-0" in out_dict["Phi_wind"]:
+            Phi_wind_stator = out_dict["Phi_wind"][STATOR_LAB + "-0"]
+            for item in wind_dict.values():
+                Phi_wind_stator[:, item["phase"]] += item["results"] * item["Ncond"]
 
     else:
         Phi_wind_stator = None
 
-    pyplot.plot(time, Phi_wind_stator)
-    pyplot.show()
-
-    # get the air gap flux result
-    Br = zeros((Nt, Na))
-    Bt = zeros((Nt, Na))
-    Bz = zeros((Nt, Na))
+    # pyplot.plot(time, Phi_wind_stator)
+    # pyplot.show()
 
     # get the torque
     # TODO compare different Elmer torque calc. methods
     Tem = tq * sym * L1
+    out_dict["Tem"][:] = Tem
 
-    return Br, Bt, Bz, Tem, Phi_wind_stator
+    return None
 
 
 def _get_scalars(scalars_file):
@@ -163,6 +169,67 @@ def _get_scalars(scalars_file):
         data[var] = scalars[int(col_number) - 1, :]
 
     return data
+
+
+def _get_fields(field_file, out_dict, time, angle):
+    """
+    Read the Elmer line data result files and return all data as a dict with
+    respective variable names as keys.
+    """
+    Nt = time.size
+    Na = angle.size
+
+    field_names_file = field_file + ".names"
+    field_data = loadtxt(field_file, unpack=True)
+
+    # load names
+    with open(field_names_file, "r") as file:
+        file_data = file.read()
+
+    # extract variable names
+    lines = file_data.splitlines()
+    variable_lines = [line for line in lines if re.match(r"^\s*\d+:\s+", line)]
+
+    # init variable names
+    data = {}
+
+    # process data rows
+    for line in variable_lines:
+        col_number, var = [txt.strip() for txt in line.split(":")]
+        data[var] = field_data[int(col_number) - 1, :]
+
+    # extract field data
+    time = data["Timestep"]
+    Br = out_dict["B_{rad}"]
+    Bt = out_dict["B_{circ}"]
+    Bz = out_dict["B_{ax}"]
+
+    for ii in range(1, Nt + 1):
+        node = data["Node index"][time == ii]
+
+        # remove duplicate nodes from results
+        seen = set()
+        indices = [i for i, x in enumerate(node) if not (x in seen or seen.add(x))]
+
+        x = data["coordinate 1"][time == ii][indices]
+        y = data["coordinate 2"][time == ii][indices]
+        z = data["coordinate 3"][time == ii][indices]
+        ang = np_angle(x + 1j * y)
+        # TODO check range of ang vs angle
+
+        Bx = data["magnetic flux density 1"][time == ii][indices]
+        By = data["magnetic flux density 2"][time == ii][indices]
+        Bz_ = data["magnetic flux density 3"][time == ii][indices]
+
+        # setup interpolation funktion (linear) and interpolate
+        kwargs = dict(kind="linear", fill_value="extrapolate", bounds_error=False)
+        Bz[ii - 1, :] = interp1d(ang, Bz_, **kwargs)(angle)
+
+        Bxi = interp1d(ang, Bx, **kwargs)(angle)
+        Byi = interp1d(ang, By, **kwargs)(angle)
+
+        Br[ii - 1, :] = Bxi * cos(angle) + Byi * sin(angle)
+        Bt[ii - 1, :] = Byi * cos(angle) - Bxi * sin(angle)
 
 
 def _get_wind_props(machine, label):

@@ -507,9 +507,10 @@ def _set_element_size(output, model, factory, gmsh_dict):
             for tool in surf["cut"].values():
                 line_list.extend(tool["lines"])
 
+        # get the actual lines of the surface
         new_line_list = _get_surf_line_list(model, surf)
 
-        # inherit element size to new line if possible
+        # set element size to new line if possible
         for line in line_list:
             # skip if number of elements is not set
             if line["n_elements"] == 0:

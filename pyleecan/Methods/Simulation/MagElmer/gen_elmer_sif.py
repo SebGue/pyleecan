@@ -18,6 +18,7 @@ from ....Functions.labels import (
     MAG_LAB,
     SHAFT_LAB,
     SLID_LAB,
+    AIRBOX_LAB,
 )
 from ....Functions.Winding.find_wind_phase_color import get_phase_id
 from .... import __version__
@@ -33,11 +34,12 @@ from ....Methods.Elmer.Section import File, Variable, MATC
 # some constants
 ROTOR_SLIDING_BAND_LABEL = ROTOR_LAB_S + "-0_" + SLID_LAB
 ROTOR_AIRGAP_LABEL = ROTOR_LAB_S + "-0_" + AIRGAP_LAB
+ROTOR_AIRBOX = ROTOR_LAB_S + "-0_" + AIRBOX_LAB
 DEFAULT_EQUATION = 1
 DEFAULT_MATERIAL = 1  # Air
 
 
-def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
+def gen_elmer_sif(self, output, sym, angle, time, angle_rotor, Is, Ir):
     """
     Generate the Elmer solver input file (sif).
 
@@ -78,6 +80,12 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
     stator_mat_file = "stator_material.pmf"
     rotor_mat_fullfile = join(project_name, rotor_mat_file)
     stator_mat_fullfile = join(project_name, stator_mat_file)
+
+    # airgap save line
+    lam_list = machine.get_lam_list()
+    Rgap_mec_int = lam_list[0].comp_radius_mec()
+    Rgap_mec_ext = lam_list[1].comp_radius_mec()
+    line_radius = Rgap_mec_int + (Rgap_mec_ext - Rgap_mec_int) / 4
 
     # TODO: Time vector must be greater than one
     time = np.append(time, time[1] + time[-1])
@@ -283,6 +291,8 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
     # The following bodies are not in the surf_list (see above)
     bodies[ROTOR_AIRGAP_LABEL]["bf"] = 1
     bodies[ROTOR_SLIDING_BAND_LABEL]["bf"] = 1
+    if ROTOR_AIRBOX in bodies.keys():
+        bodies[ROTOR_AIRBOX]["bf"] = 1
 
     # get magnet parameter # TODO use magnet temperature
     No_Magnets = pm_index - 6
@@ -414,9 +424,9 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
                 fo.write('\tName = "PM_{0}"\n'.format(m))
                 fo.write("\tRelative Permeability = {0}\n".format(magnet_permeability))
                 fo.write("\tMagnetization 1 = Variable Coordinate\n")
-                fo.write('\t\tReal MATC  "H_PM*cos(atan2(tx(1),tx(0)) + {0}*pi + Mangle{1}*pi/180)"\n'.format(m - 1, m))  # fmt: skip
+                fo.write('\t\tReal MATC  "H_PM*cos(atan2(tx(1),tx(0)) + Mangle{1}*pi/180)"\n'.format(m - 1, m))  # fmt: skip
                 fo.write("\tMagnetization 2 = Variable Coordinate\n")
-                fo.write('\t\tReal MATC "H_PM*sin(atan2(tx(1),tx(0)) + {0}*pi + Mangle{1}*pi/180)"\n'.format(m - 1, m))  # fmt: skip
+                fo.write('\t\tReal MATC "H_PM*sin(atan2(tx(1),tx(0)) + Mangle{1}*pi/180)"\n'.format(m - 1, m))  # fmt: skip
                 fo.write("\tElectric Conductivity = {0}\n".format(round(conductivity_m, 2)))  # fmt: skip
                 fo.write("End\n")
 
@@ -539,9 +549,13 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
         fo.write("\tCalculate Maxwell Stress = Logical True\n")
         fo.write("\tCalculate JxB = Logical True\n")
         fo.write("\tCalculate Magnetic Field Strength = Logical True\n")
-        fo.write("\t! Enforcing fields to be continuous is a little problematic for discontious fields\n")  # fmt: skip
-        fo.write("\tCalculate Nodal Fields = {0}\n".format("Logical False"))
-        fo.write("\tCalculate Elemental Fields = {0}\n".format("Logical True"))
+        # fo.write("\t! Enforcing fields to be continuous is a little problematic for discontious fields\n")  # fmt: skip
+        fo.write("\t!Calculate Nodal Fields = {0}\n".format("Logical False"))
+        fo.write("\t!Calculate Elemental Fields = {0}\n".format("Logical True"))
+        fo.write("\t!Discontinuous Galerkin = {0}\n".format("Logical True"))
+        fo.write("\tLinear System Solver = {0}\n".format("Direct"))
+        fo.write("\tLinear System Iterative Method  = {0}\n".format("MUMPS"))
+                 
         fo.write("End\n")
 
         fo.write("\nSolver 4\n")
@@ -562,12 +576,18 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
         fo.write("\tEquation = SaveLine\n")
         fo.write('\tFilename = "{0}"\n'.format("lines.dat"))
         fo.write('\tProcedure = "SaveData" "SaveLine"\n')
-        # fo.write("\tVariable 1 = Magnetic Flux Density 1\n")
-        # fo.write("\tVariable 2 = Magnetic Flux Density 2\n")
-        # fo.write("\tVariable 3 = Magnetic Flux Density 3\n")
-        fo.write("\tVariable 1 = Magnetic Flux Density e 1\n")
-        fo.write("\tVariable 2 = Magnetic Flux Density e 2\n")
-        fo.write("\tVariable 3 = Magnetic Flux Density e 3\n")
+
+        # fo.write('\tCoordinate Transformation = String "cartesian to cylindrical"\n')
+        # fo.write("\tCoordinate Transformation Use Degrees = Logical True\n")
+        # fo.write('\tPolyline Coordinates(2,2) = {0} 0.0 {1} 180.0\n'.format(line_radius, line_radius))  # fmt: skip
+        # fo.write("\tPolyline Divisions(1) = Integer {0}\n".format(Na - 1))
+
+        fo.write("\tVariable 1 = Magnetic Flux Density 1\n")
+        fo.write("\tVariable 2 = Magnetic Flux Density 2\n")
+        fo.write("\tVariable 3 = Magnetic Flux Density 3\n")
+        # fo.write("\tVariable 1 = Magnetic Flux Density e 1\n")
+        # fo.write("\tVariable 2 = Magnetic Flux Density e 2\n")
+        # fo.write("\tVariable 3 = Magnetic Flux Density e 3\n")
         fo.write("End\n")
 
         fo.write("\nSolver 6\n")
@@ -597,7 +617,7 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
                     if k1 == "SLAVE_STATOR_BOUNDARY":
                         slave = v1
                         break
-                if not self.is_periodicity_a:
+                if not output.geo.is_antiper_a:
                     fo.write("Boundary Condition {0}\n".format(v))
                     fo.write("\tName = {0}\n".format(k))
                     fo.write("\tMortar BC = Integer {0}\n".format(slave))
@@ -618,7 +638,7 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
                     if k1 == "SLAVE_ROTOR_BOUNDARY":
                         slave = v1
                         break
-                if not self.is_periodicity_a:
+                if not output.geo.is_antiper_a:
                     fo.write("Boundary Condition {0}\n".format(v))
                     fo.write("\tName = {0}\n".format(k))
                     fo.write("\tMortar BC = Integer {0}\n".format(slave))
@@ -639,7 +659,7 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
                     if k1 == "SB_ROTOR_BOUNDARY":
                         slave = v1
                         break
-                if not self.is_periodicity_a:
+                if not output.geo.is_antiper_a:
                     fo.write("Boundary Condition {0}\n".format(v))
                     fo.write("\tName = {0}\n".format(k))
                     fo.write("\tMortar BC = Integer {0}\n".format(slave))
@@ -658,6 +678,7 @@ def gen_elmer_sif(self, output, sym, time, angle_rotor, Is, Ir):
                 fo.write("\tName = {0}\n".format(k))
                 fo.write("\tSave Line = True\n")
                 fo.write("End\n\n")
+                # pass
             else:
                 fo.write("Boundary Condition {0}\n".format(v))
                 fo.write("\tName = {0}\n".format(k))

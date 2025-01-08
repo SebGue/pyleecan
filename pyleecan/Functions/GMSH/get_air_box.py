@@ -7,7 +7,6 @@ from ...Classes.Circle import Circle
 from ...Classes.Segment import Segment
 from ...Classes.SurfLine import SurfLine
 from ...Functions.labels import (
-    NO_LAM_LAB,
     AIRBOX_LAB,
     BOUNDARY_PROP_LAB,
     AIRBOX_SR_LAB,
@@ -44,7 +43,7 @@ def get_air_box(sym, machine):
         ext_cir = Circle(
             center=0,
             radius=R_ab,
-            label=NO_LAM_LAB + "_" + AIRBOX_LAB,
+            label=lab_ext + "_" + AIRBOX_LAB,
             point_ref=(R_ab / 2) * exp(1j * pi / 2),
             prop_dict={BOUNDARY_PROP_LAB: lab_ext + "_" + AIRBOX_R_LAB},
         )
@@ -52,7 +51,7 @@ def get_air_box(sym, machine):
         int_cir = Circle(
             center=0,
             radius=R_ext,
-            label=NO_LAM_LAB + "_" + AIRBOX_LAB,
+            label=lab_ext + "_" + AIRBOX_LAB,
             point_ref=(R_ext / 2) * exp(1j * pi / 2),
         )
 
@@ -60,7 +59,7 @@ def get_air_box(sym, machine):
             SurfRing(
                 out_surf=ext_cir,
                 in_surf=int_cir,
-                label=NO_LAM_LAB + "_" + AIRBOX_LAB,
+                label=lab_ext + "_" + AIRBOX_LAB,
                 point_ref=(R_ab / 2) * exp(1j * pi / 2),
             )
         )
@@ -108,7 +107,7 @@ def get_air_box(sym, machine):
             SurfLine(
                 line_list=airbox_lines,
                 # point_ref=0.0 * Z2 * exp(1j * pi / sym),
-                label=NO_LAM_LAB + "_" + AIRBOX_LAB,
+                label=lab_ext + "_" + AIRBOX_LAB,
             )
         )
 

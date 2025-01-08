@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from os.path import join
+from numpy import zeros
 
 from ....Functions.GMSH.draw_GMSH import draw_GMSH
+from ....Functions.labels import STATOR_LAB
 from ....Classes.OutMagElmer import OutMagElmer
 from ....Methods.Simulation.MagElmer import MagElmer_BP_dict
 
@@ -47,9 +49,28 @@ def comp_flux_airgap(self, output, axes_dict, Is_val=None, Ir_val=None):
         is_antiperiod=is_antiper_t and self.is_periodicity_t,
     )
     Nt = time.size
+    Na = angle.size
 
     # Get rotor angular position
     angle_rotor = output.get_angle_rotor()[0:Nt]
+
+    # Init flux arrays and torque array in out_dict
+    out_dict["B_{rad}"] = zeros((Nt, Na))
+    out_dict["B_{circ}"] = zeros((Nt, Na))
+    out_dict["B_{ax}"] = zeros((Nt, Na))
+    out_dict["Tem"] = zeros((Nt))
+
+    # Init lamination winding flux list of arrays in out_dict
+    machine = output.simu.machine
+    out_dict["Phi_wind"] = {}
+    axes_dict_elec = output.elec.axes_dict
+    for label in machine.get_lam_list_label():
+        if "phase_" + label in axes_dict_elec:
+            qs = axes_dict_elec["phase_" + label].get_length(is_smallestperiod=True)
+            out_dict["Phi_wind"][label] = zeros((Nt, qs))
+    # delete 'Phi_wind' if empty
+    if len(out_dict["Phi_wind"]) == 0:
+        out_dict.pop("Phi_wind")
 
     # Setup the Elmer simulation
     # Geometry building
@@ -80,21 +101,17 @@ def comp_flux_airgap(self, output, axes_dict, Is_val=None, Ir_val=None):
         )
 
     # generate the elmer solver input file
-    elmer_sif_file = self.gen_elmer_sif(output, sym, time, angle_rotor, Is_val, Ir_val)
+    elmer_sif_file = self.gen_elmer_sif(
+        output, sym, angle, time, angle_rotor, Is_val, Ir_val
+    )
 
     if not self.is_gen_only:
         # Solve for all time step and store all the results in output
-        Br, Bt, Bz, Tem, Phi_wind_stator = self.solve_FEA(
-            output, sym, angle, time, elmer_sif_file
-        )
+        self.solve_FEA(output, out_dict, sym, angle, time, elmer_sif_file)
+        # TODO store elemental data
 
-        # Store standards Magnetics outputs in out_dict
-        out_dict["B_{rad}"] = Br
-        out_dict["B_{circ}"] = Bt
-        out_dict["B_{ax}"] = Bz
-        out_dict["Tem"] = Tem
-        out_dict["Phi_wind_stator"] = Phi_wind_stator
-
-        # TODO store other Elmer outputs in out_dict
+    # Store stator winding flux
+    if "Phi_wind" in out_dict and STATOR_LAB + "-0" in out_dict["Phi_wind"]:
+        out_dict["Phi_wind_stator"] = out_dict["Phi_wind"][STATOR_LAB + "-0"]
 
     return out_dict

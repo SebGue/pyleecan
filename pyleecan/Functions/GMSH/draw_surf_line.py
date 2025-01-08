@@ -43,10 +43,11 @@ def draw_surf_line(
     for ii, line in enumerate(surf.get_lines()):
         n_elem = None if not mesh_dict else mesh_dict[str(ii)]
         n_elem = n_elem if n_elem is not None else 0
+        n_elem = n_elem if line.prop_dict else 0 # only element size if line has props
         bc_name = get_boundary_condition(line, boundary_prop)
         # Gmsh built-in engine does not allow arcs larger than 180deg
         # so arcs are split into two
-        # TODO check now that we use OCC kernal
+        # TODO utilize OCC kernel to have 180° circles 
         if isinstance(line, Arc) and abs(line.get_angle() * 180.0 / pi) >= 180.0:
             rot_dir = 1 if line.is_trigo_direction == True else -1
             kwargs = dict(
@@ -60,6 +61,9 @@ def draw_surf_line(
         elif isinstance(line, Arc) and (abs(line.get_angle() * 180.0 / pi) <= tol):
             # Don't draw anything, this is a circle and usually is repeated ? TODO check
             lines = []
+        # for debugging
+        # if isinstance(line, Arc) and abs(line.get_angle() * 180.0 / pi) == 180.0: 
+        #     lines = [line]
         else:
             lines = [line]
 
