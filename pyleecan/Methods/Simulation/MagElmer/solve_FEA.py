@@ -56,7 +56,6 @@ def solve_FEA(self, output, out_dict, sym, angle, time, elmer_sif_file):
     # TODO enable parallel computation
 
     fea_dir = self.get_path_save_fea(output)
-    project_name = split(elmer_sif_file)[0]
     ElmerSolver_binary = get_path_binary("ElmerSolver")
 
     cmd_elmersolver = [ElmerSolver_binary, split(elmer_sif_file)[1]]
@@ -69,17 +68,20 @@ def solve_FEA(self, output, out_dict, sym, angle, time, elmer_sif_file):
         cmd_elmersolver,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        cwd=project_name,
+        cwd=fea_dir,
     )
-    (stdout, stderr) = elmersolver.communicate()
-    elmersolver.wait()
-    self.get_logger().info(stdout.decode("UTF-8"))
 
-    if elmersolver.returncode != 0:
+    for line in elmersolver.stdout:
+        self.get_logger().info(line.decode("UTF-8").strip())
+
+    (_, stderr) = elmersolver.communicate()
+    elmersolver.stdout.close()
+    return_code = elmersolver.wait()
+
+    if return_code:
         self.get_logger().info("ElmerSolver [Error]: " + stderr.decode("UTF-8"))
         return False
 
-    elmersolver.terminate()
     self.get_logger().info("ElmerSolver call complete!")
 
     self.get_meshsolution(output)

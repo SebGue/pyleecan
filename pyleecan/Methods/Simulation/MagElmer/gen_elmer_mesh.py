@@ -43,13 +43,16 @@ def gen_elmer_mesh(self, output):
         stderr=subprocess.PIPE,
         cwd=fea_dir,
     )
-    (stdout, stderr) = elmergrid.communicate()
-    elmergrid.wait()
-    self.get_logger().info(stdout.decode("UTF-8"))
-    if elmergrid.returncode != 0:
+    for line in elmergrid.stdout:
+        self.get_logger().info(line.decode("UTF-8").strip())
+
+    (_, stderr) = elmergrid.communicate()
+    elmergrid.stdout.close()
+    return_code = elmergrid.wait()
+
+    if return_code:
         self.get_logger().info("ElmerGrid [Error]: " + stderr.decode("UTF-8"))
         return False
-    elmergrid.terminate()
     self.get_logger().info("ElmerGrid call complete!")
 
     return True
