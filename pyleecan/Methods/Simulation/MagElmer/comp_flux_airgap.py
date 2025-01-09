@@ -74,7 +74,7 @@ def comp_flux_airgap(self, output, axes_dict, Is_val=None, Ir_val=None):
 
     # Setup the Elmer simulation
     # Geometry building
-    gmsh_filename = self.get_path_save_fea(output) + ".msh"
+    gmsh_filename = join(self.get_path_save_fea(output), "Model.msh")
     if not self.import_file:  # True if None or len == 0
         self.get_logger().debug("Drawing machine in GMSH...")
         output.mag.internal.FEA_dict = draw_GMSH(

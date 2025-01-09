@@ -66,8 +66,8 @@ def gen_elmer_sif(self, output, sym, angle, time, angle_rotor, Is, Ir):
         Full file name of the generated Elmer solver file
     """
 
-    project_name = self.get_path_save_fea(output)
-    mesh_names_file = join(project_name, "mesh.names")
+    fea_dir = self.get_path_save_fea(output)
+    mesh_names_file = join(fea_dir, "Mesh", "mesh.names")
     boundaries = {}
     bodies = {}
     machine = output.simu.machine
@@ -78,8 +78,8 @@ def gen_elmer_sif(self, output, sym, angle, time, angle_rotor, Is, Ir):
     Speed = output.elec.OP.get_N0()
     rotor_mat_file = "rotor_material.pmf"
     stator_mat_file = "stator_material.pmf"
-    rotor_mat_fullfile = join(project_name, rotor_mat_file)
-    stator_mat_fullfile = join(project_name, stator_mat_file)
+    rotor_mat_fullfile = join(fea_dir, rotor_mat_file)
+    stator_mat_fullfile = join(fea_dir, stator_mat_file)
 
     # airgap save line
     lam_list = machine.get_lam_list()
@@ -142,7 +142,7 @@ def gen_elmer_sif(self, output, sym, angle, time, angle_rotor, Is, Ir):
         ro.write("End\n")
 
     ### prepare sif generation###
-    elmer_sif_file = join(project_name, "pyleecan_elmer.sif")
+    elmer_sif_file = join(fea_dir, "case.sif")
     pp = machine.stator.winding.p
     wind_mat = machine.stator.winding.get_connection_mat(machine.stator.slot.Zs)
     surf_wind = machine.stator.slot.comp_surface_active()
@@ -349,9 +349,9 @@ def gen_elmer_sif(self, output, sym, angle, time, angle_rotor, Is, Ir):
         # header section
         fo.write("\nHeader\n")
         fo.write("\tCHECK KEYWORDS Warn\n")
-        fo.write('\tMesh DB "."\n')
+        fo.write('\tMesh DB "Mesh" "."\n')
         fo.write('\tInclude Path "."\n')
-        fo.write('\tResults Directory "."\n')
+        fo.write('\tResults Directory "Results"\n')
         fo.write("End\n")
 
         # constants section

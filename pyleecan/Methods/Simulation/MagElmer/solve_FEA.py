@@ -55,7 +55,7 @@ def solve_FEA(self, output, out_dict, sym, angle, time, elmer_sif_file):
     # ElmerSolver v8.4 must be installed and in the PATH
     # TODO enable parallel computation
 
-    elmermesh_folder = self.get_path_save_fea(output)
+    fea_dir = self.get_path_save_fea(output)
     project_name = split(elmer_sif_file)[0]
     ElmerSolver_binary = get_path_binary("ElmerSolver")
 
@@ -89,13 +89,13 @@ def solve_FEA(self, output, out_dict, sym, angle, time, elmer_sif_file):
 
     # Loading parameters for readibility
     L1 = machine.stator.comp_length()
-    save_path = self.get_path_save(output)
+    res_dir = join(fea_dir, "Results")
 
     # get the air gap flux result
-    _get_fields(join(elmermesh_folder, "lines.dat"), out_dict, time, angle)
+    _get_fields(join(res_dir, "lines.dat"), out_dict, time, angle)
 
     # get data
-    results = _get_scalars(join(elmermesh_folder, "scalars.dat"))
+    results = _get_scalars(join(res_dir, "scalars.dat"))
 
     tq = results["group 1 torque"]
     agt = results["air gap torque"]
