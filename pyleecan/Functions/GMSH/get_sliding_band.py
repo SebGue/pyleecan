@@ -65,14 +65,17 @@ def get_sliding_band(sym, machine):
             point_ref=(Rsb - 3 * Wsb / 2) * exp(1j * pi / 2),
             prop_dict={BOUNDARY_PROP_LAB: lab_int + "_" + AR_LAB},
         )
-        surf_list.append(
-            SurfRing(
-                out_surf=int_airgap_cir,
-                in_surf=int_lam_int_cir,
-                label=lab_int + "_" + AIRGAP_LAB,
-                point_ref=(Rsb - 3 * Wsb / 2) * exp(1j * pi / 2),
+        if Rint > 0:
+            surf_list.append(
+                SurfRing(
+                    out_surf=int_airgap_cir,
+                    in_surf=int_lam_int_cir,
+                    label=lab_int + "_" + AIRGAP_LAB,
+                    point_ref=(Rsb - 3 * Wsb / 2) * exp(1j * pi / 2),
+                )
             )
-        )
+        else:
+            surf_list.append(int_airgap_cir)
 
         # Internal Sliding band
         int_sb_cir = Circle(
@@ -162,14 +165,15 @@ def get_sliding_band(sym, machine):
             )
         )
 
-        int_arc = Arc1(
-            begin=Z0,
-            end=Z1,
-            radius=Z0,
-            is_trigo_direction=True,
-        )
-        int_arc.reverse()
-        airgap_lines.append(int_arc)
+        if Rint > 0:
+            int_arc = Arc1(
+                begin=Z0,
+                end=Z1,
+                radius=Z0,
+                is_trigo_direction=True,
+            )
+            int_arc.reverse()
+            airgap_lines.append(int_arc)
 
         surf_list.append(
             SurfLine(
