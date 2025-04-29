@@ -24,6 +24,8 @@ def comp_gmsh_mesh_dict(surface, element_size, user_mesh_dict={}):
     mesh_dict : dict
         Dictionary containing the number of element of each line of the surface
     """
+    if user_mesh_dict is None:
+        user_mesh_dict = {}
 
     mesh_dict = dict()
     lines = surface.get_lines()

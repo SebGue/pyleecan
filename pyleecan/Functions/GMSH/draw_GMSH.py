@@ -34,6 +34,8 @@ def draw_GMSH(
     is_airbox=False,
     is_set_labels=False,
     is_run=False,
+    is_mesh=True,
+    is_finalize=True,
 ):
     """Draws a machine mesh in GMSH format
 
@@ -61,7 +63,11 @@ def draw_GMSH(
         True to set all line labels as physical groups
     is_run : bool
         True to launch Gmsh GUI at the end
-
+    is_mesh : bool
+        True to run mesh generation and save mesh file except geo file is requested
+    is_finalize : bool
+        True to finalize model creation, otherwise model object is returned in output dict
+        
     Returns
     -------
     GMSH_dict : dict
@@ -72,6 +78,9 @@ def draw_GMSH(
         raise InputError(
             "is_lam_only_S and is_lam_only_R can't be True at the same time"
         )
+
+    if user_mesh_dict is None:
+        user_mesh_dict = {}
 
     # get machine
     machine = output.simu.machine
@@ -332,13 +341,20 @@ def draw_GMSH(
     if file_extension == ".geo":
         gmsh.write(filename + ".geo_unrolled")
         replace(filename + ".geo_unrolled", filename + file_extension)
-    else:
+    elif is_mesh:
         gmsh.model.mesh.generate(2)
         gmsh.write(path_save)
 
     if is_run:
-        gmsh.fltk.run()  # Uncomment to launch Gmsh GUI
-    gmsh.finalize()
+        gmsh.fltk.run()
+
+    if is_finalize:
+        gmsh.finalize()
+    else:
+        gmsh_dict['gmsh'] = gmsh
+        gmsh_dict['model'] = model
+        gmsh_dict['factory'] = factory
+
     return gmsh_dict
 
 
