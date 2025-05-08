@@ -2062,7 +2062,7 @@
                 "name": "Jrms_max",
                 "size": "",
                 "type": "float",
-                "unit": "A/m\u00b2",
+                "unit": "A/m\u00c2\u00b2",
                 "value": null
             },
             {
@@ -2994,6 +2994,7 @@
             "HoleM61",
             "HoleM62",
             "HoleM63",
+            "HoleM64",
             "HoleMLSRPM",
             "HoleMag",
             "HoleUD",
@@ -4568,6 +4569,115 @@
             }
         ]
     },
+    "HoleM64": {
+        "constants": [
+            {
+                "name": "VERSION",
+                "value": "1"
+            },
+            {
+                "name": "IS_SYMMETRICAL",
+                "value": "1"
+            }
+        ],
+        "daughters": [],
+        "desc": "I shape slot for buried magnet",
+        "is_internal": false,
+        "methods": [
+            "_comp_point_coordinate",
+            "build_geometry",
+            "plot_schematics",
+            "remove_magnet",
+            "comp_surface_magnet_id",
+            "comp_radius",
+            "has_magnet",
+            "check",
+            "comp_magnetization_dict"
+        ],
+        "mother": "HoleMag",
+        "name": "HoleM64",
+        "package": "Slot",
+        "path": "pyleecan/Generator/ClassesRef/Slot/HoleM64.csv",
+        "properties": [
+            {
+                "as_dict": "",
+                "desc": "Gap width above magnet",
+                "max": "",
+                "min": "0",
+                "name": "W1",
+                "size": "0",
+                "type": "float",
+                "unit": "rad",
+                "value": null
+            },
+            {
+                "as_dict": "",
+                "desc": "Magnet width",
+                "max": "",
+                "min": "0",
+                "name": "W2",
+                "size": "0",
+                "type": "float",
+                "unit": "m",
+                "value": null
+            },
+            {
+                "as_dict": "",
+                "desc": "Gap width below magnet",
+                "max": "",
+                "min": "0",
+                "name": "W3",
+                "size": "0",
+                "type": "float",
+                "unit": "m",
+                "value": null
+            },
+            {
+                "as_dict": "",
+                "desc": "Distance from the lamination bore",
+                "max": "",
+                "min": "0",
+                "name": "H0",
+                "size": "0",
+                "type": "float",
+                "unit": "m",
+                "value": null
+            },
+            {
+                "as_dict": "",
+                "desc": "Magnet height",
+                "max": "",
+                "min": "0",
+                "name": "H2",
+                "size": "0",
+                "type": "float",
+                "unit": "m",
+                "value": null
+            },
+            {
+                "as_dict": "",
+                "desc": "Corner radii",
+                "max": "",
+                "min": "0",
+                "name": "R0",
+                "size": "0",
+                "type": "float",
+                "unit": "m",
+                "value": null
+            },
+            {
+                "as_dict": "",
+                "desc": "First Magnet",
+                "max": "",
+                "min": "",
+                "name": "magnet_0",
+                "size": "0",
+                "type": "Magnet",
+                "unit": "-",
+                "value": ""
+            }
+        ]
+    },
     "HoleMLSRPM": {
         "constants": [
             {
@@ -4708,6 +4818,7 @@
             "HoleM61",
             "HoleM62",
             "HoleM63",
+            "HoleM64",
             "HoleMLSRPM",
             "HoleUD"
         ],
@@ -11269,7 +11380,7 @@
                 "name": "Jrms",
                 "size": "",
                 "type": "float",
-                "unit": "A/m\u00b2",
+                "unit": "A/m\u00c2\u00b2",
                 "value": null
             },
             {
