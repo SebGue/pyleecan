@@ -33,5 +33,11 @@ def check(self):
     elif self.R0 is None:
         raise S64_NoneError("You must set R0 !")
 
-    if (2 * self.R0) >= self.H0:
-        raise S64_WCheckError("You must have 2*R0 < H0")
+    if (2 * self.R0) >= self.H2:
+        raise S64_WCheckError("You must have 2*R0 < H2")
+
+    if self.R0 > self.W1:
+        raise S64_WCheckError("You must have R0 <= W1")
+
+    if self.R0 > self.W3:
+        raise S64_WCheckError("You must have R0 <= W3")

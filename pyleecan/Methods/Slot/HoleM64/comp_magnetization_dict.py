@@ -24,10 +24,12 @@ def comp_magnetization_dict(self, is_north=True):
 
     mag_dict = dict()
     S0 = Segment(point_dict["ZM2"], point_dict["ZM3"])
-    mag_dict["magnet_0"] = S0.comp_normal()
+    mag_dict["magnet_0"] = S0.comp_normal() - pi/self.Zh + pi
+    mag_dict["magnet_1"] = mag_dict["magnet_0"] + 2*pi/self.Zh + pi
 
     if not is_north:
         mag_dict["magnet_0"] += pi
+        mag_dict["magnet_1"] += pi
 
     if self.magnetization_dict_offset is not None:
         for key, value in self.magnetization_dict_offset:

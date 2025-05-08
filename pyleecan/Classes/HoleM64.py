@@ -62,6 +62,11 @@ try:
 except ImportError as error:
     comp_magnetization_dict = error
 
+try:
+    from ..Methods.Slot.HoleM64.get_magnet_dict import get_magnet_dict
+except ImportError as error:
+    get_magnet_dict = error
+
 
 from numpy import isnan
 from ._check import InitUnKnowClassError
@@ -170,6 +175,17 @@ class HoleM64(HoleMag):
         )
     else:
         comp_magnetization_dict = comp_magnetization_dict
+    # cf Methods.Slot.HoleM64.get_magnet_dict
+    if isinstance(get_magnet_dict, ImportError):
+        get_magnet_dict = property(
+            fget=lambda x: raise_(
+                ImportError(
+                    "Can't use HoleM64 method get_magnet_dict: " + str(get_magnet_dict)
+                )
+            )
+        )
+    else:
+        get_magnet_dict = get_magnet_dict
     # generic save method is available in all object
     save = save
     # get_logger method is available in all object
