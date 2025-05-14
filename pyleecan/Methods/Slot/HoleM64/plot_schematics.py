@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
-from numpy import pi, exp, angle
+from numpy import pi, exp, conjugate
 
-from pyleecan.Classes.Arc1 import Arc1
+from pyleecan.Classes.Arc2 import Arc2
 from pyleecan.Classes.LamHole import LamHole
 from pyleecan.Classes.Segment import Segment
 from pyleecan.definitions import config_dict
@@ -74,20 +74,15 @@ def plot_schematics(
     lam : LamHole / LamSlot
         Default lamination used for the schematics
     """
+    mm = 1e-3
 
     # Use some default parameter
     if is_default:
         hole = type(self)(
-            Zh=4,
-            W0=pi * 0.5,
-            W1=2e-2,
-            W2=7e-2,
-            W3=8e-3,
-            H0=12e-3,
-            H1=10e-3,
+            Zh=4, W1=1 * mm, W2=5 * mm, W3=1 * mm, H0=2 * mm, H2=3 * mm, R0=0.5 * mm
         )
         lam = LamHole(
-            Rint=0.03, Rext=0.12, is_internal=True, is_stator=False, hole=[hole]
+            Rint=30 * mm, Rext=120 * mm, is_internal=True, is_stator=False, hole=[hole]
         )
         if is_return_default:
             return lam
@@ -117,12 +112,13 @@ def plot_schematics(
     fig, ax = lam.plot(
         alpha=pi / self.Zh + alpha,
         is_show_fig=False,
-        is_lam_only=type_add_active == 0,
+        is_lam_only=False,
         fig=fig,
         ax=ax,
     )  # center hole on Ox axis
     sp = 2 * pi / self.Zh
     Rbo = self.get_Rbo()
+    Rext = lam.Rext
     point_dict = self._comp_point_coordinate()
 
     # Adding point label
@@ -139,60 +135,58 @@ def plot_schematics(
 
     # Adding schematics
     if is_add_schematics:
-        # W0
-        line = Arc1(
-            begin=point_dict["ZM1s"] * exp(1j * alpha),
-            end=point_dict["ZM1"] * exp(1j * alpha),
-            radius=abs(
-                (point_dict["ZM1"] + point_dict["Z1"]) / 2
-                - (point_dict["ZM1s"] + point_dict["Z1s"]) / 2
-            ),
-            is_trigo_direction=True,
+        xOffset = self.H2 * 0.2
+        yOffset = -self.H2 * 0.2 * 1j
+        # R0
+        line = Arc2(
+            begin=point_dict["Z11"] * exp(1j * alpha),
+            center=point_dict["Z1c"] * exp(1j * alpha),
+            angle=pi / 2,
         )
         line.plot(
             fig=fig,
             ax=ax,
             color=ARROW_COLOR,
             linewidth=ARROW_WIDTH,
-            label="W0",
-            offset_label=(1 + 1j) * self.H1 * 0.4,
+            label="R0",
+            offset_label=(-1 + 1j) * self.R0,
             fontsize=SC_FONT_SIZE,
         )
-        # W1, magnet width only if magnet is visible
+        # W2, magnet width only if magnet is visible
         if type_add_active == 2:
             line = Segment(
-                point_dict["ZM1"] * exp(1j * alpha),
-                point_dict["ZM2"] * exp(1j * alpha),
+                conjugate(point_dict["ZM1"]) * exp(1j * alpha),
+                conjugate(point_dict["ZM2"]) * exp(1j * alpha),
             )
             line.plot(
                 fig=fig,
                 ax=ax,
                 color=ARROW_COLOR,
                 linewidth=ARROW_WIDTH,
-                label="W1",
-                offset_label=(1 + 1j) * self.H1 * 0.25,
+                label="W2",
+                offset_label=xOffset,
                 is_arrow=True,
                 fontsize=SC_FONT_SIZE,
             )
-        # W2
+        # W1
         line = Segment(
-            point_dict["Z3s"] * exp(1j * alpha),
-            point_dict["Z6s"] * exp(1j * alpha),
+            conjugate(point_dict["Z1"]) * exp(1j * alpha),
+            conjugate(point_dict["ZM1"]) * exp(1j * alpha),
         )
         line.plot(
             fig=fig,
             ax=ax,
             color=ARROW_COLOR,
             linewidth=ARROW_WIDTH,
-            label="W2",
-            offset_label=-1j * self.H1,
+            label="W1",
+            offset_label=xOffset,
             is_arrow=True,
             fontsize=SC_FONT_SIZE,
         )
         # W3
         line = Segment(
-            point_dict["Z1"] * exp(1j * alpha),
-            point_dict["Z1s"] * exp(1j * alpha),
+            conjugate(point_dict["ZM2"]) * exp(1j * alpha),
+            conjugate(point_dict["Z2"]) * exp(1j * alpha),
         )
         line.plot(
             fig=fig,
@@ -200,14 +194,14 @@ def plot_schematics(
             color=ARROW_COLOR,
             linewidth=ARROW_WIDTH,
             label="W3",
-            offset_label=1j * self.H1 * 0.5,
+            offset_label=xOffset,
             is_arrow=True,
             fontsize=SC_FONT_SIZE,
         )
         # H0
         line = Segment(
-            point_dict["Z2s"] * exp(1j * alpha),
-            point_dict["Z4s"] * exp(1j * alpha),
+            Rext * exp(1j * alpha),
+            point_dict["Z1"].real * exp(1j * alpha),
         )
         line.plot(
             fig=fig,
@@ -215,23 +209,23 @@ def plot_schematics(
             color=ARROW_COLOR,
             linewidth=ARROW_WIDTH,
             label="H0",
-            offset_label=-1j * self.H1,
+            offset_label=xOffset,
             is_arrow=True,
             fontsize=SC_FONT_SIZE,
         )
-        # H1
-        A = angle(point_dict["Z3"])
+        # H2
+        Z = (point_dict["ZM1"] + point_dict["ZM2"]) / 2
         line = Segment(
-            Rbo * exp(1j * A) * exp(1j * alpha),
-            (Rbo - self.H1) * exp(1j * A) * exp(1j * alpha),
+            Z * exp(1j * alpha),
+            conjugate(Z) * exp(1j * alpha),
         )
         line.plot(
             fig=fig,
             ax=ax,
             color=ARROW_COLOR,
             linewidth=ARROW_WIDTH,
-            label="H1",
-            offset_label=self.H1 * 0.5,
+            label="H2",
+            offset_label=yOffset,
             is_arrow=True,
             fontsize=SC_FONT_SIZE,
         )
@@ -246,86 +240,66 @@ def plot_schematics(
             linestyle=MAIN_LINE_STYLE,
             linewidth=MAIN_LINE_WIDTH,
         )
-        # Tooth axis
-        line = Segment(0, lam.Rext * 1.5 * exp(1j * sp / 2) * exp(1j * alpha))
-        line.plot(
-            fig=fig,
-            ax=ax,
-            color=MAIN_LINE_COLOR,
-            linestyle=MAIN_LINE_STYLE,
-            linewidth=MAIN_LINE_WIDTH,
-        )
-        line = Segment(0, lam.Rext * 1.5 * exp(-1j * sp / 2) * exp(1j * alpha))
-        line.plot(
-            fig=fig,
-            ax=ax,
-            color=MAIN_LINE_COLOR,
-            linestyle=MAIN_LINE_STYLE,
-            linewidth=MAIN_LINE_WIDTH,
-        )
-        # H1 radius
-        A = angle(point_dict["Z3"])
-        line = Segment(0, Rbo * exp(1j * A) * exp(1j * alpha))
-        line.plot(
-            fig=fig,
-            ax=ax,
-            color=MAIN_LINE_COLOR,
-            linestyle=MAIN_LINE_STYLE,
-            linewidth=MAIN_LINE_WIDTH,
-        )
-        line = Arc1(
-            begin=(Rbo - self.H1) * exp(-1j * pi / 2 * 0.9) * exp(1j * alpha),
-            end=(Rbo - self.H1) * exp(1j * pi / 2 * 0.9) * exp(1j * alpha),
-            radius=Rbo - self.H1,
-            is_trigo_direction=True,
-        )
-        line.plot(
-            fig=fig,
-            ax=ax,
-            color=MAIN_LINE_COLOR,
-            linestyle=MAIN_LINE_STYLE,
-            linewidth=MAIN_LINE_WIDTH,
-        )
-        # H0 lines
-        line = Segment(
-            point_dict["Z2"] * exp(1j * alpha), point_dict["Z4"] * exp(1j * alpha)
-        )
-        line.plot(
-            fig=fig,
-            ax=ax,
-            color=MAIN_LINE_COLOR,
-            linestyle=MAIN_LINE_STYLE,
-            linewidth=MAIN_LINE_WIDTH,
-        )
-        line = Segment(
-            point_dict["Z1"] * exp(1j * alpha), point_dict["Z5"] * exp(1j * alpha)
-        )
-        line.plot(
-            fig=fig,
-            ax=ax,
-            color=MAIN_LINE_COLOR,
-            linestyle=MAIN_LINE_STYLE,
-            linewidth=MAIN_LINE_WIDTH,
-        )
-        line = Segment(
-            point_dict["Z1s"] * exp(1j * alpha), point_dict["Z5s"] * exp(1j * alpha)
-        )
-        line.plot(
-            fig=fig,
-            ax=ax,
-            color=MAIN_LINE_COLOR,
-            linestyle=MAIN_LINE_STYLE,
-            linewidth=MAIN_LINE_WIDTH,
-        )
+        # # H1 radius
+        # A = angle(point_dict["Z3"])
+        # line = Segment(0, Rbo * exp(1j * A) * exp(1j * alpha))
+        # line.plot(
+        #     fig=fig,
+        #     ax=ax,
+        #     color=MAIN_LINE_COLOR,
+        #     linestyle=MAIN_LINE_STYLE,
+        #     linewidth=MAIN_LINE_WIDTH,
+        # )
+        # line = Arc1(
+        #     begin=(Rbo - self.H1) * exp(-1j * pi / 2 * 0.9) * exp(1j * alpha),
+        #     end=(Rbo - self.H1) * exp(1j * pi / 2 * 0.9) * exp(1j * alpha),
+        #     radius=Rbo - self.H1,
+        #     is_trigo_direction=True,
+        # )
+        # line.plot(
+        #     fig=fig,
+        #     ax=ax,
+        #     color=MAIN_LINE_COLOR,
+        #     linestyle=MAIN_LINE_STYLE,
+        #     linewidth=MAIN_LINE_WIDTH,
+        # )
+        # # H0 lines
+        # line = Segment(
+        #     point_dict["Z2"] * exp(1j * alpha), point_dict["Z4"] * exp(1j * alpha)
+        # )
+        # line.plot(
+        #     fig=fig,
+        #     ax=ax,
+        #     color=MAIN_LINE_COLOR,
+        #     linestyle=MAIN_LINE_STYLE,
+        #     linewidth=MAIN_LINE_WIDTH,
+        # )
+        # line = Segment(
+        #     point_dict["Z1"] * exp(1j * alpha), point_dict["Z5"] * exp(1j * alpha)
+        # )
+        # line.plot(
+        #     fig=fig,
+        #     ax=ax,
+        #     color=MAIN_LINE_COLOR,
+        #     linestyle=MAIN_LINE_STYLE,
+        #     linewidth=MAIN_LINE_WIDTH,
+        # )
+        # line = Segment(
+        #     point_dict["Z1s"] * exp(1j * alpha), point_dict["Z5s"] * exp(1j * alpha)
+        # )
+        # line.plot(
+        #     fig=fig,
+        #     ax=ax,
+        #     color=MAIN_LINE_COLOR,
+        #     linestyle=MAIN_LINE_STYLE,
+        #     linewidth=MAIN_LINE_WIDTH,
+        # )
 
     # Zooming and cleaning
-    W = (point_dict["Z"] * exp(1j * sp)).imag
-    Rint = self.parent.Rint
-    Rext = self.parent.Rext
 
     ax.axis("equal")
-    ax.set_ylim(Rint, Rext)
-    ax.set_xlim(-W, W)
+    ax.set_ylim(Rext - (self.H0 + self.W1 + self.W2 + self.W3) * 1.2, Rext)
+    ax.set_xlim(-self.H2 * 2, self.H2 * 2)
     manager = plt.get_current_fig_manager()
     if manager is not None:
         manager.set_window_title(type(self).__name__ + " Schematics")

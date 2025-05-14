@@ -11,3 +11,4 @@ def remove_magnet(self):
     """
 
     self.magnet_0 = None
+    self.W2 = 0

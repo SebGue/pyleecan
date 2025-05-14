@@ -53,6 +53,7 @@ from pyleecan.Classes.HoleM60 import HoleM60
 from pyleecan.Classes.HoleM61 import HoleM61
 from pyleecan.Classes.HoleM62 import HoleM62
 from pyleecan.Classes.HoleM63 import HoleM63
+from pyleecan.Classes.HoleM64 import HoleM64
 from Tests import SCHEMATICS_PATH
 from Tests import SCHEMATICS_POINT_PATH
 from os.path import join, isdir, isfile
@@ -121,6 +122,7 @@ Hole_list = [
     HoleM61(),
     HoleM62(),
     HoleM63(),
+    HoleM64(),
 ]
 
 
@@ -601,11 +603,20 @@ if __name__ == "__main__":
     a = Test_plot_schematics()
     # a.test_BoreFlower()
     # a.test_BoreSinePole()
-    a.test_plot(plot_test[41])
-    a.test_plot_point(plot_test[41])
-    a.test_plot(plot_test[19])
+    # a.test_plot(plot_test[41])
+    # a.test_plot_point(plot_test[41])
+    # a.test_plot(plot_test[19])
     # a.test_plot_point(plot_test[18])
     #
+    test_objs = [obj for obj in plot_test if isinstance(obj['test_obj'], HoleM64)]
+    for test_obj in test_objs:
+        a.test_plot(test_obj)
+        a.test_plot_point(test_obj)
+
+    test_objs = [obj for obj in plot_test if isinstance(obj['test_obj'], HoleM60)]
+    for test_obj in test_objs:
+        a.test_plot(test_obj)
+        a.test_plot_point(test_obj)
 
     # for plot in plot_test:
     #    a.test_plot(plot)
