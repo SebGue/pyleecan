@@ -36,7 +36,7 @@ class Ui_PHoleM64(object):
         self.img_slot.setMinimumSize(QSize(0, 0))
         self.img_slot.setMaximumSize(QSize(16777215, 16777215))
         self.img_slot.setPixmap(
-            QPixmap(":/images/images/MachineSetup/SMHoleMag/HoleM60_mag_int_rotor.png")
+            QPixmap(":/images/images/MachineSetup/SMHoleMag/HoleM64_mag_int_rotor.png")
         )
         self.img_slot.setScaledContents(False)
         self.img_slot.setAlignment(Qt.AlignCenter)
@@ -236,10 +236,10 @@ class Ui_PHoleM64(object):
         self.in_H0.setText(QCoreApplication.translate("PHoleM64", "H0", None))
         self.g_output.setTitle(QCoreApplication.translate("PHoleM64", "Output", None))
         self.out_slot_surface.setText(
-            QCoreApplication.translate("PHoleM64", "Slot suface (2 part) : ?", None)
+            QCoreApplication.translate("PHoleM64", "Hole total suface: ?", None)
         )
         self.out_magnet_surface.setText(
-            QCoreApplication.translate("PHoleM64", "Single Magnet surface : ?", None)
+            QCoreApplication.translate("PHoleM64", "Magnet surface : ?", None)
         )
 
     # retranslateUi

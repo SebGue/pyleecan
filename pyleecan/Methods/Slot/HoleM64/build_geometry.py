@@ -93,7 +93,7 @@ def build_geometry(self, alpha=0, delta=0, is_simplified=False):
     S1.label = vent_label + "T1-S0"
 
     # magnet_0 surface
-    if self.magnet_0:
+    if self.magnet_0 and self.W2 != 0:
         curve_list = list()
         curve_list.append(Segment(conjugate(ZM1), ZM1))
         curve_list.append(Segment(ZM1, ZM2))
@@ -106,7 +106,7 @@ def build_geometry(self, alpha=0, delta=0, is_simplified=False):
     # Create the surface list by selecting the correct ones
     surf_list = list()
     surf_list += [S0]
-    if self.magnet_0:
+    if self.magnet_0 and self.W2 != 0:
         surf_list += [SM]
     surf_list += [S1]
 

@@ -199,7 +199,7 @@ class PHoleM64(Gen_PHoleM64, QWidget):
 
                 # Update the GUI to display the Output
                 self.out_slot_surface.setText(
-                    "Slot suface (2 part): " + s_surf + " " + self.u.get_m2_name()
+                    "Hole total suface: " + s_surf + " " + self.u.get_m2_name()
                 )
                 self.out_magnet_surface.setText(
                     "Magnet surface: " + m_surf + " " + self.u.get_m2_name()
@@ -211,7 +211,7 @@ class PHoleM64(Gen_PHoleM64, QWidget):
         if not is_set:
             # We can't compute the output => We erase the previous version
             # (that way the user know that something is wrong)
-            self.out_slot_surface.setText("Slot suface (2 part): ?")
+            self.out_slot_surface.setText("Hole total suface: ?")
             self.out_magnet_surface.setText("Magnet surface: ?")
 
     def check(self):

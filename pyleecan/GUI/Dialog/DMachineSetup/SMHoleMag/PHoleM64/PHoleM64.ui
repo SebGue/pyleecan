@@ -269,14 +269,14 @@ p, li { white-space: pre-wrap; }
           <item>
            <widget class="QLabel" name="out_slot_surface">
             <property name="text">
-             <string>Slot suface (2 part) : ?</string>
+             <string>Hole total suface: ?</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QLabel" name="out_magnet_surface">
             <property name="text">
-             <string>Single Magnet surface : ?</string>
+             <string>Magnet surface : ?</string>
             </property>
            </widget>
           </item>
