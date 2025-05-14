@@ -165,9 +165,10 @@ def comp_FEMM_dict(
     for key, val in FEMM_GROUPS["lam_group_list"].items():
         FEMM_dict["groups"]["lam_group_list"][key] = list(val)
 
-    # Adding a group for each magnet on the lamination
+    # Adding a group for each magnet on the lamination even if groups may not be used
+    # due to symmetry
     if isinstance(machine.rotor, (LamSlotM, LamH)):
-        nb_mag = machine.rotor.get_magnet_number(sym=sym)
+        nb_mag = machine.rotor.get_magnet_number(sym=1)
         ndigit = max(len(str(nb_mag)), len(str(grp_max)) - 1)
         grp0 = FEMM_dict["groups"]["GROUP_RM"] * 10**ndigit
         list_mag = [grp0 + ii for ii in range(nb_mag)]

@@ -12,4 +12,6 @@ def get_magnet_dict(self):
         Dictionary of magnet (key = magnet_X, value= Magnet or None)
     """
 
-    return dict(magnet_0=self.magnet_0, magnet_1=self.magnet_0)
+    return dict(
+        magnet_0=self.magnet_0,
+    )
