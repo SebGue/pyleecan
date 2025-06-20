@@ -22,7 +22,7 @@ def get_Lm_dqh(self, Id, Iq, Phi_dqh=None):
     """
 
     if Phi_dqh is None:
-        Phi_dqh = self.interp_Phi_dqh(Id=Id, Iq=Iq)
+        Phi_dqh = self.interp_Phi_dqh(Id=Id, Iq=Iq)[0]
 
     # Get dqh flux linkage (without currents, only due to PM)
     Phi_dqh_mag = self.get_Phi_dqh_mag_mean()

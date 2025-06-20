@@ -41,7 +41,7 @@ def update_from_ref(self, LUT_ref):
         self.Phiq_mag = Phi_dqh_mag[1]
 
     # Compute stator winding flux
-    Phi_dqh = LUT_ref.interp_Phi_dqh(Id=Id, Iq=Iq)
+    Phi_dqh = LUT_ref.interp_Phi_dqh(Id=Id, Iq=Iq).T[0]
     self.Phid = Phi_dqh[0]
     self.Phiq = Phi_dqh[1]
 
