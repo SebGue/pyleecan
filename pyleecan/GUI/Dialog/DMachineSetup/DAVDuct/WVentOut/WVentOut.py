@@ -1,6 +1,6 @@
 from numpy import pi
-from PySide2.QtCore import QSize
-from PySide2.QtWidgets import QGroupBox, QLabel, QVBoxLayout, QWidget
+from qtpy.QtCore import QSize
+from qtpy.QtWidgets import QGroupBox, QLabel, QVBoxLayout, QWidget
 
 from ......Classes.Lamination import Lamination
 from ......GUI import gui_option
@@ -86,7 +86,7 @@ class WVentOut(QGroupBox):
             sp_txt = "?"
         self.out_sp.setText("pi / Zh : " + sp_txt)
 
-        Slam = pi * (lam.Rext ** 2 - lam.Rint ** 2)
+        Slam = pi * (lam.Rext**2 - lam.Rint**2)
         Slam_txt = format(self.u.get_m2(Slam), ".4g")
         self.out_lam_surface.setText(
             "Active surface: " + Slam_txt + " [" + self.u.get_m2_name() + "]"

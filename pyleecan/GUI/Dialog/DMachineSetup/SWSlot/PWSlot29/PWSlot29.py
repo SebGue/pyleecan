@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import PySide2.QtCore
-from PySide2.QtCore import Signal
-from PySide2.QtWidgets import QWidget
-from PySide2.QtGui import QPixmap
+import qtpy.QtCore
+from qtpy.QtCore import Signal
+from qtpy.QtWidgets import QWidget
+from qtpy.QtGui import QPixmap
 from ......Classes.SlotW29 import SlotW29
 from ......GUI import gui_option
 from ......GUI.Dialog.DMachineSetup.SWSlot.PWSlot29.Gen_PWSlot29 import Gen_PWSlot29
@@ -11,7 +11,7 @@ from ......Methods.Slot.Slot import SlotCheckError
 from ......GUI.Resources import pixmap_dict
 
 
-translate = PySide2.QtCore.QCoreApplication.translate
+translate = qtpy.QtCore.QCoreApplication.translate
 
 
 class PWSlot29(Gen_PWSlot29, QWidget):
@@ -90,6 +90,11 @@ class PWSlot29(Gen_PWSlot29, QWidget):
         if self.slot.wedge_type == None:
             self.slot.wedge_type = 0
 
+        elif self.slot.wedge_type == 1:
+            self.img_slot.setPixmap(
+                QPixmap(pixmap_dict["SlotW29_wedge_type_1_ext_stator"])
+            )
+
         self.c_wedge_type.setCurrentIndex(self.slot.wedge_type)
 
         # Display the main output of the slot (surface, height...)
@@ -122,14 +127,12 @@ class PWSlot29(Gen_PWSlot29, QWidget):
 
     def set_type_wedge(self):
         if self.c_wedge_type.currentIndex() == 1:
-
             self.img_slot.setPixmap(
                 QPixmap(pixmap_dict["SlotW29_wedge_type_1_ext_stator"])
             )
             self.slot.wedge_type = 1
 
         if self.c_wedge_type.currentIndex() == 0:
-
             self.img_slot.setPixmap(
                 QPixmap(pixmap_dict["SlotW29_wedge_full_ext_stator"])
             )

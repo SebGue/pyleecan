@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from PySide2.QtCore import Signal
-from PySide2.QtGui import QPixmap
-from PySide2.QtWidgets import QWidget
+from qtpy.QtCore import Signal
+from qtpy.QtGui import QPixmap
+from qtpy.QtWidgets import QWidget
 from pyleecan.Classes.HoleM63 import HoleM63
 from pyleecan.GUI import gui_option
 from pyleecan.GUI.Dialog.DMachineSetup.SMHoleMag.PHoleM63.Gen_PHoleM63 import (
@@ -61,6 +61,12 @@ class PHoleM63(Gen_PHoleM63, QWidget):
 
         if self.hole.top_flat is None:
             self.hole.top_flat = False
+
+        elif self.hole.top_flat == True:
+            self.img_slot.setPixmap(
+                QPixmap(pixmap_dict["HoleM63_mag_int_rotor_top_flat"])
+            )
+
         self.ck_is_top_flat.setChecked(self.hole.top_flat)
 
         # Set unit name (m ou mm)

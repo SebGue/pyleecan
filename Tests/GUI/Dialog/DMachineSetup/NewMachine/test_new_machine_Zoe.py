@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from os import makedirs, listdir
 from numpy import max as np_max
 
-from PySide2 import QtWidgets
+from qtpy import QtWidgets
 import mock
 import pytest
 from pyleecan.Classes.MachineWRSM import MachineWRSM
@@ -159,7 +159,7 @@ class TestNewMachineZoe(object):
         ## Initial state
         assert self.widget.w_step.test_err_msg is None
         with mock.patch(
-            "PySide2.QtWidgets.QMessageBox.critical",
+            "qtpy.QtWidgets.QMessageBox.critical",
             return_value=QtWidgets.QMessageBox.Ok,
         ):
             self.widget.w_step.b_plot.clicked.emit()
@@ -330,7 +330,7 @@ class TestNewMachineZoe(object):
         )
         assert not isfile(file_path)
         with mock.patch(
-            "PySide2.QtWidgets.QFileDialog.getSaveFileName", return_value=return_value
+            "qtpy.QtWidgets.QFileDialog.getSaveFileName", return_value=return_value
         ):
             # To trigger the slot
             self.widget.w_step.b_export.clicked.emit()
@@ -457,12 +457,13 @@ class TestNewMachineZoe(object):
             == "Slot pitch: 360 / Zs = 90 [°] (1.571 [rad])"
         )
 
-        assert self.widget.w_step.c_slot_type.count() == 2
+        assert self.widget.w_step.c_slot_type.count() == 5
+
         assert self.widget.w_step.c_slot_type.currentText() == "Pole Type 60"
 
         assert self.widget.w_step.test_err_msg is None
         with mock.patch(
-            "PySide2.QtWidgets.QMessageBox.critical",
+            "qtpy.QtWidgets.QMessageBox.critical",
             return_value=QtWidgets.QMessageBox.Ok,
         ):
             self.widget.w_step.b_plot.clicked.emit()
@@ -771,7 +772,7 @@ class TestNewMachineZoe(object):
         res_path = join(save_path, "Simu_Results")
         makedirs(res_path)
         with mock.patch(
-            "PySide2.QtWidgets.QFileDialog.getExistingDirectory", return_value=res_path
+            "qtpy.QtWidgets.QFileDialog.getExistingDirectory", return_value=res_path
         ):
             # To trigger the slot
             self.widget.w_step.w_path_result.b_path.clicked.emit()
@@ -786,7 +787,7 @@ class TestNewMachineZoe(object):
 
         ## Run
         assert len(listdir(res_path)) == 0
-        with mock.patch("PySide2.QtWidgets.QMessageBox.information", return_value=None):
+        with mock.patch("qtpy.QtWidgets.QMessageBox.information", return_value=None):
             self.widget.w_step.b_next.clicked.emit()
         # Run creates a new results folder with execution time in the name
         assert len(listdir(res_path)) == 1

@@ -24,7 +24,7 @@ system(
 # Release 1.1.0 : 1.1.0
 # First post release of the release 1.1.0 : 1.1.0.post1
 
-PYLEECAN_VERSION = "1.5.1"
+PYLEECAN_VERSION = "1.5.2"
 
 
 with open("README.md", "r") as fh:
@@ -44,12 +44,14 @@ install_requires = [
     "pyfemm>=0.1.3",
     "PySide2>=5.15.2",
     "pyuff>=1.25",
-    "pyvista>=0.25.3,<=0.31.3",
+    "pyvista>=0.42.3",
     "SciDataTool>=2.5.0",
     "scipy>=1.4.1",
     "setuptools",
+    "vtk>=9.2.6",
     "xlrd>=1.2.0",
     "xlwt>=1.3.0",
+    "qtpy>=2.4.1",
 ]
 # Pyleecan optional dependancies
 full_require = [

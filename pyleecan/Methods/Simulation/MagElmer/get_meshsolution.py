@@ -1,11 +1,14 @@
+from os.path import join
+
+from meshio import read
+from numpy import append as np_append
+from numpy import arange
+from SciDataTool import Data1D, DataTime, Norm_ref, VectorField
+
 from ....Classes.MeshSolution import MeshSolution
 from ....Classes.MeshVTK import MeshVTK
 from ....Classes.SolutionData import SolutionData
 from ....Classes.SolutionVector import SolutionVector
-from meshio import read
-from SciDataTool import Data1D, VectorField, DataTime, Norm_ref
-from numpy import arange, append as np_append
-from os.path import join
 
 
 def get_meshsolution(self, output):
@@ -31,7 +34,7 @@ def get_meshsolution(self, output):
         return False
 
     meshvtk = MeshVTK(path=elmermesh_folder, name="step_t0002", format="vtu")
-    meshsol.mesh = [meshvtk]
+    meshsol.mesh = meshvtk
 
     result_filename = join(elmermesh_folder, "step_t0002.vtu")
     meshsolvtu = read(result_filename)
@@ -97,7 +100,7 @@ def get_meshsolution(self, output):
         },
     }
     comp_ext = ["x", "y", "z"]
-    sol_list = []
+    sol_dict = dict()
     # for key, value in pt_data.items():
     for key, value in cell_data.items():
         if key in store_dict.keys():
@@ -130,13 +133,11 @@ def get_meshsolution(self, output):
 
             if siz == 1:
                 field = components[0]
-                sol_list.append(
-                    SolutionData(
-                        field=field,
-                        # type_cell="point",
-                        type_cell="triangle",
-                        label=store_dict[key]["symbol"],
-                    )
+                sol_dict[store_dict[key]["symbol"]] = SolutionData(
+                    field=field,
+                    # type_element="point",
+                    type_element="triangle",
+                    label=store_dict[key]["symbol"],
                 )
             else:
                 comps = {}
@@ -147,16 +148,14 @@ def get_meshsolution(self, output):
                     symbol=store_dict[key]["symbol"],
                     components=comps,
                 )
-                sol_list.append(
-                    SolutionVector(
-                        field=field,
-                        # type_cell="point",
-                        type_cell="triangle",
-                        label=store_dict[key]["symbol"],
-                    )
+                sol_dict[store_dict[key]["symbol"]] = SolutionVector(
+                    field=field,
+                    # type_element="point",
+                    type_element="triangle",
+                    label=store_dict[key]["symbol"],
                 )
 
-    meshsol.solution = sol_list
+    meshsol.solution_dict = sol_dict
     output.mag.meshsolution = meshsol
 
     return True
