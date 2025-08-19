@@ -361,9 +361,9 @@ class _FEMMHandler(object):
         global is_windows_os
 
         if is_windows_os:
-            self.callfemm_Windows(myString)
+            self.callfemm_noeval_Windows(myString)
         else:
-            self.callfemm_Linux(myString)
+            self.callfemm_noeval_Linux(myString)
 
     def ci_addarc(self, *arg):
         self.callfemm("ci_addarc" + self.doargs(*arg))
