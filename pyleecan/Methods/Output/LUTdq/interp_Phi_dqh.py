@@ -91,6 +91,7 @@ def interp_Phi_dqh(self, Id, Iq):
         # Interpolate Phid and Phiq, Phih is enforced to 0
         if n_OP == 1:
             Phi_dqh[0:2, :] = Phid_dqh_val[:, None]
+            Phi_dqh = np.squeeze(Phi_dqh)
         else:
             Phi_dqh[0:2, :] = Phid_dqh_val.T
 

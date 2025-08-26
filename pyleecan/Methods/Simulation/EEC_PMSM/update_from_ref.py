@@ -46,7 +46,9 @@ def update_from_ref(self, LUT_ref):
     self.Phiq = Phi_dqh[1]
 
     # Compute stator winding inductance
-    Ldqh = LUT_ref.get_L_dqh(Id=Id, Iq=Iq, Phi_dqh=Phi_dqh)
+    Id = -1 if Id == 0 else Id
+    Iq = -1 if Iq == 0 else Iq
+    Ldqh = LUT_ref.get_L_dqh(Id=Id, Iq=Iq, Phi_dqh=LUT_ref.interp_Phi_dqh(Id=Id, Iq=Iq))
     if Ldqh is not None:
         self.Ld = Ldqh[0]
         self.Lq = Ldqh[1]
