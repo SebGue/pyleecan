@@ -228,6 +228,7 @@ def gen_case(self, output, mesh_names):
             bnd = Section(section="Boundary Condition", id=i)
             bnd["Name"] = slave
             bnd["Normal-Tangential Displacement"] = True
+            bnd["One Sided Normals"] = True
             bnd["Periodic BC"] = i + 1  # next bnd will be the corresponding master
             bnd["Periodic BC Displacement 1"] = True  # normal disp is fixed between M&S
             bnd["Periodic BC Displacement 2"] = False  # tangential disp is independent
