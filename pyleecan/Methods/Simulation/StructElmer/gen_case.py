@@ -212,21 +212,18 @@ def gen_case(self, output, mesh_names):
     i = 0
 
     # pair master and slave of Magnet_x_Top, Magnet_0_Right and Magnet_1_Left
-    paired_bnds = [
-        "Rotor_Magnet_0_Top",
-        "Rotor_Magnet_1_Top",
-        "Rotor_Magnet_0_Right",
-        "Rotor_Magnet_1_Left",
-    ]
+    base_name = "Rotor_Magnet_"
+    master = "Master"
+    slave = "Slave"
+    paired_bnds = [name for name in names if base_name in name and master in name]
 
-    for name in paired_bnds:
-        master = name + "_Master"
-        slave = name + "_Slave"
-        if master in names and slave in names:
+    for master_name in paired_bnds:
+        slave_name = master_name.replace(master, slave)
+        if slave_name in names:
             # "slave"
             i += 1
             bnd = Section(section="Boundary Condition", id=i)
-            bnd["Name"] = slave
+            bnd["Name"] = slave_name
             bnd["Normal-Tangential Displacement"] = True
             bnd["One Sided Normals"] = True
             bnd["Periodic BC"] = i + 1  # next bnd will be the corresponding master
@@ -239,7 +236,7 @@ def gen_case(self, output, mesh_names):
             # "master"
             i += 1
             bnd = Section(section="Boundary Condition", id=i)
-            bnd["Name"] = master
+            bnd["Name"] = master_name
             bnd["Normal-Tangential Displacement"] = True
             boundaries.append(bnd)
 

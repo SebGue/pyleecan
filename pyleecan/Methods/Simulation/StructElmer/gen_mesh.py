@@ -35,7 +35,7 @@ def gen_mesh(self, output):
     # draw initial gmsh model
     file_gmsh_geo = join(save_dir, "GMSH_Machine_Model.geo")
 
-    draw_GMSH(
+    gmsh_dict = draw_GMSH(
         output=output,
         sym=sym_r,  # TODO is it possible to have to use draw_GMSH with sym_r > sym ?
         boundary_prop=StructElmer_BP_dict,
@@ -45,35 +45,26 @@ def gen_mesh(self, output):
         user_mesh_dict=self.FEA_dict_enforced,
         path_save=file_gmsh_geo,
         is_set_labels=True,
+        is_mesh=False,
+        is_finalize=False,
     )
 
     # preprocess GMSH model to get rotor lamination and magnet and set boundary names
     lam_name = "lamination.msh"
     mag_name = "magnets.msh" if self.include_magnets else None
+    lam_file = join(save_dir, lam_name)
+    mag_file = join(save_dir, mag_name) if self.include_magnets else None
 
-    names = {}
-    _, _, names["Lamination"] = self.process_mesh(
-        file_gmsh_geo,
-        join(save_dir, lam_name),
-        is_get_lam=True,
-        is_get_magnet=False,
-    )
-
-    if self.include_magnets:
-        _, _, names["Magnets"] = self.process_mesh(
-            file_gmsh_geo,
-            join(save_dir, mag_name),
-            is_get_lam=False,
-            is_get_magnet=True,
-        )
+    kwargs = dict(is_get_magnet=True, is_hole_air=True)
+    mesh_names = self.process_mesh(gmsh_dict, lam_file, mag_file, **kwargs)
 
     # convert to ElmerGrid mesh
-    _gen_mesh(save_dir, "Mesh", lam_name, mag_name, self.get_logger())
+    _convert_mesh(save_dir, "Mesh", lam_name, mag_name, self.get_logger())
 
-    return names
+    return mesh_names
 
 
-def _gen_mesh(cwd, out_name, lam_name, mag_name=None, logger=None):
+def _convert_mesh(cwd, out_name, lam_name, mag_name=None, logger=None):
     """Convert the mesh from GMSH format to ElmerGrid format
 
     Parameters
