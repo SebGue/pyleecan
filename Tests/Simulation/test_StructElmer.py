@@ -19,28 +19,18 @@ from pyleecan.Functions.load import load
 # get the machine
 machine_1 = load(join(DATA_DIR, "Machine", "Toyota_Prius.json"))
 save_path = join(save_path, "StructElmer")
+
 # mesh settings, original line label names have to be used (not the translated)
-n1 = 3
-n2 = 20
+mm = 1e-3
 
 mesh_dict_1 = {
-    "Magnet_0_Top": n2,
-    "Magnet_0_Bottom": n2,
-    "Magnet_0_Left": n1,
-    "Magnet_0_Right": n1,
-    "Magnet_1_Top": n2,
-    "Magnet_1_Bottom": n2,
-    "Magnet_1_Left": n1,
-    "Magnet_1_Right": n1,
-    "Hole_0_Top": 0,
-    "Hole_0_Left": n1,
-    "Hole_0_Right": n1,
-    "Hole_1_Top": 0,
-    "Hole_1_Left": n1,
-    "Tangential_Bridge": 40,
-    "Radial_Bridge": 40,
-    "ROTOR_BORE_CURVE": 100,
-    "Lamination_Rotor_Bore_Radius_Ext": 100,
+    # define surface element sizes ...
+    "Rotor-0_HoleMag_R0-T0-S0": 1 * mm,
+    "Rotor-0_Lamination": 1 * mm,
+    "Rotor-0_HoleVoid_R0-T2-S0": 0.5 * mm,
+    # ... or number of elements per line (works only for lines with 'Boundary' property)
+    "Rotor-0_YokeSide-Right-0": 100,
+    "Rotor-0_LaminationYoke": 100,
 }
 
 
@@ -51,7 +41,6 @@ mesh_dict_1 = {
 class Test_StructElmer(object):
     """Test some basic workflow of StructElmer simulations"""
 
-    @pytest.mark.skip(reason="To be corrected")
     def test_StructElmer_HoleM50(self):
         """Test StructElmer simulation with 2 magnets on HoleM50 rotor"""
 
@@ -77,7 +66,6 @@ class Test_StructElmer(object):
 
         return output
 
-    @pytest.mark.skip(reason="To be corrected")
     def test_StructElmer_HoleM50_no_magnets(self):
         """Test StructElmer simulation without magnets on HoleM50 rotor"""
 
@@ -106,7 +94,6 @@ class Test_StructElmer(object):
 
         return output
 
-    @pytest.mark.skip(reason="To be corrected")
     def test_StructElmer_disk(self):
         """Test StructElmer simulation with disc geometry (i.e. slotless rotor)"""
         # TODO compare to analytical values
@@ -120,7 +107,7 @@ class Test_StructElmer(object):
         machine.rotor.Rext = machine_1.rotor.Rext
         machine.rotor.mat_type = machine_1.rotor.mat_type.copy()
 
-        machine.rotor.slot = SlotM11(H0=0, W0=pi / 16)
+        machine.rotor.slot = SlotM11(H0=0, W0=pi / 16, H1=1 * mm, W1=5 * mm)
         machine.rotor.slot.Zs = 8
         machine.rotor.is_stator = False
 

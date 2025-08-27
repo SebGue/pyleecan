@@ -43,7 +43,7 @@ def draw_surf_line(
     for ii, line in enumerate(surf.get_lines()):
         n_elem = None if not mesh_dict else mesh_dict[str(ii)]
         n_elem = n_elem if n_elem is not None else 0
-        n_elem = n_elem if line.prop_dict else 0 # only element size if line has props
+        # n_elem = n_elem if line.prop_dict else 0 # only element size if line has props
         bc_name = get_boundary_condition(line, boundary_prop)
         # Gmsh built-in engine does not allow arcs larger than 180deg
         # so arcs are split into two

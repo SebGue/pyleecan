@@ -55,7 +55,7 @@ def gen_mesh(self, output):
     lam_file = join(save_dir, lam_name)
     mag_file = join(save_dir, mag_name) if self.include_magnets else None
 
-    kwargs = dict(is_get_magnet=True, is_hole_air=True)
+    kwargs = dict(is_get_magnet=self.include_magnets, is_hole_air=True)
     mesh_names = self.process_mesh(gmsh_dict, lam_file, mag_file, **kwargs)
 
     # convert to ElmerGrid mesh
