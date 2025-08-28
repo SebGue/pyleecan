@@ -31,6 +31,9 @@ def get_slot_desc_list(self, sym=1, is_bore=True):
     op = self.slot.comp_angle_opening()
     Zs = self.slot.Zs
 
+    if Zs * op > 2 * pi:
+        self.get_logger().warning("Sum of slot opening angles > 360°.")
+
     for ii in range(Zs // sym):
         slot_dict = dict()
         slot_dict["begin_angle"] = 2 * pi / Zs * ii - op / 2 + pi / Zs

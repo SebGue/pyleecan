@@ -2,13 +2,11 @@
 from numpy import exp, pi
 
 from ...Classes.Arc1 import Arc1
-from ...Classes.Arc2 import Arc2
+from ...Classes.SurfRing import SurfRing
 from ...Classes.Circle import Circle
 from ...Classes.Segment import Segment
 from ...Classes.SurfLine import SurfLine
 from ...Functions.labels import (
-    AIRBOX_R_LAB,
-    NO_LAM_LAB,
     AIRBOX_LAB,
     BOUNDARY_PROP_LAB,
     AIRBOX_SR_LAB,
@@ -18,7 +16,7 @@ from ...Functions.labels import (
 
 
 def get_air_box(sym, machine):
-    """Returns  an outer surface surrounding the external lamination
+    """Returns an outer surface surrounding the external lamination
 
     Parameters
     ----------
@@ -33,25 +31,39 @@ def get_air_box(sym, machine):
         Outer surface (Air Box)
     """
     lam_list = machine.get_lam_list()
-    lam_int = lam_list[0]
     lam_ext = lam_list[1]
+    lab_ext = lam_ext.get_label()
 
     R_ext = lam_ext.get_Ryoke()
     R_ab = 1.5 * R_ext  # Default at 1.5 times external lam radius
 
     surf_list = list()
     if sym == 1:  # Complete machine
-        # TO-DO: Airbox Full Machine no implemented yet.
+
+        ext_cir = Circle(
+            center=0,
+            radius=R_ab,
+            label=lab_ext + "_" + AIRBOX_LAB,
+            point_ref=(R_ab / 2) * exp(1j * pi / 2),
+            prop_dict={BOUNDARY_PROP_LAB: lab_ext + "_" + AIRBOX_R_LAB},
+        )
+
+        int_cir = Circle(
+            center=0,
+            radius=R_ext,
+            label=lab_ext + "_" + AIRBOX_LAB,
+            point_ref=(R_ext / 2) * exp(1j * pi / 2),
+        )
 
         surf_list.append(
-            Circle(
-                center=0,
-                radius=R_ab,
-                label=NO_LAM_LAB + "_" + AIRBOX_LAB,
+            SurfRing(
+                out_surf=ext_cir,
+                in_surf=int_cir,
+                label=lab_ext + "_" + AIRBOX_LAB,
                 point_ref=(R_ab / 2) * exp(1j * pi / 2),
-                prop_dict={BOUNDARY_PROP_LAB: AIRBOX_R_LAB},
             )
         )
+
     else:  # Symmetry
         # Internal AirGap
         Z1 = R_ext
@@ -60,19 +72,27 @@ def get_air_box(sym, machine):
         Z3 = Z2 * exp(1j * 2 * pi / sym)
         airbox_lines = list()
         airbox_lines.append(
-            Segment(begin=Z1, end=Z2, prop_dict={BOUNDARY_PROP_LAB: AIRBOX_SR_LAB})
+            Segment(
+                begin=Z1,
+                end=Z2,
+                prop_dict={BOUNDARY_PROP_LAB: lab_ext + "_" + AIRBOX_SR_LAB},
+            )
         )
         airbox_lines.append(
             Arc1(
                 begin=Z2,
                 end=Z3,
                 radius=R_ab,
-                prop_dict={BOUNDARY_PROP_LAB: AIRBOX_R_LAB},
+                prop_dict={BOUNDARY_PROP_LAB: lab_ext + "_" + AIRBOX_R_LAB},
                 is_trigo_direction=True,
             )
         )
         airbox_lines.append(
-            Segment(begin=Z3, end=Z0, prop_dict={BOUNDARY_PROP_LAB: AIRBOX_SL_LAB})
+            Segment(
+                begin=Z3,
+                end=Z0,
+                prop_dict={BOUNDARY_PROP_LAB: lab_ext + "_" + AIRBOX_SL_LAB},
+            )
         )
         # airbox_lines.append(Arc2(begin=Z0, center=0.0, angle=-2 * pi / sym))
         airbox_lines.append(
@@ -87,7 +107,7 @@ def get_air_box(sym, machine):
             SurfLine(
                 line_list=airbox_lines,
                 # point_ref=0.0 * Z2 * exp(1j * pi / sym),
-                label=NO_LAM_LAB + "_" + AIRBOX_LAB,
+                label=lab_ext + "_" + AIRBOX_LAB,
             )
         )
 

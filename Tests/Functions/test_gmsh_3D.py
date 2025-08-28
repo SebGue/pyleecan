@@ -12,7 +12,7 @@ from pyleecan.Classes.SlotW10 import SlotW10
 from Tests import save_validation_path as save_path
 
 
-@pytest.mark.GMSH
+@pytest.mark.GMSH3D
 @pytest.mark.long_5s
 def test_slot_10():
     """Check generation of the 3D mesh of Slot 10 with gmsh"""

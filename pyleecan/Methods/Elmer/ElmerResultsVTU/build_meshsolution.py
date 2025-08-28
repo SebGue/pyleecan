@@ -28,8 +28,8 @@ def build_meshsolution(self):
         Information if meshsolution could be created
 
     """
-    # create meshsolution
-    meshsol = MeshSolution(label=self.label)
+    # create meshsolution, assume 3 dimensions
+    meshsol = MeshSolution(dimension=3, label=self.label)
 
     # get the mesh
     save_path, fn = split(self.file_path)
@@ -37,7 +37,7 @@ def build_meshsolution(self):
     if file_ext != ".vtu":
         raise ElmerResultsVTUError("ElmerResultsVTU: Results file must be of type VTU.")
 
-    meshvtk = MeshVTK(path=save_path, name=file_name, format="vtu")
+    meshvtk = MeshVTK(dimension=3, path=save_path, name=file_name, format="vtu")
     # TODO maybe convert to MeshMat before
     meshsol.mesh = meshvtk
 
@@ -92,6 +92,7 @@ def build_meshsolution(self):
             if siz == 1:
                 field = components[0]
                 solution = SolutionData(
+                    dimension=3,
                     field=field,
                     type_element="point",
                     label=self.store_dict[key]["symbol"],
@@ -110,6 +111,7 @@ def build_meshsolution(self):
                     components=comps,
                 )
                 solution = SolutionVector(
+                    dimension=3,
                     field=field,
                     type_element="point",
                     label=self.store_dict[key]["symbol"],

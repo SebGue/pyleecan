@@ -33,6 +33,10 @@ def get_path_save_fea(self, output):
     #     file_name = output.simu.name + "_model.fem"
     # else:  # Default name
     #     file_name = "FEMM_simulation.fem"
-    file_name = "ELMER_simulation"
+    sim_dir = "Simulation"
 
-    return join(save_dir, file_name)
+    save_dir = join(save_dir, sim_dir)
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+
+    return save_dir

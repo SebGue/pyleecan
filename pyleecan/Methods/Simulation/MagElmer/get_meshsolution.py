@@ -26,17 +26,17 @@ def get_meshsolution(self, output):
     meshsol: MeshSolution
         a MeshSolution object with Elmer outputs at every time step
     """
-    project_name = self.get_path_save_fea(output)
-    elmermesh_folder = project_name
+    res_dir = join(self.get_path_save_fea(output), "Results")
+
     meshsol = MeshSolution(label="Elmer MagnetoDynamics")
     if not self.is_get_mesh or not self.is_save_FEA:
         self.get_logger().info("MagElmer: MeshSolution is not stored by request.")
         return False
 
-    meshvtk = MeshVTK(path=elmermesh_folder, name="step_t0002", format="vtu")
+    meshvtk = MeshVTK(path=res_dir, name="step_t0002", format="vtu")
     meshsol.mesh = meshvtk
 
-    result_filename = join(elmermesh_folder, "step_t0002.vtu")
+    result_filename = join(res_dir, "step_t0002.vtu")
     meshsolvtu = read(result_filename)
     # pt_data = meshsolvtu.point_data
     cell_data = meshsolvtu.cell_data
