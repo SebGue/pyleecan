@@ -1,13 +1,7 @@
 # -*- coding: utf-8 -*-
-from numpy import pi, exp
+from numpy import pi
 
 from ....Classes.Lamination import Lamination
-from ....Classes.Circle import Circle
-from ....Classes.SurfLine import SurfLine
-from ....Classes.SurfRing import SurfRing
-from ....Classes.Arc1 import Arc1
-from ....Classes.Segment import Segment
-from ....Functions.labels import update_RTS_index
 from ....Functions.Geometry.transform_hole_surf import transform_hole_surf
 
 
@@ -34,20 +28,31 @@ def build_geometry(self, sym=1, alpha=0, delta=0, is_circular_radius=False):
 
     """
 
-    # getting the Lamination surface
-    surf_list = Lamination.build_geometry(
-        self, sym=sym, alpha=alpha, delta=delta, is_circular_radius=is_circular_radius
-    )
-
     # Holes surface(s)
+    hole_surf_list = []
     for hole in self.hole:
         # Create the first hole surface(s)
         surf_hole = hole.build_geometry(alpha=pi / hole.Zh)
-        surf_list.extend(
+        hole_surf_list.extend(
             transform_hole_surf(
-                hole_surf_list=surf_hole, Zh=hole.Zh, sym=sym, alpha=0, delta=0
+                hole_surf_list=surf_hole,
+                Zh=hole.Zh,
+                sym=sym,
+                alpha=0,
+                delta=0,
+                is_split=True,
             )
         )
+
+    # getting the Lamination surface
+    surf_list = Lamination.build_geometry(
+        self,
+        sym=sym,
+        alpha=alpha,
+        delta=delta,
+        is_circular_radius=is_circular_radius,
+        hole_surf_list=hole_surf_list,
+    )
 
     # Apply the transformations
     for surf in surf_list:

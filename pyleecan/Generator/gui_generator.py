@@ -520,6 +520,9 @@ def qrc_to_py(path, file_name):
     p = Popen(
         'qtpy-rcc "' + path_in + '" -o "' + path_out + '"', stdout=PIPE, shell=True
     )
+    # p = Popen(
+    #     'pyrcc5 "' + path_in + '" -o "' + path_out + '"', stdout=PIPE, shell=True
+    # )
     (output, err) = p.communicate()
 
     # Print the name of the converted file for check

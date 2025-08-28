@@ -65,7 +65,7 @@ def split_line(self, Z1, Z2, is_join=False, prop_dict_join=None):
 
 
 def join_surf_line(split_list, prop_dict_join):
-    """Join the surface to make sur the the surface is closed"""
+    """Join the surface to make sure the surface is closed"""
     final_list = list()
     for ii in range(len(split_list) - 1):
         final_list.append(split_list[ii])

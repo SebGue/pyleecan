@@ -12,7 +12,9 @@ from ....Functions.labels import (
 from ....Functions.Geometry.transform_hole_surf import transform_hole_surf
 
 
-def build_geometry(self, sym=1, alpha=0, delta=0, is_circular_radius=False):
+def build_geometry(
+    self, sym=1, alpha=0, delta=0, is_circular_radius=False, hole_surf_list=[]
+):
     """Build the geometry of the Lamination
 
     Parameters
@@ -27,6 +29,8 @@ def build_geometry(self, sym=1, alpha=0, delta=0, is_circular_radius=False):
         Complex value for translation
     is_circular_radius : bool
         True to add surfaces to "close" the Lamination radii
+    hole_surf_list : list
+        List of holes that should be added to the lamination
 
     Returns
     surf_list : list
@@ -77,6 +81,9 @@ def build_geometry(self, sym=1, alpha=0, delta=0, is_circular_radius=False):
             )
             vent_surf_list.extend(surf)
     surf_list.extend(vent_surf_list)
+
+    # Add the holes if there is any
+    surf_list.extend(hole_surf_list)
 
     # Add keys if any
     if self.notch is not None:
@@ -131,7 +138,12 @@ def build_geometry(self, sym=1, alpha=0, delta=0, is_circular_radius=False):
                 ZBR = None
                 ZBL = None
         right_list, left_list = self.build_yoke_side_line(
-            sym=sym, vent_surf_list=vent_surf_list, ZBR=ZBR, ZTR=ZTR, ZBL=ZBL, ZTL=ZTL
+            sym=sym,
+            surf_list=vent_surf_list + hole_surf_list,
+            ZBR=ZBR,
+            ZTR=ZTR,
+            ZBL=ZBL,
+            ZTL=ZTL,
         )
         # Create lines
         curve_list = list()

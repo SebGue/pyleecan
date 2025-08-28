@@ -84,16 +84,16 @@ def assign_FEMM_surface(femm, surf, prop, FEMM_dict, machine):
                     floor_divide(angle(point_ref, deg=True), alpha_p) + 0.5
                 ) * alpha_p
 
-                mag_dict = hole.comp_magnetization_dict()
+                # get magnetisation of actual pole
+                is_north = True
+                if isinstance(lam, LamHole) and (label_dict["S_id"] % 2) == 1:
+                    is_north = False
+                elif isinstance(lam, LamHoleNS) and hole in lam.hole_south:
+                    is_north = False
+
+                mag_dict = hole.comp_magnetization_dict(is_north=is_north)
                 mag = mag_0 + mag_dict["magnet_" + str(T_id)] * 180 / pi
 
-                # modifiy magnetisation of south poles
-                if isinstance(lam, LamHole):
-                    if (label_dict["S_id"] % 2) == 1:
-                        mag = mag + 180
-                elif isinstance(lam, LamHoleNS):
-                    if hole in lam.hole_south:
-                        mag = mag + 180
                 # Modify magnetisation for Tangential
                 if mag_obj.type_magnetization == 3:
                     mag = mag - 90

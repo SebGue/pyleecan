@@ -119,6 +119,8 @@ pixmap_dict = {
     "HoleM63_mag_int_rotor": ":/images/images/MachineSetup/SMHoleMag/HoleM63_mag_int_rotor.png",
     "HoleM63_empty_int_rotor_top_flat": ":/images/images/MachineSetup/SMHoleMag/HoleM63_empty_int_rotor_top_flat.png",
     "HoleM63_mag_int_rotor_top_flat": ":/images/images/MachineSetup/SMHoleMag/HoleM63_mag_int_rotor_top_flat.png",
+    "HoleM64_empty_int_rotor": ":/images/images/MachineSetup/SMHoleMag/HoleM64_empty_int_rotor.png",
+    "HoleM64_mag_int_rotor": ":/images/images/MachineSetup/SMHoleMag/HoleM64_mag_int_rotor.png",
     "SlotCirc_empty_ext_sta_old": ":/images/images/MachineSetup/WMSlot/SlotCirc_empty_ext_sta_old.png",
     "SlotCirc_empty_ext_stator": ":/images/images/MachineSetup/WMSlot/SlotCirc_empty_ext_stator.png",
     "SlotCirc_empty_int_rot_old": ":/images/images/MachineSetup/WMSlot/SlotCirc_empty_int_rot_old.png",

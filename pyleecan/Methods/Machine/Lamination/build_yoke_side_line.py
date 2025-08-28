@@ -10,9 +10,7 @@ DELTA = 1e-6
 from ....Classes.Segment import Segment
 
 
-def build_yoke_side_line(
-    self, sym, vent_surf_list, ZBR=None, ZTR=None, ZBL=None, ZTL=None
-):
+def build_yoke_side_line(self, sym, surf_list, ZBR=None, ZTR=None, ZBL=None, ZTL=None):
     """Define the Yoke Side lines of a Lamination by taking into account sym and vent
 
     Parameters
@@ -21,8 +19,8 @@ def build_yoke_side_line(
         a Lamination object
     sym : int
         Symmetry factor (1= full machine, 2= half of the machine...)
-    vent_surf_list :
-        List of the ventilation surfaces
+    surf_list :
+        List of the ventilation and hole surfaces
     ZBR : Complex
         Yoke Side Limit point Bottom Right
     ZTR : Complex
@@ -40,14 +38,14 @@ def build_yoke_side_line(
 
     # Find the ventilation lines that collide with the Yoke Side
     inter_line_list_R, inter_line_list_L = list(), list()
-    for surf in vent_surf_list:
+    for surf in surf_list:
         for line in surf.get_lines():
             if (
                 line.prop_dict is not None
                 and BOUNDARY_PROP_LAB in line.prop_dict
                 and YS_LAB in line.prop_dict[BOUNDARY_PROP_LAB]
             ):
-                # Find if the line collide on right or left
+                # Find if the line collide on right or left # TODO rather check for name
                 if abs(np_angle(line.get_middle())) < DELTA:
                     inter_line_list_R.append(line)
                 else:
@@ -97,22 +95,17 @@ def merge_line_list(Z1, Z2, label, inter_list):
     Zb = Z1  # Current Begin
     ii = 0  # Line index
     for line in inter_list:
-        line_list.append(
-            Segment(
-                Zb,
-                line.get_begin(),
-                prop_dict={BOUNDARY_PROP_LAB: label + "-" + str(ii)},
+        if Zb != line.get_begin():
+            line_list.append(
+                Segment(
+                    Zb,
+                    line.get_begin(),
+                    prop_dict={BOUNDARY_PROP_LAB: label + "-" + str(ii)},
+                )
             )
-        )
-        ii += 1
+            ii += 1
         line.prop_dict[BOUNDARY_PROP_LAB] = label + "-" + str(ii)
-        line_list.append(
-            Segment(
-                line.get_begin(),
-                line.get_end(),
-                prop_dict={BOUNDARY_PROP_LAB: label + "-" + str(ii)},
-            )
-        )
+        line_list.append(line.copy())
         ii += 1
         Zb = line.get_end()
     # Add last line (or Z1 to Z2 if no intersection)
