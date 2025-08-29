@@ -103,9 +103,9 @@ def build_geometry(self, alpha=0, delta=0, is_simplified=False):
     SM.label = mag_label + "T0-S0"
 
     # hole without magnet_0
-    hole_lines = upper_lines[:-2]
+    hole_lines = upper_lines[:-1]
     hole_lines += [magnet_lines[1]]
-    hole_lines += lower_lines[:-2]
+    hole_lines += lower_lines[:-1]
     hole_lines += [magnet_lines[3]]
     point_ref = (ZM1 + conjugate(ZM2)) / 2
     S10 = SurfLine(line_list=hole_lines, point_ref=point_ref)
