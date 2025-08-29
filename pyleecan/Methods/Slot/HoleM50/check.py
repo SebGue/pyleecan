@@ -64,8 +64,11 @@ def check(self):
     if self.H0 <= self.H1:
         raise S50_H01CheckError("You must have H1 < H0")
 
+    if self.W4 <= 0:
+        raise S50_W4CheckError("You must have W4 > 0")
+    
     if self.comp_W5() < 0:
-        raise S50_W5CheckError("You must have W5 >=0")
+        raise S50_W5CheckError("You must have W5 >= 0")
 
     alpha_0 = 2 * arcsin(self.W0 / (2 * (Rext - self.H1)))  # W0 in rad
     alpha_3 = 2 * arcsin(self.W3 / (2 * (Rext - self.H1)))  # W3 in rad
