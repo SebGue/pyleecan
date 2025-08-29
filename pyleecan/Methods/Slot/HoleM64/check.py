@@ -1,5 +1,5 @@
 from ....Methods.Slot.Slot import SlotCheckError
-from ....Methods.Slot.HoleM64 import *
+from ....Methods.Slot.HoleM64 import S64_ValueError, S64_NoneError
 
 
 def check(self):
@@ -34,10 +34,13 @@ def check(self):
         raise S64_NoneError("You must set R0 !")
 
     if (2 * self.R0) >= self.H2:
-        raise S64_WCheckError("You must have 2*R0 < H2")
+        raise S64_ValueError("You must have 2*R0 < H2")
 
     if self.R0 > self.W1:
-        raise S64_WCheckError("You must have R0 <= W1")
+        raise S64_ValueError("You must have R0 <= W1")
 
     if self.R0 > self.W3:
-        raise S64_WCheckError("You must have R0 <= W3")
+        raise S64_ValueError("You must have R0 <= W3")
+
+    if self.W2 <= 0:
+        raise S64_ValueError("You must have W2 > 0")

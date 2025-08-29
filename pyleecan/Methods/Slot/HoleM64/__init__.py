@@ -7,7 +7,7 @@ class S64_NoneError(SlotCheckError):
     pass
 
 
-class S64_WCheckError(SlotCheckError):
+class S64_ValueError(SlotCheckError):
     """ """
 
     pass
