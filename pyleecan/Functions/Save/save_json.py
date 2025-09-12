@@ -7,7 +7,7 @@ from os.path import isdir, isfile, join, split
 from shutil import move
 from numpy import int32
 
-from ... import __version__
+from ... import __version__, __commit__
 from ...Classes import get_class_dict
 from ...Classes._frozen import FrozenClass
 from ...definitions import PACKAGE_NAME
@@ -65,6 +65,7 @@ def save_json(
     now = datetime.now()
     obj["__save_date__"] = now.strftime("%Y_%m_%d %Hh%Mmin%Ss ")
     obj["__version__"] = PACKAGE_NAME + "_" + __version__
+    obj["__commit__"] = __commit__
 
     split_list = [{base_name: obj}]
 
