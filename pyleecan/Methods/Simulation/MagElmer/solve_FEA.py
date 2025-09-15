@@ -201,7 +201,7 @@ def _get_fields(field_file, out_dict, time, angle):
         data[var] = field_data[int(col_number) - 1, :]
 
     # extract field data
-    time = data["Timestep"]
+    time = data["Timestep"] if "Timestep" in data else data["Time step"] # Elmer > 9.0
     Br = out_dict["B_{rad}"]
     Bt = out_dict["B_{circ}"]
     Bz = out_dict["B_{ax}"]
