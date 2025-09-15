@@ -72,36 +72,38 @@ def _execute(binary_name, cwd, logger, parameter=None):
 # dictionary to match StructElmer FEA boundary conditions (dict values)
 # with pyleecan line boundary properties (dict keys)
 # that are set in the build_geometry methods
+BOUNDARY = "_BOUNDARY"
+MASTER = "_MASTER" + BOUNDARY
+SLAVE = "_SLAVE" + BOUNDARY
+
 StructElmer_BP_dict = dict()
 # Airgap Int/Bottom
-StructElmer_BP_dict[AS_BR_LAB] = "MASTER_ROTOR_BOUNDARY"
-StructElmer_BP_dict[AS_BL_LAB] = "SLAVE_ROTOR_BOUNDARY"
+StructElmer_BP_dict[AS_BR_LAB] = "AGS_B" + MASTER
+StructElmer_BP_dict[AS_BL_LAB] = "AGS_B" + SLAVE
 # Sliding Band Int/Bottom
-StructElmer_BP_dict[SBS_BR_LAB] = "MASTER_ROTOR_BOUNDARY"
-StructElmer_BP_dict[SBS_BL_LAB] = "SLAVE_ROTOR_BOUNDARY"
-StructElmer_BP_dict[SBR_B_LAB] = "SB_ROTOR_BOUNDARY"
+StructElmer_BP_dict[SBS_BR_LAB] = "SBS_B" + MASTER
+StructElmer_BP_dict[SBS_BL_LAB] = "SBS_B" + SLAVE
+StructElmer_BP_dict[SBR_B_LAB] = "SB_BOTTOM" + BOUNDARY
 
 # Lamination/Shaft
 StructElmer_BP_dict[R_LAB + LAM_LAB + BORE_LAB] = "ROTOR_BORE_CURVE"
-StructElmer_BP_dict[R_LAB + YSR_LAB] = "MASTER_ROTOR_BOUNDARY"  # Rotor Yoke Side Right
-StructElmer_BP_dict[R_LAB + YSL_LAB] = "SLAVE_ROTOR_BOUNDARY"  # Rotor Yoke Side Left
-StructElmer_BP_dict[S_LAB + YSR_LAB] = (
-    "MASTER_STATOR_BOUNDARY"  # Stator Yoke Side Right
-)
-StructElmer_BP_dict[S_LAB + YSL_LAB] = "SLAVE_STATOR_BOUNDARY"  # Stator Yoke Side Left
-StructElmer_BP_dict[SHAFTSR_LAB] = "MASTER_ROTOR_BOUNDARY"  # Shaft Side Right
-StructElmer_BP_dict[SHAFTSL_LAB] = "SLAVE_ROTOR_BOUNDARY"  # Shaft Side Left
+StructElmer_BP_dict[R_LAB + YSR_LAB] = "ROTOR" + MASTER
+StructElmer_BP_dict[R_LAB + YSL_LAB] = "ROTOR" + SLAVE  
+StructElmer_BP_dict[S_LAB + YSR_LAB] = "STATOR" + MASTER
+StructElmer_BP_dict[S_LAB + YSL_LAB] = "STATOR" + SLAVE
+StructElmer_BP_dict[SHAFTSR_LAB] = "SHAFT" + MASTER
+StructElmer_BP_dict[SHAFTSL_LAB] = "SHAFT" + SLAVE
 # Airbox
-StructElmer_BP_dict[AIRBOX_R_LAB] = "VP0_BOUNDARY"
-StructElmer_BP_dict[AIRBOX_SR_LAB] = "MASTER_STATOR_BOUNDARY"
-StructElmer_BP_dict[AIRBOX_SL_LAB] = "SLAVE_STATOR_BOUNDARY"
+StructElmer_BP_dict[AIRBOX_R_LAB] = "VP0" + BOUNDARY
+StructElmer_BP_dict[AIRBOX_SR_LAB] = "ABS" + MASTER
+StructElmer_BP_dict[AIRBOX_SL_LAB] = "ABS" + SLAVE
 # Airgap Top/Ext
-StructElmer_BP_dict[AS_TR_LAB] = "MASTER_STATOR_BOUNDARY"
-StructElmer_BP_dict[AS_TL_LAB] = "SLAVE_STATOR_BOUNDARY"
-StructElmer_BP_dict[AR_T_LAB] = "AIRGAP_ARC_BOUNDARY"
-StructElmer_BP_dict[SBS_TR_LAB] = "MASTER_STATOR_BOUNDARY"
-StructElmer_BP_dict[SBS_TL_LAB] = "SLAVE_STATOR_BOUNDARY"
-StructElmer_BP_dict[SBR_T_LAB] = "SB_STATOR_BOUNDARY"
+StructElmer_BP_dict[AS_TR_LAB] =  "AGS_T" + MASTER
+StructElmer_BP_dict[AS_TL_LAB] =  "AGS_T" + SLAVE
+StructElmer_BP_dict[AR_T_LAB] = "AIRGAP_ARC" + BOUNDARY
+StructElmer_BP_dict[SBS_TR_LAB] = "SBS_T" + MASTER
+StructElmer_BP_dict[SBS_TL_LAB] = "SBS_T" + SLAVE
+StructElmer_BP_dict[SBR_T_LAB] = "SB_TOP" + BOUNDARY
 
 
 # List of all StructElmer Boundary conditions

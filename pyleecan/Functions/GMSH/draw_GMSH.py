@@ -438,11 +438,22 @@ def _set_default_boundaries(output, model, factory, gmsh_dict, boundary_prop):
 
     # set default boundary conditions in gmsh lines
     boundary_list = list(set(boundary_prop.values()))
-    for propname in boundary_list:
+    bc_names = []
+    for line in line_list:
+        bc_name = line["bc_name"]
+        if bc_name:
+            parts = bc_name.rsplit("_", 1)
+            if len(parts) == 2 and parts[1].isdigit() and parts[0] in boundary_list:
+                bc_names.append(bc_name)
+            elif bc_name in boundary_list:
+                bc_names.append(bc_name)
+    bc_names = list(set(bc_names))
+    
+    for bc_name in bc_names:
         # get relevant lines
         bc_line_list = []
         for line in line_list:
-            if line["bc_name"] == propname:
+            if line["bc_name"] == bc_name:
                 bc_line_list.append(line.copy())
 
         # update line tag
@@ -453,7 +464,7 @@ def _set_default_boundaries(output, model, factory, gmsh_dict, boundary_prop):
 
         if new_bc_lines:
             tags = list(set([line["tag"] for line in new_bc_lines]))  # remove dup.
-            model.addPhysicalGroup(1, tags, name=propname)
+            model.addPhysicalGroup(1, tags, name=bc_name)
             factory.synchronize()
 
 

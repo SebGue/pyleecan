@@ -6,6 +6,7 @@ from numpy import pi
 from ....Classes.Section import Section
 from ....Classes.SolverInputFile import SolverInputFile
 from ....Methods.Elmer.Section import File, Variable, MATC
+from ....Methods.Simulation.StructElmer import MASTER, SLAVE
 
 
 # constants
@@ -242,25 +243,29 @@ def gen_case(self, output, mesh_names):
             boundaries.append(bnd)
 
     # no normal displacement on lamination sides
-    i += 1
-    bnd = Section(section="Boundary Condition", id=i)
-    bnd["Name"] = "MASTER_ROTOR_BOUNDARY"
-    bnd["Displacement 1"] = 0.0
-    bnd["Normal-Tangential Displacement"] = True
-    bnd["Save Line"] = True
-    bnd["Save Scalars"] = True
-    bnd["MASTER_ROTOR_BOUNDARY"] = True  # mask name for SaveLine and SaveScalar
-    boundaries.append(bnd)
+    paired_bnds = [name for name in names if MASTER in name]
+    for master_name in paired_bnds:
+        slave_name = master_name.replace(MASTER, SLAVE)
+        if slave_name in names:
+            i += 1
+            bnd = Section(section="Boundary Condition", id=i)
+            bnd["Name"] = master_name
+            bnd["Displacement 1"] = 0.0
+            bnd["Normal-Tangential Displacement"] = True
+            bnd["Save Line"] = True
+            bnd["Save Scalars"] = True
+            bnd[master_name] = True  # mask name for SaveLine and SaveScalar
+            boundaries.append(bnd)
 
-    i += 1
-    bnd = Section(section="Boundary Condition", id=i)
-    bnd["Name"] = "SLAVE_ROTOR_BOUNDARY"
-    bnd["Displacement 1"] = 0.0
-    bnd["Normal-Tangential Displacement"] = True
-    bnd["Save Line"] = True
-    bnd["Save Scalars"] = True
-    bnd["SLAVE_ROTOR_BOUNDARY"] = True  # mask name for SaveLine and SaveScalar
-    boundaries.append(bnd)
+            i += 1
+            bnd = Section(section="Boundary Condition", id=i)
+            bnd["Name"] = slave_name
+            bnd["Displacement 1"] = 0.0
+            bnd["Normal-Tangential Displacement"] = True
+            bnd["Save Line"] = True
+            bnd["Save Scalars"] = True
+            bnd[slave_name] = True  # mask name for SaveLine and SaveScalar
+            boundaries.append(bnd)
 
     i += 1  # Boundary to save line values
     bnd = Section(section="Boundary Condition", id=i)

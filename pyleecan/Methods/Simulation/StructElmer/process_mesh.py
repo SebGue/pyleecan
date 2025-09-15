@@ -13,6 +13,8 @@ from ....Functions.labels import (
     LAM_LAB_S,
 )
 
+from ....Methods.Simulation.StructElmer import MASTER, SLAVE
+
 from numpy import array, dot, linalg
 
 
@@ -96,8 +98,8 @@ def process_mesh(
 
     # add boundaries to keep to groups_dict
     keeper_list = [
-        "MASTER_ROTOR_BOUNDARY",
-        "SLAVE_ROTOR_BOUNDARY",
+        "ROTOR" + MASTER,
+        "ROTOR" + SLAVE,
         "Rotor_Tangential_Bridge",
         "Rotor_Radial_Bridge",
         "ROTOR_BORE_CURVE",
@@ -106,10 +108,11 @@ def process_mesh(
     for line in lam_lines:
         names = _get_names_physical(gmsh, dimtag=[1, line])
         for key in keeper_list:
-            if any([key in name for name in names]):
-                if key not in groups_dict:
-                    groups_dict[key] = []
-                groups_dict[key].append((1, line))
+            for name in names:
+                if key in name:
+                    if name not in groups_dict:
+                        groups_dict[name] = []
+                    groups_dict[name].append((1, line))
 
     # # update group names
     # grps = model.getPhysicalGroups(-1)

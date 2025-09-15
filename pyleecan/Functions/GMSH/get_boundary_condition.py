@@ -15,14 +15,21 @@ def get_boundary_condition(line, boundary_prop):
     label : string
         boundary name
     """
-    # The id index at the end of lamination label is removed because
-    # MagElemer and StructElmer dictionaries don't support it
+    bc_name = ""
     if line.prop_dict and BOUNDARY_PROP_LAB in line.prop_dict:
-        label_with_id = line.prop_dict[BOUNDARY_PROP_LAB]
-        if "-0" in label_with_id[-2:] or "-1" in label_with_id[-2:]:
-            label_without_id = label_with_id[:-2]
+        label = line.prop_dict[BOUNDARY_PROP_LAB]
+        parts = label.rsplit("-", 1)  # split from right side into 2 parts
+        if len(parts) == 2 and parts[1].isdigit():
+            label_without_id = parts[0]
+            line_id = parts[1]
         else:
-            label_without_id = label_with_id
+            label_without_id = label
+            line_id = None
+        
         if label_without_id in boundary_prop:
-            return boundary_prop[label_without_id]
-    return ""
+            bc_name = boundary_prop[label_without_id]
+        
+        if line_id:
+            bc_name += f"_{line_id}"
+    
+    return bc_name
