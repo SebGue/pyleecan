@@ -11,8 +11,12 @@ from ....Functions.labels import (
 
 from ....Functions.Geometry.transform_hole_surf import transform_hole_surf
 
+from numpy import pi, exp
 
-def build_geometry(self, sym=1, alpha=0, delta=0, is_circular_radius=False):
+
+def build_geometry(
+    self, sym=1, alpha=0, delta=0, is_circular_radius=False, hole_surf_list=[]
+):
     """Build the geometry of the Lamination
 
     Parameters
@@ -27,6 +31,8 @@ def build_geometry(self, sym=1, alpha=0, delta=0, is_circular_radius=False):
         Complex value for translation
     is_circular_radius : bool
         True to add surfaces to "close" the Lamination radii
+    hole_surf_list : list
+        List of holes that should be added to the lamination
 
     Returns
     surf_list : list
@@ -78,6 +84,9 @@ def build_geometry(self, sym=1, alpha=0, delta=0, is_circular_radius=False):
             vent_surf_list.extend(surf)
     surf_list.extend(vent_surf_list)
 
+    # Add the holes if there is any
+    surf_list.extend(hole_surf_list)
+
     # Add keys if any
     if self.notch is not None:
         for ii, notch in enumerate(self.notch):
@@ -90,24 +99,20 @@ def build_geometry(self, sym=1, alpha=0, delta=0, is_circular_radius=False):
 
     # Create the Lamination surfaces
     point_ref = self.comp_point_ref(sym=sym)
+    surf_yoke = None
     if sym == 1:  # Complete lamination
         ext_surf = SurfLine(label=label_ext, line_list=ext_line, point_ref=point_ref)
         int_surf = SurfLine(label=label_int, line_list=int_line, point_ref=0)
         if self.Rint > 0 and len(ext_line) > 0:
-            surf_list.insert(
-                0,
-                SurfRing(
-                    out_surf=ext_surf,
-                    in_surf=int_surf,
-                    label=label_lam,
-                    point_ref=point_ref,
-                ),  # First in list for plot
+            surf_yoke = SurfRing(
+                out_surf=ext_surf,
+                in_surf=int_surf,
+                label=label_lam,
+                point_ref=point_ref,
             )
         elif self.Rint == 0 and len(ext_line) > 0:
-            surf_list.insert(0, ext_surf)  # First in list for plot
-        elif self.Rint == self.Rext:  # No lamination
-            pass  # No surface to draw
-        elif len(ext_line) == 0:  # (SlotM17)
+            surf_yoke = ext_surf
+        elif self.Rint == self.Rext or len(ext_line) == 0:
             pass  # No surface to draw / No lamination
     # Part of the lamination by symmetry
     elif sym != 1 and len(ext_line) > 0 and self.Rint != self.Rext:
@@ -131,7 +136,12 @@ def build_geometry(self, sym=1, alpha=0, delta=0, is_circular_radius=False):
                 ZBR = None
                 ZBL = None
         right_list, left_list = self.build_yoke_side_line(
-            sym=sym, vent_surf_list=vent_surf_list, ZBR=ZBR, ZTR=ZTR, ZBL=ZBL, ZTL=ZTL
+            sym=sym,
+            surf_list=vent_surf_list + hole_surf_list,
+            ZBR=ZBR,
+            ZTR=ZTR,
+            ZBL=ZBL,
+            ZTL=ZTL,
         )
         # Create lines
         curve_list = list()
@@ -148,7 +158,34 @@ def build_geometry(self, sym=1, alpha=0, delta=0, is_circular_radius=False):
             curve_list.extend(int_line)
 
         surf_yoke = SurfLine(line_list=curve_list, label=label_lam, point_ref=point_ref)
-        surf_list.insert(0, surf_yoke)  # First in list for plot
+
+    if surf_yoke:
+        # First in list for plot
+        surf_list.insert(0, surf_yoke)
+
+        # get new reference point for surf_yoke if it is inside a hole, vent, ...
+        if any([surf for surf in surf_list[1:] if surf.is_inside(point_ref)]):
+            ref_angle = pi / sym if sym != 1 else 0
+            Z0, Z1 = 0, exp(1j * ref_angle)
+            Zi = []
+            for surf in surf_list:
+                if sym == 1:
+                    zi = [zi for zi in surf.intersect_line(Z0, Z1) if zi.real > 0]
+                else:
+                    zi = surf.intersect_line(Z0, Z1)
+                Zi.extend(zi)
+
+            Zi = list(set([round(zi, 9) for zi in Zi]))  # only unique values
+            Zi.sort(key=abs, reverse=not self.is_internal)
+
+            new_ref = 1 / 2 * (Zi[0] + Zi[1])
+            surf_yoke.point_ref = new_ref
+            if sym == 1:  # Complete lamination
+                ext_surf.point_ref = new_ref
+            # self.get_logger().warning(
+            #     "Lamination.build_geometry: "
+            #     + "No valid reference point found."
+            # )
 
     # apply the transformation
     for surf in surf_list:
