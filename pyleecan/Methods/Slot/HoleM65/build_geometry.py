@@ -96,7 +96,7 @@ def build_geometry(self, alpha=0, delta=0, is_simplified=False):
     curve_list.append(Arc1(begin=Z6s, end=Z7s, radius=-R, is_trigo_direction=False))
     curve_list.append(Segment(Z7s, Z2s))
     curve_list.append(Arc1(begin=Z2s, end=Z3s, radius=-R, is_trigo_direction=False))
-    curve_list.append(Segment(Z4s, Z0s))
+    curve_list.append(Segment(Z3s, Z0s))
     point_ref = (Z1s + Z7s) / 2
     S0 = SurfLine(line_list=curve_list, point_ref=point_ref)
 
