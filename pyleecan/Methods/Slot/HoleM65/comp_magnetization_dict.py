@@ -24,9 +24,9 @@ def comp_magnetization_dict(self, is_north=True):
 
     mag_dict = dict()
     S0 = Segment(point_dict["ZM4s"], point_dict["ZM3s"])
-    mag_dict["magnet_0"] = S0.comp_normal()
+    mag_dict["magnet_0"] = S0.comp_normal() + pi
     S1 = Segment(point_dict["ZM3"], point_dict["ZM4"])
-    mag_dict["magnet_1"] = S1.comp_normal()
+    mag_dict["magnet_1"] = S1.comp_normal() + pi
 
     if not is_north:
         mag_dict["magnet_0"] += pi
