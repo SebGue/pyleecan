@@ -188,20 +188,21 @@ def plot_schematics(
             fontsize=SC_FONT_SIZE,
         )
         # W4 - magnet offset
-        line = Segment(
-            point_dict["Zs"] * exp(1j * alpha),
-            (point_dict["ZM2s"] + point_dict["ZM3s"]) / 2 * exp(1j * alpha),
-        )
-        line.plot(
-            fig=fig,
-            ax=ax,
-            color=ARROW_COLOR,
-            linewidth=ARROW_WIDTH,
-            label="W4",
-            offset_label=(1 + 1j) * self.H0 * 0.25,
-            is_arrow=True,
-            fontsize=SC_FONT_SIZE,
-        )
+        if type_add_active == 2:
+            line = Segment(
+                point_dict["Zs"] * exp(1j * alpha),
+                (point_dict["ZM2s"] + point_dict["ZM3s"]) / 2 * exp(1j * alpha),
+            )
+            line.plot(
+                fig=fig,
+                ax=ax,
+                color=ARROW_COLOR,
+                linewidth=ARROW_WIDTH,
+                label="W4",
+                offset_label=(1 + 1j) * self.H0 * 0.25,
+                is_arrow=True,
+                fontsize=SC_FONT_SIZE,
+            )
         # H1 - magnet height
         line = Segment(
             point_dict["ZM1s"] * exp(1j * alpha),
