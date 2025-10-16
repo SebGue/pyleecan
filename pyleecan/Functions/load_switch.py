@@ -64,6 +64,7 @@ load_switch = {
     "HoleM62": HoleM62,
     "HoleM63": HoleM63,
     "HoleM64": HoleM64,
+    "HoleM65": HoleM65,
     "HoleMLSRPM": HoleMLSRPM,
     "HoleMag": HoleMag,
     "HoleUD": HoleUD,

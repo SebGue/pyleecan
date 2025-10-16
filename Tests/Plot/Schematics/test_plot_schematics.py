@@ -54,6 +54,7 @@ from pyleecan.Classes.HoleM61 import HoleM61
 from pyleecan.Classes.HoleM62 import HoleM62
 from pyleecan.Classes.HoleM63 import HoleM63
 from pyleecan.Classes.HoleM64 import HoleM64
+from pyleecan.Classes.HoleM65 import HoleM65
 from Tests import SCHEMATICS_PATH
 from Tests import SCHEMATICS_POINT_PATH
 from os.path import join, isdir, isfile
@@ -123,6 +124,7 @@ Hole_list = [
     HoleM62(),
     HoleM63(),
     HoleM64(),
+    HoleM65(),
 ]
 
 
@@ -614,6 +616,11 @@ if __name__ == "__main__":
         a.test_plot_point(test_obj)
 
     test_objs = [obj for obj in plot_test if isinstance(obj['test_obj'], HoleM60)]
+    for test_obj in test_objs:
+        a.test_plot(test_obj)
+        a.test_plot_point(test_obj)
+
+    test_objs = [obj for obj in plot_test if isinstance(obj['test_obj'], HoleM65)]
     for test_obj in test_objs:
         a.test_plot(test_obj)
         a.test_plot_point(test_obj)

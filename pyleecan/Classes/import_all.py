@@ -62,6 +62,7 @@ from ..Classes.HoleM61 import HoleM61
 from ..Classes.HoleM62 import HoleM62
 from ..Classes.HoleM63 import HoleM63
 from ..Classes.HoleM64 import HoleM64
+from ..Classes.HoleM65 import HoleM65
 from ..Classes.HoleMLSRPM import HoleMLSRPM
 from ..Classes.HoleMag import HoleMag
 from ..Classes.HoleUD import HoleUD

@@ -2995,6 +2995,7 @@
             "HoleM62",
             "HoleM63",
             "HoleM64",
+            "HoleM65",
             "HoleMLSRPM",
             "HoleMag",
             "HoleUD",
@@ -4672,6 +4673,137 @@
                 "max": "",
                 "min": "",
                 "name": "magnet_0",
+                "size": "0",
+                "type": "Magnet",
+                "unit": "-",
+                "value": ""
+            }
+        ]
+    },
+    "HoleM65": {
+        "constants": [
+            {
+                "name": "VERSION",
+                "value": "1"
+            },
+            {
+                "name": "IS_SYMMETRICAL",
+                "value": "1"
+            }
+        ],
+        "daughters": [],
+        "desc": "V shape slot for buried magnet",
+        "is_internal": false,
+        "methods": [
+            "_comp_point_coordinate",
+            "build_geometry",
+            "plot_schematics",
+            "remove_magnet",
+            "comp_surface_magnet_id",
+            "comp_radius",
+            "has_magnet",
+            "check",
+            "comp_magnetization_dict"
+        ],
+        "mother": "HoleMag",
+        "name": "HoleM65",
+        "package": "Slot",
+        "path": "pyleecan/Generator/ClassesRef/Slot/HoleM65.csv",
+        "properties": [
+            {
+                "as_dict": "",
+                "desc": "Magnet width",
+                "max": "",
+                "min": "0",
+                "name": "W1",
+                "size": "0",
+                "type": "float",
+                "unit": "m",
+                "value": 0.01
+            },
+            {
+                "as_dict": "",
+                "desc": "Hole width",
+                "max": "",
+                "min": "0",
+                "name": "W2",
+                "size": "0",
+                "type": "float",
+                "unit": "m",
+                "value": 0.012
+            },
+            {
+                "as_dict": "",
+                "desc": "Tooth width",
+                "max": "",
+                "min": "0",
+                "name": "W3",
+                "size": "0",
+                "type": "float",
+                "unit": "m",
+                "value": 0.002
+            },
+            {
+                "as_dict": "",
+                "desc": "Magnet offset",
+                "max": "",
+                "min": "0",
+                "name": "W4",
+                "size": "0",
+                "type": "float",
+                "unit": "m",
+                "value": 0.001
+            },
+            {
+                "as_dict": "",
+                "desc": "Distance from the lamination bore",
+                "max": "",
+                "min": "0",
+                "name": "H0",
+                "size": "0",
+                "type": "float",
+                "unit": "m",
+                "value": 0.001
+            },
+            {
+                "as_dict": "",
+                "desc": "Magnet height",
+                "max": "",
+                "min": "0",
+                "name": "H1",
+                "size": "0",
+                "type": "float",
+                "unit": "m",
+                "value": 0.005
+            },
+            {
+                "as_dict": "",
+                "desc": "Edge radius",
+                "max": "",
+                "min": "0",
+                "name": "R",
+                "size": "0",
+                "type": "float",
+                "unit": "m",
+                "value": 0.0001
+            },
+            {
+                "as_dict": "",
+                "desc": "First Magnet",
+                "max": "",
+                "min": "",
+                "name": "magnet_0",
+                "size": "0",
+                "type": "Magnet",
+                "unit": "-",
+                "value": ""
+            },
+            {
+                "as_dict": "",
+                "desc": "Second Magnet",
+                "max": "",
+                "min": "",
+                "name": "magnet_1",
                 "size": "0",
                 "type": "Magnet",
                 "unit": "-",
