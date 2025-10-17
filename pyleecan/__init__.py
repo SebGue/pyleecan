@@ -15,9 +15,13 @@ else:
 __version__ = "1.5.2"
 
 try:
-    __commit__ = subprocess.check_output(
-        ["git", "rev-parse", "HEAD"], cwd=os.path.dirname(os.path.abspath(__file__))
-    ).strip().decode("utf-8")
+    __commit__ = (
+        subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=os.path.dirname(os.path.abspath(__file__))
+        )
+        .strip()
+        .decode("utf-8")
+    )
 except Exception:
     __commit__ = ""
 

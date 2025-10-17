@@ -67,7 +67,7 @@ def draw_GMSH(
         True to run mesh generation and save mesh file except geo file is requested
     is_finalize : bool
         True to finalize model creation, otherwise model object is returned in output dict
-        
+
     Returns
     -------
     GMSH_dict : dict
@@ -351,9 +351,9 @@ def draw_GMSH(
     if is_finalize:
         gmsh.finalize()
     else:
-        gmsh_dict['gmsh'] = gmsh
-        gmsh_dict['model'] = model
-        gmsh_dict['factory'] = factory
+        gmsh_dict["gmsh"] = gmsh
+        gmsh_dict["model"] = model
+        gmsh_dict["factory"] = factory
 
     return gmsh_dict
 

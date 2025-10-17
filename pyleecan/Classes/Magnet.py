@@ -15,6 +15,29 @@ from ..Functions.Load.import_class import import_class
 from copy import deepcopy
 from ._frozen import FrozenClass
 
+# Import all class method
+# Try/catch to remove unnecessary dependencies in unused method
+try:
+    from ..Methods.Machine.Magnet.get_Hc import get_Hc
+except ImportError as error:
+    get_Hc = error
+
+try:
+    from ..Methods.Machine.Magnet.get_Brm import get_Brm
+except ImportError as error:
+    get_Brm = error
+
+try:
+    from ..Methods.Machine.Magnet.get_mur_lin import get_mur_lin
+except ImportError as error:
+    get_mur_lin = error
+
+try:
+    from ..Methods.Machine.Magnet.get_rho_elec import get_rho_elec
+except ImportError as error:
+    get_rho_elec = error
+
+
 from numpy import isnan
 from ._check import InitUnKnowClassError
 
@@ -24,6 +47,45 @@ class Magnet(FrozenClass):
 
     VERSION = 1
 
+    # Check ImportError to remove unnecessary dependencies in unused method
+    # cf Methods.Machine.Magnet.get_Hc
+    if isinstance(get_Hc, ImportError):
+        get_Hc = property(
+            fget=lambda x: raise_(
+                ImportError("Can't use Magnet method get_Hc: " + str(get_Hc))
+            )
+        )
+    else:
+        get_Hc = get_Hc
+    # cf Methods.Machine.Magnet.get_Brm
+    if isinstance(get_Brm, ImportError):
+        get_Brm = property(
+            fget=lambda x: raise_(
+                ImportError("Can't use Magnet method get_Brm: " + str(get_Brm))
+            )
+        )
+    else:
+        get_Brm = get_Brm
+    # cf Methods.Machine.Magnet.get_mur_lin
+    if isinstance(get_mur_lin, ImportError):
+        get_mur_lin = property(
+            fget=lambda x: raise_(
+                ImportError("Can't use Magnet method get_mur_lin: " + str(get_mur_lin))
+            )
+        )
+    else:
+        get_mur_lin = get_mur_lin
+    # cf Methods.Machine.Magnet.get_rho_elec
+    if isinstance(get_rho_elec, ImportError):
+        get_rho_elec = property(
+            fget=lambda x: raise_(
+                ImportError(
+                    "Can't use Magnet method get_rho_elec: " + str(get_rho_elec)
+                )
+            )
+        )
+    else:
+        get_rho_elec = get_rho_elec
     # generic save method is available in all object
     save = save
     # get_logger method is available in all object

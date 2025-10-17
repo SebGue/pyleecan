@@ -5,4 +5,7 @@ Lmag,-,Magnet axial length,0,float,0.95,0,
 Nseg,,Number of segments,,int,1,1,
 ,
 Package,Inherit,Methods,Constant Name,Constant Value,Class description
-Machine,,,VERSION,1,Magnet class
+Machine,,get_Hc,VERSION,1,Magnet class
+,,get_Brm,,,
+,,get_mur_lin,,,
+,,get_rho_elec,,,

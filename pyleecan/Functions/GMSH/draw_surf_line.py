@@ -47,7 +47,7 @@ def draw_surf_line(
         bc_name = get_boundary_condition(line, boundary_prop)
         # Gmsh built-in engine does not allow arcs larger than 180deg
         # so arcs are split into two
-        # TODO utilize OCC kernel to have 180° circles 
+        # TODO utilize OCC kernel to have 180° circles
         if isinstance(line, Arc) and abs(line.get_angle() * 180.0 / pi) >= 180.0:
             rot_dir = 1 if line.is_trigo_direction == True else -1
             kwargs = dict(
@@ -62,7 +62,7 @@ def draw_surf_line(
             # Don't draw anything, this is a circle and usually is repeated ? TODO check
             lines = []
         # for debugging
-        # if isinstance(line, Arc) and abs(line.get_angle() * 180.0 / pi) == 180.0: 
+        # if isinstance(line, Arc) and abs(line.get_angle() * 180.0 / pi) == 180.0:
         #     lines = [line]
         else:
             lines = [line]

@@ -1,0 +1,9 @@
+Variable name,Unit,Description (EN),Size,Type,Default value,Minimum value,Maximum value,as_dict Type
+hGap,m,Gap to Lamination over Magnet Height,0,float,0.0005,0,
+wGap,m,Gap to Lamination over Magnet Width,0,float,0.0005,0,
+,
+Package,Inherit,Methods,Constant Name,Constant Value,Class description
+Machine,Magnet,get_Hc,VERSION,1,Magnet for Hole Rotors with Gap
+,,get_Brm,,,
+,,get_mur_lin,,,
+,,get_rho_elec,,,

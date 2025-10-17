@@ -4952,6 +4952,7 @@
             "HoleM62",
             "HoleM63",
             "HoleM64",
+            "HoleM65",
             "HoleMLSRPM",
             "HoleUD"
         ],
@@ -8679,10 +8680,17 @@
                 "value": "1"
             }
         ],
-        "daughters": [],
+        "daughters": [
+            "MagnetWithGap"
+        ],
         "desc": "Magnet class",
         "is_internal": false,
-        "methods": [],
+        "methods": [
+            "get_Hc",
+            "get_Brm",
+            "get_mur_lin",
+            "get_rho_elec"
+        ],
         "mother": "",
         "name": "Magnet",
         "package": "Machine",
@@ -8731,6 +8739,51 @@
                 "type": "int",
                 "unit": "",
                 "value": 1
+            }
+        ]
+    },
+    "MagnetWithGap": {
+        "constants": [
+            {
+                "name": "VERSION",
+                "value": "1"
+            }
+        ],
+        "daughters": [],
+        "desc": "Magnet for Hole Rotors with Gap",
+        "is_internal": false,
+        "methods": [
+            "get_Hc",
+            "get_Brm",
+            "get_mur_lin",
+            "get_rho_elec"
+        ],
+        "mother": "Magnet",
+        "name": "MagnetWithGap",
+        "package": "Machine",
+        "path": "pyleecan/Generator/ClassesRef/Machine/MagnetWithGap.csv",
+        "properties": [
+            {
+                "as_dict": "",
+                "desc": "Gap to Lamination over Magnet Height",
+                "max": "",
+                "min": "0",
+                "name": "hGap",
+                "size": "0",
+                "type": "float",
+                "unit": "m",
+                "value": 0.0005
+            },
+            {
+                "as_dict": "",
+                "desc": "Gap to Lamination over Magnet Width",
+                "max": "",
+                "min": "0",
+                "name": "wGap",
+                "size": "0",
+                "type": "float",
+                "unit": "m",
+                "value": 0.0005
             }
         ]
     },

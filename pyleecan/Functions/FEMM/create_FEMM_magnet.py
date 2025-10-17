@@ -23,9 +23,9 @@ def create_FEMM_magnet(femm, is_mmf, is_eddies, materials, mag_obj, T_mag):
 
     """
 
-    rho = mag_obj.mat_type.elec.rho  # Resistivity
-    Hcm = mag_obj.mat_type.mag.get_Hc(T_op=T_mag)  # Magnet coercitivity field
-    mur = mag_obj.mat_type.mag.mur_lin
+    rho = mag_obj.get_rho_elec()  # Resistivity
+    Hcm = mag_obj.get_Hc(T_op=T_mag)  # Magnet coercitivity field
+    mur = mag_obj.get_mur_lin()
 
     mat_name = mag_obj.mat_type.name
     if mat_name not in materials:

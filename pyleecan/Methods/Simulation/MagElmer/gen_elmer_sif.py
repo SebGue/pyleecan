@@ -555,7 +555,7 @@ def gen_elmer_sif(self, output, sym, angle, time, angle_rotor, Is, Ir):
         fo.write("\t!Discontinuous Galerkin = {0}\n".format("Logical True"))
         fo.write("\tLinear System Solver = {0}\n".format("Direct"))
         fo.write("\tLinear System Iterative Method  = {0}\n".format("MUMPS"))
-                 
+
         fo.write("End\n")
 
         fo.write("\nSolver 4\n")
