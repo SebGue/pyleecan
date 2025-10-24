@@ -17,4 +17,4 @@ def get_rho_elec(self):
     """
     rho = self.mat_type.elec.rho
 
-    return Hc
+    return rho
