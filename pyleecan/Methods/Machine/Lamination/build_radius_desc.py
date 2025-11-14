@@ -5,6 +5,8 @@ from ....Classes.Arc3 import Arc3
 from ....Functions.Geometry.merge_notch_list import merge_notch_list
 
 
+EPS = 1e-12  # TODO import geometrical tolerance, i.e. use global value
+
 def build_radius_desc(self, is_bore, sym=1):
     """This method returns an ordered description of the slot/notch
     that defines the bore/yoke radius of the lamination
@@ -90,7 +92,7 @@ def build_radius_desc(self, is_bore, sym=1):
         radius_desc.append(all_desc_list[ii])
         begin = all_desc_list[ii]["end_angle"]
         end = all_desc_list[ii + 1]["begin_angle"]
-        if begin != end:  # begin = end for "full slot / no tooth"
+        if abs(begin - end) >= EPS:  # begin = end for "full slot / no tooth"
             radius_desc.append(
                 {
                     "begin_angle": begin,
