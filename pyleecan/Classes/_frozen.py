@@ -66,17 +66,16 @@ class FrozenClass(object):
             True if self == other
         """
 
-        if isinstance(other, self.__class__):
-            for attr in self.__dict__:
-                if isinstance(self.__dict__[attr], ndarray):
-                    if not array_equal(self.__dict__[attr], other.__dict__[attr]):
-                        return False
-                else:
-                    if self.__dict__[attr] != other.__dict__[attr]:
-                        return False
-            return True
-        else:
+        if not isinstance(other, self.__class__):
             return False
+        for attr in self.__dict__:
+            if isinstance(self.__dict__[attr], ndarray):
+                if not array_equal(self.__dict__[attr], other.__dict__[attr]):
+                    return False
+            else:
+                if self.__dict__[attr] != other.__dict__[attr]:
+                    return False
+        return True
 
     def __ne__(self, other):
         """Call __eq__
