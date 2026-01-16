@@ -207,20 +207,20 @@ def draw_GMSH(
         ext_lam_loop = None
         rotor_cloops = list()
         # loop though all (surface) entries of the rotor lamination
-        for s_data in gmsh_dict.values():
-            lloop = []
+        for surfaceData in gmsh_dict.values():
+            lineloop = []
             # skip this surface dataset if it is the origin
-            if s_data["label"] == "origin":
+            if surfaceData["label"] == "origin":
                 continue
 
             # build a lineloop of the surfaces lines
-            for lvalues in s_data.values():
+            for lvalues in surfaceData.values():
                 if type(lvalues) is not dict:
                     continue
-                lloop.extend([lvalues["tag"]])
-            cloop = factory.addCurveLoop(lloop)
+                lineloop.extend([lvalues["tag"]])
+            cloop = factory.addCurveLoop(lineloop)
 
-            label_dict = decode_label(s_data["label"])
+            label_dict = decode_label(surfaceData["label"])
             if (
                 MAG_LAB in label_dict["surf_type"]
                 or HOLEM_LAB_S in label_dict["surf_type"]
@@ -268,7 +268,7 @@ def draw_GMSH(
         pg = model.addPhysicalGroup(2, [gmsh_dict[lam_rotor_surf_id]["tag"]])
         model.setPhysicalName(2, pg, gmsh_dict[lam_rotor_surf_id]["label"])
         # rotor_cloops = lam_and_holes
-
+        
     # store rotor dict
     rotor_dict = gmsh_dict.copy()
 
@@ -327,10 +327,10 @@ def draw_GMSH(
                 mesh_size_S,
             )
 
-        for s_data in gmsh_dict.values():
-            lloop = []
+        for surfaceData in gmsh_dict.values():
+            lineloop = []
             # skip this surface dataset if it is the origin
-            if s_data["label"] == "origin":
+            if surfaceData["label"] == "origin":
                 continue
 
             if sym == 1:
@@ -814,15 +814,15 @@ def draw_GMSH(
             mesh_size_AB,
         )
 
-    for s_id, s_data in gmsh_dict.items():
-        lloop = []
+    for s_id, surfaceData in gmsh_dict.items():
+        lineloop = []
         if s_id == 0:
             continue
-        for lvalues in s_data.values():
-            if AIRBOX_LAB in decode_label(s_data["label"])["surf_type"]:
+        for lvalues in surfaceData.values():
+            if AIRBOX_LAB in decode_label(surfaceData["label"])["surf_type"]:
                 if type(lvalues) is not dict:
                     continue
-                lloop.extend([lvalues["tag"]])
+                lineloop.extend([lvalues["tag"]])
             else:
                 continue
         if lloop:
@@ -836,8 +836,8 @@ def draw_GMSH(
     boundary_list = list(set(boundary_prop.values()))
     for propname in boundary_list:
         bc_id = []
-        for s_data in gmsh_dict.values():
-            for lvalues in s_data.values():
+        for surfaceData in gmsh_dict.values():
+            for lvalues in surfaceData.values():
                 if type(lvalues) is not dict:
                     continue
                 if lvalues["bc_name"] == propname:
@@ -850,8 +850,8 @@ def draw_GMSH(
     # Set all line labels as physical groups
     if is_set_labels:
         groups = {}
-        for s_data in gmsh_dict.values():
-            for lvalues in s_data.values():
+        for surfaceData in gmsh_dict.values():
+            for lvalues in surfaceData.values():
                 if (
                     type(lvalues) is not dict
                     or "label" not in lvalues

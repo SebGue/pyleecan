@@ -62,9 +62,11 @@ def build_geometry(self, alpha=0, delta=0, is_simplified=False):
         curve_list.append(Segment(Z3, Z11))
         curve_list.append(Segment(Z7, Z10))
     else:
-        curve_list.append(Segment(Z4, Z11))
+        curve_list.append(Segment(Z4, Z3))
+        curve_list.append(Segment(Z3, Z11))
         curve_list.append(Segment(Z11, Z10))
-        curve_list.append(Segment(Z10, Z6))
+        curve_list.append(Segment(Z10, Z7))
+        curve_list.append(Segment(Z7, Z6))
         curve_list.append(Segment(Z6, Z4))
     point_ref = (Z11 + Z4 + Z6 + Z10) / 4
     S2 = SurfLine(line_list=curve_list, label=mag_label + "T0-S0", point_ref=point_ref)

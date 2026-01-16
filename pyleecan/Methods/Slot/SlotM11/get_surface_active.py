@@ -41,6 +41,7 @@ def get_surface_active(self, alpha=0, delta=0):
     else:
         curve_list.append(Segment(ZM1, ZM2))
 
+    # top of magnet
     if self.is_outwards():
         curve_list.append(
             Arc1(ZM2, ZM3, (Rbo + self.H0 - self.H1), is_trigo_direction=True)
@@ -49,6 +50,10 @@ def get_surface_active(self, alpha=0, delta=0):
         curve_list.append(
             Arc1(ZM2, ZM3, (Rbo - self.H0 + self.H1), is_trigo_direction=True)
         )
+    # left magnet side
+    if self.W0 == self.W1 and self.H0 < self.H1 and self.H0 > 0 and self.H0 != self.H1:
+        curve_list.append(Segment(ZM3, Z4))
+        curve_list.append(Segment(Z4, ZM4))
 
     # Case Z3-Z4 overlapping with ZM3-ZM4
     if self.H0 != 0 and self.H0 < self.H1 and self.W0 == self.W1:
