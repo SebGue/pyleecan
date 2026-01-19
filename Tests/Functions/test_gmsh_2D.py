@@ -283,6 +283,9 @@ def encode_complex(z):
 
 
 if __name__ == "__main__":
+    for file_path in get_test_files(join(DATA_DIR, "Machine")):
+        test_gmsh_machines(file_path)
+        
     # gmsh_dict = test_gmsh_ipm()
     # gmsh_dict = test_gmsh_spm()
     # test_gmsh_benchmark()
